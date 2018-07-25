@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1968E0AE14B8E8A90E194980 /* PyHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 1968EF7567E06D2A5BB3481A /* PyHandler.m */; };
 		544FBD4521064AEB008A260C /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544FBD4421064AEB008A260C /* Python.framework */; };
 		544FBD4721064B2F008A260C /* getFeed.py in Resources */ = {isa = PBXBuildFile; fileRef = 544FBD4621064B2F008A260C /* getFeed.py */; };
 		544FBD4921064DF0008A260C /* feedparser521.py in Resources */ = {isa = PBXBuildFile; fileRef = 544FBD4821064DF0008A260C /* feedparser521.py */; };
@@ -17,10 +18,11 @@
 		54ACC28C21061B3C0020715F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28B21061B3C0020715F /* main.m */; };
 		54ACC29521061E270020715F /* NewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29421061E270020715F /* NewsController.m */; };
 		54ACC29821061FBA0020715F /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29721061FBA0020715F /* Preferences.m */; };
-		54ED7BDA2107CE5500AC8248 /* PyHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54ED7BD92107CE5500AC8248 /* PyHandler.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1968E7919BAA36F042FCB717 /* PyHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PyHandler.h; sourceTree = "<group>"; };
+		1968EF7567E06D2A5BB3481A /* PyHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PyHandler.m; sourceTree = "<group>"; };
 		544FBD4421064AEB008A260C /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		544FBD4621064B2F008A260C /* getFeed.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = getFeed.py; sourceTree = "<group>"; usesTabs = 0; };
 		544FBD4821064DF0008A260C /* feedparser521.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = feedparser521.py; sourceTree = "<group>"; usesTabs = 0; };
@@ -37,7 +39,6 @@
 		54ACC29421061E270020715F /* NewsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NewsController.m; sourceTree = "<group>"; };
 		54ACC29621061FBA0020715F /* Preferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		54ACC29721061FBA0020715F /* Preferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
-		54ED7BD92107CE5500AC8248 /* PyHandler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PyHandler.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +61,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		549369F421091E6D001AF895 /* python */ = {
+			isa = PBXGroup;
+			children = (
+				1968E7919BAA36F042FCB717 /* PyHandler.h */,
+				1968EF7567E06D2A5BB3481A /* PyHandler.m */,
+				544FBD4621064B2F008A260C /* getFeed.py */,
+				544FBD4821064DF0008A260C /* feedparser521.py */,
+			);
+			path = python;
+			sourceTree = "<group>";
+		};
 		54ACC27321061B3B0020715F = {
 			isa = PBXGroup;
 			children = (
@@ -80,9 +92,7 @@
 		54ACC27E21061B3B0020715F /* baRSS */ = {
 			isa = PBXGroup;
 			children = (
-				54ED7BD92107CE5500AC8248 /* PyHandler.cpp */,
-				544FBD4621064B2F008A260C /* getFeed.py */,
-				544FBD4821064DF0008A260C /* feedparser521.py */,
+				549369F421091E6D001AF895 /* python */,
 				54ACC27F21061B3B0020715F /* AppDelegate.h */,
 				54ACC28021061B3B0020715F /* AppDelegate.m */,
 				54ACC29321061E270020715F /* NewsController.h */,
@@ -179,9 +189,9 @@
 				54ACC29521061E270020715F /* NewsController.m in Sources */,
 				54ACC28421061B3B0020715F /* baRSS.xcdatamodeld in Sources */,
 				54ACC28C21061B3C0020715F /* main.m in Sources */,
-				54ED7BDA2107CE5500AC8248 /* PyHandler.cpp in Sources */,
 				54ACC28121061B3B0020715F /* AppDelegate.m in Sources */,
 				54ACC29821061FBA0020715F /* Preferences.m in Sources */,
+				1968E0AE14B8E8A90E194980 /* PyHandler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -313,6 +323,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_CXX0X_EXTENSIONS = YES;
+				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
+				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				CODE_SIGN_ENTITLEMENTS = baRSS/baRSS.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -322,6 +336,11 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_STRICT_SELECTOR_MATCH = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
 				INFOPLIST_FILE = baRSS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -340,6 +359,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_CXX0X_EXTENSIONS = YES;
+				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
+				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
+				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				CODE_SIGN_ENTITLEMENTS = baRSS/baRSS.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -349,6 +372,11 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_STRICT_SELECTOR_MATCH = YES;
+				GCC_WARN_UNKNOWN_PRAGMAS = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
 				INFOPLIST_FILE = baRSS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

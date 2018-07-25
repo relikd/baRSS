@@ -102,13 +102,7 @@ def prepareResult(obj):
 
 
 def parse(url, etag=None, modified=None):
-    print "mod:", modified
     if isinstance(modified, list):
         modified = time.struct_time(modified)
-    print url
-    print etag
-    print modified
-    return '[{"name":"joe","title":"none"},{"value":24}]'
-    # d = fp.parse(url, etag=etag, modified=modified)
-    # return json.dumps(prepareResult(d), separators=(',', ':'))
-
+    d = fp.parse(url, etag=etag, modified=modified)
+    return json.dumps(prepareResult(d), separators=(',', ':'))
