@@ -21,7 +21,7 @@
 //  SOFTWARE.
 
 #import "AppDelegate.h"
-#import "PyHandler.cpp"
+#import "PyHandler.h"
 
 @interface AppDelegate ()
 @property (strong) NSStatusItem *statusItem;
@@ -35,20 +35,21 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-	// Insert code here to initialize your application
 	self.statusItem = [NSStatusBar.systemStatusBar statusItemWithLength:NSVariableStatusItemLength];
 	self.statusItem.title = @"me";
 	self.statusItem.menu = self.statusMenu;
-	int a[] = {2017,8,9,13,9,59,0,0,0};
 	printf("will init\n");
-	pyhandler_init();
+	[PyHandler prepare];
 	printf("done\n");
-	printf("%s", pyhandler_getWithDateArr([@"https://feeds.feedburner.com/simpledesktops" UTF8String], NULL, a));
+	NSDictionary * obj = [PyHandler getFeed:@"https://feeds.feedburner.com/simpledesktops" withEtag:nil andModified:nil];
+	NSLog(@"obj = %@", obj);
 	[self quitClicked:nil];
 }
 
+
+
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
-	// Insert code here to tear down your application
+	[PyHandler shutdown];
 }
 
 #pragma mark - Core Data stack
