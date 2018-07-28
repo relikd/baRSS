@@ -41,9 +41,6 @@
 	printf("will init\n");
 	[PyHandler prepare];
 	printf("done\n");
-	NSDictionary * obj = [PyHandler getFeed:@"https://feeds.feedburner.com/simpledesktops" withEtag:nil andModified:nil];
-	NSLog(@"obj = %@", obj);
-	[self quitClicked:nil];
 }
 
 
@@ -60,7 +57,7 @@
     // The persistent container for the application. This implementation creates and returns a container, having loaded the store for the application to it.
     @synchronized (self) {
         if (_persistentContainer == nil) {
-            _persistentContainer = [[NSPersistentContainer alloc] initWithName:@"baRSS"];
+            _persistentContainer = [[NSPersistentContainer alloc] initWithName:@"DBv1"];
             [_persistentContainer loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription *storeDescription, NSError *error) {
                 if (error != nil) {
                     // Replace this implementation with code to handle the error appropriately.

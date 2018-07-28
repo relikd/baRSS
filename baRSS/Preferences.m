@@ -31,11 +31,12 @@
 @end
 
 @implementation Preferences
-
-- (void)windowDidLoad {
-    [super windowDidLoad];
-    NSLog(@"%@", @"hi");
-    // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
+- (void)awakeFromNib {
+	[super awakeFromNib];
+	if (self.window.contentView.subviews.count == 0) {
+		self.window.contentView = self.viewGeneral;
+		self.toolbar.selectedItemIdentifier = self.toolbar.items.firstObject.itemIdentifier;
+	}
 }
 
 - (IBAction)clickGeneral:(NSToolbarItem *)sender {

@@ -12,12 +12,12 @@
 		544FBD4721064B2F008A260C /* getFeed.py in Resources */ = {isa = PBXBuildFile; fileRef = 544FBD4621064B2F008A260C /* getFeed.py */; };
 		544FBD4921064DF0008A260C /* feedparser521.py in Resources */ = {isa = PBXBuildFile; fileRef = 544FBD4821064DF0008A260C /* feedparser521.py */; };
 		54ACC28121061B3B0020715F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28021061B3B0020715F /* AppDelegate.m */; };
-		54ACC28421061B3B0020715F /* baRSS.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28221061B3B0020715F /* baRSS.xcdatamodeld */; };
 		54ACC28621061B3C0020715F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54ACC28521061B3C0020715F /* Assets.xcassets */; };
 		54ACC28921061B3C0020715F /* Main.xib in Resources */ = {isa = PBXBuildFile; fileRef = 54ACC28721061B3C0020715F /* Main.xib */; };
 		54ACC28C21061B3C0020715F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28B21061B3C0020715F /* main.m */; };
 		54ACC29521061E270020715F /* NewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29421061E270020715F /* NewsController.m */; };
 		54ACC29821061FBA0020715F /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29721061FBA0020715F /* Preferences.m */; };
+		54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,7 +29,7 @@
 		54ACC27C21061B3B0020715F /* baRSS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = baRSS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		54ACC27F21061B3B0020715F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		54ACC28021061B3B0020715F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		54ACC28321061B3B0020715F /* baRRS.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = baRRS.xcdatamodel; sourceTree = "<group>"; };
+		54ACC28321061B3B0020715F /* DBv1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DBv1.xcdatamodel; sourceTree = "<group>"; };
 		54ACC28521061B3C0020715F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		54ACC28821061B3C0020715F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Main.xib; sourceTree = "<group>"; };
 		54ACC28A21061B3C0020715F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -104,7 +104,7 @@
 				54ACC28A21061B3C0020715F /* Info.plist */,
 				54ACC28B21061B3C0020715F /* main.m */,
 				54ACC28D21061B3C0020715F /* baRSS.entitlements */,
-				54ACC28221061B3B0020715F /* baRSS.xcdatamodeld */,
+				54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */,
 			);
 			path = baRSS;
 			sourceTree = "<group>";
@@ -142,6 +142,9 @@
 						CreatedOnToolsVersion = 9.4.1;
 						LastSwiftMigration = 0940;
 						SystemCapabilities = {
+							com.apple.ApplicationGroups.Mac = {
+								enabled = 0;
+							};
 							com.apple.Sandbox = {
 								enabled = 1;
 							};
@@ -186,8 +189,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */,
 				54ACC29521061E270020715F /* NewsController.m in Sources */,
-				54ACC28421061B3B0020715F /* baRSS.xcdatamodeld in Sources */,
 				54ACC28C21061B3C0020715F /* main.m in Sources */,
 				54ACC28121061B3B0020715F /* AppDelegate.m in Sources */,
 				54ACC29821061FBA0020715F /* Preferences.m in Sources */,
@@ -413,13 +416,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		54ACC28221061B3B0020715F /* baRSS.xcdatamodeld */ = {
+		54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				54ACC28321061B3B0020715F /* baRRS.xcdatamodel */,
+				54ACC28321061B3B0020715F /* DBv1.xcdatamodel */,
 			);
-			currentVersion = 54ACC28321061B3B0020715F /* baRRS.xcdatamodel */;
-			path = baRSS.xcdatamodeld;
+			currentVersion = 54ACC28321061B3B0020715F /* DBv1.xcdatamodel */;
+			path = DBv1.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

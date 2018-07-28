@@ -21,33 +21,66 @@
 //  SOFTWARE.
 
 #import "NewsController.h"
+#import "PyHandler.h"
+#import "AppDelegate.h"
+#import "DBv1+CoreDataModel.h"
 
 @interface NewsController ()
 @property (weak) IBOutlet NSMenuItem *pauseItem;
 @property (weak) IBOutlet NSMenuItem *updateAllItem;
 @property (weak) IBOutlet NSMenuItem *openUnreadItem;
-@property (weak) IBOutlet NSManagedObjectContext *managedObjectContext;
+@property (retain) NSManagedObjectContext *managedContext;
 @end
 
 @implementation NewsController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    // Do view setup here.
+- (void)awakeFromNib {
+    [super awakeFromNib];
+	self.managedContext = [((AppDelegate*)[NSApp delegate]) persistentContainer].viewContext;
 }
+
 - (IBAction)pauseUpdates:(NSMenuItem *)sender {
 	NSLog(@"pause");
-	NSLog(@"%@", self.managedObjectContext);
+	NSLog(@"%@", self.managedContext);
 }
 - (IBAction)updateAllFeeds:(NSMenuItem *)sender {
 	NSLog(@"update all");
+	NSDictionary * obj = [PyHandler getFeed:@"https://feeds.feedburner.com/simpledesktops" withEtag:nil andModified:nil];
+	NSLog(@"obj = %@", obj);
+	// TODO: check status code
+	/*
+	Feed *a = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:self.managedContext];
+	a.title = obj[@"feed"][@"title"];
+	a.subtitle = obj[@"feed"][@"subtitle"];
+	a.author = obj[@"feed"][@"author"];
+	a.link = obj[@"feed"][@"link"];
+	a.published = obj[@"feed"][@"published"];
+	a.icon = obj[@"feed"][@"icon"];
+	a.etag = obj[@"header"][@"etag"];
+	a.date = obj[@"header"][@"date"];
+	a.modified = obj[@"header"][@"modified"];
+	for (NSDictionary *entry in obj[@"entries"]) {
+		FeedItem *b = [[FeedItem alloc] initWithEntity:FeedItem.entity insertIntoManagedObjectContext:self.managedContext];
+		b.title = entry[@"title"];
+		b.subtitle = entry[@"subtitle"];
+		b.author = entry[@"author"];
+		b.link = entry[@"link"];
+		b.published = entry[@"published"];
+		b.summary = entry[@"summary"];
+		for (NSString *tag in entry[@"tags"]) {
+			FeedTag *c = [[FeedTag alloc] initWithEntity:FeedTag.entity insertIntoManagedObjectContext:self.managedContext];
+			c.name = tag;
+			[b addTagsObject:c];
+		}
+		[a addItemsObject:b];
+	}*/
 }
 - (IBAction)openAllUnread:(NSMenuItem *)sender {
 	NSLog(@"all unread");
 }
 - (IBAction)addFeed:(NSButton *)sender {
 	NSLog(@"add feed");
-	NSLog(@"%@", self.managedObjectContext);
+	NSLog(@"%@", self.managedContext);
 }
 - (IBAction)removeFeed:(NSButton *)sender {
 	NSLog(@"del feed");
