@@ -21,7 +21,6 @@
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <customObject id="he0-Eb-PDA" customClass="NewsController">
             <connections>
-                <outlet property="managedObjectContext" destination="ESi-qE-Dj9" id="Nnv-1A-WLk"/>
                 <outlet property="openUnreadItem" destination="Qqw-Xj-oA5" id="8df-is-Qop"/>
                 <outlet property="pauseItem" destination="D7r-Vb-9eO" id="o7e-jD-3Yj"/>
                 <outlet property="updateAllItem" destination="wgp-fa-8Wj" id="edP-bQ-bIM"/>
@@ -447,7 +446,6 @@
             </subviews>
             <point key="canvasLocation" x="350" y="903.5"/>
         </customView>
-        <managedObjectContext id="ESi-qE-Dj9"/>
         <userDefaultsController representsSharedInstance="YES" id="K8S-BW-Na6"/>
     </objects>
     <resources>
