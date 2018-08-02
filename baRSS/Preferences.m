@@ -21,13 +21,15 @@
 //  SOFTWARE.
 
 #import "Preferences.h"
-#import "AppDelegate.h"
+#import "NewsController.h"
 
 @interface Preferences ()
 @property (weak) IBOutlet NSToolbar *toolbar;
 @property (weak) IBOutlet NSView *viewGeneral;
 @property (weak) IBOutlet NSView *viewFeeds;
-@property (weak) IBOutlet AppDelegate *appDelegate;
+
+@property (weak) IBOutlet NewsController *newsController;
+@property (weak) IBOutlet NSOutlineView *feedsOutline;
 @end
 
 @implementation Preferences
@@ -53,12 +55,33 @@
 
 - (void)keyDown:(NSEvent *)event {
 	if (event.modifierFlags & NSEventModifierFlagCommand) {
-		if ([event.characters isEqualToString:@"w"]) {
-			[self close];
-		} else if ([event.characters isEqualToString:@"q"]) {
-			[self.appDelegate quitClicked:self];
+		bool holdShift = event.modifierFlags & NSEventModifierFlagShift;
+		@try {
+			unichar key = [event.characters characterAtIndex:0];
+			switch (key) {
+				case 'w': [self close]; break;
+				case 'q': [NSApplication.sharedApplication terminate:self]; break;
+			}
+			if (self.window.contentView == self.viewFeeds) { // these only apply for NSOutlineView
+				switch (key) {
+					case 'z':
+						if (holdShift) [self.newsController.managedObjectContext.undoManager redo];
+						else           [self.newsController.managedObjectContext.undoManager undo];
+						[self.newsController rearrangeObjects]; // update the ordering
+						break;
+					case 'n': [self.newsController addFeed:nil]; break;
+					case 'o': break; // open .opml file
+					case 's': break; // save data or backup .opml file
+					case 'c': // copy row entry
+						[self.newsController copyDescriptionOfSelectedItems];
+						break;
+					case 'a': [self.feedsOutline selectAll:nil]; break;
+					// TODO: delete
+				}
+			}
+		} @catch (NSException *exception) {
+			NSLog(@"%@", event);
 		}
-		// TODO: new, delete, ...
 	}
 }
 

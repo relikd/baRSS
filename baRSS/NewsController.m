@@ -26,22 +26,28 @@
 #import "DBv1+CoreDataModel.h"
 
 @interface NewsController ()
+@property (weak) IBOutlet NSOutlineView *outlineView;
 @property (weak) IBOutlet NSMenuItem *pauseItem;
 @property (weak) IBOutlet NSMenuItem *updateAllItem;
 @property (weak) IBOutlet NSMenuItem *openUnreadItem;
-@property (retain) NSManagedObjectContext *managedContext;
+
+@property (strong) NSArray<NSTreeNode*> *currentlyDraggedNodes;
 @end
 
 @implementation NewsController
 
+// Declare a string constant for the drag type - to be used when writing and retrieving pasteboard data...
+static NSString *dragNodeType = @"baRSS-feed-type";
+
 - (void)awakeFromNib {
     [super awakeFromNib];
-	self.managedContext = [((AppDelegate*)[NSApp delegate]) persistentContainer].viewContext;
+	// Set the outline view to accept the custom drag type AbstractTreeNodeType...
+	[self.outlineView registerForDraggedTypes:[NSArray arrayWithObject:dragNodeType]];
+	[self setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];
 }
 
 - (IBAction)pauseUpdates:(NSMenuItem *)sender {
 	NSLog(@"pause");
-	NSLog(@"%@", self.managedContext);
 }
 - (IBAction)updateAllFeeds:(NSMenuItem *)sender {
 	NSLog(@"update all");
@@ -49,7 +55,7 @@
 	NSLog(@"obj = %@", obj);
 	// TODO: check status code
 	/*
-	Feed *a = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:self.managedContext];
+	Feed *a = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:self.managedObjectContext];
 	a.title = obj[@"feed"][@"title"];
 	a.subtitle = obj[@"feed"][@"subtitle"];
 	a.author = obj[@"feed"][@"author"];
@@ -60,7 +66,7 @@
 	a.date = obj[@"header"][@"date"];
 	a.modified = obj[@"header"][@"modified"];
 	for (NSDictionary *entry in obj[@"entries"]) {
-		FeedItem *b = [[FeedItem alloc] initWithEntity:FeedItem.entity insertIntoManagedObjectContext:self.managedContext];
+		FeedItem *b = [[FeedItem alloc] initWithEntity:FeedItem.entity insertIntoManagedObjectContext:self.managedObjectContext];
 		b.title = entry[@"title"];
 		b.subtitle = entry[@"subtitle"];
 		b.author = entry[@"author"];
@@ -68,45 +74,157 @@
 		b.published = entry[@"published"];
 		b.summary = entry[@"summary"];
 		for (NSString *tag in entry[@"tags"]) {
-			FeedTag *c = [[FeedTag alloc] initWithEntity:FeedTag.entity insertIntoManagedObjectContext:self.managedContext];
+			FeedTag *c = [[FeedTag alloc] initWithEntity:FeedTag.entity insertIntoManagedObjectContext:self.managedObjectContext];
 			c.name = tag;
 			[b addTagsObject:c];
 		}
 		[a addItemsObject:b];
 	}*/
 }
+
 - (IBAction)openAllUnread:(NSMenuItem *)sender {
 	NSLog(@"all unread");
 }
+
 - (IBAction)addFeed:(NSButton *)sender {
 	NSLog(@"add feed");
-	NSLog(@"%@", self.managedContext);
 }
-- (IBAction)removeFeed:(NSButton *)sender {
-	NSLog(@"del feed");
-}
+
 - (IBAction)addGroup:(NSButton *)sender {
+	FeedConfig *g = [[FeedConfig alloc] initWithEntity:FeedConfig.entity insertIntoManagedObjectContext:self.managedObjectContext];
+	g.name = @"Group";
+	g.type = 0;
 	NSLog(@"add group");
 }
+
 - (IBAction)addSeparator:(NSButton *)sender {
 	NSLog(@"add separator");
+	//	[self.managedObjectContext.undoManager beginUndoGrouping];
+	//	[self.managedObjectContext.undoManager endUndoGrouping];
 }
 
-
-- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item {
-	return 1;
+- (NSString*)copyDescriptionOfSelectedItems {
+	NSMutableString *str = [[NSMutableString alloc] init];
+	for (FeedConfig *item in self.selectedObjects) {
+		[self traverseChildren:item appendString:str indentation:0];
+	}
+	[[NSPasteboard generalPasteboard] clearContents];
+	[[NSPasteboard generalPasteboard] setString:str forType:NSPasteboardTypeString];
+	NSLog(@"%@", str);
+	return str;
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item {
-	return NO;
+- (void)traverseChildren:(FeedConfig*)obj appendString:(NSMutableString*)str indentation:(int)indent {
+	for (int i = indent; i > 0; i--) {
+		[str appendString:@"  "];
+	}
+	switch (obj.type) {
+		case 0: [str appendFormat:@"%@:\n", obj.name]; break; // Group
+		case 2: [str appendString:@"-------------\n"]; break; // Separator
+		default: [str appendFormat:@"%@ (%@) - %@\n", obj.name, obj.url, obj.refresh];
+	}
+	for (FeedConfig *child in obj.children) {
+		[self traverseChildren:child appendString:str indentation:indent + 1];
+	}
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item {
-	return @"du";
+- (FeedConfig*)insertNewItemAtCurrentSelection {
+	FeedConfig *selected = [[[self arrangedObjects] descendantNodeAtIndexPath:[self selectionIndexPath]] representedObject];
+	FeedConfig *newItem = [[FeedConfig alloc] initWithEntity:FeedConfig.entity insertIntoManagedObjectContext:self.managedObjectContext];
+	if (selected.type == 0) // a group
+		newItem.sortIndex = (int32_t)selected.children.count;
+	else
+		newItem.sortIndex = selected.sortIndex + 1;
+	return newItem;
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item {
-	return @"hi";
+- (void)incrementIndicesBy:(int)val forSubsequentNodes:(NSIndexPath*)path {
+	NSIndexPath *parentPath = [path indexPathByRemovingLastIndex];
+	NSTreeNode *root = [self arrangedObjects];
+	if (parentPath.length > 0)
+		root = [root descendantNodeAtIndexPath:parentPath];
+	
+	for (NSUInteger i = [path indexAtPosition:path.length - 1]; i < root.childNodes.count; i++) {
+		((FeedConfig*)[root.childNodes[i] representedObject]).sortIndex += val;
+	}
+}
+
+#pragma mark - Dragging Support, Data Source Delegate
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard {
+	[self.managedObjectContext.undoManager beginUndoGrouping];
+	[pboard declareTypes:[NSArray arrayWithObject:dragNodeType] owner:self];
+	[pboard setString:@"dragging" forType:dragNodeType];
+	self.currentlyDraggedNodes = items;
+	return YES;
+}
+
+- (void)outlineView:(NSOutlineView *)outlineView draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation {
+	self.currentlyDraggedNodes = nil;
+	[self.managedObjectContext.undoManager endUndoGrouping];
+	if ([self.managedObjectContext hasChanges]) {
+		NSError *err;
+		[self.managedObjectContext save:&err];
+		if (err) NSLog(@"Error: %@", err);
+	}
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index {
+	NSArray<NSTreeNode *> *dstChildren = [item childNodes];
+	if (!item || !dstChildren)
+		dstChildren = [self arrangedObjects].childNodes;
+	
+	bool isFolderDrag = (index == -1);
+	NSUInteger insertIndex = (isFolderDrag ? dstChildren.count : (NSUInteger)index);
+	// index where the items will be moved to, but not final since items above can vanish
+	NSIndexPath *dest = [item indexPath];
+	if (!dest) dest = [NSIndexPath indexPathWithIndex:insertIndex];
+	else       dest = [dest indexPathByAddingIndex:insertIndex];
+	
+	// decrement index for every item that is dragged from the same location (above the destination)
+	NSUInteger updateIndex = insertIndex;
+	for (NSTreeNode *node in self.currentlyDraggedNodes) {
+		NSIndexPath *nodesPath = [node indexPath];
+		if ([[nodesPath indexPathByRemovingLastIndex] isEqualTo:[dest indexPathByRemovingLastIndex]] &&
+			insertIndex > [nodesPath indexAtPosition:nodesPath.length - 1])
+		{
+			--updateIndex;
+		}
+	}
+	
+	// decrement sort indices at source
+	for (NSTreeNode *node in self.currentlyDraggedNodes)
+		[self incrementIndicesBy:-1 forSubsequentNodes:[node indexPath]];
+	// increment sort indices at destination
+	if (!isFolderDrag)
+		[self incrementIndicesBy:(int)self.currentlyDraggedNodes.count forSubsequentNodes:dest];
+	
+	// move items
+	[self moveNodes:self.currentlyDraggedNodes toIndexPath:dest];
+	
+	// set sort indices for dragged items
+	for (NSUInteger i = 0; i < self.currentlyDraggedNodes.count; i++) {
+		FeedConfig *fc = [self.currentlyDraggedNodes[i] representedObject];
+		fc.sortIndex = (int32_t)(updateIndex + i);
+	}
+	return YES;
+}
+
+- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index {
+	FeedConfig *fc = [(NSTreeNode*)item representedObject];
+	if (index == -1 && fc.type != 0) { // if drag is on specific item and that item isnt a group
+		return NSDragOperationNone;
+	}
+	
+	NSTreeNode *parent = item;
+	while (parent != nil) {
+		for (NSTreeNode *node in self.currentlyDraggedNodes) {
+			if (parent == node)
+				return NSDragOperationNone; // cannot move items into a child of its own
+		}
+		parent = [parent parentNode];
+	}
+	return NSDragOperationGeneric;
 }
 
 @end
