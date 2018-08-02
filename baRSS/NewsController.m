@@ -44,8 +44,18 @@ static NSString *dragNodeType = @"baRSS-feed-type";
 }
 
 - (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item {
-	// this delegate method is only here to set owner to null and prohibit repeated awakeFromNib calls
-	return [self.outlineView makeViewWithIdentifier:tableColumn.identifier owner:nil];
+	// owner is nil to prohibit repeated awakeFromNib calls
+	NSTableCellView *cellView = [self.outlineView makeViewWithIdentifier:tableColumn.identifier owner:nil];
+	if (cellView)
+		return cellView; // is a refresh cell
+	
+	FeedConfig *f = [(NSTreeNode*)item representedObject];
+	if (f.type == 2) { // Seperator
+		return [self.outlineView makeViewWithIdentifier:@"cellFeedConfigSeperator" owner:nil];
+	}
+	cellView = [self.outlineView makeViewWithIdentifier:@"cellFeedConfigName" owner:nil];
+	cellView.imageView.image = [NSImage imageNamed:NSImageNameFolder];
+	return cellView;
 }
 
 - (IBAction)pauseUpdates:(NSMenuItem *)sender {
@@ -90,19 +100,29 @@ static NSString *dragNodeType = @"baRSS-feed-type";
 
 - (IBAction)addFeed:(NSButton *)sender {
 	NSLog(@"add feed");
+	[self.managedObjectContext.undoManager beginUndoGrouping];
+	FeedConfig *nf = [self insertSortedItemAtSelection];
+	nf.type = 1;
+	nf.name = [NSString stringWithFormat:@"%@", [NSDate date]];
+	nf.refresh = @"42s";
+	[self.managedObjectContext.undoManager endUndoGrouping];
 }
 
 - (IBAction)addGroup:(NSButton *)sender {
-	FeedConfig *g = [[FeedConfig alloc] initWithEntity:FeedConfig.entity insertIntoManagedObjectContext:self.managedObjectContext];
+	[self.managedObjectContext.undoManager beginUndoGrouping];
+	FeedConfig *g = [self insertSortedItemAtSelection];
 	g.name = @"Group";
 	g.type = 0;
-	NSLog(@"add group");
+	[self.managedObjectContext.undoManager endUndoGrouping];
 }
 
 - (IBAction)addSeparator:(NSButton *)sender {
 	NSLog(@"add separator");
-	//	[self.managedObjectContext.undoManager beginUndoGrouping];
-	//	[self.managedObjectContext.undoManager endUndoGrouping];
+	[self.managedObjectContext.undoManager beginUndoGrouping];
+	FeedConfig *sp = [self insertSortedItemAtSelection];
+	sp.name = @"-------------";
+	sp.type = 2;
+	[self.managedObjectContext.undoManager endUndoGrouping];
 }
 
 - (NSString*)copyDescriptionOfSelectedItems {
@@ -130,13 +150,20 @@ static NSString *dragNodeType = @"baRSS-feed-type";
 	}
 }
 
-- (FeedConfig*)insertNewItemAtCurrentSelection {
+- (FeedConfig*)insertSortedItemAtSelection {
 	FeedConfig *selected = [[[self arrangedObjects] descendantNodeAtIndexPath:[self selectionIndexPath]] representedObject];
+	if (selected.type != 0) { // other than group
+		[self incrementIndicesBy:+1 forSubsequentNodes:[self selectionIndexPath]];
+	}
 	FeedConfig *newItem = [[FeedConfig alloc] initWithEntity:FeedConfig.entity insertIntoManagedObjectContext:self.managedObjectContext];
-	if (selected.type == 0) // a group
+	if (selected.type == 0) { // a group
 		newItem.sortIndex = (int32_t)selected.children.count;
-	else
-		newItem.sortIndex = selected.sortIndex + 1;
+		newItem.parent = selected;
+	} else {
+		newItem.sortIndex = selected.sortIndex;
+		newItem.parent = selected.parent;
+		--selected.sortIndex; // was increased before the new item is inserted
+	}
 	return newItem;
 }
 
