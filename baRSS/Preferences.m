@@ -56,31 +56,25 @@
 - (void)keyDown:(NSEvent *)event {
 	if (event.modifierFlags & NSEventModifierFlagCommand) {
 		bool holdShift = event.modifierFlags & NSEventModifierFlagShift;
-		@try {
-			unichar key = [event.characters characterAtIndex:0];
+		unichar key = [event.characters characterAtIndex:0];
+		switch (key) {
+			case 'w': [self close]; break;
+			case 'q': [NSApplication.sharedApplication terminate:self]; break;
+		}
+		if (self.window.contentView == self.viewFeeds) { // these only apply for NSOutlineView
 			switch (key) {
-				case 'w': [self close]; break;
-				case 'q': [NSApplication.sharedApplication terminate:self]; break;
+				case 'z':
+					if (holdShift) [self.newsController.managedObjectContext.undoManager redo];
+					else           [self.newsController.managedObjectContext.undoManager undo];
+					[self.newsController rearrangeObjects]; // update the ordering
+					break;
+				case 'o': break; // open .opml file
+				case 's': break; // save data or backup .opml file
+				case 'c': // copy row entry
+					[self.newsController copyDescriptionOfSelectedItems];
+					break;
+				case 'a': [self.feedsOutline selectAll:nil]; break;
 			}
-			if (self.window.contentView == self.viewFeeds) { // these only apply for NSOutlineView
-				switch (key) {
-					case 'z':
-						if (holdShift) [self.newsController.managedObjectContext.undoManager redo];
-						else           [self.newsController.managedObjectContext.undoManager undo];
-						[self.newsController rearrangeObjects]; // update the ordering
-						break;
-					case 'n': [self.newsController addFeed:nil]; break;
-					case 'o': break; // open .opml file
-					case 's': break; // save data or backup .opml file
-					case 'c': // copy row entry
-						[self.newsController copyDescriptionOfSelectedItems];
-						break;
-					case 'a': [self.feedsOutline selectAll:nil]; break;
-					// TODO: delete
-				}
-			}
-		} @catch (NSException *exception) {
-			NSLog(@"%@", event);
 		}
 	}
 }

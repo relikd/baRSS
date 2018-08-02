@@ -25,6 +25,5 @@
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 @property (readonly, strong) NSPersistentContainer *persistentContainer;
-- (IBAction)quitClicked:(id)sender;
 @end
 
