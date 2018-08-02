@@ -325,7 +325,7 @@
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="cellFeedConfigName" width="262" minWidth="40" maxWidth="1000" id="Lb1-9n-wlc">
+                                    <tableColumn identifier="" width="262" minWidth="40" maxWidth="1000" id="Lb1-9n-wlc">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Name">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -338,30 +338,45 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="cellFeedConfigName" id="USO-Q1-NDq" userLabel="cellView">
+                                            <tableCellView identifier="cellFeedConfigName" id="xPj-mA-zCd">
                                                 <rect key="frame" x="1" y="1" width="262" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Z4d-cK-DSP" userLabel="img">
-                                                        <rect key="frame" x="0.0" y="0.0" width="17" height="17"/>
+                                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZkQ-CQ-77k">
+                                                        <rect key="frame" x="3" y="0.0" width="17" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSActionTemplate" id="qWz-Xe-Me7"/>
+                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSActionTemplate" id="6xE-Sq-YVt"/>
                                                     </imageView>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9aj-WF-3MF" userLabel="str">
-                                                        <rect key="frame" x="23" y="0.0" width="239" height="17"/>
+                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v0D-kY-dKT">
+                                                        <rect key="frame" x="25" y="0.0" width="237" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Feed Title" id="Vp6-Ny-4XI">
+                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="AQH-6L-dw6">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                             <connections>
-                                                                <binding destination="USO-Q1-NDq" name="value" keyPath="objectValue.name" id="Ojs-Mi-qdl"/>
+                                                                <binding destination="xPj-mA-zCd" name="value" keyPath="objectValue.name" id="0Dx-uS-rnx"/>
                                                             </connections>
                                                         </textFieldCell>
                                                     </textField>
                                                 </subviews>
                                                 <connections>
-                                                    <outlet property="textField" destination="9aj-WF-3MF" id="I4F-yK-Is7"/>
+                                                    <outlet property="imageView" destination="ZkQ-CQ-77k" id="0A9-d2-BsO"/>
+                                                    <outlet property="textField" destination="v0D-kY-dKT" id="gFH-Fi-20f"/>
+                                                </connections>
+                                            </tableCellView>
+                                            <tableCellView identifier="cellFeedConfigSeperator" id="IkM-wJ-Az7">
+                                                <rect key="frame" x="1" y="20" width="262" height="17"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ees-3B-mIa">
+                                                        <rect key="frame" x="3" y="0.0" width="256" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageAlignment="left" image="seperator" id="NRu-eZ-uh3"/>
+                                                    </imageView>
+                                                </subviews>
+                                                <connections>
+                                                    <outlet property="imageView" destination="ees-3B-mIa" id="qFZ-vH-ATa"/>
                                                 </connections>
                                             </tableCellView>
                                         </prototypeCellViews>
@@ -410,6 +425,7 @@
                                 </tableColumns>
                                 <connections>
                                     <outlet property="dataSource" destination="1oZ-Uo-mIu" id="sch-o5-yEm"/>
+                                    <outlet property="delegate" destination="1oZ-Uo-mIu" id="Nye-dQ-vdy"/>
                                 </connections>
                             </outlineView>
                         </subviews>
@@ -437,7 +453,7 @@
                         <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                     </buttonCell>
                     <connections>
-                        <action selector="add:" target="1oZ-Uo-mIu" id="9rc-sz-RXa"/>
+                        <action selector="addFeed:" target="1oZ-Uo-mIu" id="wR9-Np-joC"/>
                         <binding destination="1oZ-Uo-mIu" name="enabled" keyPath="canInsert" id="1xq-Nj-Acq"/>
                     </connections>
                 </button>
@@ -502,5 +518,6 @@ CA
         <image name="NSRemoveTemplate" width="11" height="11"/>
         <image name="NSShareTemplate" width="11" height="16"/>
         <image name="NSUserAccounts" width="32" height="32"/>
+        <image name="seperator" width="198.5" height="2"/>
     </resources>
 </document>
