@@ -27,12 +27,8 @@
 
 @interface NewsController ()
 @property (weak) IBOutlet NSOutlineView *outlineView;
-@property (weak) IBOutlet NSMenuItem *pauseItem;
-@property (weak) IBOutlet NSMenuItem *updateAllItem;
-@property (weak) IBOutlet NSMenuItem *openUnreadItem;
 
 @property (strong) NSArray<NSTreeNode*> *currentlyDraggedNodes;
-@property (strong) NSMutableSet<NSIndexPath*> *expandedItems;
 @end
 
 @implementation NewsController
@@ -42,35 +38,10 @@ static NSString *dragNodeType = @"baRSS-feed-type";
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-	self.expandedItems = [NSMutableSet set];
-	NSArray *storedExpansions = [[NSUserDefaults standardUserDefaults] arrayForKey:@"pups"];
-	NSLog(@"%lu", storedExpansions.count);
-	for (NSString *str in storedExpansions) {
-		if (str.length == 0)
-			continue;
-		NSIndexPath *path = [NSIndexPath new];
-		for (NSString *idx in [str componentsSeparatedByString:@","]) {
-			path = [path indexPathByAddingIndex:(NSUInteger)[idx integerValue]];
-		}
-		NSLog(@"%@", path);
-	}
-	NSLog(@"%@", self.arrangedObjects.childNodes);
-//	[self.expandedItems bind:NSContentArrayBinding toObject:[NSUserDefaultsController sharedUserDefaultsController] withKeyPath:@"values.pups" options:nil];
-//	[self.expandedItems addObject:[self indexPathToString:[NSIndexPath indexPathWithIndex:4]]];
-//	self.expandedItems = [NSMutableSet set];
-//	[self.expandedItems bind:@"values" toObject:[NSUserDefaults standardUserDefaults]
-//	   withKeyPath:@"extensio" options:@{ NSContinuouslyUpdatesValueBindingOption : @YES,
-//										  NSRaisesForNotApplicableKeysBindingOption : @YES
-//										  }];
-//	[self.expandedItems addObject:[NSIndexPath indexPathWithIndex:4]];
-	
-	
-	
 	// Set the outline view to accept the custom drag type AbstractTreeNodeType...
 	[self.outlineView registerForDraggedTypes:[NSArray arrayWithObject:dragNodeType]];
 	[self setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];
 }
-
 
 - (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item {
 	// this delegate method is only here to set owner to null and prohibit repeated awakeFromNib calls
@@ -178,67 +149,6 @@ static NSString *dragNodeType = @"baRSS-feed-type";
 	for (NSUInteger i = [path indexAtPosition:path.length - 1]; i < root.childNodes.count; i++) {
 		((FeedConfig*)[root.childNodes[i] representedObject]).sortIndex += val;
 	}
-}
-
-- (NSString*)indexPathToString:(NSIndexPath*)path {
-	NSMutableString *mStr = [NSMutableString string];
-	for (NSUInteger i = 0;  i < path.length; i++) {
-		[mStr appendFormat:@",%lu", [path indexAtPosition:i]];
-	}
-	if (mStr.length < 1) return mStr;
-	return [mStr substringFromIndex:1];
-}
-
-- (NSArray*)indexPathToNumberArray:(NSIndexPath*)path {
-	NSUInteger *idcs = malloc(sizeof(NSUInteger) * path.length);
-	[path getIndexes:idcs];
-	NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:path.length];
-	for (NSUInteger i = 0; i < path.length; i++) {
-		[arr addObject:[NSNumber numberWithUnsignedInteger:[path indexAtPosition:i]]];
-	}
-	free(idcs);
-	return arr;
-}
-
-- (id)outlineView:(NSOutlineView *)outlineView itemForPersistentObject:(id)object {
-	NSIndexPath *path = [NSIndexPath new];
-	for (NSNumber *num in object) {
-		path = [path indexPathByAddingIndex:[num unsignedIntegerValue]];
-	}
-	NSLog(@"%@", [self arrangedObjects]);
-	[((AppDelegate*)[NSApp delegate]) persistentContainer];
-	NSTreeNode *node = [[self arrangedObjects] descendantNodeAtIndexPath:path];
-	return node;
-}
-
-- (id)outlineView:(NSOutlineView *)outlineView persistentObjectForItem:(id)item {
-	NSUInteger len = [item indexPath].length;
-	NSUInteger *idcs = malloc(sizeof(NSUInteger) * len);
-	[[item indexPath] getIndexes:idcs];
-	NSMutableArray *arr = [[NSMutableArray alloc] initWithCapacity:len];
-	for (NSUInteger i = 0; i < len; i++) {
-		[arr addObject:[NSNumber numberWithUnsignedInteger:[[item indexPath] indexAtPosition:i]]];
-	}
-	free(idcs);
-	return arr;
-}
-
-#pragma mark - Store and reload exanded items
-
-- (void)loadExpandedItems {
-	
-}
-
-- (BOOL)outlineView:(NSOutlineView *)outlineView shouldExpandItem:(id)item {
-	[self.expandedItems addObject:[item indexPath]];
-	return YES;
-}
-
-- (BOOL)outlineView:(NSOutlineView *)outlineView shouldCollapseItem:(id)item {
-	[self.expandedItems removeObject:[item indexPath]];
-//	[self.outlineView isExpandable:]
-//	[self.outlineView expandItem:]
-	return YES;
 }
 
 #pragma mark - Dragging Support, Data Source Delegate

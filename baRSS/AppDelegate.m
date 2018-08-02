@@ -30,10 +30,6 @@
 
 @implementation AppDelegate
 
-- (IBAction)quitClicked:(id)sender {
-	[NSApplication.sharedApplication terminate:self];
-}
-
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	self.statusItem = [NSStatusBar.systemStatusBar statusItemWithLength:NSVariableStatusItemLength];
 	self.statusItem.title = @"me";
@@ -42,8 +38,6 @@
 	[PyHandler prepare];
 	printf("done\n");
 }
-
-
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
 	[PyHandler shutdown];

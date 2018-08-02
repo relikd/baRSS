@@ -22,10 +22,7 @@
         <treeController mode="entity" entityName="FeedConfig" fetchPredicateFormat="parent == nil" automaticallyPreparesContent="YES" childrenKeyPath="children" leafKeyPath="type" id="1oZ-Uo-mIu" customClass="NewsController">
             <connections>
                 <binding destination="Voe-Tx-rLC" name="managedObjectContext" keyPath="self.persistentContainer.viewContext" id="Q1f-VN-9qq"/>
-                <outlet property="openUnreadItem" destination="Qqw-Xj-oA5" id="JN3-Ej-EPc"/>
                 <outlet property="outlineView" destination="hKk-G1-1po" id="Z4y-uD-Zse"/>
-                <outlet property="pauseItem" destination="D7r-Vb-9eO" id="8Cu-bX-0uT"/>
-                <outlet property="updateAllItem" destination="wgp-fa-8Wj" id="dI0-8A-qaY"/>
             </connections>
         </treeController>
         <customObject id="bgB-po-1IK" customClass="Preferences">
@@ -67,7 +64,7 @@
                 </menuItem>
                 <menuItem title="Quit" keyEquivalent="q" id="Nb6-yK-a1A">
                     <connections>
-                        <action selector="quitClicked:" target="Voe-Tx-rLC" id="itf-Lt-9Yn"/>
+                        <action selector="terminate:" target="-1" id="STj-gf-HrE"/>
                     </connections>
                 </menuItem>
             </items>
@@ -413,7 +410,6 @@
                                 </tableColumns>
                                 <connections>
                                     <outlet property="dataSource" destination="1oZ-Uo-mIu" id="sch-o5-yEm"/>
-                                    <outlet property="delegate" destination="1oZ-Uo-mIu" id="ZkV-Zy-rDc"/>
                                 </connections>
                             </outlineView>
                         </subviews>
@@ -437,6 +433,8 @@
                     <buttonCell key="cell" type="smallSquare" alternateTitle="Add feed" bezelStyle="smallSquare" image="NSAddTemplate" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="WMA-eZ-pOl">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
+                        <string key="keyEquivalent">n</string>
+                        <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                     </buttonCell>
                     <connections>
                         <action selector="add:" target="1oZ-Uo-mIu" id="9rc-sz-RXa"/>
@@ -449,6 +447,9 @@
                     <buttonCell key="cell" type="smallSquare" alternateTitle="Remove Feed" bezelStyle="smallSquare" image="NSRemoveTemplate" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="d9M-ZD-oma">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
+                        <string key="keyEquivalent" base64-UTF8="YES">
+CA
+</string>
                     </buttonCell>
                     <connections>
                         <action selector="remove:" target="1oZ-Uo-mIu" id="mph-g8-8J0"/>
@@ -472,6 +473,8 @@
                     <buttonCell key="cell" type="smallSquare" alternateTitle="Add group" bezelStyle="smallSquare" image="NSPathTemplate" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="9m2-U5-xE2">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
+                        <string key="keyEquivalent">g</string>
+                        <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                     </buttonCell>
                     <connections>
                         <action selector="addGroup:" target="1oZ-Uo-mIu" id="8MO-eQ-XcJ"/>
