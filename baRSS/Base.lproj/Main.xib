@@ -19,16 +19,19 @@
             </connections>
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
-        <customObject id="he0-Eb-PDA" customClass="NewsController">
+        <treeController mode="entity" entityName="FeedConfig" fetchPredicateFormat="parent == nil" automaticallyPreparesContent="YES" childrenKeyPath="children" leafKeyPath="type" id="1oZ-Uo-mIu" customClass="NewsController">
             <connections>
-                <outlet property="openUnreadItem" destination="Qqw-Xj-oA5" id="8df-is-Qop"/>
-                <outlet property="pauseItem" destination="D7r-Vb-9eO" id="o7e-jD-3Yj"/>
-                <outlet property="updateAllItem" destination="wgp-fa-8Wj" id="edP-bQ-bIM"/>
+                <binding destination="Voe-Tx-rLC" name="managedObjectContext" keyPath="self.persistentContainer.viewContext" id="Q1f-VN-9qq"/>
+                <outlet property="openUnreadItem" destination="Qqw-Xj-oA5" id="JN3-Ej-EPc"/>
+                <outlet property="outlineView" destination="hKk-G1-1po" id="Z4y-uD-Zse"/>
+                <outlet property="pauseItem" destination="D7r-Vb-9eO" id="8Cu-bX-0uT"/>
+                <outlet property="updateAllItem" destination="wgp-fa-8Wj" id="dI0-8A-qaY"/>
             </connections>
-        </customObject>
+        </treeController>
         <customObject id="bgB-po-1IK" customClass="Preferences">
             <connections>
-                <outlet property="appDelegate" destination="Voe-Tx-rLC" id="1aD-dC-e6r"/>
+                <outlet property="feedsOutline" destination="hKk-G1-1po" id="jcw-Fq-DyK"/>
+                <outlet property="newsController" destination="1oZ-Uo-mIu" id="hAk-g4-Oii"/>
                 <outlet property="toolbar" destination="wLj-fD-HpE" id="bMA-dd-1H1"/>
                 <outlet property="viewFeeds" destination="EwH-fT-yW8" id="pmQ-as-O2V"/>
                 <outlet property="viewGeneral" destination="8H4-sI-Ub8" id="lWU-Il-4in"/>
@@ -40,26 +43,26 @@
                 <menuItem title="Pause Updates" id="D7r-Vb-9eO">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="pauseUpdates:" target="he0-Eb-PDA" id="9Nm-b4-h4h"/>
+                        <action selector="pauseUpdates:" target="1oZ-Uo-mIu" id="WaC-Gv-Jlh"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Update All Feeds" id="wgp-fa-8Wj">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="updateAllFeeds:" target="he0-Eb-PDA" id="z7p-Ax-hgc"/>
+                        <action selector="updateAllFeeds:" target="1oZ-Uo-mIu" id="5yX-Gc-9Qg"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Open All Unread" id="Qqw-Xj-oA5">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="openAllUnread:" target="he0-Eb-PDA" id="bgo-Tt-0sv"/>
+                        <action selector="openAllUnread:" target="1oZ-Uo-mIu" id="dpt-U6-GPp"/>
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="ld2-b0-07a"/>
                 <menuItem isSeparatorItem="YES" id="1VS-wM-kTc"/>
                 <menuItem title="Preferences" keyEquivalent="," id="VFY-eR-2EA">
                     <connections>
-                        <action selector="showWindow:" target="bgB-po-1IK" id="eBk-Wq-1eA"/>
+                        <action selector="makeKeyAndOrderFront:" target="ai3-RW-O8g" id="qaE-j2-fux"/>
                     </connections>
                 </menuItem>
                 <menuItem title="Quit" keyEquivalent="q" id="Nb6-yK-a1A">
@@ -318,14 +321,14 @@
                         <rect key="frame" x="1" y="0.0" width="318" height="306"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="sii-NE-JkJ" viewBased="YES" indentationPerLevel="16" outlineTableColumn="Lb1-9n-wlc" id="hKk-G1-1po">
+                            <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" autosaveColumns="NO" headerView="sii-NE-JkJ" indentationPerLevel="16" outlineTableColumn="Lb1-9n-wlc" id="hKk-G1-1po">
                                 <rect key="frame" x="0.0" y="0.0" width="318" height="283"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="" editable="NO" width="252.5" minWidth="40" maxWidth="1000" id="Lb1-9n-wlc">
+                                    <tableColumn identifier="" width="252.5" minWidth="40" maxWidth="1000" id="Lb1-9n-wlc">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Name">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -337,29 +340,17 @@
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
-                                        <prototypeCellViews>
-                                            <tableCellView id="6yl-oX-eNn">
-                                                <rect key="frame" x="1" y="1" width="253" height="17"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Z97-we-rgn">
-                                                        <rect key="frame" x="0.0" y="0.0" width="253" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="FGY-QQ-joq">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                </subviews>
-                                                <connections>
-                                                    <outlet property="textField" destination="Z97-we-rgn" id="Xfe-pC-8kn"/>
-                                                </connections>
-                                            </tableCellView>
-                                        </prototypeCellViews>
+                                        <connections>
+                                            <binding destination="1oZ-Uo-mIu" name="value" keyPath="arrangedObjects.name" id="Lgo-HL-51z">
+                                                <dictionary key="options">
+                                                    <bool key="NSConditionallySetsEditable" value="YES"/>
+                                                    <string key="NSNullPlaceholder">TUUP</string>
+                                                </dictionary>
+                                            </binding>
+                                        </connections>
                                     </tableColumn>
-                                    <tableColumn identifier="" editable="NO" width="59.5" minWidth="40" maxWidth="1000" id="8st-OH-BXG">
-                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Update">
+                                    <tableColumn identifier="" width="59.5" minWidth="40" maxWidth="1000" id="8st-OH-BXG">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Refresh">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -369,11 +360,13 @@
                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
+                                        <connections>
+                                            <binding destination="1oZ-Uo-mIu" name="value" keyPath="arrangedObjects.refresh" id="R51-fy-Ufu"/>
+                                        </connections>
                                     </tableColumn>
                                 </tableColumns>
                                 <connections>
-                                    <outlet property="dataSource" destination="he0-Eb-PDA" id="bid-ep-fYr"/>
-                                    <outlet property="delegate" destination="he0-Eb-PDA" id="FV8-3T-QDV"/>
+                                    <outlet property="dataSource" destination="1oZ-Uo-mIu" id="sch-o5-yEm"/>
                                 </connections>
                             </outlineView>
                         </subviews>
@@ -399,7 +392,8 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="addFeed:" target="he0-Eb-PDA" id="dC1-tw-xxy"/>
+                        <action selector="add:" target="1oZ-Uo-mIu" id="9rc-sz-RXa"/>
+                        <binding destination="1oZ-Uo-mIu" name="enabled" keyPath="canInsert" id="1xq-Nj-Acq"/>
                     </connections>
                 </button>
                 <button toolTip="Delete item" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kwZ-TS-nM7">
@@ -410,7 +404,8 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="removeFeed:" target="he0-Eb-PDA" id="C4r-3D-ARB"/>
+                        <action selector="remove:" target="1oZ-Uo-mIu" id="mph-g8-8J0"/>
+                        <binding destination="1oZ-Uo-mIu" name="enabled" keyPath="canRemove" id="9oY-fm-uq0"/>
                     </connections>
                 </button>
                 <button toolTip="Add new line separator" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BRb-Je-jM4">
@@ -421,7 +416,7 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="addSeparator:" target="he0-Eb-PDA" id="68L-xT-tM9"/>
+                        <action selector="addSeparator:" target="1oZ-Uo-mIu" id="bs4-Jk-EWD"/>
                     </connections>
                 </button>
                 <button toolTip="Add new grouping folder" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kQF-LC-quC">
@@ -432,7 +427,7 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="addGroup:" target="he0-Eb-PDA" id="82S-0f-6d9"/>
+                        <action selector="addGroup:" target="1oZ-Uo-mIu" id="8MO-eQ-XcJ"/>
                     </connections>
                 </button>
                 <button hidden="YES" toolTip="Import or Export data" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XaQ-S9-guo">

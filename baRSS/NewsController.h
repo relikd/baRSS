@@ -22,5 +22,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface NewsController : NSViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
+@interface NewsController : NSTreeController <NSOutlineViewDataSource, NSOutlineViewDelegate>
+- (IBAction)addFeed:(NSButton *)sender;
+- (IBAction)addGroup:(NSButton *)sender;
+- (IBAction)addSeparator:(NSButton *)sender;
+
+- (NSString*)copyDescriptionOfSelectedItems;
 @end
