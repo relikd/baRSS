@@ -257,3 +257,16 @@ static NSString *dragNodeType = @"baRSS-feed-type";
 }
 
 @end
+
+
+@interface Separator : NSView
+@end
+
+@implementation Separator
+- (void)drawRect:(NSRect)dirtyRect {
+	[super drawRect:dirtyRect];
+	NSGradient *grdnt = [[NSGradient alloc] initWithStartingColor:[NSColor darkGrayColor] endingColor:[[NSColor darkGrayColor] colorWithAlphaComponent:0.0]];
+	NSBezierPath *rounded = [NSBezierPath bezierPathWithRoundedRect:NSMakeRect(1, self.bounds.size.height/2.0-1, self.bounds.size.width-2, 2) xRadius:1 yRadius:1];
+	[grdnt drawInBezierPath:rounded angle:0];
+}
+@end

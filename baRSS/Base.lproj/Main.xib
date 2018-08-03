@@ -318,14 +318,14 @@
                         <rect key="frame" x="1" y="0.0" width="318" height="306"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" columnResizing="NO" autosaveColumns="NO" autosaveName="" rowSizeStyle="automatic" headerView="sii-NE-JkJ" viewBased="YES" indentationPerLevel="16" outlineTableColumn="Lb1-9n-wlc" id="hKk-G1-1po">
+                            <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" autosaveName="" rowSizeStyle="automatic" headerView="ne2-ld-l1b" viewBased="YES" indentationPerLevel="15" outlineTableColumn="Lb1-9n-wlc" id="hKk-G1-1po">
                                 <rect key="frame" x="0.0" y="0.0" width="318" height="283"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="" width="262" minWidth="40" maxWidth="1000" id="Lb1-9n-wlc">
+                                    <tableColumn identifier="" editable="NO" width="262" minWidth="40" maxWidth="42000" id="Lb1-9n-wlc">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Name">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -365,26 +365,27 @@
                                                     <outlet property="textField" destination="v0D-kY-dKT" id="gFH-Fi-20f"/>
                                                 </connections>
                                             </tableCellView>
-                                            <tableCellView identifier="cellFeedConfigSeperator" id="IkM-wJ-Az7">
+                                            <tableCellView identifier="cellFeedConfigSeperator" id="IkM-wJ-Az7" userLabel="Separator">
                                                 <rect key="frame" x="1" y="20" width="262" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ees-3B-mIa">
+                                                    <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mlO-VE-655" userLabel="img" customClass="Separator">
                                                         <rect key="frame" x="3" y="0.0" width="256" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageAlignment="left" image="seperator" id="NRu-eZ-uh3"/>
-                                                    </imageView>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    </customView>
                                                 </subviews>
-                                                <connections>
-                                                    <outlet property="imageView" destination="ees-3B-mIa" id="qFZ-vH-ATa"/>
-                                                </connections>
                                             </tableCellView>
                                         </prototypeCellViews>
                                         <connections>
-                                            <binding destination="1oZ-Uo-mIu" name="value" keyPath="arrangedObjects" id="YFe-9D-GmJ"/>
+                                            <binding destination="1oZ-Uo-mIu" name="value" keyPath="arrangedObjects" id="Ghy-7M-Gx2">
+                                                <dictionary key="options">
+                                                    <bool key="NSConditionallySetsEditable" value="YES"/>
+                                                    <bool key="NSCreatesSortDescriptor" value="NO"/>
+                                                </dictionary>
+                                            </binding>
                                         </connections>
                                     </tableColumn>
-                                    <tableColumn identifier="cellFeedConfigRefresh" width="50" minWidth="40" maxWidth="1000" id="8st-OH-BXG">
+                                    <tableColumn identifier="cellFeedConfigRefresh" editable="NO" width="50" minWidth="40" maxWidth="1000" id="8st-OH-BXG">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Refresh">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -419,7 +420,12 @@
                                             </tableCellView>
                                         </prototypeCellViews>
                                         <connections>
-                                            <binding destination="1oZ-Uo-mIu" name="value" keyPath="arrangedObjects" id="Xuf-hB-h9d"/>
+                                            <binding destination="1oZ-Uo-mIu" name="value" keyPath="arrangedObjects" id="hf4-eT-K3p">
+                                                <dictionary key="options">
+                                                    <bool key="NSConditionallySetsEditable" value="YES"/>
+                                                    <bool key="NSCreatesSortDescriptor" value="NO"/>
+                                                </dictionary>
+                                            </binding>
                                         </connections>
                                     </tableColumn>
                                 </tableColumns>
@@ -438,7 +444,7 @@
                         <rect key="frame" x="-15" y="23" width="16" height="0.0"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
-                    <tableHeaderView key="headerView" id="sii-NE-JkJ">
+                    <tableHeaderView key="headerView" id="ne2-ld-l1b">
                         <rect key="frame" x="0.0" y="0.0" width="318" height="23"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </tableHeaderView>
@@ -518,6 +524,5 @@ CA
         <image name="NSRemoveTemplate" width="11" height="11"/>
         <image name="NSShareTemplate" width="11" height="16"/>
         <image name="NSUserAccounts" width="32" height="32"/>
-        <image name="seperator" width="198.5" height="2"/>
     </resources>
 </document>
