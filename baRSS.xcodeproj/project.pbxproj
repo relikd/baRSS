@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1968E0AE14B8E8A90E194980 /* PyHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 1968EF7567E06D2A5BB3481A /* PyHandler.m */; };
+		544B011A2114B41200386E5C /* FeedEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* FeedEdit.m */; };
+		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
 		544FBD4521064AEB008A260C /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544FBD4421064AEB008A260C /* Python.framework */; };
 		544FBD4721064B2F008A260C /* getFeed.py in Resources */ = {isa = PBXBuildFile; fileRef = 544FBD4621064B2F008A260C /* getFeed.py */; };
 		544FBD4921064DF0008A260C /* feedparser521.py in Resources */ = {isa = PBXBuildFile; fileRef = 544FBD4821064DF0008A260C /* feedparser521.py */; };
@@ -23,6 +25,10 @@
 /* Begin PBXFileReference section */
 		1968E7919BAA36F042FCB717 /* PyHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PyHandler.h; sourceTree = "<group>"; };
 		1968EF7567E06D2A5BB3481A /* PyHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PyHandler.m; sourceTree = "<group>"; };
+		544B01182114B41200386E5C /* FeedEdit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FeedEdit.h; sourceTree = "<group>"; };
+		544B01192114B41200386E5C /* FeedEdit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeedEdit.m; sourceTree = "<group>"; };
+		544B011B2114EE9100386E5C /* AppHook.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppHook.h; sourceTree = "<group>"; };
+		544B011C2114EE9100386E5C /* AppHook.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppHook.m; sourceTree = "<group>"; };
 		544FBD4421064AEB008A260C /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		544FBD4621064B2F008A260C /* getFeed.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = getFeed.py; sourceTree = "<group>"; usesTabs = 0; };
 		544FBD4821064DF0008A260C /* feedparser521.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = feedparser521.py; sourceTree = "<group>"; usesTabs = 0; };
@@ -92,12 +98,16 @@
 			isa = PBXGroup;
 			children = (
 				549369F421091E6D001AF895 /* python */,
+				544B011B2114EE9100386E5C /* AppHook.h */,
+				544B011C2114EE9100386E5C /* AppHook.m */,
 				54ACC27F21061B3B0020715F /* AppDelegate.h */,
 				54ACC28021061B3B0020715F /* AppDelegate.m */,
 				54ACC29321061E270020715F /* NewsController.h */,
 				54ACC29421061E270020715F /* NewsController.m */,
 				54ACC29621061FBA0020715F /* Preferences.h */,
 				54ACC29721061FBA0020715F /* Preferences.m */,
+				544B01182114B41200386E5C /* FeedEdit.h */,
+				544B01192114B41200386E5C /* FeedEdit.m */,
 				54ACC28521061B3C0020715F /* Assets.xcassets */,
 				54ACC28721061B3C0020715F /* Main.xib */,
 				54ACC28A21061B3C0020715F /* Info.plist */,
@@ -188,9 +198,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */,
+				544B011D2114EE9100386E5C /* AppHook.m in Sources */,
 				54ACC29521061E270020715F /* NewsController.m in Sources */,
 				54ACC28C21061B3C0020715F /* main.m in Sources */,
 				54ACC28121061B3B0020715F /* AppDelegate.m in Sources */,
+				544B011A2114B41200386E5C /* FeedEdit.m in Sources */,
 				54ACC29821061FBA0020715F /* Preferences.m in Sources */,
 				1968E0AE14B8E8A90E194980 /* PyHandler.m in Sources */,
 			);

@@ -22,10 +22,11 @@
 
 #import "NewsController.h"
 #import "PyHandler.h"
-#import "AppDelegate.h"
+#import "Preferences.h"
 #import "DBv1+CoreDataModel.h"
 
 @interface NewsController ()
+@property (weak) IBOutlet Preferences *preferencesWindow;
 @property (weak) IBOutlet NSOutlineView *outlineView;
 
 @property (strong) NSArray<NSTreeNode*> *currentlyDraggedNodes;
@@ -98,8 +99,22 @@ static NSString *dragNodeType = @"baRSS-feed-type";
 	NSLog(@"all unread");
 }
 
+- (IBAction)presentModalFeedProperties:(id)sender {
+	self.preferencesWindow.feedDetailSheet.parentWindow = self.preferencesWindow;
+	[self.preferencesWindow beginSheet:self.preferencesWindow.feedDetailSheet completionHandler:^(NSModalResponse returnCode) {
+		NSLog(@"%ld", (long)returnCode);
+	}];
+//	if ([sender isKindOfClass:[NSOutlineView class]]) {
+//		NSOutlineView *ov = sender;
+//		if (ov.clickedRow == -1)
+//			return; // ignore clicks on column headers and where no row was selected
+//
+//		id vop = [ov itemAtRow:ov.clickedRow];
+//		NSLog(@"%@", vop);
+//	}
+}
+
 - (IBAction)addFeed:(NSButton *)sender {
-	NSLog(@"add feed");
 	[self.managedObjectContext.undoManager beginUndoGrouping];
 	FeedConfig *nf = [self insertSortedItemAtSelection];
 	nf.type = 1;
@@ -117,10 +132,9 @@ static NSString *dragNodeType = @"baRSS-feed-type";
 }
 
 - (IBAction)addSeparator:(NSButton *)sender {
-	NSLog(@"add separator");
 	[self.managedObjectContext.undoManager beginUndoGrouping];
 	FeedConfig *sp = [self insertSortedItemAtSelection];
-	sp.name = @"-------------";
+	sp.name = @"---";
 	sp.type = 2;
 	[self.managedObjectContext.undoManager endUndoGrouping];
 }

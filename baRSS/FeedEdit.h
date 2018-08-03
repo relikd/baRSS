@@ -22,7 +22,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface Preferences : NSWindow
-@property (weak) IBOutlet NSWindow *feedDetailSheet;
+@interface FeedEdit : NSWindow
 
 @end

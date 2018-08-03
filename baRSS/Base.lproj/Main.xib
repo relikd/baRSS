@@ -19,22 +19,6 @@
             </connections>
         </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
-        <treeController mode="entity" entityName="FeedConfig" fetchPredicateFormat="parent == nil" automaticallyPreparesContent="YES" childrenKeyPath="children" leafKeyPath="type" id="1oZ-Uo-mIu" customClass="NewsController">
-            <connections>
-                <binding destination="Voe-Tx-rLC" name="managedObjectContext" keyPath="self.persistentContainer.viewContext" id="Q1f-VN-9qq"/>
-                <outlet property="outlineView" destination="hKk-G1-1po" id="Z4y-uD-Zse"/>
-            </connections>
-        </treeController>
-        <customObject id="bgB-po-1IK" customClass="Preferences">
-            <connections>
-                <outlet property="feedsOutline" destination="hKk-G1-1po" id="jcw-Fq-DyK"/>
-                <outlet property="newsController" destination="1oZ-Uo-mIu" id="hAk-g4-Oii"/>
-                <outlet property="toolbar" destination="wLj-fD-HpE" id="bMA-dd-1H1"/>
-                <outlet property="viewFeeds" destination="EwH-fT-yW8" id="pmQ-as-O2V"/>
-                <outlet property="viewGeneral" destination="8H4-sI-Ub8" id="lWU-Il-4in"/>
-                <outlet property="window" destination="ai3-RW-O8g" id="Ncu-vV-dTy"/>
-            </connections>
-        </customObject>
         <menu id="tDc-nD-HS2">
             <items>
                 <menuItem title="Pause Updates" id="D7r-Vb-9eO">
@@ -70,10 +54,16 @@
             </items>
             <point key="canvasLocation" x="277" y="419"/>
         </menu>
-        <window title="baRSS Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" tabbingMode="disallowed" id="ai3-RW-O8g" userLabel="Preferences">
+        <treeController mode="entity" entityName="FeedConfig" fetchPredicateFormat="parent == nil" automaticallyPreparesContent="YES" childrenKeyPath="children" leafKeyPath="type" id="1oZ-Uo-mIu" customClass="NewsController">
+            <connections>
+                <binding destination="Voe-Tx-rLC" name="managedObjectContext" keyPath="self.persistentContainer.viewContext" id="Q1f-VN-9qq"/>
+                <outlet property="outlineView" destination="hKk-G1-1po" id="Z4y-uD-Zse"/>
+                <outlet property="preferencesWindow" destination="ai3-RW-O8g" id="cNF-TI-ups"/>
+            </connections>
+        </treeController>
+        <window title="baRSS Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="prefWindow" animationBehavior="default" tabbingMode="disallowed" id="ai3-RW-O8g" userLabel="Preferences" customClass="Preferences">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
-            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="131" y="159" width="320" height="327"/>
+            <rect key="contentRect" x="948" y="431" width="320" height="327"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <value key="minSize" type="size" width="320" height="327"/>
             <view key="contentView" id="ct3-G7-3SQ">
@@ -84,12 +74,12 @@
                 <allowedToolbarItems>
                     <toolbarItem implicitItemIdentifier="AF4483E3-0457-47B7-AE52-AC11B1545455" explicitItemIdentifier="preferencesTabGeneral" label="General" paletteLabel="General" tag="-1" image="NSPreferencesGeneral" selectable="YES" id="0qP-ah-ojT">
                         <connections>
-                            <action selector="clickGeneral:" target="bgB-po-1IK" id="G4I-Zs-FZR"/>
+                            <action selector="tabGeneralClicked:" target="ai3-RW-O8g" id="OiJ-PY-QCu"/>
                         </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="E8527558-3D5F-4B79-99E4-675C1557D10B" explicitItemIdentifier="preferencesTabFeeds" label="Feeds" paletteLabel="Feeds" tag="-1" image="NSUserAccounts" selectable="YES" id="Av5-VA-zps">
                         <connections>
-                            <action selector="clickFeeds:" target="bgB-po-1IK" id="Daq-b8-lpE"/>
+                            <action selector="tabFeedsClicked:" target="ai3-RW-O8g" id="l5x-nd-qBx"/>
                         </connections>
                     </toolbarItem>
                 </allowedToolbarItems>
@@ -98,6 +88,12 @@
                     <toolbarItem reference="Av5-VA-zps"/>
                 </defaultToolbarItems>
             </toolbar>
+            <connections>
+                <outlet property="feedDetailSheet" destination="6yF-Ii-jhG" id="ozt-yn-eEM"/>
+                <outlet property="newsController" destination="1oZ-Uo-mIu" id="1HA-Vz-PBK"/>
+                <outlet property="viewFeeds" destination="EwH-fT-yW8" id="aBH-fR-foa"/>
+                <outlet property="viewGeneral" destination="8H4-sI-Ub8" id="PS7-gG-GJs"/>
+            </connections>
             <point key="canvasLocation" x="-20" y="521"/>
         </window>
         <customView id="8H4-sI-Ub8" userLabel="Preferences-General">
@@ -430,6 +426,7 @@
                                     </tableColumn>
                                 </tableColumns>
                                 <connections>
+                                    <action trigger="doubleAction" selector="presentModalFeedProperties:" target="1oZ-Uo-mIu" id="zNP-kQ-Xmh"/>
                                     <outlet property="dataSource" destination="1oZ-Uo-mIu" id="sch-o5-yEm"/>
                                     <outlet property="delegate" destination="1oZ-Uo-mIu" id="Nye-dQ-vdy"/>
                                 </connections>
@@ -459,7 +456,7 @@
                         <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                     </buttonCell>
                     <connections>
-                        <action selector="addFeed:" target="1oZ-Uo-mIu" id="wR9-Np-joC"/>
+                        <action selector="addFeed:" target="1oZ-Uo-mIu" id="jX0-xl-p0f"/>
                         <binding destination="1oZ-Uo-mIu" name="enabled" keyPath="canInsert" id="1xq-Nj-Acq"/>
                     </connections>
                 </button>
@@ -514,6 +511,131 @@ CA
             <point key="canvasLocation" x="350" y="903.5"/>
         </customView>
         <userDefaultsController representsSharedInstance="YES" id="K8S-BW-Na6"/>
+        <window title="Feed Detail Sheet" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="formFeedDetail" animationBehavior="default" id="6yF-Ii-jhG" customClass="FeedEdit">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <rect key="contentRect" x="131" y="159" width="400" height="153"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+            <value key="minSize" type="size" width="400" height="153"/>
+            <value key="maxSize" type="size" width="1200" height="153"/>
+            <view key="contentView" id="bH3-c8-m3D">
+                <rect key="frame" x="0.0" y="0.0" width="400" height="153"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="u2j-52-0kN">
+                        <rect key="frame" x="18" y="114" width="103" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="URL" id="FDr-0e-igw">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9nh-vY-v6W">
+                        <rect key="frame" x="127" y="112" width="253" height="21"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://example.org/feed.rss" drawsBackground="YES" usesSingleLineMode="YES" id="VSm-J7-qAA">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Znc-BK-dhw">
+                        <rect key="frame" x="18" y="85" width="103" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Name" id="Uda-8X-onH">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5uB-Zy-4u6">
+                        <rect key="frame" x="127" y="83" width="253" height="21"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Example Title" drawsBackground="YES" usesSingleLineMode="YES" id="vzt-hb-cGT">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sMQ-B7-WTo">
+                        <rect key="frame" x="127" y="54" width="86" height="22"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="30" drawsBackground="YES" usesSingleLineMode="YES" id="bNw-iS-Gfz">
+                            <customFormatter key="formatter" id="NEE-2h-FN9" customClass="StrictUIntFormatter"/>
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Az1-ZL-15b">
+                        <rect key="frame" x="232" y="13" width="82" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="V93-O8-bjm">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="didTapCancelButton:" target="6yF-Ii-jhG" id="uS5-n0-iZ3"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CRz-wU-u6m">
+                        <rect key="frame" x="314" y="13" width="72" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="push" title="Done" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="fdr-rD-bgC">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                            <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="didTapDoneButton:" target="6yF-Ii-jhG" id="vK2-Ou-z3b"/>
+                        </connections>
+                    </button>
+                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FYV-ch-Bjd" userLabel="TimeUnit">
+                        <rect key="frame" x="219" y="51" width="127" height="26"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <popUpButtonCell key="cell" type="push" title="Minutes" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" autoenablesItems="NO" selectedItem="7DG-HF-41v" id="54G-6B-9Vg">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="menu"/>
+                            <menu key="menu" showsStateColumn="NO" autoenablesItems="NO" id="FA5-Wc-aKF">
+                                <items>
+                                    <menuItem title="Seconds" id="ObP-NX-RUr">
+                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                    </menuItem>
+                                    <menuItem title="Minutes" state="on" id="7DG-HF-41v">
+                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                    </menuItem>
+                                    <menuItem title="Hours" id="buP-XT-lMO">
+                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                    </menuItem>
+                                    <menuItem title="Days" id="wJ7-Ui-a4q">
+                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                    </menuItem>
+                                    <menuItem title="Weeks" id="Py4-7n-CXD">
+                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                    </menuItem>
+                                </items>
+                            </menu>
+                        </popUpButtonCell>
+                    </popUpButton>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hlP-VB-yeu">
+                        <rect key="frame" x="18" y="56" width="103" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh" id="c0W-IR-MMR">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                </subviews>
+            </view>
+            <point key="canvasLocation" x="20" y="1225.5"/>
+        </window>
     </objects>
     <resources>
         <image name="NSActionTemplate" width="14" height="14"/>
