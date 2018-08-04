@@ -28,4 +28,5 @@
 - (IBAction)addSeparator:(NSButton *)sender;
 
 - (NSString*)copyDescriptionOfSelectedItems;
+- (void)openModalForSelection;
 @end
