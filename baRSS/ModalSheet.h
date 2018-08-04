@@ -20,39 +20,31 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import "FeedEdit.h"
+#import <Cocoa/Cocoa.h>
 
-@implementation FeedEdit
-
-- (IBAction)didTapDoneButton:(id)sender {
-	[self.parentWindow endSheet:self returnCode:NSModalResponseOK];
-}
-
-- (IBAction)didTapCancelButton:(id)sender {
-	[self.parentWindow endSheet:self returnCode:NSModalResponseAbort];
-}
-
+@interface ModalSheet : NSWindow
+- (void)setFormContent:(NSView *)subcontent;
 @end
 
+
+@interface ModalFeedEdit : NSView
+@property (weak) IBOutlet NSTextField *url;
+@property (weak) IBOutlet NSTextField *title;
+@property (weak) IBOutlet NSTextField *refreshNum;
+@property (weak) IBOutlet NSPopUpButton *refreshUnit;
+- (void)setDefaultValues;
+- (void)setURL:(NSString*)url name:(NSString*)name refreshNum:(int32_t)num unit:(int16_t)unit;
++ (NSString*)stringForRefreshNum:(int32_t)num unit:(int16_t)unit;
+@end
+
+
+@interface ModalGroupEdit : NSView
+@property (weak) IBOutlet NSTextField *title;
+- (void)setDefaultValues;
+- (void)setGroupName:(NSString*)name;
+@end
 
 
 @interface StrictUIntFormatter : NSFormatter
 @end
 
-@implementation StrictUIntFormatter
-- (NSString *)stringForObjectValue:(id)obj {
-	return [NSString stringWithFormat:@"%d", [[NSString stringWithFormat:@"%@", obj] intValue]];
-}
-- (BOOL)getObjectValue:(out id  _Nullable __autoreleasing *)obj forString:(NSString *)string errorDescription:(out NSString *__autoreleasing  _Nullable *)error {
-	*obj = [[NSNumber numberWithInt:[string intValue]] stringValue];
-	return YES;
-}
-- (BOOL)isPartialStringValid:(NSString *__autoreleasing  _Nonnull *)partialStringPtr proposedSelectedRange:(NSRangePointer)proposedSelRangePtr originalString:(NSString *)origString originalSelectedRange:(NSRange)origSelRange errorDescription:(NSString *__autoreleasing  _Nullable *)error {
-	for (NSUInteger i = 0; i < [*partialStringPtr length]; i++) {
-		unichar c = [*partialStringPtr characterAtIndex:i];
-		if (c < '0' || c > '9')
-			return NO;
-	}
-	return YES;
-}
-@end

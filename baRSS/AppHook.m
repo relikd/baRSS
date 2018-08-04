@@ -43,14 +43,19 @@ static NSEventModifierFlags fnKeyFlags = NSEventModifierFlagShift | NSEventModif
 				case 'w': if ([self sendAction:@selector(performClose:) to:nil from:self]) return; break;
 			}
 		} else if (flags == (NSEventModifierFlagCommand | NSEventModifierFlagShift)) {
-			if (key == 'z') {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
+			if (key == 'z') {
 				if ([self sendAction:@selector(redo:) to:nil from:self])
 					return;
-#pragma clang diagnostic pop
+			}
+		} else {
+			if (key == 13 || key == 3) { // Enter / Return key
+				if ([self sendAction:@selector(enterPressed:) to:nil from:self])
+					return;
 			}
 		}
+#pragma clang diagnostic pop
 	}
 	[super sendEvent:event];
 }

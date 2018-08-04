@@ -24,9 +24,12 @@
 #import "PyHandler.h"
 #import "Preferences.h"
 #import "DBv1+CoreDataModel.h"
+#import "ModalSheet.h"
 
 @interface NewsController ()
 @property (weak) IBOutlet Preferences *preferencesWindow;
+@property (weak) IBOutlet ModalFeedEdit *viewModalEditFeed;
+@property (weak) IBOutlet ModalGroupEdit *viewModalEditGroup;
 @property (weak) IBOutlet NSOutlineView *outlineView;
 
 @property (strong) NSArray<NSTreeNode*> *currentlyDraggedNodes;
@@ -35,7 +38,7 @@
 @implementation NewsController
 
 // Declare a string constant for the drag type - to be used when writing and retrieving pasteboard data...
-static NSString *dragNodeType = @"baRSS-feed-type";
+static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (void)awakeFromNib {
     [super awakeFromNib];
@@ -45,17 +48,24 @@ static NSString *dragNodeType = @"baRSS-feed-type";
 }
 
 - (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item {
-	// owner is nil to prohibit repeated awakeFromNib calls
-	NSTableCellView *cellView = [self.outlineView makeViewWithIdentifier:tableColumn.identifier owner:nil];
-	if (cellView)
-		return cellView; // is a refresh cell
-	
 	FeedConfig *f = [(NSTreeNode*)item representedObject];
-	if (f.type == 2) { // Seperator
-		return [self.outlineView makeViewWithIdentifier:@"cellFeedConfigSeperator" owner:nil];
+	bool isSeperator = (f.type == 2);
+	bool isRefreshColumn = [tableColumn.identifier isEqualToString:@"RefreshColumn"];
+	
+	NSString *cellIdent = (isRefreshColumn ? @"cellRefresh" : (isSeperator ? @"cellSeparator" : @"cellFeed"));
+	// owner is nil to prohibit repeated awakeFromNib calls
+	NSTableCellView *cellView = [self.outlineView makeViewWithIdentifier:cellIdent owner:nil];
+	
+	if (isRefreshColumn) {
+		cellView.textField.stringValue = (f.type != 1 ? @"" : [ModalFeedEdit stringForRefreshNum:f.refreshNum unit:f.refreshUnit]);
+	} else if (isSeperator) {
+		return cellView; // the refresh cell is already skipped with the above if condition
+	} else {
+		cellView.textField.objectValue = f.name;
+		cellView.imageView.image = (f.type == 0 ? [NSImage imageNamed:NSImageNameFolder] : nil);
+		// TODO: load icon or show default rss icon
 	}
-	cellView = [self.outlineView makeViewWithIdentifier:@"cellFeedConfigName" owner:nil];
-	cellView.imageView.image = [NSImage imageNamed:NSImageNameFolder];
+	cellView.textField.textColor = (f.refreshNum == 0 ? [NSColor disabledControlTextColor] : [NSColor controlTextColor]);
 	return cellView;
 }
 
@@ -99,45 +109,103 @@ static NSString *dragNodeType = @"baRSS-feed-type";
 	NSLog(@"all unread");
 }
 
-- (IBAction)presentModalFeedProperties:(id)sender {
-	self.preferencesWindow.feedDetailSheet.parentWindow = self.preferencesWindow;
-	[self.preferencesWindow beginSheet:self.preferencesWindow.feedDetailSheet completionHandler:^(NSModalResponse returnCode) {
-		NSLog(@"%ld", (long)returnCode);
-	}];
-//	if ([sender isKindOfClass:[NSOutlineView class]]) {
-//		NSOutlineView *ov = sender;
-//		if (ov.clickedRow == -1)
-//			return; // ignore clicks on column headers and where no row was selected
-//
-//		id vop = [ov itemAtRow:ov.clickedRow];
-//		NSLog(@"%@", vop);
-//	}
+#pragma mark - Insert & Edit Feed Items
+
+- (IBAction)addFeed:(id)sender {
+	[self showModalForFeedConfig:nil isGroupEdit:NO];
 }
 
-- (IBAction)addFeed:(NSButton *)sender {
-	[self.managedObjectContext.undoManager beginUndoGrouping];
-	FeedConfig *nf = [self insertSortedItemAtSelection];
-	nf.type = 1;
-	nf.name = [NSString stringWithFormat:@"%@", [NSDate date]];
-	nf.refresh = @"42s";
-	[self.managedObjectContext.undoManager endUndoGrouping];
+- (IBAction)addGroup:(id)sender {
+	[self showModalForFeedConfig:nil isGroupEdit:YES];
 }
 
-- (IBAction)addGroup:(NSButton *)sender {
-	[self.managedObjectContext.undoManager beginUndoGrouping];
-	FeedConfig *g = [self insertSortedItemAtSelection];
-	g.name = @"Group";
-	g.type = 0;
-	[self.managedObjectContext.undoManager endUndoGrouping];
-}
-
-- (IBAction)addSeparator:(NSButton *)sender {
+- (IBAction)addSeparator:(id)sender {
 	[self.managedObjectContext.undoManager beginUndoGrouping];
 	FeedConfig *sp = [self insertSortedItemAtSelection];
 	sp.name = @"---";
 	sp.type = 2;
 	[self.managedObjectContext.undoManager endUndoGrouping];
 }
+
+- (void)remove:(id)sender {
+	[self.managedObjectContext.undoManager beginUndoGrouping];
+	for (NSIndexPath *path in self.selectionIndexPaths)
+		[self incrementIndicesBy:-1 forSubsequentNodes:path];
+	[super remove:sender];
+	[self.managedObjectContext.undoManager endUndoGrouping];
+}
+
+- (IBAction)doubleClickOutlineView:(NSOutlineView*)sender {
+	if (sender.clickedRow == -1)
+		return; // ignore clicks on column headers and where no row was selected
+	
+	FeedConfig *fc = [(NSTreeNode*)[sender itemAtRow:sender.clickedRow] representedObject];
+	[self showModalForFeedConfig:fc isGroupEdit:YES]; // yes will be overwritten anyway
+}
+
+- (void)openModalForSelection {
+	[self showModalForFeedConfig:self.selectedObjects.firstObject isGroupEdit:YES]; // yes will be overwritten anyway
+}
+
+- (void)showModalForFeedConfig:(FeedConfig*)obj isGroupEdit:(bool)group {
+	bool existingItem = [obj isKindOfClass:[FeedConfig class]];
+	if (existingItem) {
+		if (obj.type == 2) return; // Separator
+		group = (obj.type == 0);
+		if (group) [self.viewModalEditGroup setGroupName:obj.name];
+		else       [self.viewModalEditFeed setURL:obj.url name:obj.name refreshNum:obj.refreshNum unit:obj.refreshUnit];
+	} else {
+		if (group) [self.viewModalEditGroup setDefaultValues];
+		else       [self.viewModalEditFeed setDefaultValues];
+	}
+	NSView *content = (group ? self.viewModalEditGroup : self.viewModalEditFeed);
+	[self.preferencesWindow presentModal:content completion:^(NSModalResponse returnCode) {
+		if (returnCode == NSModalResponseOK) {
+			[self.managedObjectContext.undoManager beginUndoGrouping];
+			FeedConfig *item = obj;
+			if (!existingItem) { // create new item
+				item = [self insertSortedItemAtSelection];
+				item.type = (group ? 0 : 1);
+			}
+			
+			if (group) {
+				item.name = self.viewModalEditGroup.title.stringValue;
+			} else {
+				item.name = self.viewModalEditFeed.title.stringValue;
+				item.url = self.viewModalEditFeed.url.stringValue;
+				item.refreshNum = self.viewModalEditFeed.refreshNum.intValue;
+				item.refreshUnit = (int16_t)self.viewModalEditFeed.refreshUnit.indexOfSelectedItem;
+			}
+			[self.managedObjectContext.undoManager endUndoGrouping];
+			[self rearrangeObjects];
+		}
+	}];
+}
+
+- (FeedConfig*)insertSortedItemAtSelection {
+	NSIndexPath *selectedIndex = [self selectionIndexPath];
+	NSIndexPath *insertIndex = selectedIndex;
+	
+	FeedConfig *selected = [[[self arrangedObjects] descendantNodeAtIndexPath:selectedIndex] representedObject];
+	NSUInteger lastIndex = selected.children.count;
+	bool groupSelected = (selected.type == 0);
+	
+	if (!groupSelected) {
+		lastIndex = (NSUInteger)selected.sortIndex + 1; // insert after selection
+		insertIndex = [insertIndex indexPathByRemovingLastIndex];
+		[self incrementIndicesBy:+1 forSubsequentNodes:selectedIndex];
+		--selected.sortIndex; // insert after selection
+	}
+	
+	FeedConfig *newItem = [[FeedConfig alloc] initWithEntity:FeedConfig.entity insertIntoManagedObjectContext:self.managedObjectContext];
+	[self insertObject:newItem atArrangedObjectIndexPath:[insertIndex indexPathByAddingIndex:lastIndex]];
+	// First insert, then parent, else troubles
+	newItem.sortIndex = (int32_t)lastIndex;
+	newItem.parent = (groupSelected ? selected : selected.parent);
+	return newItem;
+}
+
+#pragma mark - Import & Export of Data
 
 - (NSString*)copyDescriptionOfSelectedItems {
 	NSMutableString *str = [[NSMutableString alloc] init];
@@ -157,28 +225,11 @@ static NSString *dragNodeType = @"baRSS-feed-type";
 	switch (obj.type) {
 		case 0: [str appendFormat:@"%@:\n", obj.name]; break; // Group
 		case 2: [str appendString:@"-------------\n"]; break; // Separator
-		default: [str appendFormat:@"%@ (%@) - %@\n", obj.name, obj.url, obj.refresh];
+		default: [str appendFormat:@"%@ (%@) - %@\n", obj.name, obj.url, [ModalFeedEdit stringForRefreshNum:obj.refreshNum unit:obj.refreshUnit]];
 	}
 	for (FeedConfig *child in obj.children) {
 		[self traverseChildren:child appendString:str indentation:indent + 1];
 	}
-}
-
-- (FeedConfig*)insertSortedItemAtSelection {
-	FeedConfig *selected = [[[self arrangedObjects] descendantNodeAtIndexPath:[self selectionIndexPath]] representedObject];
-	if (selected.type != 0) { // other than group
-		[self incrementIndicesBy:+1 forSubsequentNodes:[self selectionIndexPath]];
-	}
-	FeedConfig *newItem = [[FeedConfig alloc] initWithEntity:FeedConfig.entity insertIntoManagedObjectContext:self.managedObjectContext];
-	if (selected.type == 0) { // a group
-		newItem.sortIndex = (int32_t)selected.children.count;
-		newItem.parent = selected;
-	} else {
-		newItem.sortIndex = selected.sortIndex;
-		newItem.parent = selected.parent;
-		--selected.sortIndex; // was increased before the new item is inserted
-	}
-	return newItem;
 }
 
 - (void)incrementIndicesBy:(int)val forSubsequentNodes:(NSIndexPath*)path {
@@ -272,11 +323,11 @@ static NSString *dragNodeType = @"baRSS-feed-type";
 
 @end
 
+#pragma mark - Drawings on Screen
 
-@interface Separator : NSView
-@end
+@interface DrawSeparator : NSView @end
 
-@implementation Separator
+@implementation DrawSeparator
 - (void)drawRect:(NSRect)dirtyRect {
 	[super drawRect:dirtyRect];
 	NSGradient *grdnt = [[NSGradient alloc] initWithStartingColor:[NSColor darkGrayColor] endingColor:[[NSColor darkGrayColor] colorWithAlphaComponent:0.0]];

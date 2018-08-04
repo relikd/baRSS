@@ -22,6 +22,7 @@
 
 #import "Preferences.h"
 #import "NewsController.h"
+#import "ModalSheet.h"
 
 @interface Preferences ()
 @property (weak) IBOutlet NSView *viewGeneral;
@@ -33,36 +34,62 @@
 
 - (void)awakeFromNib {
 	[super awakeFromNib];
-	if (self.contentView.subviews.count == 0) {
+	NSUInteger idx = (NSUInteger)[[NSUserDefaults standardUserDefaults] integerForKey:@"preferencesTab"];
+	if (idx >= self.toolbar.items.count)
+		idx = 0;
+	[self tabClicked:self.toolbar.items[idx]];
+}
+
+- (IBAction)tabClicked:(NSToolbarItem *)sender {
+	self.contentView = nil;
+	if ([sender.itemIdentifier isEqualToString:@"tabGeneral"])
 		self.contentView = self.viewGeneral;
-		self.toolbar.selectedItemIdentifier = self.toolbar.items.firstObject.itemIdentifier;
-	}
-}
-
-- (IBAction)tabGeneralClicked:(NSToolbarItem *)sender {
-	self.contentView = self.viewGeneral;
-}
-
-- (IBAction)tabFeedsClicked:(NSToolbarItem *)sender {
-	self.contentView = self.viewFeeds;
+	else if ([sender.itemIdentifier isEqualToString:@"tabFeeds"])
+		self.contentView = self.viewFeeds;
+	
+	self.toolbar.selectedItemIdentifier = sender.itemIdentifier;
+	[self recalculateKeyViewLoop];
+	[self setInitialFirstResponder:self.contentView];
+	
+	[[NSUserDefaults standardUserDefaults] setInteger:(NSInteger)[self.toolbar.items indexOfObject:sender]
+											   forKey:@"preferencesTab"];
 }
 
 - (void)undo:(id)sender {
-	if (self.contentView == self.viewFeeds) {
-		[self.newsController.managedObjectContext.undoManager undo];
-		[self.newsController rearrangeObjects]; // update the ordering
-	}
+	[self.newsController.managedObjectContext.undoManager undo];
+	[self.newsController rearrangeObjects]; // update ordering
 }
 
 - (void)redo:(id)sender {
-	if (self.contentView == self.viewFeeds) {
-		[self.newsController.managedObjectContext.undoManager redo];
-		[self.newsController rearrangeObjects]; // update the ordering
-	}
+	[self.newsController.managedObjectContext.undoManager redo];
+	[self.newsController rearrangeObjects]; // update ordering
 }
 
 - (void)copy:(id)sender {
 	[self.newsController copyDescriptionOfSelectedItems];
+}
+
+- (void)enterPressed:(id)sender {
+	[self.newsController openModalForSelection];
+}
+
+- (BOOL)respondsToSelector:(SEL)aSelector {
+	bool isFeedView = (self.contentView == self.viewFeeds) && !self.attachedSheet;
+	// Only if 'Feeds' Tab is selected  &  no open modal sheet  &  NSOutlineView has focus
+	if (aSelector == @selector(enterPressed:) || aSelector == @selector(copy:)) {
+		bool outlineHasFocus = [[self firstResponder] isKindOfClass:[NSOutlineView class]];
+		return isFeedView && outlineHasFocus && (self.newsController.selectedNodes.count > 0);
+	} else if (aSelector == @selector(undo:)) {
+		return isFeedView && [self.newsController.managedObjectContext.undoManager canUndo];
+	} else if (aSelector == @selector(redo:)) {
+		return isFeedView && [self.newsController.managedObjectContext.undoManager canRedo];
+	}
+	return [super respondsToSelector:aSelector];
+}
+
+- (void)presentModal:(NSView*)view completion:(void (^ __nullable)(NSModalResponse returnCode))handler {
+	[self.modalSheet setFormContent:view];
+	[self beginSheet:self.modalSheet completionHandler:handler];
 }
 
 @end

@@ -22,7 +22,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface Preferences : NSWindow
-@property (weak) IBOutlet NSWindow *feedDetailSheet;
+@class ModalSheet;
 
+@interface Preferences : NSWindow
+@property (weak) IBOutlet ModalSheet *modalSheet;
+
+- (void)presentModal:(NSView*)view completion:(void (^ __nullable)(NSModalResponse returnCode))handler;
 @end
