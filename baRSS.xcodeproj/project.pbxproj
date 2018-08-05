@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1968E0AE14B8E8A90E194980 /* PyHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 1968EF7567E06D2A5BB3481A /* PyHandler.m */; };
+		54209E942117325100F3B5EF /* DrawImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 54209E932117325100F3B5EF /* DrawImage.m */; };
 		544B011A2114B41200386E5C /* ModalSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* ModalSheet.m */; };
 		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
 		544FBD4521064AEB008A260C /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544FBD4421064AEB008A260C /* Python.framework */; };
@@ -25,6 +26,8 @@
 /* Begin PBXFileReference section */
 		1968E7919BAA36F042FCB717 /* PyHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PyHandler.h; sourceTree = "<group>"; };
 		1968EF7567E06D2A5BB3481A /* PyHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PyHandler.m; sourceTree = "<group>"; };
+		54209E922117325100F3B5EF /* DrawImage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DrawImage.h; sourceTree = "<group>"; };
+		54209E932117325100F3B5EF /* DrawImage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DrawImage.m; sourceTree = "<group>"; };
 		544B01182114B41200386E5C /* ModalSheet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModalSheet.h; sourceTree = "<group>"; };
 		544B01192114B41200386E5C /* ModalSheet.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ModalSheet.m; sourceTree = "<group>"; };
 		544B011B2114EE9100386E5C /* AppHook.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppHook.h; sourceTree = "<group>"; };
@@ -108,6 +111,8 @@
 				54ACC29721061FBA0020715F /* Preferences.m */,
 				544B01182114B41200386E5C /* ModalSheet.h */,
 				544B01192114B41200386E5C /* ModalSheet.m */,
+				54209E922117325100F3B5EF /* DrawImage.h */,
+				54209E932117325100F3B5EF /* DrawImage.m */,
 				54ACC28521061B3C0020715F /* Assets.xcassets */,
 				54ACC28721061B3C0020715F /* Main.xib */,
 				54ACC28A21061B3C0020715F /* Info.plist */,
@@ -205,6 +210,7 @@
 				544B011A2114B41200386E5C /* ModalSheet.m in Sources */,
 				54ACC29821061FBA0020715F /* Preferences.m in Sources */,
 				1968E0AE14B8E8A90E194980 /* PyHandler.m in Sources */,
+				54209E942117325100F3B5EF /* DrawImage.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

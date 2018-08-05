@@ -22,6 +22,7 @@
 
 #import "AppDelegate.h"
 #import "PyHandler.h"
+#import "DrawImage.h"
 
 @interface AppDelegate ()
 @property (strong) NSStatusItem *statusItem;
@@ -34,9 +35,11 @@
 	self.statusItem = [NSStatusBar.systemStatusBar statusItemWithLength:NSVariableStatusItemLength];
 	self.statusItem.title = @"me";
 	self.statusItem.menu = self.statusMenu;
-	printf("will init\n");
+	self.statusItem.highlightMode = YES;
+	self.statusItem.image = [[RSSIcon templateIcon:16 tint:nil] image];
+	self.statusItem.image.template = YES;
 	[PyHandler prepare];
-	printf("done\n");
+	printf("up and running\n");
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {

@@ -25,6 +25,7 @@
 #import "Preferences.h"
 #import "DBv1+CoreDataModel.h"
 #import "ModalSheet.h"
+#import "DrawImage.h"
 
 @interface NewsController ()
 @property (weak) IBOutlet Preferences *preferencesWindow;
@@ -49,6 +50,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item {
 	FeedConfig *f = [(NSTreeNode*)item representedObject];
+	bool isFeed = (f.type == 1);
 	bool isSeperator = (f.type == 2);
 	bool isRefreshColumn = [tableColumn.identifier isEqualToString:@"RefreshColumn"];
 	
@@ -57,15 +59,24 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	NSTableCellView *cellView = [self.outlineView makeViewWithIdentifier:cellIdent owner:nil];
 	
 	if (isRefreshColumn) {
-		cellView.textField.stringValue = (f.type != 1 ? @"" : [ModalFeedEdit stringForRefreshNum:f.refreshNum unit:f.refreshUnit]);
+		cellView.textField.stringValue = (!isFeed ? @"" : [ModalFeedEdit stringForRefreshNum:f.refreshNum unit:f.refreshUnit]);
 	} else if (isSeperator) {
 		return cellView; // the refresh cell is already skipped with the above if condition
 	} else {
 		cellView.textField.objectValue = f.name;
-		cellView.imageView.image = (f.type == 0 ? [NSImage imageNamed:NSImageNameFolder] : nil);
-		// TODO: load icon or show default rss icon
+		if (f.type == 0) {
+			cellView.imageView.image = [NSImage imageNamed:NSImageNameFolder];
+		} else {
+			// TODO: load icon
+			static NSImage *defaultRSSIcon;
+			if (!defaultRSSIcon)
+				defaultRSSIcon = [[[RSSIcon iconWithSize:cellView.imageView.frame.size] autoGradient] image];
+			
+			cellView.imageView.image = defaultRSSIcon;
+		}
 	}
-	cellView.textField.textColor = (f.refreshNum == 0 ? [NSColor disabledControlTextColor] : [NSColor controlTextColor]);
+	if (isFeed) // also for refresh column
+		cellView.textField.textColor = (f.refreshNum == 0 ? [NSColor disabledControlTextColor] : [NSColor controlTextColor]);
 	return cellView;
 }
 
@@ -321,17 +332,4 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	return NSDragOperationGeneric;
 }
 
-@end
-
-#pragma mark - Drawings on Screen
-
-@interface DrawSeparator : NSView @end
-
-@implementation DrawSeparator
-- (void)drawRect:(NSRect)dirtyRect {
-	[super drawRect:dirtyRect];
-	NSGradient *grdnt = [[NSGradient alloc] initWithStartingColor:[NSColor darkGrayColor] endingColor:[[NSColor darkGrayColor] colorWithAlphaComponent:0.0]];
-	NSBezierPath *rounded = [NSBezierPath bezierPathWithRoundedRect:NSMakeRect(1, self.bounds.size.height/2.0-1, self.bounds.size.width-2, 2) xRadius:1 yRadius:1];
-	[grdnt drawInBezierPath:rounded angle:0];
-}
 @end
