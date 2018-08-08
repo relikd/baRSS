@@ -27,30 +27,31 @@ static NSEventModifierFlags fnKeyFlags = NSEventModifierFlagShift | NSEventModif
 @implementation AppHook
 - (void) sendEvent:(NSEvent *)event {
 	if ([event type] == NSEventTypeKeyDown) {
+		if (!event.characters || event.characters.length == 0) {
+			[super sendEvent:event];
+			return;
+		}
 		NSEventModifierFlags flags = (event.modifierFlags & fnKeyFlags); // ignore caps lock, etc.
 		unichar key = [event.characters characterAtIndex:0]; // charactersIgnoringModifiers
 		if (flags == NSEventModifierFlagCommand) {
 			switch (key) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wundeclared-selector"
-				case 'z': if ([self sendAction:@selector(undo:) to:nil from:self]) return; break;
-#pragma clang diagnostic pop
 				case 'x': if ([self sendAction:@selector(cut:) to:nil from:self]) return; break;
 				case 'c': if ([self sendAction:@selector(copy:) to:nil from:self]) return; break;
 				case 'v': if ([self sendAction:@selector(paste:) to:nil from:self]) return; break;
 				case 'a': if ([self sendAction:@selector(selectAll:) to:nil from:self]) return; break;
 				case 'q': if ([self sendAction:@selector(terminate:) to:nil from:self]) return; break;
 				case 'w': if ([self sendAction:@selector(performClose:) to:nil from:self]) return; break;
-			}
-		} else if (flags == (NSEventModifierFlagCommand | NSEventModifierFlagShift)) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
+				case 'z': if ([self sendAction:@selector(undo:) to:nil from:self]) return; break;
+			}
+		} else if (flags == (NSEventModifierFlagCommand | NSEventModifierFlagShift)) {
 			if (key == 'z') {
 				if ([self sendAction:@selector(redo:) to:nil from:self])
 					return;
 			}
 		} else {
-			if (key == 13 || key == 3) { // Enter / Return key
+			if (key == NSEnterCharacter || key == NSCarriageReturnCharacter) {
 				if ([self sendAction:@selector(enterPressed:) to:nil from:self])
 					return;
 			}

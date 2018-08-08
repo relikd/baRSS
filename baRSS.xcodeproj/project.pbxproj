@@ -14,6 +14,11 @@
 		544FBD4521064AEB008A260C /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544FBD4421064AEB008A260C /* Python.framework */; };
 		544FBD4721064B2F008A260C /* getFeed.py in Resources */ = {isa = PBXBuildFile; fileRef = 544FBD4621064B2F008A260C /* getFeed.py */; };
 		544FBD4921064DF0008A260C /* feedparser521.py in Resources */ = {isa = PBXBuildFile; fileRef = 544FBD4821064DF0008A260C /* feedparser521.py */; };
+		546FC43D21188AD5007CC3A3 /* SettingsFeeds.m in Sources */ = {isa = PBXBuildFile; fileRef = 546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */; };
+		546FC43F21188C78007CC3A3 /* SettingsFeeds.xib in Resources */ = {isa = PBXBuildFile; fileRef = 546FC43E21188C78007CC3A3 /* SettingsFeeds.xib */; };
+		546FC44321189975007CC3A3 /* SettingsGeneral.m in Sources */ = {isa = PBXBuildFile; fileRef = 546FC44121189975007CC3A3 /* SettingsGeneral.m */; };
+		546FC44421189975007CC3A3 /* SettingsGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 546FC44221189975007CC3A3 /* SettingsGeneral.xib */; };
+		546FC4472118A8E6007CC3A3 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 546FC4462118A8E6007CC3A3 /* Preferences.xib */; };
 		54ACC28121061B3B0020715F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28021061B3B0020715F /* AppDelegate.m */; };
 		54ACC28621061B3C0020715F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54ACC28521061B3C0020715F /* Assets.xcassets */; };
 		54ACC28921061B3C0020715F /* Main.xib in Resources */ = {isa = PBXBuildFile; fileRef = 54ACC28721061B3C0020715F /* Main.xib */; };
@@ -35,6 +40,13 @@
 		544FBD4421064AEB008A260C /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
 		544FBD4621064B2F008A260C /* getFeed.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = getFeed.py; sourceTree = "<group>"; usesTabs = 0; };
 		544FBD4821064DF0008A260C /* feedparser521.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = feedparser521.py; sourceTree = "<group>"; usesTabs = 0; };
+		546FC43B21188AD5007CC3A3 /* SettingsFeeds.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsFeeds.h; sourceTree = "<group>"; };
+		546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsFeeds.m; sourceTree = "<group>"; };
+		546FC43E21188C78007CC3A3 /* SettingsFeeds.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsFeeds.xib; sourceTree = "<group>"; };
+		546FC44021189975007CC3A3 /* SettingsGeneral.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsGeneral.h; sourceTree = "<group>"; };
+		546FC44121189975007CC3A3 /* SettingsGeneral.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsGeneral.m; sourceTree = "<group>"; };
+		546FC44221189975007CC3A3 /* SettingsGeneral.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsGeneral.xib; sourceTree = "<group>"; };
+		546FC4462118A8E6007CC3A3 /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
 		54ACC27C21061B3B0020715F /* baRSS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = baRSS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		54ACC27F21061B3B0020715F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		54ACC28021061B3B0020715F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -67,6 +79,32 @@
 				544FBD4421064AEB008A260C /* Python.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		546FC44521189ADC007CC3A3 /* Settings Tabs */ = {
+			isa = PBXGroup;
+			children = (
+				546FC44021189975007CC3A3 /* SettingsGeneral.h */,
+				546FC44121189975007CC3A3 /* SettingsGeneral.m */,
+				546FC44221189975007CC3A3 /* SettingsGeneral.xib */,
+				546FC43B21188AD5007CC3A3 /* SettingsFeeds.h */,
+				546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */,
+				546FC43E21188C78007CC3A3 /* SettingsFeeds.xib */,
+			);
+			path = "Settings Tabs";
+			sourceTree = "<group>";
+		};
+		546FC44D2118B357007CC3A3 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				54ACC29621061FBA0020715F /* Preferences.h */,
+				54ACC29721061FBA0020715F /* Preferences.m */,
+				546FC4462118A8E6007CC3A3 /* Preferences.xib */,
+				546FC44521189ADC007CC3A3 /* Settings Tabs */,
+				544B01182114B41200386E5C /* ModalSheet.h */,
+				544B01192114B41200386E5C /* ModalSheet.m */,
+			);
+			path = Preferences;
 			sourceTree = "<group>";
 		};
 		549369F421091E6D001AF895 /* python */ = {
@@ -107,12 +145,9 @@
 				54ACC28021061B3B0020715F /* AppDelegate.m */,
 				54ACC29321061E270020715F /* NewsController.h */,
 				54ACC29421061E270020715F /* NewsController.m */,
-				54ACC29621061FBA0020715F /* Preferences.h */,
-				54ACC29721061FBA0020715F /* Preferences.m */,
-				544B01182114B41200386E5C /* ModalSheet.h */,
-				544B01192114B41200386E5C /* ModalSheet.m */,
 				54209E922117325100F3B5EF /* DrawImage.h */,
 				54209E932117325100F3B5EF /* DrawImage.m */,
+				546FC44D2118B357007CC3A3 /* Preferences */,
 				54ACC28521061B3C0020715F /* Assets.xcassets */,
 				54ACC28721061B3C0020715F /* Main.xib */,
 				54ACC28A21061B3C0020715F /* Info.plist */,
@@ -188,7 +223,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				546FC4472118A8E6007CC3A3 /* Preferences.xib in Resources */,
 				54ACC28621061B3C0020715F /* Assets.xcassets in Resources */,
+				546FC44421189975007CC3A3 /* SettingsGeneral.xib in Resources */,
+				546FC43F21188C78007CC3A3 /* SettingsFeeds.xib in Resources */,
 				544FBD4921064DF0008A260C /* feedparser521.py in Resources */,
 				544FBD4721064B2F008A260C /* getFeed.py in Resources */,
 				54ACC28921061B3C0020715F /* Main.xib in Resources */,
@@ -204,11 +242,13 @@
 			files = (
 				54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */,
 				544B011D2114EE9100386E5C /* AppHook.m in Sources */,
+				546FC44321189975007CC3A3 /* SettingsGeneral.m in Sources */,
 				54ACC29521061E270020715F /* NewsController.m in Sources */,
 				54ACC28C21061B3C0020715F /* main.m in Sources */,
 				54ACC28121061B3B0020715F /* AppDelegate.m in Sources */,
 				544B011A2114B41200386E5C /* ModalSheet.m in Sources */,
 				54ACC29821061FBA0020715F /* Preferences.m in Sources */,
+				546FC43D21188AD5007CC3A3 /* SettingsFeeds.m in Sources */,
 				1968E0AE14B8E8A90E194980 /* PyHandler.m in Sources */,
 				54209E942117325100F3B5EF /* DrawImage.m in Sources */,
 			);
@@ -232,6 +272,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -279,7 +320,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -290,6 +331,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -331,7 +373,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};

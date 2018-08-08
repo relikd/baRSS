@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="Preferences">
+            <connections>
+                <outlet property="settingsFeeds" destination="IYm-V7-352" id="KdS-eY-jdj"/>
+                <outlet property="settingsGeneral" destination="iap-X4-1Ef" id="VYy-lR-Cba"/>
+                <outlet property="window" destination="XQ4-ia-CCO" id="rse-30-FqG"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <window title="baRSS Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="prefWindow" animationBehavior="default" tabbingMode="disallowed" id="XQ4-ia-CCO" userLabel="Window" customClass="NonRespondingWindow">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
+            <rect key="contentRect" x="948" y="431" width="320" height="327"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+            <value key="minSize" type="size" width="320" height="327"/>
+            <view key="contentView" id="hcr-99-ABl">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="327"/>
+                <autoresizingMask key="autoresizingMask"/>
+            </view>
+            <toolbar key="toolbar" implicitIdentifier="5B23E7E6-13E5-4910-875D-2E3EA566F38B" autosavesConfiguration="NO" allowsUserCustomization="NO" displayMode="iconAndLabel" sizeMode="regular" id="vwy-mG-3U7">
+                <allowedToolbarItems>
+                    <toolbarItem implicitItemIdentifier="AF4483E3-0457-47B7-AE52-AC11B1545455" explicitItemIdentifier="tabGeneral" label="General" paletteLabel="General" tag="-1" image="NSPreferencesGeneral" selectable="YES" id="WDq-RJ-C3X">
+                        <connections>
+                            <action selector="tabClicked:" target="-2" id="P5A-7V-1JL"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="E8527558-3D5F-4B79-99E4-675C1557D10B" explicitItemIdentifier="tabFeeds" label="Feeds" paletteLabel="Feeds" tag="-1" image="NSUserAccounts" selectable="YES" id="atT-AS-vmR">
+                        <connections>
+                            <action selector="tabClicked:" target="-2" id="MVF-hq-6H4"/>
+                        </connections>
+                    </toolbarItem>
+                </allowedToolbarItems>
+                <defaultToolbarItems>
+                    <toolbarItem reference="WDq-RJ-C3X"/>
+                    <toolbarItem reference="atT-AS-vmR"/>
+                </defaultToolbarItems>
+            </toolbar>
+            <connections>
+                <outlet property="delegate" destination="-2" id="QYC-U2-meR"/>
+            </connections>
+            <point key="canvasLocation" x="-96" y="741"/>
+        </window>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <viewController id="iap-X4-1Ef" customClass="SettingsGeneral"/>
+        <viewController id="IYm-V7-352" customClass="SettingsFeeds"/>
+    </objects>
+    <resources>
+        <image name="NSPreferencesGeneral" width="32" height="32"/>
+        <image name="NSUserAccounts" width="32" height="32"/>
+    </resources>
+</document>

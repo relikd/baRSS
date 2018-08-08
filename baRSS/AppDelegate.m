@@ -23,10 +23,12 @@
 #import "AppDelegate.h"
 #import "PyHandler.h"
 #import "DrawImage.h"
+#import "Preferences.h"
 
 @interface AppDelegate ()
-@property (strong) NSStatusItem *statusItem;
 @property (weak) IBOutlet NSMenu *statusMenu;
+@property (strong) NSStatusItem *statusItem;
+@property (strong) Preferences *prefWindow;
 @end
 
 @implementation AppDelegate
@@ -44,6 +46,17 @@
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
 	[PyHandler shutdown];
+}
+
+- (IBAction)openPreferences:(id)sender {
+	if (!self.prefWindow)
+		self.prefWindow = [[Preferences alloc] initWithWindowNibName:@"Preferences"];
+	[NSApp activateIgnoringOtherApps:YES];
+	[self.prefWindow showWindow:nil];
+}
+
+- (void)preferencesClosed {
+	self.prefWindow = nil;
 }
 
 #pragma mark - Core Data stack
