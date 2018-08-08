@@ -21,11 +21,7 @@
 //  SOFTWARE.
 
 #import <Cocoa/Cocoa.h>
-#import <CoreData/CoreData.h>
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
-@property (readonly, strong) NSPersistentContainer *persistentContainer;
+@interface SettingsFeeds : NSViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
 
-- (void)preferencesClosed;
 @end
-

@@ -96,8 +96,9 @@
 				CGContextDrawLinearGradient(c, gradient, CGPointMake(0, s), CGPointMake(s, 0), 0);
 				CGGradientRelease(gradient);
 				CFRelease(colors);
+			} else {
+				CGContextFillPath(c);
 			}
-			CGContextFillPath(c);
 			CGContextSetFillColorWithColor(c, [self.barsColor CGColor]);
 		}
 		CGContextAddPath(c, bars);

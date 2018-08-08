@@ -21,11 +21,30 @@
 //  SOFTWARE.
 
 #import <Cocoa/Cocoa.h>
-#import <CoreData/CoreData.h>
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
-@property (readonly, strong) NSPersistentContainer *persistentContainer;
+@interface ModalSheet : NSPanel
++ (instancetype)modalWithView:(NSView*)content;
+@end
 
-- (void)preferencesClosed;
+
+@interface ModalFeedEdit : NSView
+@property (weak) IBOutlet NSTextField *url;
+@property (weak) IBOutlet NSTextField *title;
+@property (weak) IBOutlet NSTextField *refreshNum;
+@property (weak) IBOutlet NSPopUpButton *refreshUnit;
+- (void)setDefaultValues;
+- (void)setURL:(NSString*)url name:(NSString*)name refreshNum:(int32_t)num unit:(int16_t)unit;
++ (NSString*)stringForRefreshNum:(int32_t)num unit:(int16_t)unit;
+@end
+
+
+@interface ModalGroupEdit : NSView
+@property (weak) IBOutlet NSTextField *title;
+- (void)setDefaultValues;
+- (void)setGroupName:(NSString*)name;
+@end
+
+
+@interface StrictUIntFormatter : NSFormatter
 @end
 
