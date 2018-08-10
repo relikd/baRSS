@@ -22,15 +22,15 @@
 
 #import "ModalSheet.h"
 
-#define BETWEEN(x,min,max) (x < min ? min : x > max ? max : x)
-
-
-#pragma mark - ModalSheet
+@interface ModalSheet()
+@property (strong) NSButton *btnDone;
+@end
 
 @implementation ModalSheet
 
 - (void)didTapDoneButton:(id)sender { [self closeWithResponse:NSModalResponseOK]; }
 - (void)didTapCancelButton:(id)sender { [self closeWithResponse:NSModalResponseAbort]; }
+- (void)setDoneEnabled:(BOOL)accept { self.btnDone.enabled = accept; }
 
 - (void)closeWithResponse:(NSModalResponse)response {
 	// store modal view width and remove subviews to avoid _NSKeyboardFocusClipView issues
@@ -46,27 +46,30 @@
 	static const int padButtons = 12;
 	static const int minWidth = 320;
 	static const int maxWidth = 1200;
-	NSInteger prevWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"modalSheetWidth"];
 	
-	NSRect cFrame = NSMakeRect(padWindow, padWindow, BETWEEN(prevWidth, minWidth, maxWidth), content.frame.size.height);
+	NSInteger prevWidth = [[NSUserDefaults standardUserDefaults] integerForKey:@"modalSheetWidth"];
+	if      (prevWidth < minWidth)  prevWidth = minWidth;
+	else if (prevWidth > maxWidth)  prevWidth = maxWidth;
+	
+	NSRect cFrame = NSMakeRect(padWindow, padWindow, prevWidth, content.frame.size.height);
 	NSRect wFrame = CGRectInset(cFrame, -padWindow, -padWindow);
 	
 	NSWindowStyleMask style = NSWindowStyleMaskTitled | NSWindowStyleMaskResizable | NSWindowStyleMaskFullSizeContentView;
 	ModalSheet *sheet = [[super alloc] initWithContentRect:wFrame styleMask:style backing:NSBackingStoreBuffered defer:NO];
 	
 	// Respond buttons
-	NSButton *btnDone = [NSButton buttonWithTitle:NSLocalizedString(@"Done", nil) target:sheet action:@selector(didTapDoneButton:)];
-	btnDone.keyEquivalent = @"\r"; // Enter / Return
-	btnDone.autoresizingMask = NSViewMinXMargin | NSViewMaxYMargin;
+	sheet.btnDone = [NSButton buttonWithTitle:NSLocalizedString(@"Done", nil) target:sheet action:@selector(didTapDoneButton:)];
+	sheet.btnDone.keyEquivalent = @"\r"; // Enter / Return
+	sheet.btnDone.autoresizingMask = NSViewMinXMargin | NSViewMaxYMargin;
 	
 	NSButton *btnCancel = [NSButton buttonWithTitle:NSLocalizedString(@"Cancel", nil) target:sheet action:@selector(didTapCancelButton:)];
 	btnCancel.keyEquivalent = [NSString stringWithFormat:@"%c", 0x1b]; // ESC
 	btnCancel.autoresizingMask = NSViewMinXMargin | NSViewMaxYMargin;
 	
-	NSRect align = [btnDone alignmentRectForFrame:btnDone.frame];
+	NSRect align = [sheet.btnDone alignmentRectForFrame:sheet.btnDone.frame];
 	align.origin.x = wFrame.size.width - align.size.width - padWindow;
 	align.origin.y = padWindow;
-	[btnDone setFrameOrigin:[btnDone frameForAlignmentRect:align].origin];
+	[sheet.btnDone setFrameOrigin:[sheet.btnDone frameForAlignmentRect:align].origin];
 
 	align.origin.x -= [btnCancel alignmentRectForFrame:btnCancel.frame].size.width + padButtons;
 	[btnCancel setFrameOrigin:[btnCancel frameForAlignmentRect:align].origin];
@@ -78,7 +81,7 @@
 	// add all UI elements to the window view
 	content.frame = cFrame;
 	[sheet.contentView addSubview:content];
-	[sheet.contentView addSubview:btnDone];
+	[sheet.contentView addSubview:sheet.btnDone];
 	[sheet.contentView addSubview:btnCancel];
 	
 	// add respond buttons to the window height
@@ -93,58 +96,3 @@
 @end
 
 
-#pragma mark - ModalFeedEdit
-
-
-@implementation ModalFeedEdit
-- (void)setDefaultValues {
-	self.url.stringValue = @"";
-	self.title.stringValue = @"";
-	self.refreshNum.intValue = 30;
-	[self.refreshUnit selectItemAtIndex:1];
-}
-- (void)setURL:(NSString*)url name:(NSString*)name refreshNum:(int32_t)num unit:(int16_t)unit {
-	self.url.objectValue = url;
-	self.title.objectValue = name;
-	self.refreshNum.intValue = num;
-	[self.refreshUnit selectItemAtIndex:BETWEEN(unit, 0, self.refreshUnit.numberOfItems - 1)];
-}
-+ (NSString*)stringForRefreshNum:(int32_t)num unit:(int16_t)unit {
-	return [NSString stringWithFormat:@"%d%c", num, [@"smhdw" characterAtIndex:(NSUInteger)BETWEEN(unit, 0, 4)]];
-}
-@end
-
-
-#pragma mark - ModalGroupEdit
-
-
-@implementation ModalGroupEdit
-- (void)setDefaultValues {
-	self.title.stringValue = @"New Group";
-}
-- (void)setGroupName:(NSString*)name {
-	self.title.objectValue = name;
-}
-@end
-
-
-#pragma mark - StrictUIntFormatter
-
-
-@implementation StrictUIntFormatter
-- (NSString *)stringForObjectValue:(id)obj {
-	return [NSString stringWithFormat:@"%d", [[NSString stringWithFormat:@"%@", obj] intValue]];
-}
-- (BOOL)getObjectValue:(out id  _Nullable __autoreleasing *)obj forString:(NSString *)string errorDescription:(out NSString *__autoreleasing  _Nullable *)error {
-	*obj = [[NSNumber numberWithInt:[string intValue]] stringValue];
-	return YES;
-}
-- (BOOL)isPartialStringValid:(NSString *__autoreleasing  _Nonnull *)partialStringPtr proposedSelectedRange:(NSRangePointer)proposedSelRangePtr originalString:(NSString *)origString originalSelectedRange:(NSRange)origSelRange errorDescription:(NSString *__autoreleasing  _Nullable *)error {
-	for (NSUInteger i = 0; i < [*partialStringPtr length]; i++) {
-		unichar c = [*partialStringPtr characterAtIndex:i];
-		if (c < '0' || c > '9')
-			return NO;
-	}
-	return YES;
-}
-@end

@@ -11,8 +11,6 @@
                 <outlet property="dataStore" destination="JPf-gH-wxm" id="9qy-D6-L4R"/>
                 <outlet property="outlineView" destination="wP9-Vd-f79" id="nKf-fc-7Np"/>
                 <outlet property="view" destination="zfc-Ie-Sdx" id="65R-bK-FDI"/>
-                <outlet property="viewModalEditFeed" destination="0p5-Fv-ym4" id="C7K-zb-25M"/>
-                <outlet property="viewModalEditGroup" destination="ZZI-U3-ymX" id="G34-k8-YYo"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
@@ -221,120 +219,7 @@ CA
             </subviews>
             <point key="canvasLocation" x="27" y="883"/>
         </customView>
-        <customView id="0p5-Fv-ym4" userLabel="Modal Edit Feed" customClass="ModalFeedEdit">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
-            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-            <subviews>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qGE-iP-bhd" userLabel="URL Label">
-                    <rect key="frame" x="-2" y="60" width="103" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="URL" id="20W-UE-O54">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField verticalHuggingPriority="750" fixedFrame="YES" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dBf-Ic-aFx">
-                    <rect key="frame" x="107" y="58" width="213" height="21"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="https://example.org/feed.rss" drawsBackground="YES" usesSingleLineMode="YES" id="9uG-PC-ydS">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Gwc-hR-gQU" userLabel="Name Label">
-                    <rect key="frame" x="-2" y="31" width="103" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Name" id="ZZt-vJ-gqR">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Sif-B7-ReQ">
-                    <rect key="frame" x="107" y="29" width="213" height="21"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Example Title" drawsBackground="YES" usesSingleLineMode="YES" id="B6j-EO-17H">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OtU-zo-1Fb" userLabel="Refresh Label">
-                    <rect key="frame" x="-2" y="2" width="103" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Refresh" id="XDh-kX-OcM">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kGm-Pt-t1H">
-                    <rect key="frame" x="107" y="0.0" width="85" height="21"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="30" drawsBackground="YES" usesSingleLineMode="YES" id="rm9-UV-YhG">
-                        <customFormatter key="formatter" id="Ubj-jG-b6k" customClass="StrictUIntFormatter"/>
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mB4-d4-lQz" userLabel="TimeUnit">
-                    <rect key="frame" x="198" y="-3" width="125" height="26"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <popUpButtonCell key="cell" type="push" title="Seconds" bezelStyle="rounded" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" autoenablesItems="NO" altersStateOfSelectedItem="NO" selectedItem="KZL-Pi-rjI" id="0ux-Qa-zbq">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="menu"/>
-                        <menu key="menu" showsStateColumn="NO" autoenablesItems="NO" id="Snb-Bo-1GG">
-                            <items>
-                                <menuItem title="Seconds" keyEquivalent="s" id="TnX-Hk-ZFr">
-                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                </menuItem>
-                                <menuItem title="Minutes" keyEquivalent="m" id="KZL-Pi-rjI">
-                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                </menuItem>
-                                <menuItem title="Hours" keyEquivalent="h" id="uwN-nk-aaQ">
-                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                </menuItem>
-                                <menuItem title="Days" keyEquivalent="d" id="XCA-xq-97w">
-                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                </menuItem>
-                                <menuItem title="Weeks" keyEquivalent="w" id="r9d-8y-QrY">
-                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                </menuItem>
-                            </items>
-                        </menu>
-                    </popUpButtonCell>
-                </popUpButton>
-            </subviews>
-            <connections>
-                <outlet property="refreshNum" destination="kGm-Pt-t1H" id="OJY-yn-Mye"/>
-                <outlet property="refreshUnit" destination="mB4-d4-lQz" id="xsk-oZ-up1"/>
-                <outlet property="title" destination="Sif-B7-ReQ" id="vdX-oR-Lvv"/>
-                <outlet property="url" destination="dBf-Ic-aFx" id="DqH-R5-Sfe"/>
-            </connections>
-            <point key="canvasLocation" x="27" y="1131"/>
-        </customView>
-        <customView id="ZZI-U3-ymX" userLabel="Modal Edit Group" customClass="ModalGroupEdit">
-            <rect key="frame" x="0.0" y="0.0" width="260" height="21"/>
-            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-            <subviews>
-                <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zl1-tn-hla">
-                    <rect key="frame" x="0.0" y="0.0" width="260" height="21"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="Group Name" placeholderString="Group Name" drawsBackground="YES" usesSingleLineMode="YES" id="afG-YW-7CW">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-            </subviews>
-            <connections>
-                <outlet property="title" destination="zl1-tn-hla" id="R4x-bv-CHB"/>
-            </connections>
-            <point key="canvasLocation" x="27" y="1229"/>
-        </customView>
+        <viewController id="TaZ-4L-TdU" customClass="ModalFeedEdit"/>
     </objects>
     <resources>
         <image name="NSActionTemplate" width="14" height="14"/>

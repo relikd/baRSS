@@ -20,9 +20,21 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
+#ifndef FeedConfig_Print_h
+#define FeedConfig_Print_h
 
-@interface NewsController : NSObject
-
-+ (void)downloadFeed:(NSString*)url withBlock:(nullable void (^)(NSDictionary* result, NSError* error))block;
+@implementation FeedConfig (Print)
+- (NSString*)readableRefreshString {
+	return [NSString stringWithFormat:@"%d%c", self.refreshNum, [@"smhdw" characterAtIndex:self.refreshUnit % 5]];
+}
+- (NSString*)readableDescription {
+	switch (self.type) {
+		case 0: return [NSString stringWithFormat:@"%@", self.name]; // Group
+		case 2: return @"-------------"; // Separator
+		default:
+			return [NSString stringWithFormat:@"%@ (%@) - %@", self.name, self.url, [self readableRefreshString]];
+	}
+}
 @end
+
+#endif /* FeedConfig_Print_h */
