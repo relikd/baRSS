@@ -25,6 +25,8 @@
 		54ACC28C21061B3C0020715F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28B21061B3C0020715F /* main.m */; };
 		54ACC29521061E270020715F /* NewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29421061E270020715F /* NewsController.m */; };
 		54ACC29821061FBA0020715F /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29721061FBA0020715F /* Preferences.m */; };
+		54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E8831E211B509D00064188 /* ModalFeedEdit.m */; };
+		54E88321211B509D00064188 /* ModalFeedEdit.xib in Resources */ = {isa = PBXBuildFile; fileRef = 54E8831F211B509D00064188 /* ModalFeedEdit.xib */; };
 		54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +61,10 @@
 		54ACC29421061E270020715F /* NewsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NewsController.m; sourceTree = "<group>"; };
 		54ACC29621061FBA0020715F /* Preferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		54ACC29721061FBA0020715F /* Preferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
+		54E8831D211B509D00064188 /* ModalFeedEdit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModalFeedEdit.h; sourceTree = "<group>"; };
+		54E8831E211B509D00064188 /* ModalFeedEdit.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ModalFeedEdit.m; sourceTree = "<group>"; };
+		54E8831F211B509D00064188 /* ModalFeedEdit.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ModalFeedEdit.xib; sourceTree = "<group>"; };
+		54EC3E1D211D03C100E314F4 /* FeedConfig+Print.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FeedConfig+Print.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,28 +87,27 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		546FC44521189ADC007CC3A3 /* Settings Tabs */ = {
+		546FC44521189ADC007CC3A3 /* General Tab */ = {
 			isa = PBXGroup;
 			children = (
 				546FC44021189975007CC3A3 /* SettingsGeneral.h */,
 				546FC44121189975007CC3A3 /* SettingsGeneral.m */,
 				546FC44221189975007CC3A3 /* SettingsGeneral.xib */,
-				546FC43B21188AD5007CC3A3 /* SettingsFeeds.h */,
-				546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */,
-				546FC43E21188C78007CC3A3 /* SettingsFeeds.xib */,
 			);
-			path = "Settings Tabs";
+			path = "General Tab";
 			sourceTree = "<group>";
 		};
 		546FC44D2118B357007CC3A3 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
+				54EC3E1D211D03C100E314F4 /* FeedConfig+Print.h */,
 				54ACC29621061FBA0020715F /* Preferences.h */,
 				54ACC29721061FBA0020715F /* Preferences.m */,
 				546FC4462118A8E6007CC3A3 /* Preferences.xib */,
-				546FC44521189ADC007CC3A3 /* Settings Tabs */,
 				544B01182114B41200386E5C /* ModalSheet.h */,
 				544B01192114B41200386E5C /* ModalSheet.m */,
+				546FC44521189ADC007CC3A3 /* General Tab */,
+				54E88323211B542E00064188 /* Feeds Tab */,
 			);
 			path = Preferences;
 			sourceTree = "<group>";
@@ -155,6 +160,19 @@
 				54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */,
 			);
 			path = baRSS;
+			sourceTree = "<group>";
+		};
+		54E88323211B542E00064188 /* Feeds Tab */ = {
+			isa = PBXGroup;
+			children = (
+				546FC43B21188AD5007CC3A3 /* SettingsFeeds.h */,
+				546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */,
+				546FC43E21188C78007CC3A3 /* SettingsFeeds.xib */,
+				54E8831D211B509D00064188 /* ModalFeedEdit.h */,
+				54E8831E211B509D00064188 /* ModalFeedEdit.m */,
+				54E8831F211B509D00064188 /* ModalFeedEdit.xib */,
+			);
+			path = "Feeds Tab";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -224,6 +242,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				546FC4472118A8E6007CC3A3 /* Preferences.xib in Resources */,
+				54E88321211B509D00064188 /* ModalFeedEdit.xib in Resources */,
 				54ACC28621061B3C0020715F /* Assets.xcassets in Resources */,
 				546FC44421189975007CC3A3 /* SettingsGeneral.xib in Resources */,
 				546FC43F21188C78007CC3A3 /* SettingsFeeds.xib in Resources */,
@@ -249,6 +268,7 @@
 				544B011A2114B41200386E5C /* ModalSheet.m in Sources */,
 				54ACC29821061FBA0020715F /* Preferences.m in Sources */,
 				546FC43D21188AD5007CC3A3 /* SettingsFeeds.m in Sources */,
+				54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */,
 				1968E0AE14B8E8A90E194980 /* PyHandler.m in Sources */,
 				54209E942117325100F3B5EF /* DrawImage.m in Sources */,
 			);

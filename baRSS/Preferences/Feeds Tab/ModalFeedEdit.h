@@ -22,7 +22,14 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface NewsController : NSObject
-
-+ (void)downloadFeed:(NSString*)url withBlock:(nullable void (^)(NSDictionary* result, NSError* error))block;
+@protocol ModalFeedConfigEdit <NSObject>
+- (void)updateRepresentedObject; // must call [item.managedObjectContext refreshAllObjects]
 @end
+
+
+@interface ModalFeedEdit : NSViewController <ModalFeedConfigEdit, NSTextFieldDelegate>
+@end
+
+@interface ModalGroupEdit : NSViewController <ModalFeedConfigEdit>
+@end
+

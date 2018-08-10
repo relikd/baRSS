@@ -117,7 +117,8 @@
 @implementation DrawSeparator
 - (void)drawRect:(NSRect)dirtyRect {
 	NSGradient *grdnt = [[NSGradient alloc] initWithStartingColor:[NSColor darkGrayColor] endingColor:[[NSColor darkGrayColor] colorWithAlphaComponent:0.0]];
-	NSBezierPath *rounded = [NSBezierPath bezierPathWithRoundedRect:NSMakeRect(1, self.bounds.size.height/2.0-1, self.bounds.size.width-2, 2) xRadius:1 yRadius:1];
+	NSRect separatorRect = NSMakeRect(1, self.frame.size.height / 2.0 - 1, self.frame.size.width - 2, 2);
+	NSBezierPath *rounded = [NSBezierPath bezierPathWithRoundedRect:separatorRect xRadius:1 yRadius:1];
 	[grdnt drawInBezierPath:rounded angle:0];
 }
 @end

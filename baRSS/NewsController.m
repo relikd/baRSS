@@ -70,4 +70,15 @@
 	NSLog(@"all unread");
 }
 
++ (void)downloadFeed:(NSString*)url withBlock:(nullable void (^)(NSDictionary* result, NSError* error))block {
+	[NSThread detachNewThreadWithBlock:^{
+		NSDictionary *dict = [PyHandler getFeed:url withEtag:nil andModified:nil];
+		NSError *err = nil;
+		if (!dict || [dict[@"entries"] count] == 0 ) {
+			err = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotParseResponse userInfo:nil];
+		}
+		if (block) block(dict, err);
+	}];
+}
+
 @end

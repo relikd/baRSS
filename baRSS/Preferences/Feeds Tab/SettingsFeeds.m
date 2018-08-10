@@ -21,17 +21,18 @@
 //  SOFTWARE.
 
 #import "SettingsFeeds.h"
-#import "DBv1+CoreDataModel.h"
-#import "ModalSheet.h"
-#import "DrawImage.h"
 #import "AppDelegate.h"
+#import "DBv1+CoreDataModel.h"
+#import "FeedConfig+Print.h"
+#import "ModalSheet.h"
+#import "ModalFeedEdit.h"
+#import "DrawImage.h"
 
 @interface SettingsFeeds ()
-@property (weak) IBOutlet ModalFeedEdit *viewModalEditFeed;
-@property (weak) IBOutlet ModalGroupEdit *viewModalEditGroup;
 @property (weak) IBOutlet NSOutlineView *outlineView;
 @property (weak) IBOutlet NSTreeController *dataStore;
 
+@property (strong) NSViewController<ModalFeedConfigEdit> *modalController;
 @property (strong) NSArray<NSTreeNode*> *currentlyDraggedNodes;
 @property (strong) NSUndoManager *undoManager;
 @end
@@ -89,40 +90,25 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[self showModalForFeedConfig:self.dataStore.selectedObjects.firstObject isGroupEdit:YES]; // yes will be overwritten anyway
 }
 
-- (void)showModalForFeedConfig:(FeedConfig*)obj isGroupEdit:(bool)group {
-	bool existingItem = [obj isKindOfClass:[FeedConfig class]];
+- (void)showModalForFeedConfig:(FeedConfig*)obj isGroupEdit:(BOOL)group {
+	BOOL existingItem = [obj isKindOfClass:[FeedConfig class]];
 	if (existingItem) {
 		if (obj.type == 2) return; // Separator
 		group = (obj.type == 0);
-		if (group) [self.viewModalEditGroup setGroupName:obj.name];
-		else       [self.viewModalEditFeed setURL:obj.url name:obj.name refreshNum:obj.refreshNum unit:obj.refreshUnit];
-	} else {
-		if (group) [self.viewModalEditGroup setDefaultValues];
-		else       [self.viewModalEditFeed setDefaultValues];
 	}
-	NSView *content = (group ? self.viewModalEditGroup : self.viewModalEditFeed);
-	[self.view.window beginSheet:[ModalSheet modalWithView:content] completionHandler:^(NSModalResponse returnCode) {
+	self.modalController = (group ? [ModalGroupEdit new] : [ModalFeedEdit new]);
+	self.modalController.representedObject = obj;
+	
+	[self.view.window beginSheet:[ModalSheet modalWithView:self.modalController.view] completionHandler:^(NSModalResponse returnCode) {
 		if (returnCode == NSModalResponseOK) {
-			FeedConfig *item = obj;
 			if (!existingItem) { // create new item
-				item = [self insertSortedItemAtSelection];
+				FeedConfig *item = [self insertSortedItemAtSelection];
 				item.type = (group ? 0 : 1);
+				self.modalController.representedObject = item;
 			}
-			if (group) {
-				if (![item.name isEqualToString: self.viewModalEditGroup.title.stringValue])
-					item.name = self.viewModalEditGroup.title.stringValue;
-			} else {
-				if (![item.name isEqualToString: self.viewModalEditFeed.title.stringValue])
-					item.name = self.viewModalEditFeed.title.stringValue;
-				if (![item.url isEqualToString:self.viewModalEditFeed.url.stringValue])
-					item.url = self.viewModalEditFeed.url.stringValue;
-				if (item.refreshNum != self.viewModalEditFeed.refreshNum.intValue)
-					item.refreshNum = self.viewModalEditFeed.refreshNum.intValue;
-				if (item.refreshUnit != self.viewModalEditFeed.refreshUnit.indexOfSelectedItem)
-					item.refreshUnit = (int16_t)self.viewModalEditFeed.refreshUnit.indexOfSelectedItem;
-			}
-			[self.dataStore rearrangeObjects];
+			[self.modalController updateRepresentedObject];
 		}
+		self.modalController = nil;
 	}];
 }
 
@@ -132,7 +118,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	
 	FeedConfig *selected = [[[self.dataStore arrangedObjects] descendantNodeAtIndexPath:selectedIndex] representedObject];
 	NSUInteger lastIndex = selected.children.count;
-	bool groupSelected = (selected.type == 0);
+	BOOL groupSelected = (selected.type == 0);
 	
 	if (!groupSelected) {
 		lastIndex = (NSUInteger)selected.sortIndex + 1; // insert after selection
@@ -191,7 +177,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	if (!item || !dstChildren)
 		dstChildren = [self.dataStore arrangedObjects].childNodes;
 	
-	bool isFolderDrag = (index == -1);
+	BOOL isFolderDrag = (index == -1);
 	NSUInteger insertIndex = (isFolderDrag ? dstChildren.count : (NSUInteger)index);
 	// index where the items will be moved to, but not final since items above can vanish
 	NSIndexPath *dest = [item indexPath];
@@ -250,16 +236,16 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item {
 	FeedConfig *f = [(NSTreeNode*)item representedObject];
-	bool isFeed = (f.type == 1);
-	bool isSeperator = (f.type == 2);
-	bool isRefreshColumn = [tableColumn.identifier isEqualToString:@"RefreshColumn"];
+	BOOL isFeed = (f.type == 1);
+	BOOL isSeperator = (f.type == 2);
+	BOOL isRefreshColumn = [tableColumn.identifier isEqualToString:@"RefreshColumn"];
 	
 	NSString *cellIdent = (isRefreshColumn ? @"cellRefresh" : (isSeperator ? @"cellSeparator" : @"cellFeed"));
 	// owner is nil to prohibit repeated awakeFromNib calls
 	NSTableCellView *cellView = [self.outlineView makeViewWithIdentifier:cellIdent owner:nil];
 	
 	if (isRefreshColumn) {
-		cellView.textField.stringValue = (!isFeed ? @"" : [ModalFeedEdit stringForRefreshNum:f.refreshNum unit:f.refreshUnit]);
+		cellView.textField.stringValue = (!isFeed ? @"" : [f readableRefreshString]);
 	} else if (isSeperator) {
 		return cellView; // the refresh cell is already skipped with the above if condition
 	} else {
@@ -285,13 +271,17 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 
 - (BOOL)respondsToSelector:(SEL)aSelector {
-	if (aSelector == @selector(enterPressed:) || aSelector == @selector(copy:)) {
-		bool outlineHasFocus = [[self.view.window firstResponder] isKindOfClass:[NSOutlineView class]];
-		return outlineHasFocus && (self.dataStore.selectedNodes.count > 0);
-	} else if (aSelector == @selector(undo:)) {
-		return [self.undoManager canUndo];
-	} else if (aSelector == @selector(redo:)) {
-		return [self.undoManager canRedo];
+	if (aSelector == @selector(undo:)) return [self.undoManager canUndo];
+	if (aSelector == @selector(redo:)) return [self.undoManager canRedo];
+	if (aSelector == @selector(copy:) || aSelector == @selector(enterPressed:)) {
+		BOOL outlineHasFocus = [[self.view.window firstResponder] isKindOfClass:[NSOutlineView class]];
+		BOOL hasSelection = (self.dataStore.selectedNodes.count > 0);
+		if (!outlineHasFocus || !hasSelection)
+			return NO;
+		if (aSelector == @selector(copy:))
+			return YES;
+		// can edit only if selection is not a separator
+		return (((FeedConfig*)self.dataStore.selectedNodes.firstObject.representedObject).type != 2);
 	}
 	return [super respondsToSelector:aSelector];
 }
@@ -312,32 +302,37 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (void)copy:(id)sender {
 	NSMutableString *str = [[NSMutableString alloc] init];
-	NSMutableArray<FeedConfig*> *items = [NSMutableArray arrayWithArray:self.dataStore.selectedObjects];
-	while (items.count > 0) {
-		[self traverseChildren:items[0] appendString:str indentation:0 onSelection:items];
+	NSUInteger count = self.dataStore.selectedNodes.count;
+	NSMutableArray<NSTreeNode*> *groups = [NSMutableArray arrayWithCapacity:count];
+	
+	// filter out nodes that are already present in some selected parent node
+	for (NSTreeNode *node in self.dataStore.selectedNodes) {
+		BOOL skipItem = NO;
+		for (NSTreeNode *stored in groups) {
+			NSIndexPath *p = node.indexPath;
+			while (p.length > stored.indexPath.length)
+				p = [p indexPathByRemovingLastIndex];
+			if ([p isEqualTo:stored.indexPath]) {
+				skipItem = YES;
+				break;
+			}
+		}
+		if (!skipItem) {
+			[self traverseChildren:node appendString:str prefix:@""];
+			if (node.childNodes.count > 0)
+				[groups addObject:node];
+		}
 	}
 	[[NSPasteboard generalPasteboard] clearContents];
 	[[NSPasteboard generalPasteboard] setString:str forType:NSPasteboardTypeString];
 	NSLog(@"%@", str);
 }
 
-- (void)traverseChildren:(FeedConfig*)obj appendString:(NSMutableString*)str indentation:(int)indent onSelection:(NSMutableArray*)arr {
-	for (NSUInteger i = 0; i < arr.count; i++) {
-		if (obj == arr[i]) {
-			[arr removeObjectAtIndex:i];
-			break;
-		}
-	}
-	for (int i = indent; i > 0; i--) {
-		[str appendString:@"  "];
-	}
-	switch (obj.type) {
-		case 0: [str appendFormat:@"%@:\n", obj.name]; break; // Group
-		case 2: [str appendString:@"-------------\n"]; break; // Separator
-		default: [str appendFormat:@"%@ (%@) - %@\n", obj.name, obj.url, [ModalFeedEdit stringForRefreshNum:obj.refreshNum unit:obj.refreshUnit]];
-	}
-	for (FeedConfig *child in obj.children) {
-		[self traverseChildren:child appendString:str indentation:indent + 1 onSelection:arr];
+- (void)traverseChildren:(NSTreeNode*)obj appendString:(NSMutableString*)str prefix:(NSString*)prefix {
+	[str appendFormat:@"%@%@\n", prefix, [obj.representedObject readableDescription]];
+	prefix = [prefix stringByAppendingString:@"  "];
+	for (NSTreeNode *child in obj.childNodes) {
+		[self traverseChildren:child appendString:str prefix:prefix];
 	}
 }
 

@@ -219,7 +219,7 @@
                     </popUpButtonCell>
                 </popUpButton>
             </subviews>
-            <point key="canvasLocation" x="-20" y="903.5"/>
+            <point key="canvasLocation" x="91" y="-163"/>
         </customView>
     </objects>
     <resources>
