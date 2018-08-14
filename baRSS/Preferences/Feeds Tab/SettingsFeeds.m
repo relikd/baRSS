@@ -101,12 +101,14 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	
 	[self.view.window beginSheet:[ModalSheet modalWithView:self.modalController.view] completionHandler:^(NSModalResponse returnCode) {
 		if (returnCode == NSModalResponseOK) {
+			[self.undoManager beginUndoGrouping];
 			if (!existingItem) { // create new item
 				FeedConfig *item = [self insertSortedItemAtSelection];
 				item.type = (group ? 0 : 1);
 				self.modalController.representedObject = item;
 			}
 			[self.modalController updateRepresentedObject];
+			[self.undoManager endUndoGrouping];
 		}
 		self.modalController = nil;
 	}];
@@ -328,6 +330,12 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	NSLog(@"%@", str);
 }
 
+/**
+ Go through all children recursively and prepend the string with spaces as nesting
+ @param obj Root Node or parent Node
+ @param str An initialized @c NSMutableString to append to
+ @param prefix Should be @c @@"" for the first call
+ */
 - (void)traverseChildren:(NSTreeNode*)obj appendString:(NSMutableString*)str prefix:(NSString*)prefix {
 	[str appendFormat:@"%@%@\n", prefix, [obj.representedObject readableDescription]];
 	prefix = [prefix stringByAppendingString:@"  "];

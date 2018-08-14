@@ -23,7 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 @protocol ModalFeedConfigEdit <NSObject>
-- (void)updateRepresentedObject; // must call [item.managedObjectContext refreshAllObjects]
+- (void)updateRepresentedObject; // must call [item.managedObjectContext refreshObject:item mergeChanges:YES];
 @end
 
 

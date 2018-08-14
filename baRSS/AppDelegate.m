@@ -24,6 +24,7 @@
 #import "PyHandler.h"
 #import "DrawImage.h"
 #import "Preferences.h"
+#import "StoreCoordinator.h"
 
 @interface AppDelegate ()
 @property (weak) IBOutlet NSMenu *statusMenu;
@@ -42,6 +43,7 @@
 	self.statusItem.image.template = YES;
 	[PyHandler prepare];
 	printf("up and running\n");
+//	[StoreCoordinator deleteUnreferencedFeeds];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
@@ -75,6 +77,7 @@
                 }
             }];
 			NSUndoManager *um = [[NSUndoManager alloc] init];
+			um.groupsByEvent = NO;
 			um.levelsOfUndo = 30;
 			_persistentContainer.viewContext.undoManager = um;
         }

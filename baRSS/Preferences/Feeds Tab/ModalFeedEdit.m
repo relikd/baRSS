@@ -22,6 +22,7 @@
 
 #import "ModalFeedEdit.h"
 #import "NewsController.h"
+#import "StoreCoordinator.h"
 #import "FeedConfig+CoreDataProperties.h"
 
 @interface ModalFeedEdit()
@@ -38,8 +39,9 @@
 @property (strong) NSError *feedError;
 @property (strong) NSDictionary *feedResult;
 
-@property (assign) BOOL shouldEvaluate;
-@property (assign) BOOL lateEvaluation;
+@property (assign) BOOL shouldSaveObject;
+@property (assign) BOOL objectNeedsSaving;
+@property (assign) BOOL objectIsModified;
 @end
 
 @implementation ModalFeedEdit
@@ -48,7 +50,9 @@
 	[super viewDidLoad];
 	self.previousURL = @"";
 	self.refreshNum.intValue = 30;
-	self.shouldEvaluate = NO;
+	self.shouldSaveObject = NO;
+	self.objectNeedsSaving = NO;
+	self.objectIsModified = NO;
 	
 	FeedConfig *fc = [self feedConfigOrNil];
 	if (fc) {
@@ -65,21 +69,30 @@
 }
 
 - (void)dealloc {
-	FeedConfig *item = [self feedConfigOrNil];
-	if (self.shouldEvaluate && self.lateEvaluation && item) {
-		if (!item.name || [item.name isEqualToString:@""]) {
-			[self setTitleFromFeed];
-			if (![item.name isEqualToString: self.name.stringValue]) // only if result isnt empty as well
-				item.name = self.name.stringValue;
-			[item.managedObjectContext refreshAllObjects];
+	if (self.shouldSaveObject) {
+		if (self.objectNeedsSaving)
+			[self updateRepresentedObject];
+		NSUndoManager *um = [self feedConfigOrNil].managedObjectContext.undoManager;
+		[um endUndoGrouping];
+		if (!self.objectIsModified) {
+			[um disableUndoRegistration];
+			[um undoNestedGroup];
+			[um enableUndoRegistration];
+		} else {
+			[StoreCoordinator save];
 		}
-		
 	}
 }
 
 - (void)updateRepresentedObject {
 	FeedConfig *item = [self feedConfigOrNil];
 	if (item) {
+		if (!self.shouldSaveObject) { // first call to this method
+			[item.managedObjectContext.undoManager beginUndoGrouping];
+		}
+		self.shouldSaveObject = YES;
+		self.objectNeedsSaving = NO; // after this method it is saved
+		
 		// if's to prevent unnecessary undo groups if nothing has changed
 		if (![item.name isEqualToString: self.name.stringValue])
 			item.name = self.name.stringValue;
@@ -90,11 +103,17 @@
 		if (item.refreshUnit != self.refreshUnit.indexOfSelectedItem)
 			item.refreshUnit = (int16_t)self.refreshUnit.indexOfSelectedItem;
 		
-		self.shouldEvaluate = YES;
-		self.lateEvaluation = NO;
-		// TODO: append feed result
-		NSLog(@"here i want to set it");
-		[item.managedObjectContext refreshAllObjects];
+		
+		if (self.feedResult) {
+			Feed *rss = [StoreCoordinator createFeedFromDictionary:self.feedResult];
+			if (item.feed)
+				[item.managedObjectContext deleteObject:(NSManagedObject*)item.feed];
+			item.feed = rss;
+		}
+		if ([item.managedObjectContext hasChanges]) {
+			self.objectIsModified = YES;
+			[item.managedObjectContext refreshObject:item mergeChanges:YES];
+		}
 	}
 }
 
@@ -118,17 +137,15 @@
 	if (obj.object == self.url && [self urlHasChanged]) {
 		self.previousURL = self.url.stringValue;
 		self.feedResult = nil;
-		NSLog(@"setting result to nil");
 		self.feedError = nil;
 		[self.spinnerURL startAnimation:nil];
 		[self.spinnerName startAnimation:nil];
 		[NewsController downloadFeed:self.previousURL withBlock:^(NSDictionary *result, NSError *error) {
 			self.feedResult = result;
-			NSLog(@"got results back");
 			self.feedError = error; // warning indicator .hidden is bound to feedError
 			// TODO: play error sound?
 			dispatch_async(dispatch_get_main_queue(), ^{
-				self.lateEvaluation = YES; // stays YES if this block runs after updateRepresentedObject:
+				self.objectNeedsSaving = YES; // stays YES if this block runs after updateRepresentedObject:
 				[self setTitleFromFeed];
 				[self.spinnerURL stopAnimation:nil];
 				[self.spinnerName stopAnimation:nil];
@@ -186,7 +203,7 @@
 		NSString *name = ((NSTextField*)self.view).stringValue;
 		if (![item.name isEqualToString: name]) {
 			item.name = name;
-			[item.managedObjectContext refreshAllObjects];
+			[item.managedObjectContext refreshObject:item mergeChanges:YES];
 		}
 	}
 }

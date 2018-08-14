@@ -22,6 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+/** Manages the NSOutlineView and Feed creation and editing */
 @interface SettingsFeeds : NSViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
 
 @end
