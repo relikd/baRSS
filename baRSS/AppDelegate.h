@@ -25,7 +25,7 @@
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 @property (readonly, strong) NSPersistentContainer *persistentContainer;
-
+- (IBAction)saveAction:(id)sender;
 - (void)preferencesClosed;
 @end
 

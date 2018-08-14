@@ -12,9 +12,6 @@
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="config" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedConfig" inverseName="feed" inverseEntity="FeedConfig" syncable="YES"/>
         <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="FeedItem" inverseName="feed" inverseEntity="FeedItem" syncable="YES"/>
-        <fetchedProperty name="tags" optional="YES" syncable="YES">
-            <fetchRequest name="fetchedPropertyFetchRequest" entity="Feed" predicateString="(SELF.tags.feedItem=$FETCH_SOURCE.items)"/>
-        </fetchedProperty>
     </entity>
     <entity name="FeedConfig" representedClassName="FeedConfig" syncable="YES" codeGenerationType="class">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
@@ -42,7 +39,7 @@
         <relationship name="feedItem" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedItem" inverseName="tags" inverseEntity="FeedItem" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Feed" positionX="-209" positionY="-3" width="128" height="239"/>
+        <element name="Feed" positionX="-209" positionY="-3" width="128" height="210"/>
         <element name="FeedConfig" positionX="-20" positionY="-126" width="128" height="180"/>
         <element name="FeedItem" positionX="-20" positionY="81" width="128" height="165"/>
         <element name="FeedTag" positionX="187" positionY="171" width="128" height="75"/>

@@ -23,6 +23,5 @@
 #import <Cocoa/Cocoa.h>
 
 @interface NewsController : NSObject
-
 + (void)downloadFeed:(NSString*)url withBlock:(nullable void (^)(NSDictionary* result, NSError* error))block;
 @end
