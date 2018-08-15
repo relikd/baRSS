@@ -21,7 +21,7 @@
 //  SOFTWARE.
 
 #import "SettingsFeeds.h"
-#import "AppDelegate.h"
+#import "AppHook.h"
 #import "FeedConfig+Ext.h"
 #import "ModalSheet.h"
 #import "ModalFeedEdit.h"
@@ -43,7 +43,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-	self.dataStore.managedObjectContext = [(AppDelegate*)[NSApp delegate] persistentContainer].viewContext;
+	self.dataStore.managedObjectContext = [(AppHook*)NSApp persistentContainer].viewContext;
 	self.undoManager = self.dataStore.managedObjectContext.undoManager;
 	[self.outlineView registerForDraggedTypes:[NSArray arrayWithObject:dragNodeType]];
 	[self.dataStore setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];

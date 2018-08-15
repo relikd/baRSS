@@ -21,7 +21,9 @@
 //  SOFTWARE.
 
 #import <Cocoa/Cocoa.h>
+#import <CoreData/CoreData.h>
 
-@interface AppHook : NSApplication
-
+@interface AppHook : NSApplication <NSApplicationDelegate>
+@property (readonly, strong) NSPersistentContainer *persistentContainer;
+- (IBAction)saveAction:(id)sender;
 @end
