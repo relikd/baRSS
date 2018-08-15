@@ -22,43 +22,22 @@
 
 #import "AppDelegate.h"
 #import "PyHandler.h"
-#import "DrawImage.h"
-#import "Preferences.h"
-#import "StoreCoordinator.h"
+#import "BarMenu.h"
 
 @interface AppDelegate ()
-@property (weak) IBOutlet NSMenu *statusMenu;
-@property (strong) NSStatusItem *statusItem;
-@property (strong) Preferences *prefWindow;
+@property (strong) BarMenu *barMenu;
 @end
 
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-	self.statusItem = [NSStatusBar.systemStatusBar statusItemWithLength:NSVariableStatusItemLength];
-	self.statusItem.title = @"me";
-	self.statusItem.menu = self.statusMenu;
-	self.statusItem.highlightMode = YES;
-	self.statusItem.image = [[RSSIcon templateIcon:16 tint:nil] image];
-	self.statusItem.image.template = YES;
+	self.barMenu = [BarMenu new];
 	[PyHandler prepare];
 	printf("up and running\n");
-//	[StoreCoordinator deleteUnreferencedFeeds];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
 	[PyHandler shutdown];
-}
-
-- (IBAction)openPreferences:(id)sender {
-	if (!self.prefWindow)
-		self.prefWindow = [[Preferences alloc] initWithWindowNibName:@"Preferences"];
-	[NSApp activateIgnoringOtherApps:YES];
-	[self.prefWindow showWindow:nil];
-}
-
-- (void)preferencesClosed {
-	self.prefWindow = nil;
 }
 
 #pragma mark - Core Data stack

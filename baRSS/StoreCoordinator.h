@@ -21,11 +21,14 @@
 //  SOFTWARE.
 
 #import <Foundation/Foundation.h>
+#import "DBv1+CoreDataModel.h"
+#import "FeedConfig+Ext.h"
 
-@class Feed;
 
 @interface StoreCoordinator : NSObject
 + (void)save;
 + (void)deleteUnreferencedFeeds;
++ (NSArray<FeedConfig*>*)sortedFeedConfigItems;
++ (id)objectWithID:(NSManagedObjectID*)objID;
 + (Feed*)createFeedFromDictionary:(NSDictionary*)obj;
 @end

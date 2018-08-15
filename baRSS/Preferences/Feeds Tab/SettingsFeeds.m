@@ -22,8 +22,7 @@
 
 #import "SettingsFeeds.h"
 #import "AppDelegate.h"
-#import "DBv1+CoreDataModel.h"
-#import "FeedConfig+Print.h"
+#import "FeedConfig+Ext.h"
 #import "ModalSheet.h"
 #import "ModalFeedEdit.h"
 #import "DrawImage.h"
@@ -62,7 +61,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[self.undoManager beginUndoGrouping];
 	FeedConfig *sp = [self insertSortedItemAtSelection];
 	sp.name = @"---";
-	sp.type = 2;
+	sp.typ = SEPARATOR;
 	[self.undoManager endUndoGrouping];
 }
 
@@ -93,8 +92,8 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 - (void)showModalForFeedConfig:(FeedConfig*)obj isGroupEdit:(BOOL)group {
 	BOOL existingItem = [obj isKindOfClass:[FeedConfig class]];
 	if (existingItem) {
-		if (obj.type == 2) return; // Separator
-		group = (obj.type == 0);
+		if (obj.typ == SEPARATOR) return;
+		group = (obj.typ == GROUP);
 	}
 	self.modalController = (group ? [ModalGroupEdit new] : [ModalFeedEdit new]);
 	self.modalController.representedObject = obj;
@@ -104,7 +103,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 			[self.undoManager beginUndoGrouping];
 			if (!existingItem) { // create new item
 				FeedConfig *item = [self insertSortedItemAtSelection];
-				item.type = (group ? 0 : 1);
+				item.typ = (group ? GROUP : FEED);
 				self.modalController.representedObject = item;
 			}
 			[self.modalController updateRepresentedObject];
@@ -120,7 +119,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	
 	FeedConfig *selected = [[[self.dataStore arrangedObjects] descendantNodeAtIndexPath:selectedIndex] representedObject];
 	NSUInteger lastIndex = selected.children.count;
-	BOOL groupSelected = (selected.type == 0);
+	BOOL groupSelected = (selected.typ == GROUP);
 	
 	if (!groupSelected) {
 		lastIndex = (NSUInteger)selected.sortIndex + 1; // insert after selection
@@ -217,7 +216,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index {
 	FeedConfig *fc = [(NSTreeNode*)item representedObject];
-	if (index == -1 && fc.type != 0) { // if drag is on specific item and that item isnt a group
+	if (index == -1 && fc.typ != GROUP) { // if drag is on specific item and that item isnt a group
 		return NSDragOperationNone;
 	}
 	
@@ -238,8 +237,8 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item {
 	FeedConfig *f = [(NSTreeNode*)item representedObject];
-	BOOL isFeed = (f.type == 1);
-	BOOL isSeperator = (f.type == 2);
+	BOOL isFeed = (f.typ == FEED);
+	BOOL isSeperator = (f.typ == SEPARATOR);
 	BOOL isRefreshColumn = [tableColumn.identifier isEqualToString:@"RefreshColumn"];
 	
 	NSString *cellIdent = (isRefreshColumn ? @"cellRefresh" : (isSeperator ? @"cellSeparator" : @"cellFeed"));
@@ -252,7 +251,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		return cellView; // the refresh cell is already skipped with the above if condition
 	} else {
 		cellView.textField.objectValue = f.name;
-		if (f.type == 0) {
+		if (f.typ == GROUP) {
 			cellView.imageView.image = [NSImage imageNamed:NSImageNameFolder];
 		} else {
 			// TODO: load icon
@@ -283,7 +282,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		if (aSelector == @selector(copy:))
 			return YES;
 		// can edit only if selection is not a separator
-		return (((FeedConfig*)self.dataStore.selectedNodes.firstObject.representedObject).type != 2);
+		return (((FeedConfig*)self.dataStore.selectedNodes.firstObject.representedObject).typ != SEPARATOR);
 	}
 	return [super respondsToSelector:aSelector];
 }

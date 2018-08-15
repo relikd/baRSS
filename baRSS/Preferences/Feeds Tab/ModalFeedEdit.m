@@ -21,9 +21,8 @@
 //  SOFTWARE.
 
 #import "ModalFeedEdit.h"
-#import "NewsController.h"
+#import "FeedDownload.h"
 #import "StoreCoordinator.h"
-#import "FeedConfig+CoreDataProperties.h"
 
 @interface ModalFeedEdit()
 @property (weak) IBOutlet NSTextField *url;
@@ -140,7 +139,7 @@
 		self.feedError = nil;
 		[self.spinnerURL startAnimation:nil];
 		[self.spinnerName startAnimation:nil];
-		[NewsController downloadFeed:self.previousURL withBlock:^(NSDictionary *result, NSError *error) {
+		[FeedDownload getFeed:self.previousURL withBlock:^(NSDictionary *result, NSError *error) {
 			self.feedResult = result;
 			self.feedError = error; // warning indicator .hidden is bound to feedError
 			// TODO: play error sound?

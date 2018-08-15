@@ -23,7 +23,6 @@
 #import "Preferences.h"
 #import "SettingsFeeds.h"
 #import "SettingsGeneral.h"
-#import "AppDelegate.h"
 
 
 @interface Preferences ()
@@ -58,7 +57,7 @@
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
-	[(AppDelegate*)[NSApp delegate] preferencesClosed];
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"baRSSPreferencesClosed" object:nil];
 }
 
 @end
