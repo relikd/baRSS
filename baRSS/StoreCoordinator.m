@@ -21,16 +21,16 @@
 //  SOFTWARE.
 
 #import "StoreCoordinator.h"
-#import "AppDelegate.h"
+#import "AppHook.h"
 
 @implementation StoreCoordinator
 
 + (NSManagedObjectContext*)getContext {
-	return [(AppDelegate*)[NSApp delegate] persistentContainer].viewContext;
+	return [(AppHook*)NSApp persistentContainer].viewContext;
 }
 
 + (void)save {
-	[(AppDelegate*)[NSApp delegate] saveAction:nil];
+	[(AppHook*)NSApp saveAction:nil];
 }
 
 + (void)deleteUnreferencedFeeds {

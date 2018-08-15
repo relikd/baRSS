@@ -21,7 +21,9 @@
 //  SOFTWARE.
 
 #import <Cocoa/Cocoa.h>
+#import "AppHook.h"
 
 int main(int argc, const char * argv[]) {
-	return NSApplicationMain(argc, argv);
+	[[AppHook sharedApplication] run];
+	return 0;
 }

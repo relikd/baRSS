@@ -20,9 +20,7 @@
 		546FC44421189975007CC3A3 /* SettingsGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 546FC44221189975007CC3A3 /* SettingsGeneral.xib */; };
 		546FC4472118A8E6007CC3A3 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 546FC4462118A8E6007CC3A3 /* Preferences.xib */; };
 		5477D34E21233C62002BA27F /* FeedConfig+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 5477D34D21233C62002BA27F /* FeedConfig+Ext.m */; };
-		54ACC28121061B3B0020715F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28021061B3B0020715F /* AppDelegate.m */; };
 		54ACC28621061B3C0020715F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54ACC28521061B3C0020715F /* Assets.xcassets */; };
-		54ACC28921061B3C0020715F /* Main.xib in Resources */ = {isa = PBXBuildFile; fileRef = 54ACC28721061B3C0020715F /* Main.xib */; };
 		54ACC28C21061B3C0020715F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28B21061B3C0020715F /* main.m */; };
 		54ACC29521061E270020715F /* FeedDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29421061E270020715F /* FeedDownload.m */; };
 		54ACC29821061FBA0020715F /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29721061FBA0020715F /* Preferences.m */; };
@@ -55,11 +53,8 @@
 		5477D34C21233C62002BA27F /* FeedConfig+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FeedConfig+Ext.h"; sourceTree = "<group>"; };
 		5477D34D21233C62002BA27F /* FeedConfig+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "FeedConfig+Ext.m"; sourceTree = "<group>"; };
 		54ACC27C21061B3B0020715F /* baRSS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = baRSS.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		54ACC27F21061B3B0020715F /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		54ACC28021061B3B0020715F /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		54ACC28321061B3B0020715F /* DBv1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DBv1.xcdatamodel; sourceTree = "<group>"; };
 		54ACC28521061B3C0020715F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		54ACC28821061B3C0020715F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Main.xib; sourceTree = "<group>"; };
 		54ACC28A21061B3C0020715F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		54ACC28B21061B3C0020715F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		54ACC29321061E270020715F /* FeedDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FeedDownload.h; sourceTree = "<group>"; };
@@ -155,8 +150,6 @@
 				549369F421091E6D001AF895 /* python */,
 				544B011B2114EE9100386E5C /* AppHook.h */,
 				544B011C2114EE9100386E5C /* AppHook.m */,
-				54ACC27F21061B3B0020715F /* AppDelegate.h */,
-				54ACC28021061B3B0020715F /* AppDelegate.m */,
 				54FE73D1212316CD003EAC65 /* BarMenu.h */,
 				54FE73D2212316CD003EAC65 /* BarMenu.m */,
 				54FE73CE21220DEC003EAC65 /* StoreCoordinator.h */,
@@ -167,7 +160,6 @@
 				54209E932117325100F3B5EF /* DrawImage.m */,
 				546FC44D2118B357007CC3A3 /* Preferences */,
 				54ACC28521061B3C0020715F /* Assets.xcassets */,
-				54ACC28721061B3C0020715F /* Main.xib */,
 				54ACC28A21061B3C0020715F /* Info.plist */,
 				54ACC28B21061B3C0020715F /* main.m */,
 				54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */,
@@ -261,7 +253,6 @@
 				546FC43F21188C78007CC3A3 /* SettingsFeeds.xib in Resources */,
 				544FBD4921064DF0008A260C /* feedparser521.py in Resources */,
 				544FBD4721064B2F008A260C /* getFeed.py in Resources */,
-				54ACC28921061B3C0020715F /* Main.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,7 +269,6 @@
 				54ACC29521061E270020715F /* FeedDownload.m in Sources */,
 				5477D34E21233C62002BA27F /* FeedConfig+Ext.m in Sources */,
 				54ACC28C21061B3C0020715F /* main.m in Sources */,
-				54ACC28121061B3B0020715F /* AppDelegate.m in Sources */,
 				54FE73D3212316CD003EAC65 /* BarMenu.m in Sources */,
 				544B011A2114B41200386E5C /* ModalSheet.m in Sources */,
 				54ACC29821061FBA0020715F /* Preferences.m in Sources */,
@@ -291,17 +281,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		54ACC28721061B3C0020715F /* Main.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				54ACC28821061B3C0020715F /* Base */,
-			);
-			name = Main.xib;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		54ACC28E21061B3C0020715F /* Debug */ = {
