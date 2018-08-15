@@ -21,10 +21,7 @@
 //  SOFTWARE.
 
 #import <Cocoa/Cocoa.h>
-#import <CoreData/CoreData.h>
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
-@property (readonly, strong) NSPersistentContainer *persistentContainer;
-- (IBAction)saveAction:(id)sender;
+@interface BarMenu : NSObject <NSMenuDelegate>
+//+ (instancetype)start;
 @end
-

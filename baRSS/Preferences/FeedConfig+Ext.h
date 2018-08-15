@@ -20,35 +20,17 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import "NewsController.h"
-#import "PyHandler.h"
+#import "FeedConfig+CoreDataClass.h"
 
-@interface NewsController ()
-@end
+@interface FeedConfig (Ext)
+typedef enum int16_t {
+	GROUP = 0,
+	FEED = 1,
+	SEPARATOR = 2
+} FeedConfigType;
+@property (getter=typ, setter=setTyp:) FeedConfigType typ;
+@property (readonly) NSArray<FeedConfig*> *sortedChildren;
 
-@implementation NewsController
-
-- (IBAction)pauseUpdates:(NSMenuItem *)sender {
-	NSLog(@"pause");
-}
-
-- (IBAction)updateAllFeeds:(NSMenuItem *)sender {
-	NSLog(@"update all");
-}
-
-- (IBAction)openAllUnread:(NSMenuItem *)sender {
-	NSLog(@"all unread");
-}
-
-+ (void)downloadFeed:(NSString*)url withBlock:(nullable void (^)(NSDictionary* result, NSError* error))block {
-	[NSThread detachNewThreadWithBlock:^{
-		NSDictionary *dict = [PyHandler getFeed:url withEtag:nil andModified:nil];
-		NSError *err = nil;
-		if (!dict || [dict[@"entries"] count] == 0 ) {
-			err = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotParseResponse userInfo:nil];
-		}
-		if (block) block(dict, err);
-	}];
-}
-
+- (NSString*)readableRefreshString;
+- (NSString*)readableDescription;
 @end

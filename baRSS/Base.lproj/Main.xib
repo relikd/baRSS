@@ -12,46 +12,6 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
-            <connections>
-                <outlet property="statusMenu" destination="tDc-nD-HS2" id="eHw-32-GGa"/>
-            </connections>
-        </customObject>
-        <menu id="tDc-nD-HS2">
-            <items>
-                <menuItem title="Pause Updates" id="D7r-Vb-9eO">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="pauseUpdates:" target="gkw-5j-nxL" id="c8f-Vl-zzt"/>
-                    </connections>
-                </menuItem>
-                <menuItem title="Update All Feeds" id="wgp-fa-8Wj">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="updateAllFeeds:" target="gkw-5j-nxL" id="eeM-ZQ-Aha"/>
-                    </connections>
-                </menuItem>
-                <menuItem title="Open All Unread" id="Qqw-Xj-oA5">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <connections>
-                        <action selector="openAllUnread:" target="gkw-5j-nxL" id="r6A-ca-Dz4"/>
-                    </connections>
-                </menuItem>
-                <menuItem isSeparatorItem="YES" id="ld2-b0-07a"/>
-                <menuItem isSeparatorItem="YES" id="1VS-wM-kTc"/>
-                <menuItem title="Preferences" keyEquivalent="," id="VFY-eR-2EA">
-                    <connections>
-                        <action selector="openPreferences:" target="Voe-Tx-rLC" id="a8v-fo-Drx"/>
-                    </connections>
-                </menuItem>
-                <menuItem title="Quit" keyEquivalent="q" id="Nb6-yK-a1A">
-                    <connections>
-                        <action selector="terminate:" target="-1" id="STj-gf-HrE"/>
-                    </connections>
-                </menuItem>
-            </items>
-            <point key="canvasLocation" x="-47" y="485"/>
-        </menu>
-        <customObject id="gkw-5j-nxL" customClass="NewsController"/>
+        <customObject id="Voe-Tx-rLC" customClass="AppDelegate"/>
     </objects>
 </document>

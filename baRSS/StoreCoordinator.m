@@ -22,7 +22,6 @@
 
 #import "StoreCoordinator.h"
 #import "AppDelegate.h"
-#import "DBv1+CoreDataModel.h"
 
 @implementation StoreCoordinator
 
@@ -42,6 +41,21 @@
 	NSError *err;
 	[moc executeRequest:bdr error:&err];
 	if (err) NSLog(@"%@", err);
+}
+
++ (NSArray<FeedConfig*>*)sortedFeedConfigItems {
+	NSManagedObjectContext *moc = [self getContext];
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: FeedConfig.entity.name];
+	fr.predicate = [NSPredicate predicateWithFormat:@"parent = NULL"]; // %@", parent
+	fr.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]];
+	NSError *err;
+	NSArray *result = [moc executeFetchRequest:fr error:&err];
+	if (err) NSLog(@"%@", err);
+	return result;
+}
+
++ (id)objectWithID:(NSManagedObjectID*)objID {
+	return [[self getContext] objectWithID:objID];
 }
 
 + (Feed*)createFeedFromDictionary:(NSDictionary*)obj {

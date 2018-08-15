@@ -20,11 +20,35 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
-#import <CoreData/CoreData.h>
+#import "FeedConfig+Ext.h"
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
-@property (readonly, strong) NSPersistentContainer *persistentContainer;
-- (IBAction)saveAction:(id)sender;
+@implementation FeedConfig (Ext)
+
+- (FeedConfigType)typ {
+	return (FeedConfigType)self.type;
+}
+
+- (void)setTyp:(FeedConfigType)typ {
+	self.type = typ;
+}
+
+- (NSArray<FeedConfig *> *)sortedChildren {
+	if (self.children.count == 0)
+		return nil;
+	return [self.children sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];
+}
+
+- (NSString*)readableRefreshString {
+	return [NSString stringWithFormat:@"%d%c", self.refreshNum, [@"smhdw" characterAtIndex:self.refreshUnit % 5]];
+}
+
+- (NSString*)readableDescription {
+	switch (self.typ) {
+		case SEPARATOR: return @"-------------";
+		case GROUP: return [NSString stringWithFormat:@"%@", self.name];
+		case FEED:
+			return [NSString stringWithFormat:@"%@ (%@) - %@", self.name, self.url, [self readableRefreshString]];
+	}
+}
+
 @end
-

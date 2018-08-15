@@ -20,21 +20,20 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#ifndef FeedConfig_Print_h
-#define FeedConfig_Print_h
+#import "FeedDownload.h"
+#import "PyHandler.h"
 
-@implementation FeedConfig (Print)
-- (NSString*)readableRefreshString {
-	return [NSString stringWithFormat:@"%d%c", self.refreshNum, [@"smhdw" characterAtIndex:self.refreshUnit % 5]];
+@implementation FeedDownload
+
++ (void)getFeed:(NSString*)url withBlock:(nullable void (^)(NSDictionary* result, NSError* error))block {
+	[NSThread detachNewThreadWithBlock:^{
+		NSDictionary *dict = [PyHandler getFeed:url withEtag:nil andModified:nil];
+		NSError *err = nil;
+		if (!dict || [dict[@"entries"] count] == 0 ) {
+			err = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotParseResponse userInfo:nil];
+		}
+		if (block) block(dict, err);
+	}];
 }
-- (NSString*)readableDescription {
-	switch (self.type) {
-		case 0: return [NSString stringWithFormat:@"%@", self.name]; // Group
-		case 2: return @"-------------"; // Separator
-		default:
-			return [NSString stringWithFormat:@"%@ (%@) - %@", self.name, self.url, [self readableRefreshString]];
-	}
-}
+
 @end
-
-#endif /* FeedConfig_Print_h */
