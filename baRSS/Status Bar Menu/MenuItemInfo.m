@@ -22,6 +22,12 @@
 
 #import "MenuItemInfo.h"
 
+@interface MenuItemInfo()
+/// internal counter used to sum the unread count of all sub items
+@property (assign) int unreadCount;
+/// internal flag whether unread count is displayed in parenthesis
+@property (assign) BOOL countInTitle;
+@end
 
 @implementation MenuItemInfo
 /// @return Info with unreadCount = 0
@@ -57,72 +63,14 @@
 
 @implementation NSMenuItem (MenuItemInfo)
 
-/**
- Call represented object and retrieve the unread count from info.
+/** Call represented object and check whether unread count > 0. */
+- (BOOL)hasUnread {
+	return [self.representedObject unreadCount] > 0;
+}
 
- @return Unread count stored in menu info.
- */
+/** Call represented object and retrieve the unread count from info. */
 - (int)unreadCount {
-	MenuItemInfo *info = self.representedObject;
-	if (![info isKindOfClass:[MenuItemInfo class]]) return 0;
-	return info.unreadCount;
-}
-
-/**
- Recursively iterate over submenues and children. Count aggregated element edits.
-
- @param block Will be called for each @c NSMenuItem sub-element where @c representedObject is set to a @c MenuItemInfo.
- @param flag If set to @c YES, recursive calls will be skipped for submenus that contain soleily read elements.
- @return The number of changed elements in total.
- */
-- (int)descendantItemInfo:(MenuItemInfoRecursiveBlock)block unreadEntriesOnly:(BOOL)flag {
-	MenuItemInfo *info = self.representedObject;
-	if (![info isKindOfClass:[MenuItemInfo class]]) return 0;
-	if (flag && !info.hasUnread) return 0;
-	if (self.isSeparatorItem) return 0;
-	
-	int countItems = 1; // deepest entry, FeedItem
-	if (self.hasSubmenu) {
-		countItems = 0;
-		for (NSMenuItem *child in self.submenu.itemArray) {
-			int c = [child descendantItemInfo:block unreadEntriesOnly:flag];
-			if (c < 0) break;
-			countItems += c;
-		}
-	}
-	return block(self, info, countItems);
-}
-
-/**
- Recursively iterate over siblings and all contained children. Count aggregated element edits.
- 
- @param block Will be called for each @c NSMenuItem sub-element where @c representedObject is set to a @c MenuItemInfo.
- @param flag If set to @c YES, recursive calls will be skipped for submenus that contain soleily read elements.
- @return The number of changed elements in total.
- */
-- (int)siblingsDescendantItemInfo:(MenuItemInfoRecursiveBlock)block unreadEntriesOnly:(BOOL)flag {
-	int markedTotal = 0;
-	for (NSMenuItem *sibling in self.menu.itemArray) {
-		int marked = [sibling descendantItemInfo:block unreadEntriesOnly:flag];
-		if (marked < 0) break;
-		markedTotal += marked;
-	}
-	return markedTotal;
-}
-
-/**
- Recursively propagate unread count to ancestor menu items.
- 
- @note Does not update the current item, only the ancestors.
- @param count The amount by which the counter is adjusted.
-              If negative the items will be marked as unread.
- */
-- (void)markAncestorsRead:(int)count {
-	NSMenuItem *parent = self.parentItem;
-	while (parent.representedObject) {
-		[parent markReadAndUpdateTitle:count];
-		parent = parent.parentItem;
-	}
+	return [self.representedObject unreadCount];
 }
 
 /**
@@ -131,9 +79,10 @@
  @note Count may be negative to mark items as unread.
  @warning Does not check if @c representedObject is set accordingly
  @param count The amount by which the counter is adjusted.
-              If negative the items will be marked as unread.
+ If negative the items will be marked as unread.
  */
 - (void)markReadAndUpdateTitle:(int)count {
+	if (count == 0) return; // 0 won't change anything
 	MenuItemInfo *info = self.representedObject;
 	if (!self.hasSubmenu) {
 		[info markRead:count];
@@ -153,6 +102,67 @@
 			info.countInTitle = YES;
 		}
 	}
+}
+
+/**
+ Recursively propagate unread count to ancestor menu items.
+ 
+ @note Does not update the current item, only the ancestors.
+ @param count The amount by which the counter is adjusted.
+ If negative the items will be marked as unread.
+ */
+- (void)markAncestorsRead:(int)count {
+	NSMenuItem *parent = self.parentItem;
+	while (parent.representedObject) {
+		[parent markReadAndUpdateTitle:count];
+		parent = parent.parentItem;
+	}
+}
+
+/**
+ Recursively iterate over submenues and children. Count aggregated element edits.
+
+ @warning Block will be called for parent items, too. Consider this when using counters.
+ @param block Will be called for each @c NSMenuItem sub-element where @c representedObject is set to a @c MenuItemInfo.
+              Return -1 to stop processing early.
+ @param flag If set to @c YES, recursive calls will be skipped for submenus that contain soleily read elements.
+ @return The number of changed elements in total.
+ */
+- (int)descendantItemInfo:(MenuItemInfoRecursiveBlock)block unreadEntriesOnly:(BOOL)flag {
+	MenuItemInfo *info = self.representedObject;
+	if (![info isKindOfClass:[MenuItemInfo class]]) return 0;
+	if (flag && !info.hasUnread) return 0;
+	if (self.isSeparatorItem) return 0;
+	
+	int countItems = 1; // deepest entry, FeedItem
+	if (self.hasSubmenu) {
+		countItems = 0;
+		for (NSMenuItem *child in self.submenu.itemArray) {
+			int c = [child descendantItemInfo:block unreadEntriesOnly:flag];
+			if (c < 0) break;
+			countItems += c;
+		}
+	}
+	return block(self, countItems);
+}
+
+/**
+ Recursively iterate over siblings and all contained children. Count aggregated element edits.
+ 
+ @warning Block will be called for parent items, too. Consider this when using counters.
+ @param block Will be called for each @c NSMenuItem sub-element where @c representedObject is set to a @c MenuItemInfo.
+              Return -1 to stop processing early.
+ @param flag If set to @c YES, recursive calls will be skipped for submenus that contain soleily read elements.
+ @return The number of changed elements in total.
+ */
+- (int)siblingsDescendantItemInfo:(MenuItemInfoRecursiveBlock)block unreadEntriesOnly:(BOOL)flag {
+	int markedTotal = 0;
+	for (NSMenuItem *sibling in self.menu.itemArray) {
+		int marked = [sibling descendantItemInfo:block unreadEntriesOnly:flag];
+		if (marked < 0) break;
+		markedTotal += marked;
+	}
+	return markedTotal;
 }
 
 @end

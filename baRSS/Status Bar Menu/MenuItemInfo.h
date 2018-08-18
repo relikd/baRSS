@@ -22,22 +22,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-/**
- Object storing the corresponding Core Data object id and an unread counter.
- */
 @interface MenuItemInfo : NSObject
-/// Core Data store ID
 @property (strong) NSManagedObjectID *objID;
-/// internal counter used to sum the unread count of all sub items
-@property (assign) int unreadCount;
-/// internal flag whether unread count is displayed in parenthesis
-@property (assign) BOOL countInTitle;
-
 + (instancetype)withID:(NSManagedObjectID*)oid;
 + (instancetype)withID:(NSManagedObjectID*)oid unread:(int)count;
-
-- (BOOL)hasUnread;
-- (void)markRead:(int)count;
 @end
 
 
@@ -50,11 +38,12 @@
  @return Return how many elements are updated in this block execution. If none were changed return @c 0.
                 If execution should be stopped early, return @c -1.
  */
-typedef int (^MenuItemInfoRecursiveBlock) (NSMenuItem *item, MenuItemInfo *info, int count);
+typedef int (^MenuItemInfoRecursiveBlock) (NSMenuItem *item, int count);
 
+- (BOOL)hasUnread;
 - (int)unreadCount;
-- (int)siblingsDescendantItemInfo:(MenuItemInfoRecursiveBlock)block unreadEntriesOnly:(BOOL)flag;
-- (void)markAncestorsRead:(int)count;
 - (void)markReadAndUpdateTitle:(int)count;
+- (void)markAncestorsRead:(int)count;
+- (int)siblingsDescendantItemInfo:(MenuItemInfoRecursiveBlock)block unreadEntriesOnly:(BOOL)flag;
 @end
 
