@@ -22,15 +22,28 @@
 
 #import "FeedConfig+CoreDataClass.h"
 
+@class FeedItem;
+
 @interface FeedConfig (Ext)
+/// Enum type to distinguish different @c FeedConfig types
 typedef enum int16_t {
 	GROUP = 0,
 	FEED = 1,
 	SEPARATOR = 2
 } FeedConfigType;
+/**
+ Iteration block for descendants of @c FeedItem.
+
+ @param parent The parent @c FeedConfig where this @c FeedItem belongs to.
+ @param item Currently processed @c FeedItem.
+ @return Return @c YES to continue processing. Return @c NO to stop processing and exit early.
+ */
+typedef BOOL (^FeedConfigRecursiveItemsBlock) (FeedConfig *parent, FeedItem *item);
+
 @property (getter=typ, setter=setTyp:) FeedConfigType typ;
 @property (readonly) NSArray<FeedConfig*> *sortedChildren;
 
+- (BOOL)descendantFeedItems:(FeedConfigRecursiveItemsBlock)block;
 - (NSString*)readableRefreshString;
 - (NSString*)readableDescription;
 @end

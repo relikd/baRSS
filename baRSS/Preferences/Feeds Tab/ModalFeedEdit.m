@@ -191,8 +191,8 @@
 	}
 }
 - (void)loadView {
-	NSTextField *tf = [NSTextField textFieldWithString:@"New Group"];
-	tf.placeholderString = @"New Group";
+	NSTextField *tf = [NSTextField textFieldWithString:NSLocalizedString(@"New Group", nil)];
+	tf.placeholderString = NSLocalizedString(@"New Group", nil);
 	tf.autoresizingMask = NSViewWidthSizable | NSViewMinYMargin;
 	self.view = tf;
 }

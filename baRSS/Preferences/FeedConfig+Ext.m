@@ -21,27 +21,52 @@
 //  SOFTWARE.
 
 #import "FeedConfig+Ext.h"
+#import "Feed+CoreDataClass.h"
 
 @implementation FeedConfig (Ext)
+/// Enum tpye getter see @c FeedConfigType
+- (FeedConfigType)typ { return (FeedConfigType)self.type; }
+/// Enum type setter see @c FeedConfigType
+- (void)setTyp:(FeedConfigType)typ { self.type = typ; }
 
-- (FeedConfigType)typ {
-	return (FeedConfigType)self.type;
-}
+/**
+ Sorted children array based on sort order provided in feed settings.
 
-- (void)setTyp:(FeedConfigType)typ {
-	self.type = typ;
-}
-
+ @return Sorted array of @c FeedConfig items.
+ */
 - (NSArray<FeedConfig *> *)sortedChildren {
 	if (self.children.count == 0)
 		return nil;
 	return [self.children sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];
 }
 
+/**
+ Iterate over all descendant @c FeedItems in sub groups
+ 
+ @param block Will yield the current parent config and feed item. Return @c NO to cancel iteration.
+ @return Returns @c NO if the iteration was canceled early. Otherwise @c YES.
+ */
+- (BOOL)descendantFeedItems:(FeedConfigRecursiveItemsBlock)block {
+	if (self.children.count > 0) {
+		for (FeedConfig *config in self.children) {
+			if ([config descendantFeedItems:block] == NO)
+				return NO;
+		}
+	} else if (self.feed.items.count > 0) {
+		for (FeedItem* item in self.feed.items) {
+			if (block(self, item) == NO)
+				return NO;
+		}
+	}
+	return YES;
+}
+
+/// @return Formatted string for update interval ( e.g., @c 30m or @c 12h )
 - (NSString*)readableRefreshString {
 	return [NSString stringWithFormat:@"%d%c", self.refreshNum, [@"smhdw" characterAtIndex:self.refreshUnit % 5]];
 }
 
+/// @return Simplified description of the feed object.
 - (NSString*)readableDescription {
 	switch (self.typ) {
 		case SEPARATOR: return @"-------------";
