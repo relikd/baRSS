@@ -31,6 +31,7 @@
         <attribute name="subtitle" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="summary" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="unread" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="items" inverseEntity="Feed" syncable="YES"/>
         <relationship name="tags" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="FeedTag" inverseName="feedItem" inverseEntity="FeedTag" syncable="YES"/>
     </entity>
@@ -41,7 +42,7 @@
     <elements>
         <element name="Feed" positionX="-209" positionY="-3" width="128" height="210"/>
         <element name="FeedConfig" positionX="-20" positionY="-126" width="128" height="180"/>
-        <element name="FeedItem" positionX="-20" positionY="81" width="128" height="165"/>
+        <element name="FeedItem" positionX="-20" positionY="81" width="128" height="180"/>
         <element name="FeedTag" positionX="187" positionY="171" width="128" height="75"/>
     </elements>
 </model>

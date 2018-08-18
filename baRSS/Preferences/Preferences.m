@@ -56,10 +56,6 @@
 	[[NSUserDefaults standardUserDefaults] setInteger:selectedIndex forKey:@"preferencesTab"];
 }
 
-- (void)windowWillClose:(NSNotification *)notification {
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"baRSSPreferencesClosed" object:nil];
-}
-
 @end
 
 

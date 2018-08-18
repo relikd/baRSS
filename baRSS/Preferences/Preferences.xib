@@ -14,7 +14,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <window title="baRSS Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="prefWindow" animationBehavior="default" tabbingMode="disallowed" id="XQ4-ia-CCO" userLabel="Window" customClass="NonRespondingWindow">
+        <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="prefWindow" animationBehavior="default" tabbingMode="disallowed" id="XQ4-ia-CCO" userLabel="Window" customClass="NonRespondingWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" resizable="YES"/>
             <rect key="contentRect" x="948" y="431" width="320" height="327"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>

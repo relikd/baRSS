@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1968E0AE14B8E8A90E194980 /* PyHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 1968EF7567E06D2A5BB3481A /* PyHandler.m */; };
+		541A90F221257D77002680A6 /* MenuItemInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 541A90F121257D77002680A6 /* MenuItemInfo.m */; };
 		54209E942117325100F3B5EF /* DrawImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 54209E932117325100F3B5EF /* DrawImage.m */; };
 		544B011A2114B41200386E5C /* ModalSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* ModalSheet.m */; };
 		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
@@ -34,6 +35,8 @@
 /* Begin PBXFileReference section */
 		1968E7919BAA36F042FCB717 /* PyHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PyHandler.h; sourceTree = "<group>"; };
 		1968EF7567E06D2A5BB3481A /* PyHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PyHandler.m; sourceTree = "<group>"; };
+		541A90F021257D77002680A6 /* MenuItemInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MenuItemInfo.h; sourceTree = "<group>"; };
+		541A90F121257D77002680A6 /* MenuItemInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MenuItemInfo.m; sourceTree = "<group>"; };
 		54209E922117325100F3B5EF /* DrawImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawImage.h; sourceTree = "<group>"; };
 		54209E932117325100F3B5EF /* DrawImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawImage.m; sourceTree = "<group>"; };
 		544B01182114B41200386E5C /* ModalSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSheet.h; sourceTree = "<group>"; };
@@ -82,6 +85,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		541A90EF21257D4F002680A6 /* Status Bar Menu */ = {
+			isa = PBXGroup;
+			children = (
+				541A90F021257D77002680A6 /* MenuItemInfo.h */,
+				541A90F121257D77002680A6 /* MenuItemInfo.m */,
+				54FE73D1212316CD003EAC65 /* BarMenu.h */,
+				54FE73D2212316CD003EAC65 /* BarMenu.m */,
+			);
+			path = "Status Bar Menu";
+			sourceTree = "<group>";
+		};
 		544FBD4321064AEB008A260C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -150,8 +164,7 @@
 				549369F421091E6D001AF895 /* python */,
 				544B011B2114EE9100386E5C /* AppHook.h */,
 				544B011C2114EE9100386E5C /* AppHook.m */,
-				54FE73D1212316CD003EAC65 /* BarMenu.h */,
-				54FE73D2212316CD003EAC65 /* BarMenu.m */,
+				541A90EF21257D4F002680A6 /* Status Bar Menu */,
 				54FE73CE21220DEC003EAC65 /* StoreCoordinator.h */,
 				54FE73CF21220DEC003EAC65 /* StoreCoordinator.m */,
 				54ACC29321061E270020715F /* FeedDownload.h */,
@@ -277,6 +290,7 @@
 				1968E0AE14B8E8A90E194980 /* PyHandler.m in Sources */,
 				54209E942117325100F3B5EF /* DrawImage.m in Sources */,
 				54FE73D021220DEC003EAC65 /* StoreCoordinator.m in Sources */,
+				541A90F221257D77002680A6 /* MenuItemInfo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
