@@ -48,7 +48,7 @@
  */
 - (BOOL)descendantFeedItems:(FeedConfigRecursiveItemsBlock)block {
 	if (self.children.count > 0) {
-		for (FeedConfig *config in self.children) {
+		for (FeedConfig *config in self.sortedChildren) {
 			if ([config descendantFeedItems:block] == NO)
 				return NO;
 		}

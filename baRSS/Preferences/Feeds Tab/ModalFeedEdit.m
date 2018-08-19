@@ -105,14 +105,18 @@
 		item.refreshUnit = (int16_t)self.refreshUnit.indexOfSelectedItem;
 	
 	if (self.feedResult) {
-		Feed *rss = [StoreCoordinator createFeedFromDictionary:self.feedResult inContext:item.managedObjectContext];
-		if (item.feed)
-			[item.managedObjectContext deleteObject:(NSManagedObject*)item.feed];
-		item.feed = rss;
+		[item.managedObjectContext performBlockAndWait:^{
+			Feed *rss = [StoreCoordinator createFeedFromDictionary:self.feedResult inContext:item.managedObjectContext];
+			if (item.feed)
+				[item.managedObjectContext deleteObject:(NSManagedObject*)item.feed];
+			item.feed = rss;
+		}];
 	}
 	if ([item.managedObjectContext hasChanges]) {
 		self.objectIsModified = YES;
-		[item.managedObjectContext refreshObject:item mergeChanges:YES];
+		[item.managedObjectContext performBlockAndWait:^{
+			[item.managedObjectContext refreshObject:item mergeChanges:YES];
+		}];
 	}
 }
 
@@ -202,7 +206,9 @@
 		NSString *name = ((NSTextField*)self.view).stringValue;
 		if (![item.name isEqualToString: name]) {
 			item.name = name;
-			[item.managedObjectContext refreshObject:item mergeChanges:YES];
+			[item.managedObjectContext performBlockAndWait:^{
+				[item.managedObjectContext refreshObject:item mergeChanges:YES];
+			}];
 			[self.delegate modalDidUpdateFeedConfig:item];
 		}
 	}
