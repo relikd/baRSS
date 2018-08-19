@@ -23,5 +23,5 @@
 #import <Cocoa/Cocoa.h>
 
 @interface BarMenu : NSObject <NSMenuDelegate>
-//+ (instancetype)start;
+- (void)rebuildMenu;
 @end

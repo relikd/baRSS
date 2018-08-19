@@ -59,11 +59,14 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 - (instancetype)init {
 	self = [super init];
 	self.barItem = [NSStatusBar.systemStatusBar statusItemWithLength:NSVariableStatusItemLength];
-	self.barItem.menu = self.mainMenu;
 	self.barItem.highlightMode = YES;
-	[self updateBarIcon];
+	self.barItem.menu = [self generateMainMenu];
 //	[self donothing];
 	return self;
+}
+
+- (void)rebuildMenu {
+	self.barItem.menu = [self generateMainMenu];
 }
 
 - (void)donothing {
@@ -72,6 +75,21 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	});
 	sleep(1);
 	[self performSelectorInBackground:@selector(donothing) withObject:nil];
+}
+
+- (void)printUnreadRecurisve:(NSMenu*)menu str:(NSString*)prefix {
+	for (NSMenuItem *item in menu.itemArray) {
+		if (!item.hasUnread) continue;
+		MenuItemInfo *info = item.representedObject;
+		id obj = [StoreCoordinator objectWithID:info.objID];
+		if ([obj isKindOfClass:[FeedItem class]])
+			NSLog(@"%@ %@ (%d == %d)", prefix, item.title, item.unreadCount, [obj unread]);
+		else
+			NSLog(@"%@ %@ (%d)", prefix, item.title, item.unreadCount);
+		if (item.hasSubmenu) {
+			[self printUnreadRecurisve:item.submenu str:[NSString stringWithFormat:@"  %@", prefix]];
+		}
+	}
 }
 
 /**
@@ -87,6 +105,8 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 		self.barItem.image = [[RSSIcon templateIcon:16 tint:nil] image];
 		self.barItem.image.template = YES;
 	}
+	NSLog(@"==> %d", self.unreadCountTotal);
+	[self printUnreadRecurisve:self.barItem.menu str:@""];
 }
 
 
@@ -96,7 +116,7 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 /**
  Builds main menu with items on the very first menu level. Including Preferences, Quit, etc.
  */
-- (NSMenu*)mainMenu {
+- (NSMenu*)generateMainMenu {
 	NSMenu *menu = [NSMenu new];
 	menu.autoenablesItems = NO;
 	[self addTitle:NSLocalizedString(@"Pause Updates", nil) selector:@selector(pauseUpdates:) toMenu:menu tag:TagPauseUpdates];
@@ -104,9 +124,11 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	[menu addItem:[NSMenuItem separatorItem]];
 	[self defaultHeaderForMenu:menu scope:ScopeGlobal];
 	
+	self.unreadCountTotal = 0;
 	for (FeedConfig *fc in [StoreCoordinator sortedFeedConfigItems]) {
 		[menu addItem:[self menuItemForFeedConfig:fc unread:&_unreadCountTotal]];
 	}
+	[self updateBarIcon];
 	
 	[menu addItem:[NSMenuItem separatorItem]];
 	[self addTitle:NSLocalizedString(@"Preferences", nil) selector:@selector(openPreferences) toMenu:menu tag:TagPreferences];

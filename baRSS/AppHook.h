@@ -23,7 +23,9 @@
 #import <Cocoa/Cocoa.h>
 #import <CoreData/CoreData.h>
 
+@class BarMenu;
+
 @interface AppHook : NSApplication <NSApplicationDelegate>
+@property (readonly, strong) BarMenu *barMenu;
 @property (readonly, strong) NSPersistentContainer *persistentContainer;
-- (IBAction)saveAction:(id)sender;
 @end

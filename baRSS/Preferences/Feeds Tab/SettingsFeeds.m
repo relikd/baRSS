@@ -22,12 +22,13 @@
 
 #import "SettingsFeeds.h"
 #import "AppHook.h"
-#import "FeedConfig+Ext.h"
+#import "BarMenu.h"
 #import "ModalSheet.h"
 #import "ModalFeedEdit.h"
 #import "DrawImage.h"
+#import "StoreCoordinator.h"
 
-@interface SettingsFeeds ()
+@interface SettingsFeeds () <ModalEditDelegate>
 @property (weak) IBOutlet NSOutlineView *outlineView;
 @property (weak) IBOutlet NSTreeController *dataStore;
 
@@ -43,10 +44,29 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-	self.dataStore.managedObjectContext = [(AppHook*)NSApp persistentContainer].viewContext;
-	self.undoManager = self.dataStore.managedObjectContext.undoManager;
 	[self.outlineView registerForDraggedTypes:[NSArray arrayWithObject:dragNodeType]];
 	[self.dataStore setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];
+	
+	NSManagedObjectContext *childContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+	[childContext setParentContext:[(AppHook*)NSApp persistentContainer].viewContext];
+//	childContext.automaticallyMergesChangesFromParent = YES;
+	NSUndoManager *um = [[NSUndoManager alloc] init];
+	um.groupsByEvent = NO;
+	um.levelsOfUndo = 30;
+	childContext.undoManager = um;
+	
+	self.dataStore.managedObjectContext = childContext;
+	self.undoManager = self.dataStore.managedObjectContext.undoManager;
+}
+
+- (void)dealloc {
+	[self saveAndRebuildMenu];
+}
+
+- (void)saveAndRebuildMenu {
+	[StoreCoordinator saveContext:self.dataStore.managedObjectContext];
+	[StoreCoordinator saveContext:self.dataStore.managedObjectContext.parentContext];
+	[[(AppHook*)NSApp barMenu] rebuildMenu]; // updating individual items was way to complicated ...
 }
 
 - (IBAction)addFeed:(id)sender {
@@ -63,6 +83,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	sp.name = @"---";
 	sp.typ = SEPARATOR;
 	[self.undoManager endUndoGrouping];
+	[self saveAndRebuildMenu];
 }
 
 - (IBAction)remove:(id)sender {
@@ -71,6 +92,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		[self incrementIndicesBy:-1 forSubsequentNodes:path];
 	[self.dataStore remove:sender];
 	[self.undoManager endUndoGrouping];
+	[self saveAndRebuildMenu];
 }
 
 - (IBAction)doubleClickOutlineView:(NSOutlineView*)sender {
@@ -97,20 +119,26 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	}
 	self.modalController = (group ? [ModalGroupEdit new] : [ModalFeedEdit new]);
 	self.modalController.representedObject = obj;
+	self.modalController.delegate = self;
 	
 	[self.view.window beginSheet:[ModalSheet modalWithView:self.modalController.view] completionHandler:^(NSModalResponse returnCode) {
 		if (returnCode == NSModalResponseOK) {
-			[self.undoManager beginUndoGrouping];
 			if (!existingItem) { // create new item
+				[self.undoManager beginUndoGrouping];
 				FeedConfig *item = [self insertSortedItemAtSelection];
 				item.typ = (group ? GROUP : FEED);
 				self.modalController.representedObject = item;
 			}
 			[self.modalController updateRepresentedObject];
-			[self.undoManager endUndoGrouping];
+			if (!existingItem)
+				[self.undoManager endUndoGrouping];
 		}
 		self.modalController = nil;
 	}];
+}
+
+- (void)modalDidUpdateFeedConfig:(FeedConfig*)config {
+	[self saveAndRebuildMenu];
 }
 
 - (FeedConfig*)insertSortedItemAtSelection {
@@ -164,13 +192,15 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation {
-	self.currentlyDraggedNodes = nil;
 	[self.undoManager endUndoGrouping];
-	if ([self.dataStore.managedObjectContext hasChanges]) {
-		NSError *err;
-		[self.dataStore.managedObjectContext save:&err];
-		if (err) NSLog(@"Error: %@", err);
+	if (self.dataStore.managedObjectContext.hasChanges) {
+		[self saveAndRebuildMenu];
+	} else {
+		[self.undoManager disableUndoRegistration];
+		[self.undoManager undoNestedGroup];
+		[self.undoManager enableUndoRegistration];
 	}
+	self.currentlyDraggedNodes = nil;
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index {
@@ -290,11 +320,13 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 - (void)undo:(id)sender {
 	[self.undoManager undo];
 	[self.dataStore rearrangeObjects]; // update ordering
+	[self saveAndRebuildMenu];
 }
 
 - (void)redo:(id)sender {
 	[self.undoManager redo];
 	[self.dataStore rearrangeObjects]; // update ordering
+	[self saveAndRebuildMenu];
 }
 
 - (void)enterPressed:(id)sender {
