@@ -22,7 +22,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class FeedConfig;
+
+@protocol ModalEditDelegate <NSObject>
+- (void)modalDidUpdateFeedConfig:(FeedConfig*)config;
+@end
+
 @protocol ModalFeedConfigEdit <NSObject>
+@property (weak) id<ModalEditDelegate> delegate;
 - (void)updateRepresentedObject; // must call [item.managedObjectContext refreshObject:item mergeChanges:YES];
 @end
 

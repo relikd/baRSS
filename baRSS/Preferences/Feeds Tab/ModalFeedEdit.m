@@ -44,6 +44,7 @@
 @end
 
 @implementation ModalFeedEdit
+@synthesize delegate;
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
@@ -71,48 +72,47 @@
 	if (self.shouldSaveObject) {
 		if (self.objectNeedsSaving)
 			[self updateRepresentedObject];
-		NSUndoManager *um = [self feedConfigOrNil].managedObjectContext.undoManager;
+		FeedConfig *item = [self feedConfigOrNil];
+		NSUndoManager *um = item.managedObjectContext.undoManager;
 		[um endUndoGrouping];
 		if (!self.objectIsModified) {
 			[um disableUndoRegistration];
 			[um undoNestedGroup];
 			[um enableUndoRegistration];
 		} else {
-			[StoreCoordinator save];
+			[self.delegate modalDidUpdateFeedConfig:item];
 		}
 	}
 }
 
 - (void)updateRepresentedObject {
 	FeedConfig *item = [self feedConfigOrNil];
-	if (item) {
-		if (!self.shouldSaveObject) { // first call to this method
-			[item.managedObjectContext.undoManager beginUndoGrouping];
-		}
-		self.shouldSaveObject = YES;
-		self.objectNeedsSaving = NO; // after this method it is saved
-		
-		// if's to prevent unnecessary undo groups if nothing has changed
-		if (![item.name isEqualToString: self.name.stringValue])
-			item.name = self.name.stringValue;
-		if (![item.url isEqualToString:self.url.stringValue])
-			item.url = self.url.stringValue;
-		if (item.refreshNum != self.refreshNum.intValue)
-			item.refreshNum = self.refreshNum.intValue;
-		if (item.refreshUnit != self.refreshUnit.indexOfSelectedItem)
-			item.refreshUnit = (int16_t)self.refreshUnit.indexOfSelectedItem;
-		
-		
-		if (self.feedResult) {
-			Feed *rss = [StoreCoordinator createFeedFromDictionary:self.feedResult];
-			if (item.feed)
-				[item.managedObjectContext deleteObject:(NSManagedObject*)item.feed];
-			item.feed = rss;
-		}
-		if ([item.managedObjectContext hasChanges]) {
-			self.objectIsModified = YES;
-			[item.managedObjectContext refreshObject:item mergeChanges:YES];
-		}
+	if (!item)
+		return;
+	if (!self.shouldSaveObject) // first call to this method
+		[item.managedObjectContext.undoManager beginUndoGrouping];
+	self.shouldSaveObject = YES;
+	self.objectNeedsSaving = NO; // after this method it is saved
+	
+	// if's to prevent unnecessary undo groups if nothing has changed
+	if (![item.name isEqualToString: self.name.stringValue])
+		item.name = self.name.stringValue;
+	if (![item.url isEqualToString:self.url.stringValue])
+		item.url = self.url.stringValue;
+	if (item.refreshNum != self.refreshNum.intValue)
+		item.refreshNum = self.refreshNum.intValue;
+	if (item.refreshUnit != self.refreshUnit.indexOfSelectedItem)
+		item.refreshUnit = (int16_t)self.refreshUnit.indexOfSelectedItem;
+	
+	if (self.feedResult) {
+		Feed *rss = [StoreCoordinator createFeedFromDictionary:self.feedResult inContext:item.managedObjectContext];
+		if (item.feed)
+			[item.managedObjectContext deleteObject:(NSManagedObject*)item.feed];
+		item.feed = rss;
+	}
+	if ([item.managedObjectContext hasChanges]) {
+		self.objectIsModified = YES;
+		[item.managedObjectContext refreshObject:item mergeChanges:YES];
 	}
 }
 
@@ -151,7 +151,6 @@
 			});
 		}];
 	}
-	// http://feeds.feedburner.com/simpledesktops
 }
 
 - (void)setTitleFromFeed {
@@ -183,6 +182,7 @@
 #pragma mark - ModalGroupEdit
 
 @implementation ModalGroupEdit
+@synthesize delegate;
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	if ([self.representedObject isKindOfClass:[FeedConfig class]]) {
@@ -203,6 +203,7 @@
 		if (![item.name isEqualToString: name]) {
 			item.name = name;
 			[item.managedObjectContext refreshObject:item mergeChanges:YES];
+			[self.delegate modalDidUpdateFeedConfig:item];
 		}
 	}
 }

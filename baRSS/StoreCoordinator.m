@@ -29,8 +29,16 @@
 	return [(AppHook*)NSApp persistentContainer].viewContext;
 }
 
-+ (void)save {
-	[(AppHook*)NSApp saveAction:nil];
++ (void)saveContext:(NSManagedObjectContext*)context {
+	// Performs the save action for the application, which is to send the save: message to the application's managed object context. Any encountered errors are presented to the user.
+	if (![context commitEditing]) {
+		NSLog(@"%@:%@ unable to commit editing before saving", [self class], NSStringFromSelector(_cmd));
+	}
+	NSError *error = nil;
+	if (context.hasChanges && ![context save:&error]) {
+		// Customize this code block to include application-specific recovery steps.
+		[[NSApplication sharedApplication] presentError:error];
+	}
 }
 
 + (void)deleteUnreferencedFeeds {
@@ -58,8 +66,8 @@
 	return [[self getContext] objectWithID:objID];
 }
 
-+ (Feed*)createFeedFromDictionary:(NSDictionary*)obj {
-	NSManagedObjectContext *moc = [self getContext];
++ (Feed*)createFeedFromDictionary:(NSDictionary*)obj inContext:(NSManagedObjectContext*)moc {
+//	NSManagedObjectContext *moc = [self getContext];
 	Feed *a = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:moc];
 	a.title = obj[@"feed"][@"title"];
 	a.subtitle = obj[@"feed"][@"subtitle"];

@@ -24,10 +24,6 @@
 #import "PyHandler.h"
 #import "BarMenu.h"
 
-@interface AppHook()
-@property (strong) BarMenu *barMenu;
-@end
-
 @implementation AppHook
 
 - (instancetype)init {
@@ -37,17 +33,13 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-	self.barMenu = [BarMenu new];
+	_barMenu = [BarMenu new];
 	[PyHandler prepare];
 	printf("up and running\n");
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
 	[PyHandler shutdown];
-}
-
-- (IBAction)closePreferences:(id)sender {
-	NSLog(@"closing in %@", sender);
 }
 
 
@@ -67,39 +59,14 @@
 					abort();
 				}
 			}];
-			NSUndoManager *um = [[NSUndoManager alloc] init];
-			um.groupsByEvent = NO;
-			um.levelsOfUndo = 30;
-			_persistentContainer.viewContext.undoManager = um;
 		}
 	}
-	
 	return _persistentContainer;
 }
 
 
 #pragma mark - Core Data Saving and Undo support
 
-
-- (IBAction)saveAction:(id)sender {
-	// Performs the save action for the application, which is to send the save: message to the application's managed object context. Any encountered errors are presented to the user.
-	NSManagedObjectContext *context = self.persistentContainer.viewContext;
-	
-	if (![context commitEditing]) {
-		NSLog(@"%@:%@ unable to commit editing before saving", [self class], NSStringFromSelector(_cmd));
-	}
-	
-	NSError *error = nil;
-	if (context.hasChanges && ![context save:&error]) {
-		// Customize this code block to include application-specific recovery steps.
-		[[NSApplication sharedApplication] presentError:error];
-	}
-}
-
-- (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window {
-	// Returns the NSUndoManager for the application. In this case, the manager returned is that of the managed object context for the application.
-	return self.persistentContainer.viewContext.undoManager;
-}
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
 	// Save changes in the application's managed object context before the application terminates.

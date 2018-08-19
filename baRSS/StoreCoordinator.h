@@ -26,9 +26,9 @@
 
 
 @interface StoreCoordinator : NSObject
-+ (void)save;
++ (void)saveContext:(NSManagedObjectContext*)context;
 + (void)deleteUnreferencedFeeds;
 + (NSArray<FeedConfig*>*)sortedFeedConfigItems;
 + (id)objectWithID:(NSManagedObjectID*)objID;
-+ (Feed*)createFeedFromDictionary:(NSDictionary*)obj;
++ (Feed*)createFeedFromDictionary:(NSDictionary*)obj inContext:(NSManagedObjectContext*)context;
 @end
