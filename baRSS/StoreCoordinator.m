@@ -66,9 +66,8 @@
 	return [[self getContext] objectWithID:objID];
 }
 
-+ (Feed*)createFeedFromDictionary:(NSDictionary*)obj inContext:(NSManagedObjectContext*)moc {
-//	NSManagedObjectContext *moc = [self getContext];
-	Feed *a = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:moc];
++ (Feed*)createFeedFromDictionary:(NSDictionary*)obj inContext:(NSManagedObjectContext*)context {
+	Feed *a = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:context];
 	a.title = obj[@"feed"][@"title"];
 	a.subtitle = obj[@"feed"][@"subtitle"];
 	a.author = obj[@"feed"][@"author"];
@@ -79,7 +78,7 @@
 	a.date = obj[@"header"][@"date"];
 	a.modified = obj[@"header"][@"modified"];
 	for (NSDictionary *entry in obj[@"entries"]) {
-		FeedItem *b = [[FeedItem alloc] initWithEntity:FeedItem.entity insertIntoManagedObjectContext:moc];
+		FeedItem *b = [[FeedItem alloc] initWithEntity:FeedItem.entity insertIntoManagedObjectContext:context];
 		b.title = entry[@"title"];
 		b.subtitle = entry[@"subtitle"];
 		b.author = entry[@"author"];
@@ -87,7 +86,7 @@
 		b.published = entry[@"published"];
 		b.summary = entry[@"summary"];
 		for (NSString *tag in entry[@"tags"]) {
-			FeedTag *c = [[FeedTag alloc] initWithEntity:FeedTag.entity insertIntoManagedObjectContext:moc];
+			FeedTag *c = [[FeedTag alloc] initWithEntity:FeedTag.entity insertIntoManagedObjectContext:context];
 			c.name = tag;
 			[b addTagsObject:c];
 		}

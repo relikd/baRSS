@@ -59,14 +59,15 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	self.undoManager = self.dataStore.managedObjectContext.undoManager;
 }
 
-- (void)dealloc {
-	[self saveAndRebuildMenu];
-}
-
 - (void)saveAndRebuildMenu {
-	[StoreCoordinator saveContext:self.dataStore.managedObjectContext];
-	[StoreCoordinator saveContext:self.dataStore.managedObjectContext.parentContext];
-	[[(AppHook*)NSApp barMenu] rebuildMenu]; // updating individual items was way to complicated ...
+	[self.dataStore.managedObjectContext performBlock:^{
+		[StoreCoordinator saveContext:self.dataStore.managedObjectContext];
+		[[(AppHook*)NSApp barMenu] rebuildMenu]; // updating individual items was way to complicated ...
+		[self.dataStore.managedObjectContext.parentContext performBlock:^{
+			[StoreCoordinator saveContext:self.dataStore.managedObjectContext.parentContext];
+		}];
+
+	}];
 }
 
 - (IBAction)addFeed:(id)sender {

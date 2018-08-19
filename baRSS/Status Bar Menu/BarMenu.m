@@ -31,13 +31,11 @@
 /// @c NSMenuItem options that are assigned to the @c tag attribute.
 typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	/// Item visible at the very first menu level
-	ScopeGlobal = 1,
+	ScopeGlobal = 2,
 	/// Item visible at each grouping, e.g., multiple feeds in one group
-	ScopeGroup = 2,
+	ScopeGroup = 4,
 	/// Item visible at the deepest menu level (@c FeedItem elements and header)
-	ScopeLocal = 4,
-	/// @c NSMenuItem is an alternative
-	ScopeAlternative = 8,
+	ScopeLocal = 8,
 	///
 	TagPreferences = (1 << 4),
 	TagPauseUpdates = (2 << 4),
@@ -79,12 +77,12 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 
 - (void)printUnreadRecurisve:(NSMenu*)menu str:(NSString*)prefix {
 	for (NSMenuItem *item in menu.itemArray) {
-		if (!item.hasUnread) continue;
 		MenuItemInfo *info = item.representedObject;
+		if (!info) continue;
 		id obj = [StoreCoordinator objectWithID:info.objID];
-		if ([obj isKindOfClass:[FeedItem class]])
+		if ([obj isKindOfClass:[FeedItem class]] && ([obj unread] > 0 || item.unreadCount > 0))
 			NSLog(@"%@ %@ (%d == %d)", prefix, item.title, item.unreadCount, [obj unread]);
-		else
+		else if (item.hasUnread)
 			NSLog(@"%@ %@ (%d)", prefix, item.title, item.unreadCount);
 		if (item.hasSubmenu) {
 			[self printUnreadRecurisve:item.submenu str:[NSString stringWithFormat:@"  %@", prefix]];
@@ -242,10 +240,11 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	[self addTitle:NSLocalizedString(@"Mark all unread", nil) selector:@selector(markAllUnread:) toMenu:menu tag:TagMarkAllUnread | scope];
 	[self addTitle:NSLocalizedString(@"Open all unread", nil) selector:@selector(openAllUnread:) toMenu:menu tag:TagOpenAllUnread | scope];
 	
-	NSString *alternateTitle = [NSString stringWithFormat:NSLocalizedString(@"Open a few unread (%d)", nil), 3];
-	[self addTitle:alternateTitle selector:@selector(openAllUnread:) toMenu:menu tag:TagOpenAllUnread | scope | ScopeAlternative];
-	menu.itemArray.lastObject.alternate = YES;
-	menu.itemArray.lastObject.keyEquivalentModifierMask = NSEventModifierFlagOption;
+	NSMenuItem *openSomeUrls = [menu.itemArray.lastObject copy];
+	openSomeUrls.title = [NSString stringWithFormat:NSLocalizedString(@"Open a few unread (%d)", nil), 3];
+	openSomeUrls.alternate = YES;
+	openSomeUrls.keyEquivalentModifierMask = NSEventModifierFlagOption;
+	[menu addItem:openSomeUrls];
 	
 	[menu addItem:[NSMenuItem separatorItem]];
 	return menu;
@@ -281,7 +280,7 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 										NSLocalizedString(@"Preferences", nil)];
 		// one time token to set reference to nil, which will release window
 		NSNotificationCenter * __weak center = [NSNotificationCenter defaultCenter];
-		id __block token = [center addObserverForName:NSWindowWillCloseNotification object:self.prefWindow.window queue:nil usingBlock:^(NSNotification *note) {
+		__block id token = [center addObserverForName:NSWindowWillCloseNotification object:self.prefWindow.window queue:nil usingBlock:^(NSNotification *note) {
 			self.prefWindow = nil;
 			[center removeObserver:token];
 		}];
