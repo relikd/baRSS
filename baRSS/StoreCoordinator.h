@@ -24,11 +24,12 @@
 #import "DBv1+CoreDataModel.h"
 #import "FeedConfig+Ext.h"
 
+@class RSParsedFeed;
 
 @interface StoreCoordinator : NSObject
 + (void)saveContext:(NSManagedObjectContext*)context;
 + (void)deleteUnreferencedFeeds;
 + (NSArray<FeedConfig*>*)sortedFeedConfigItems;
 + (id)objectWithID:(NSManagedObjectID*)objID;
-+ (Feed*)createFeedFromDictionary:(NSDictionary*)obj inContext:(NSManagedObjectContext*)context;
++ (Feed*)createFeedFrom:(RSParsedFeed*)obj inContext:(NSManagedObjectContext*)context;
 @end

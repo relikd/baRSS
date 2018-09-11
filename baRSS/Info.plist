@@ -30,5 +30,10 @@
 	<string>Copyright © 2018 relikd. All rights reserved.</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

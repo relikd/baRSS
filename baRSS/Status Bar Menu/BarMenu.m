@@ -74,7 +74,7 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	sleep(1);
 	[self performSelectorInBackground:@selector(donothing) withObject:nil];
 }
-
+// TODO: remove debugging stuff
 - (void)printUnreadRecurisve:(NSMenu*)menu str:(NSString*)prefix {
 	for (NSMenuItem *item in menu.itemArray) {
 		MenuItemInfo *info = item.representedObject;
@@ -103,8 +103,8 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 		self.barItem.image = [[RSSIcon templateIcon:16 tint:nil] image];
 		self.barItem.image.template = YES;
 	}
-	NSLog(@"==> %d", self.unreadCountTotal);
-	[self printUnreadRecurisve:self.barItem.menu str:@""];
+//	NSLog(@"==> %d", self.unreadCountTotal);
+//	[self printUnreadRecurisve:self.barItem.menu str:@""];
 }
 
 
@@ -123,8 +123,10 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	[self defaultHeaderForMenu:menu scope:ScopeGlobal];
 	
 	self.unreadCountTotal = 0;
-	for (FeedConfig *fc in [StoreCoordinator sortedFeedConfigItems]) {
-		[menu addItem:[self menuItemForFeedConfig:fc unread:&_unreadCountTotal]];
+	@autoreleasepool {
+		for (FeedConfig *fc in [StoreCoordinator sortedFeedConfigItems]) {
+			[menu addItem:[self menuItemForFeedConfig:fc unread:&_unreadCountTotal]];
+		}
 	}
 	[self updateBarIcon];
 	
@@ -214,7 +216,12 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle:item.title action:@selector(openFeedURL:) keyEquivalent:@""];
 	mi.target = self;
 	mi.representedObject = [MenuItemInfo withID:item.objectID unread:(item.unread ? 1 : 0)];
-	mi.toolTip = item.subtitle;
+	//mi.toolTip = item.abstract;
+	// TODO: Do regex during save, not during display. Its here for testing purposes ...
+	if (item.abstract.length > 0) {
+		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<[^>]*>" options:kNilOptions error:nil];
+		mi.toolTip = [regex stringByReplacingMatchesInString:item.abstract options:kNilOptions range:NSMakeRange(0, item.abstract.length) withTemplate:@""];
+	}
 	mi.enabled = (item.link.length > 0);
 	mi.state = (item.unread ? NSControlStateValueOn : NSControlStateValueOff);
 	mi.tag = ScopeLocal;
@@ -278,15 +285,15 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 		self.prefWindow = [[Preferences alloc] initWithWindowNibName:@"Preferences"];
 		self.prefWindow.window.title = [NSString stringWithFormat:@"%@ %@", NSProcessInfo.processInfo.processName,
 										NSLocalizedString(@"Preferences", nil)];
-		// one time token to set reference to nil, which will release window
-		NSNotificationCenter * __weak center = [NSNotificationCenter defaultCenter];
-		__block id token = [center addObserverForName:NSWindowWillCloseNotification object:self.prefWindow.window queue:nil usingBlock:^(NSNotification *note) {
-			self.prefWindow = nil;
-			[center removeObserver:token];
-		}];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preferencesClosed:) name:NSWindowWillCloseNotification object:self.prefWindow.window];
 	}
 	[NSApp activateIgnoringOtherApps:YES];
 	[self.prefWindow showWindow:nil];
+}
+
+- (void)preferencesClosed:(id)sender {
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:self.prefWindow.window];
+	self.prefWindow = nil;
 }
 
 
@@ -441,9 +448,11 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 		[[self requestFeedConfigForMenuItem:sender.parentItem] descendantFeedItems:block];
 	} else {
 		// Sadly we can't just fetch the list of FeedItems since it is not ordered (in case open 10 at a time)
-		for (FeedConfig *config in [StoreCoordinator sortedFeedConfigItems]) {
-			if ([config descendantFeedItems:block] == NO)
-				break;
+		@autoreleasepool {
+			for (FeedConfig *config in [StoreCoordinator sortedFeedConfigItems]) {
+				if ([config descendantFeedItems:block] == NO)
+					break;
+			}
 		}
 	}
 }

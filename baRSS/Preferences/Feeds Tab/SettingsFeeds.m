@@ -144,10 +144,12 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (FeedConfig*)insertSortedItemAtSelection {
 	NSIndexPath *selectedIndex = [self.dataStore selectionIndexPath];
+	if (selectedIndex == NULL)
+		selectedIndex = [NSIndexPath new];
 	NSIndexPath *insertIndex = selectedIndex;
 	
 	FeedConfig *selected = [[[self.dataStore arrangedObjects] descendantNodeAtIndexPath:selectedIndex] representedObject];
-	NSUInteger lastIndex = selected.children.count;
+	NSUInteger lastIndex = (selected ? selected.children.count : self.dataStore.arrangedObjects.childNodes.count);
 	BOOL groupSelected = (selected.typ == GROUP);
 	
 	if (!groupSelected) {

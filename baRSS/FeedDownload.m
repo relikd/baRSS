@@ -21,19 +21,30 @@
 //  SOFTWARE.
 
 #import "FeedDownload.h"
-#import "PyHandler.h"
 
 @implementation FeedDownload
 
-+ (void)getFeed:(NSString*)url withBlock:(nullable void (^)(NSDictionary* result, NSError* error))block {
-	[NSThread detachNewThreadWithBlock:^{
-		NSDictionary *dict = [PyHandler getFeed:url withEtag:nil andModified:nil];
-		NSError *err = nil;
-		if (!dict || [dict[@"entries"] count] == 0 ) {
-			err = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotParseResponse userInfo:nil];
++ (void)getFeed:(NSString *)url block:(void(^)(RSParsedFeed *feed, NSError* error, NSHTTPURLResponse* response))block {
+	NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+	req.timeoutInterval = 30;
+	req.cachePolicy = NSURLRequestReloadIgnoringCacheData;
+//	[req setValue:@"Mon, 10 Sep 2018 10:32:19 GMT" forHTTPHeaderField:@"If-Modified-Since"];
+//	[req setValue:@"wII2pETT9EGmlqyCHBFJpm25/7w" forHTTPHeaderField:@"If-None-Match"]; // ETag
+	[[[NSURLSession sharedSession] dataTaskWithRequest:req completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+		NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
+//		NSString* etag = [httpResponse allHeaderFields][@"Etag"];
+//		if (etag.length > 5 && [[etag substringFromIndex:etag.length - 5] isEqualToString:@"-gzip"]) {
+//			etag = [etag substringToIndex:etag.length - 5];
+//		}
+		if (error || [httpResponse statusCode] == 304) {
+			block(nil, error, httpResponse);
+			return;
 		}
-		if (block) block(dict, err);
-	}];
+		RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:url];
+		RSParseFeed(xml, ^(RSParsedFeed * _Nullable parsedFeed, NSError * _Nullable err) {
+			block(parsedFeed, err, httpResponse);
+		});
+	}] resume];
 }
 
 @end

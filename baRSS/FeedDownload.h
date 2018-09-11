@@ -21,7 +21,8 @@
 //  SOFTWARE.
 
 #import <Cocoa/Cocoa.h>
+#import <RSXML/RSXML.h>
 
 @interface FeedDownload : NSObject
-+ (void)getFeed:(NSString*)url withBlock:(nullable void (^)(NSDictionary* result, NSError* error))block;
++ (void)getFeed:(NSString *)url block:(void(^)(RSParsedFeed *feed, NSError* error, NSHTTPURLResponse* response))block;
 @end

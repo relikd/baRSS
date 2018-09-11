@@ -36,9 +36,10 @@
 
 @property (copy) NSString *previousURL;
 @property (strong) NSError *feedError;
-@property (strong) NSDictionary *feedResult;
+@property (strong) RSParsedFeed *feedResult;
 
 @property (assign) BOOL shouldSaveObject;
+@property (assign) BOOL shouldDeletePrevArticles;
 @property (assign) BOOL objectNeedsSaving;
 @property (assign) BOOL objectIsModified;
 @end
@@ -51,6 +52,7 @@
 	self.previousURL = @"";
 	self.refreshNum.intValue = 30;
 	self.shouldSaveObject = NO;
+	self.shouldDeletePrevArticles = NO;
 	self.objectNeedsSaving = NO;
 	self.objectIsModified = NO;
 	
@@ -104,12 +106,12 @@
 	if (item.refreshUnit != self.refreshUnit.indexOfSelectedItem)
 		item.refreshUnit = (int16_t)self.refreshUnit.indexOfSelectedItem;
 	
-	if (self.feedResult) {
+	if (self.shouldDeletePrevArticles) {
 		[item.managedObjectContext performBlockAndWait:^{
-			Feed *rss = [StoreCoordinator createFeedFromDictionary:self.feedResult inContext:item.managedObjectContext];
 			if (item.feed)
 				[item.managedObjectContext deleteObject:(NSManagedObject*)item.feed];
-			item.feed = rss;
+			if (self.feedResult)
+				item.feed = [StoreCoordinator createFeedFrom:self.feedResult inContext:item.managedObjectContext];
 		}];
 	}
 	if ([item.managedObjectContext hasChanges]) {
@@ -138,16 +140,19 @@
 
 - (void)controlTextDidEndEditing:(NSNotification *)obj {
 	if (obj.object == self.url && [self urlHasChanged]) {
+		self.shouldDeletePrevArticles = YES;
 		self.previousURL = self.url.stringValue;
 		self.feedResult = nil;
 		self.feedError = nil;
 		[self.spinnerURL startAnimation:nil];
 		[self.spinnerName startAnimation:nil];
-		[FeedDownload getFeed:self.previousURL withBlock:^(NSDictionary *result, NSError *error) {
+		[FeedDownload getFeed:self.previousURL block:^(RSParsedFeed *result, NSError *error, NSHTTPURLResponse* response) {
 			self.feedResult = result;
-			self.feedError = error; // warning indicator .hidden is bound to feedError
-			// TODO: play error sound?
+//			[httpResponse allHeaderFields][@"Date"]; // @"Expires", @"Last-Modified"
+//			[httpResponse allHeaderFields][@"Etag"];
 			dispatch_async(dispatch_get_main_queue(), ^{
+				// TODO: play error sound?
+				self.feedError = error; // warning indicator .hidden is bound to feedError
 				self.objectNeedsSaving = YES; // stays YES if this block runs after updateRepresentedObject:
 				[self setTitleFromFeed];
 				[self.spinnerURL stopAnimation:nil];
@@ -159,7 +164,7 @@
 
 - (void)setTitleFromFeed {
 	if ([self.name.stringValue isEqualToString:@""]) {
-		self.name.objectValue = self.feedResult[@"feed"][@"title"];
+		self.name.objectValue = self.feedResult.title;
 	}
 }
 
