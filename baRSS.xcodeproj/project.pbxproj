@@ -7,14 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1968E0AE14B8E8A90E194980 /* PyHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 1968EF7567E06D2A5BB3481A /* PyHandler.m */; };
 		541A90F221257D77002680A6 /* MenuItemInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 541A90F121257D77002680A6 /* MenuItemInfo.m */; };
 		54209E942117325100F3B5EF /* DrawImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 54209E932117325100F3B5EF /* DrawImage.m */; };
 		544B011A2114B41200386E5C /* ModalSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* ModalSheet.m */; };
 		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
-		544FBD4521064AEB008A260C /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544FBD4421064AEB008A260C /* Python.framework */; };
-		544FBD4721064B2F008A260C /* getFeed.py in Resources */ = {isa = PBXBuildFile; fileRef = 544FBD4621064B2F008A260C /* getFeed.py */; };
-		544FBD4921064DF0008A260C /* feedparser521.py in Resources */ = {isa = PBXBuildFile; fileRef = 544FBD4821064DF0008A260C /* feedparser521.py */; };
+		544DCCB9212A2B4D002DBC46 /* RSXML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML.framework */; };
+		544DCCBA212A2B4D002DBC46 /* RSXML.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		544DCCBE212A2B6F002DBC46 /* RSXML.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 544DCCBD212A2B6F002DBC46 /* RSXML.framework.dSYM */; };
 		546FC43D21188AD5007CC3A3 /* SettingsFeeds.m in Sources */ = {isa = PBXBuildFile; fileRef = 546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */; };
 		546FC43F21188C78007CC3A3 /* SettingsFeeds.xib in Resources */ = {isa = PBXBuildFile; fileRef = 546FC43E21188C78007CC3A3 /* SettingsFeeds.xib */; };
 		546FC44321189975007CC3A3 /* SettingsGeneral.m in Sources */ = {isa = PBXBuildFile; fileRef = 546FC44121189975007CC3A3 /* SettingsGeneral.m */; };
@@ -32,9 +31,31 @@
 		54FE73D3212316CD003EAC65 /* BarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 54FE73D2212316CD003EAC65 /* BarMenu.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		544DCCBB212A2B4D002DBC46 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				544DCCBA212A2B4D002DBC46 /* RSXML.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		544DCCBC212A2B5A002DBC46 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				544DCCBE212A2B6F002DBC46 /* RSXML.framework.dSYM in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		1968E7919BAA36F042FCB717 /* PyHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PyHandler.h; sourceTree = "<group>"; };
-		1968EF7567E06D2A5BB3481A /* PyHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PyHandler.m; sourceTree = "<group>"; };
 		541A90F021257D77002680A6 /* MenuItemInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MenuItemInfo.h; sourceTree = "<group>"; };
 		541A90F121257D77002680A6 /* MenuItemInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MenuItemInfo.m; sourceTree = "<group>"; };
 		54209E922117325100F3B5EF /* DrawImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawImage.h; sourceTree = "<group>"; };
@@ -43,9 +64,8 @@
 		544B01192114B41200386E5C /* ModalSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalSheet.m; sourceTree = "<group>"; };
 		544B011B2114EE9100386E5C /* AppHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppHook.h; sourceTree = "<group>"; };
 		544B011C2114EE9100386E5C /* AppHook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppHook.m; sourceTree = "<group>"; };
-		544FBD4421064AEB008A260C /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = System/Library/Frameworks/Python.framework; sourceTree = SDKROOT; };
-		544FBD4621064B2F008A260C /* getFeed.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = getFeed.py; sourceTree = "<group>"; usesTabs = 0; };
-		544FBD4821064DF0008A260C /* feedparser521.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = feedparser521.py; sourceTree = "<group>"; usesTabs = 0; };
+		544DCCB8212A2B4D002DBC46 /* RSXML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSXML.framework; path = Carthage/Build/Mac/RSXML.framework; sourceTree = "<group>"; };
+		544DCCBD212A2B6F002DBC46 /* RSXML.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = RSXML.framework.dSYM; path = Carthage/Build/Mac/RSXML.framework.dSYM; sourceTree = "<group>"; };
 		546FC43B21188AD5007CC3A3 /* SettingsFeeds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsFeeds.h; sourceTree = "<group>"; };
 		546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsFeeds.m; sourceTree = "<group>"; };
 		546FC43E21188C78007CC3A3 /* SettingsFeeds.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsFeeds.xib; sourceTree = "<group>"; };
@@ -78,7 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				544FBD4521064AEB008A260C /* Python.framework in Frameworks */,
+				544DCCB9212A2B4D002DBC46 /* RSXML.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,7 +119,8 @@
 		544FBD4321064AEB008A260C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				544FBD4421064AEB008A260C /* Python.framework */,
+				544DCCB8212A2B4D002DBC46 /* RSXML.framework */,
+				544DCCBD212A2B6F002DBC46 /* RSXML.framework.dSYM */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -130,17 +151,6 @@
 			path = Preferences;
 			sourceTree = "<group>";
 		};
-		549369F421091E6D001AF895 /* python */ = {
-			isa = PBXGroup;
-			children = (
-				1968E7919BAA36F042FCB717 /* PyHandler.h */,
-				1968EF7567E06D2A5BB3481A /* PyHandler.m */,
-				544FBD4621064B2F008A260C /* getFeed.py */,
-				544FBD4821064DF0008A260C /* feedparser521.py */,
-			);
-			path = python;
-			sourceTree = "<group>";
-		};
 		54ACC27321061B3B0020715F = {
 			isa = PBXGroup;
 			children = (
@@ -161,7 +171,6 @@
 		54ACC27E21061B3B0020715F /* baRSS */ = {
 			isa = PBXGroup;
 			children = (
-				549369F421091E6D001AF895 /* python */,
 				544B011B2114EE9100386E5C /* AppHook.h */,
 				544B011C2114EE9100386E5C /* AppHook.m */,
 				541A90EF21257D4F002680A6 /* Status Bar Menu */,
@@ -203,6 +212,8 @@
 				54ACC27821061B3B0020715F /* Sources */,
 				54ACC27921061B3B0020715F /* Frameworks */,
 				54ACC27A21061B3B0020715F /* Resources */,
+				544DCCBB212A2B4D002DBC46 /* Embed Frameworks */,
+				544DCCBC212A2B5A002DBC46 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -264,8 +275,6 @@
 				54ACC28621061B3C0020715F /* Assets.xcassets in Resources */,
 				546FC44421189975007CC3A3 /* SettingsGeneral.xib in Resources */,
 				546FC43F21188C78007CC3A3 /* SettingsFeeds.xib in Resources */,
-				544FBD4921064DF0008A260C /* feedparser521.py in Resources */,
-				544FBD4721064B2F008A260C /* getFeed.py in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,7 +296,6 @@
 				54ACC29821061FBA0020715F /* Preferences.m in Sources */,
 				546FC43D21188AD5007CC3A3 /* SettingsFeeds.m in Sources */,
 				54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */,
-				1968E0AE14B8E8A90E194980 /* PyHandler.m in Sources */,
 				54209E942117325100F3B5EF /* DrawImage.m in Sources */,
 				54FE73D021220DEC003EAC65 /* StoreCoordinator.m in Sources */,
 				541A90F221257D77002680A6 /* MenuItemInfo.m in Sources */,
@@ -432,6 +440,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
 				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
@@ -481,6 +490,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
 				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;

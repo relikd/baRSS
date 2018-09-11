@@ -22,6 +22,7 @@
 
 #import "StoreCoordinator.h"
 #import "AppHook.h"
+#import <RSXML/RSXML.h>
 
 @implementation StoreCoordinator
 
@@ -66,30 +67,23 @@
 	return [[self getContext] objectWithID:objID];
 }
 
-+ (Feed*)createFeedFromDictionary:(NSDictionary*)obj inContext:(NSManagedObjectContext*)context {
++ (Feed*)createFeedFrom:(RSParsedFeed*)obj inContext:(NSManagedObjectContext*)context {
 	Feed *a = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:context];
-	a.title = obj[@"feed"][@"title"];
-	a.subtitle = obj[@"feed"][@"subtitle"];
-	a.author = obj[@"feed"][@"author"];
-	a.link = obj[@"feed"][@"link"];
-	a.published = obj[@"feed"][@"published"];
-	a.icon = obj[@"feed"][@"icon"];
-	a.etag = obj[@"header"][@"etag"];
-	a.date = obj[@"header"][@"date"];
-	a.modified = obj[@"header"][@"modified"];
-	for (NSDictionary *entry in obj[@"entries"]) {
+	a.title = obj.title;
+	a.subtitle = obj.subtitle;
+	a.link = obj.link;
+	for (RSParsedArticle *entry in obj.articles) {
 		FeedItem *b = [[FeedItem alloc] initWithEntity:FeedItem.entity insertIntoManagedObjectContext:context];
-		b.title = entry[@"title"];
-		b.subtitle = entry[@"subtitle"];
-		b.author = entry[@"author"];
-		b.link = entry[@"link"];
-		b.published = entry[@"published"];
-		b.summary = entry[@"summary"];
-		for (NSString *tag in entry[@"tags"]) {
-			FeedTag *c = [[FeedTag alloc] initWithEntity:FeedTag.entity insertIntoManagedObjectContext:context];
-			c.name = tag;
-			[b addTagsObject:c];
-		}
+		b.guid = entry.guid;
+		b.title = entry.title;
+		b.abstract = entry.abstract;
+		b.body = entry.body;
+		b.author = entry.author;
+		b.link = entry.link;
+		b.published = entry.datePublished;
+		// TODO: remove NSLog()
+		if (!entry.datePublished)
+			NSLog(@"No date for feed '%@'", obj.urlString);
 		[a addItemsObject:b];
 	}
 	return a;

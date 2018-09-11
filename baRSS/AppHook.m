@@ -21,7 +21,6 @@
 //  SOFTWARE.
 
 #import "AppHook.h"
-#import "PyHandler.h"
 #import "BarMenu.h"
 
 @implementation AppHook
@@ -34,12 +33,12 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	_barMenu = [BarMenu new];
-	[PyHandler prepare];
 	printf("up and running\n");
+//	https://feeds.feedburner.com/simpledesktops
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
-	[PyHandler shutdown];
+	
 }
 
 
