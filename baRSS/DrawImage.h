@@ -42,4 +42,21 @@ IB_DESIGNABLE
 @interface DrawSeparator : NSView
 @end
 
+IB_DESIGNABLE
+@interface DrawImage : NSView
+@property (strong) IBInspectable NSColor *color;
+/** percentage value between 0 - 100 */
+@property (assign) IBInspectable CGFloat roundness;
+@property (strong, readonly) NSImageView *imageView;
+
+- (NSImage*)drawnImage;
+@end
+
+IB_DESIGNABLE
+@interface SettingsIconGlobal : DrawImage
+@end
+
+IB_DESIGNABLE
+@interface SettingsIconGroup : DrawImage
+@end
 

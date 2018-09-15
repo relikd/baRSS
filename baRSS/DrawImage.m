@@ -22,6 +22,16 @@
 
 #import "DrawImage.h"
 
+@implementation NSColor (RandomColor)
++ (NSColor*)randomColor { // just for testing purposes
+	return [NSColor colorWithRed:(arc4random()%50+20)/100.0
+						   green:(arc4random()%50+20)/100.0
+							blue:(arc4random()%50+20)/100.0
+						   alpha:1];
+}
+@end
+
+
 @implementation RSSIcon
 
 + (NSColor*)rssOrange {
@@ -120,5 +130,135 @@
 	NSRect separatorRect = NSMakeRect(1, self.frame.size.height / 2.0 - 1, self.frame.size.width - 2, 2);
 	NSBezierPath *rounded = [NSBezierPath bezierPathWithRoundedRect:separatorRect xRadius:1 yRadius:1];
 	[grdnt drawInBezierPath:rounded angle:0];
+}
+@end
+
+
+
+@implementation DrawImage
+@synthesize roundness = _roundness;
+
+//#if !TARGET_INTERFACE_BUILDER #endif
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+	self = [super initWithCoder:decoder];
+	_imageView = [NSImageView imageViewWithImage:[self drawnImage]];
+	[_imageView setFrameSize:self.frame.size];
+	_imageView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+	[self addSubview:_imageView];
+	return self;
+}
+
+- (NSImage*)drawnImage {
+	return [NSImage imageWithSize:self.frame.size flipped:NO drawingHandler:^BOOL(NSRect rect) {
+		[self drawImageInRect:rect];
+		return YES;
+	}];
+}
+
+- (CGFloat)roundness { return _roundness; }
+- (void)setRoundness:(CGFloat)roundness {
+	if (roundness < 0) roundness = 0;
+	else if (roundness > 100) roundness = 100;
+	_roundness = roundness / 2;
+}
+
+- (CGFloat)shorterSide {
+	if (self.frame.size.width < self.frame.size.height)
+		return self.frame.size.width;
+	return self.frame.size.height;
+}
+
+- (void)drawImageInRect:(NSRect)r {
+	CGMutablePathRef pth = CGPathCreateMutable();
+	CGFloat corner = (_roundness / 100.0);
+	if (corner > 0) {
+		corner *= [self shorterSide];
+		CGPathAddRoundedRect(pth, NULL, r, corner, corner);
+	} else {
+		CGPathAddRect(pth, NULL, r);
+	}
+	CGContextRef c = [[NSGraphicsContext currentContext] CGContext];
+	CGContextSetFillColorWithColor(c, [_color CGColor]);
+	CGContextAddPath(c, pth);
+	CGPathRelease(pth);
+	if ([self isMemberOfClass:[DrawImage class]])
+		CGContextFillPath(c); // fill only if not a subclass
+}
+@end
+
+
+@implementation SettingsIconGlobal
+- (void)drawImageInRect:(NSRect)r {
+	CGFloat w = r.size.width;
+	CGFloat h = r.size.height;
+	
+	CGMutablePathRef menu = CGPathCreateMutable();
+//	CGFloat s = (w < h ? w : h);
+	CGAffineTransform at = CGAffineTransformIdentity;//CGAffineTransformMake(0.7, 0, 0, 0.7, s * 0.15, s * 0.15); // scale 0.7, translate 0.15
+	CGPathAddRect(menu, &at, CGRectMake(0, 0.8 * h, w, 0.2 * h));
+	CGPathAddRect(menu, &at, CGRectMake(0.3 * w, 0, 0.55 * w, 0.75 * h));
+	CGPathAddRect(menu, &at, CGRectMake(0.35 * w, 0.05 * h, 0.45 * w, 0.75 * h));
+	
+	CGFloat entryHeight = 0.1 * h; // 0.075
+	for (int i = 0; i < 3; i++) { // 4
+		//CGPathAddRect(menu, &at, CGRectMake(0.37 * w, (2 * i + 1) * entryHeight, 0.42 * w, entryHeight)); // uncomment path above
+		CGPathAddRect(menu, &at, CGRectMake(0.35 * w, (2 * i + 1.5) * entryHeight, 0.4 * w, entryHeight * 0.8));
+	}
+	
+	CGContextRef c = [[NSGraphicsContext currentContext] CGContext];
+	CGContextSetFillColorWithColor(c, [self.color CGColor]);
+	
+//	[super drawImageInRect:r]; // add path of rounded rect
+	CGContextAddPath(c, menu);
+	CGPathRelease(menu);
+	CGContextEOFillPath(c);
+}
+@end
+
+
+@implementation SettingsIconGroup
+- (void)drawImageInRect:(NSRect)r {
+	CGFloat w = r.size.width;
+	CGFloat h = r.size.height;
+	CGFloat s = (w < h ? w : h); // shorter side
+	CGFloat l = s * 0.04; // line size (half)
+	CGFloat r1 = s * 0.05; // corners
+	CGFloat r2 = s * 0.08; // upper part, name tag
+	CGFloat r3 = s * 0.15; // lower part, corners inside
+	CGFloat posTop = 0.85 * h - l;
+	CGFloat posMiddle = 0.6 * h - l - r3;
+	CGFloat posBottom = 0.15 * h + l + r1;
+	CGFloat posNameTag = 0.3 * w - l;
+	
+	CGContextRef c = [[NSGraphicsContext currentContext] CGContext];
+	CGAffineTransform at = CGAffineTransformIdentity;//CGAffineTransformMake(0.7, 0, 0, 0.7, s * 0.15, s * 0.15); // scale 0.7, translate 0.15
+	CGContextSetFillColorWithColor(c, [self.color CGColor]);
+	CGContextSetStrokeColorWithColor(c, [self.color CGColor]);
+	CGContextSetLineWidth(c, l * 2);
+	
+	CGMutablePathRef upper = CGPathCreateMutable();
+	CGPathMoveToPoint(upper, &at, l, 0.5 * h);
+	CGPathAddLineToPoint(upper, &at, l, posTop - r1);
+	CGPathAddArc(upper, &at, l + r1, posTop - r1, r1, M_PI, M_PI_2, YES);
+	CGPathAddArc(upper, &at, posNameTag, posTop - r2, r2, M_PI_2, M_PI_4, YES);
+	CGPathAddArc(upper, &at, posNameTag + 2 * r2, posTop, r2, M_PI + M_PI_4, -M_PI_2, NO);
+	CGPathAddArc(upper, &at, w - l - r1, posTop - r1 - r2, r1, M_PI_2, 0, YES);
+	CGPathAddArc(upper, &at, w - l - r1, posBottom, r1, 0, -M_PI_2, YES);
+	CGPathAddArc(upper, &at, l + r1, posBottom, r1, -M_PI_2, M_PI, YES);
+	CGPathCloseSubpath(upper);
+	
+	CGMutablePathRef lower = CGPathCreateMutable();
+	CGPathMoveToPoint(lower, &at, l, 0.5 * h);
+	CGPathAddArc(lower, &at, l + r3, posMiddle, r3, M_PI, M_PI_2, YES);
+	CGPathAddArc(lower, &at, w - l - r3, posMiddle, r3, M_PI_2, 0, YES);
+	CGPathAddArc(lower, &at, w - l - r1, posBottom, r1, 0, -M_PI_2, YES);
+	CGPathAddArc(lower, &at, l + r1, posBottom, r1, -M_PI_2, M_PI, YES);
+	CGPathCloseSubpath(lower);
+	
+	CGContextAddPath(c, upper);
+	CGContextAddPath(c, lower);
+	CGContextStrokePath(c);
+	CGPathRelease(upper);
+	CGPathRelease(lower);
 }
 @end
