@@ -22,41 +22,73 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface RSSIcon : NSObject
-@property (strong) NSColor *barsColor;
-@property (strong) NSColor *squareColor;
-@property (strong) NSColor *squareGradientColor;
-@property (assign) NSSize size;
-@property (assign) bool isTemplate;
-
-+ (instancetype)iconWithSize:(NSSize)size;
-+ (instancetype)templateIcon:(CGFloat)size tint:(nullable NSColor*)color;
-- (instancetype)autoGradient;
-
+@interface NSColor (RandomColor)
+/// just for testing purposes
++ (NSColor*)randomColor;
+/// RGB color with (251, 163, 58)
 + (NSColor*)rssOrange;
-- (NSImage*)image;
 @end
 
-
-IB_DESIGNABLE
-@interface DrawSeparator : NSView
-@end
+//  ---------------------------------------------------------------
+// |
+// |  DrawImage
+// |
+//  ---------------------------------------------------------------
 
 IB_DESIGNABLE
 @interface DrawImage : NSView
 @property (strong) IBInspectable NSColor *color;
+@property (assign) IBInspectable BOOL showBackground;
 /** percentage value between 0 - 100 */
-@property (assign) IBInspectable CGFloat roundness;
+@property (assign, nonatomic) IBInspectable CGFloat roundness;
+@property (assign, nonatomic) IBInspectable CGFloat contentScale;
 @property (strong, readonly) NSImageView *imageView;
 
 - (NSImage*)drawnImage;
 @end
 
+//  ---------------------------------------------------------------
+// |
+// |  RSSIcon
+// |
+//  ---------------------------------------------------------------
+
+IB_DESIGNABLE
+@interface RSSIcon : DrawImage
+@property (strong) IBInspectable NSColor *barsColor;
+@property (strong) IBInspectable NSColor *gradientColor;
+
++ (NSImage*)iconWithSize:(CGFloat)size;
++ (NSImage*)templateIcon:(CGFloat)size tint:(NSColor*)color;
+@end
+
+//  ---------------------------------------------------------------
+// |
+// |  SettingsIconGlobal
+// |
+//  ---------------------------------------------------------------
+
 IB_DESIGNABLE
 @interface SettingsIconGlobal : DrawImage
 @end
 
+//  ---------------------------------------------------------------
+// |
+// |  SettingsIconGroup
+// |
+//  ---------------------------------------------------------------
+
 IB_DESIGNABLE
 @interface SettingsIconGroup : DrawImage
+@end
+
+//  ---------------------------------------------------------------
+// |
+// |  DrawSeparator
+// |
+//  ---------------------------------------------------------------
+
+IB_DESIGNABLE
+@interface DrawSeparator : NSView
 @end
 
