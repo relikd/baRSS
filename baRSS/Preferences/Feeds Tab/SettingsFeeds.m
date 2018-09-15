@@ -290,7 +290,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 			// TODO: load icon
 			static NSImage *defaultRSSIcon;
 			if (!defaultRSSIcon)
-				defaultRSSIcon = [[[RSSIcon iconWithSize:cellView.imageView.frame.size] autoGradient] image];
+				defaultRSSIcon = [RSSIcon iconWithSize:cellView.imageView.frame.size.height];
 			
 			cellView.imageView.image = defaultRSSIcon;
 		}

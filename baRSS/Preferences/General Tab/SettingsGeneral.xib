@@ -35,135 +35,14 @@
                     </connections>
                 </button>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4Z4-ko-oj2">
-                    <rect key="frame" x="18" y="271" width="284" height="18"/>
+                    <rect key="frame" x="70" y="124" width="22" height="18"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="Show tick mark for unread entries" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="3cL-4f-90v">
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="3cL-4f-90v">
                         <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.markEntries" id="44f-w7-faP">
-                            <dictionary key="options">
-                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
-                                <integer key="NSNullPlaceholder" value="1"/>
-                            </dictionary>
-                        </binding>
-                    </connections>
-                </button>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yAR-77-YL8">
-                    <rect key="frame" x="18" y="248" width="284" height="17"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Show number of unread items:" id="3jA-g1-5aG">
-                        <font key="font" metaFont="system"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QYu-9A-RSx">
-                    <rect key="frame" x="28" y="224" width="274" height="18"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="in menu bar" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="NHd-8Y-lgR">
-                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.unreadCountInMenuBar" id="DJz-7q-FEI">
-                            <dictionary key="options">
-                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
-                                <integer key="NSNullPlaceholder" value="1"/>
-                            </dictionary>
-                        </binding>
-                    </connections>
-                </button>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iGf-ZI-o6t">
-                    <rect key="frame" x="28" y="204" width="274" height="18"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="in groups" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fhA-hO-eSv">
-                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.unreadCountInGroups" id="8R1-go-abo">
-                            <dictionary key="options">
-                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
-                                <integer key="NSNullPlaceholder" value="1"/>
-                            </dictionary>
-                        </binding>
-                    </connections>
-                </button>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ezY-pZ-WN7">
-                    <rect key="frame" x="28" y="184" width="274" height="18"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="in feeds" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="PgG-Pm-s9M">
-                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.unreadCountInFeeds" id="7bx-Th-0os">
-                            <dictionary key="options">
-                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
-                                <integer key="NSNullPlaceholder" value="1"/>
-                            </dictionary>
-                        </binding>
-                    </connections>
-                </button>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xbr-a8-v9X">
-                    <rect key="frame" x="18" y="117" width="22" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="FT6-me-ACu">
-                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalOpenUnread" id="c20-0p-cPb">
-                            <dictionary key="options">
-                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
-                                <integer key="NSNullPlaceholder" value="1"/>
-                            </dictionary>
-                        </binding>
-                    </connections>
-                </button>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Eyy-w7-79K">
-                    <rect key="frame" x="18" y="137" width="22" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Z56-ik-iHk">
-                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalUpdateAll" id="FrQ-u0-lFo">
-                            <dictionary key="options">
-                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
-                                <integer key="NSNullPlaceholder" value="1"/>
-                            </dictionary>
-                        </binding>
-                    </connections>
-                </button>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lAu-qx-vWl">
-                    <rect key="frame" x="18" y="97" width="22" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="8Ko-Cq-fCy">
-                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalMarkRead" id="uiO-3M-xfT">
-                            <dictionary key="options">
-                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
-                                <integer key="NSNullPlaceholder" value="1"/>
-                            </dictionary>
-                        </binding>
-                    </connections>
-                </button>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eKg-IL-v85">
-                    <rect key="frame" x="18" y="77" width="22" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="K4h-ul-R6b">
-                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalMarkUnread" id="drp-87-kfY">
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.feedTickMark" id="xKL-Lh-tBL">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
                                 <integer key="NSNullPlaceholder" value="1"/>
@@ -209,9 +88,217 @@
                         </menu>
                     </popUpButtonCell>
                 </popUpButton>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Fey-RP-7wF">
-                    <rect key="frame" x="128" y="138" width="133" height="17"/>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QYu-9A-RSx">
+                    <rect key="frame" x="18" y="146" width="22" height="18"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="NHd-8Y-lgR">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalUnreadCount" id="dyl-pE-j2k">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <integer key="NSNullPlaceholder" value="1"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iGf-ZI-o6t">
+                    <rect key="frame" x="44" y="146" width="22" height="18"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fhA-hO-eSv">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.groupUnreadCount" id="Mg5-xJ-L3n">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <integer key="NSNullPlaceholder" value="1"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ezY-pZ-WN7">
+                    <rect key="frame" x="70" y="146" width="22" height="18"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="PgG-Pm-s9M">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.feedUnreadCount" id="hnm-Q2-kbs">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <integer key="NSNullPlaceholder" value="1"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Xbr-a8-v9X">
+                    <rect key="frame" x="18" y="212" width="22" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="FT6-me-ACu">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalOpenUnread" id="c20-0p-cPb">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <integer key="NSNullPlaceholder" value="1"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kO5-iF-mZX">
+                    <rect key="frame" x="44" y="212" width="22" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="4uj-0i-drs">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.groupOpenUnread" id="mCn-aE-DwT">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <integer key="NSNullPlaceholder" value="1"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZVR-xf-ZeB">
+                    <rect key="frame" x="70" y="212" width="22" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="tQ4-MK-ghd">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.feedOpenUnread" id="Qyh-BN-P74">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <integer key="NSNullPlaceholder" value="1"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Eyy-w7-79K">
+                    <rect key="frame" x="18" y="234" width="22" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Z56-ik-iHk">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalUpdateAll" id="FrQ-u0-lFo">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <integer key="NSNullPlaceholder" value="1"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lAu-qx-vWl">
+                    <rect key="frame" x="18" y="190" width="22" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="8Ko-Cq-fCy">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalMarkRead" id="uiO-3M-xfT">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <integer key="NSNullPlaceholder" value="1"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hAY-eb-Ygs">
+                    <rect key="frame" x="44" y="190" width="22" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="vBc-4I-hsa">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.groupMarkRead" id="YLZ-t8-Jbk">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <integer key="NSNullPlaceholder" value="1"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TfV-CA-pjd">
+                    <rect key="frame" x="70" y="190" width="22" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="OPa-de-9M3">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.feedMarkRead" id="mYj-26-0OV">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <integer key="NSNullPlaceholder" value="1"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eKg-IL-v85">
+                    <rect key="frame" x="18" y="168" width="22" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="K4h-ul-R6b">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalMarkUnread" id="drp-87-kfY">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <integer key="NSNullPlaceholder" value="1"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z97-Z3-YRK">
+                    <rect key="frame" x="44" y="168" width="22" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="bYm-jJ-lA7">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.groupMarkUnread" id="bJP-0I-l7t">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <integer key="NSNullPlaceholder" value="1"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yGm-6r-8xg">
+                    <rect key="frame" x="70" y="168" width="22" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="check" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="KHI-ra-F11">
+                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.feedMarkUnread" id="mRu-7M-3bu">
+                            <dictionary key="options">
+                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
+                                <integer key="NSNullPlaceholder" value="1"/>
+                            </dictionary>
+                        </binding>
+                    </connections>
+                </button>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Fey-RP-7wF">
+                    <rect key="frame" x="96" y="235" width="206" height="17"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Update all feeds" id="Yy6-xr-m0l">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -219,8 +306,8 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VhY-mw-Rej">
-                    <rect key="frame" x="128" y="118" width="133" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <rect key="frame" x="96" y="213" width="206" height="17"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Open all unread" id="lVL-bb-uA6">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -228,8 +315,8 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qFU-En-OSw">
-                    <rect key="frame" x="128" y="98" width="133" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <rect key="frame" x="96" y="191" width="206" height="17"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Mark all read" id="XD8-5a-Hlg">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -237,55 +324,73 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oFG-IQ-p9b">
-                    <rect key="frame" x="128" y="78" width="133" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <rect key="frame" x="96" y="169" width="206" height="17"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Mark all unread" id="PJI-mv-AnH">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZCI-pL-I3q">
-                    <rect key="frame" x="56" y="162" width="18" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSFolder" id="r1h-PL-XrL"/>
-                </imageView>
-                <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SKf-Y7-8xS" customClass="SettingsIconGroup">
-                    <rect key="frame" x="114" y="168" width="18" height="18"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="color" keyPath="color">
-                            <color key="value" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                        </userDefinedRuntimeAttribute>
-                    </userDefinedRuntimeAttributes>
-                </customView>
-                <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="P4Y-i1-MGE" customClass="SettingsIconGlobal">
-                    <rect key="frame" x="20" y="162" width="18" height="18"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="K4q-A1-Fi9">
+                    <rect key="frame" x="96" y="125" width="206" height="17"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Tick mark unread items" id="a7h-dX-8Vg">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <customView toolTip="Show in menu bar" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="P4Y-i1-MGE" customClass="SettingsIconGlobal">
+                    <rect key="frame" x="20" y="260" width="18" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="color" keyPath="color">
-                            <color key="value" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                        </userDefinedRuntimeAttribute>
-                    </userDefinedRuntimeAttributes>
-                </customView>
-                <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q3s-d8-Nlf" customClass="SettingsIconGroup">
-                    <rect key="frame" x="174" y="119" width="121" height="121"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="color" keyPath="color">
-                            <color key="value" red="1" green="0.077124427349073099" blue="0.07612364338405142" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
                         </userDefinedRuntimeAttribute>
                         <userDefinedRuntimeAttribute type="number" keyPath="roundness">
                             <real key="value" value="40"/>
                         </userDefinedRuntimeAttribute>
                     </userDefinedRuntimeAttributes>
                 </customView>
+                <customView toolTip="Show in group menu" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SKf-Y7-8xS" customClass="SettingsIconGroup">
+                    <rect key="frame" x="46" y="260" width="18" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                            <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="roundness">
+                            <real key="value" value="40"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </customView>
+                <customView toolTip="Show in feed menu" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="18m-2g-bqW" customClass="RSSIcon">
+                    <rect key="frame" x="72" y="260" width="18" height="18"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="roundness">
+                            <real key="value" value="40"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="color">
+                            <color key="value" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </customView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tjr-Of-qZE">
+                    <rect key="frame" x="96" y="147" width="206" height="17"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Number of unread items" id="JZc-eZ-uTe">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
             </subviews>
             <point key="canvasLocation" x="140" y="-155.5"/>
         </customView>
     </objects>
     <resources>
         <image name="NSBookmarksTemplate" width="17" height="18"/>
-        <image name="NSFolder" width="32" height="32"/>
     </resources>
 </document>

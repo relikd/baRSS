@@ -97,10 +97,10 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	// TODO: Option: unread count in menubar, Option: highlight color, Option: icon choice
 	if (self.unreadCountTotal > 0) {
 		self.barItem.title = [NSString stringWithFormat:@"%d", self.unreadCountTotal];
-		self.barItem.image = [[RSSIcon templateIcon:16 tint:[RSSIcon rssOrange]] image];
+		self.barItem.image = [RSSIcon templateIcon:16 tint:[NSColor rssOrange]];
 	} else {
 		self.barItem.title = @"";
-		self.barItem.image = [[RSSIcon templateIcon:16 tint:nil] image];
+		self.barItem.image = [RSSIcon templateIcon:16 tint:nil];
 		self.barItem.image.template = YES;
 	}
 //	NSLog(@"==> %d", self.unreadCountTotal);
@@ -173,7 +173,7 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 - (NSMenuItem*)feedItem:(FeedConfig*)config unread:(int*)unread {
 	static NSImage *defaultRSSIcon;
 	if (!defaultRSSIcon)
-		defaultRSSIcon = [[[RSSIcon iconWithSize:NSMakeSize(16, 16)] autoGradient] image];
+		defaultRSSIcon = [RSSIcon iconWithSize:16];
 	
 	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:config.name action:@selector(openFeedURL:) keyEquivalent:@""];
 	item.target = self;
