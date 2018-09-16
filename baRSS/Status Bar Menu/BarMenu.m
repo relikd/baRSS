@@ -24,27 +24,11 @@
 #import "StoreCoordinator.h"
 #import "DrawImage.h"
 #import "Preferences.h"
-#import "MenuItemInfo.h"
+#import "NSMenuItem+Info.h"
+#import "UserPrefs.h"
 
 
 @interface BarMenu()
-/// @c NSMenuItem options that are assigned to the @c tag attribute.
-typedef NS_OPTIONS(NSInteger, MenuItemTag) {
-	/// Item visible at the very first menu level
-	ScopeGlobal = 2,
-	/// Item visible at each grouping, e.g., multiple feeds in one group
-	ScopeGroup = 4,
-	/// Item visible at the deepest menu level (@c FeedItem elements and header)
-	ScopeLocal = 8,
-	///
-	TagPreferences = (1 << 4),
-	TagPauseUpdates = (2 << 4),
-	TagUpdateFeed = (3 << 4),
-	TagMarkAllRead = (4 << 4),
-	TagMarkAllUnread = (5 << 4),
-	TagOpenAllUnread = (6 << 4),
-};
-
 @property (strong) NSStatusItem *barItem;
 @property (strong) Preferences *prefWindow;
 @property (weak) NSMenu *mm;
@@ -58,7 +42,7 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	self = [super init];
 	self.barItem = [NSStatusBar.systemStatusBar statusItemWithLength:NSVariableStatusItemLength];
 	self.barItem.highlightMode = YES;
-	self.barItem.menu = [self generateMainMenu];
+	[self rebuildMenu];
 //	[self donothing];
 	return self;
 }
@@ -77,12 +61,11 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 // TODO: remove debugging stuff
 - (void)printUnreadRecurisve:(NSMenu*)menu str:(NSString*)prefix {
 	for (NSMenuItem *item in menu.itemArray) {
-		MenuItemInfo *info = item.representedObject;
-		if (!info) continue;
-		id obj = [StoreCoordinator objectWithID:info.objID];
+		if (![item hasReaderInfo]) continue;
+		id obj = [item requestCoreDataObject];
 		if ([obj isKindOfClass:[FeedItem class]] && ([obj unread] > 0 || item.unreadCount > 0))
 			NSLog(@"%@ %@ (%d == %d)", prefix, item.title, item.unreadCount, [obj unread]);
-		else if (item.hasUnread)
+		else if ([item hasUnread])
 			NSLog(@"%@ %@ (%d)", prefix, item.title, item.unreadCount);
 		if (item.hasSubmenu) {
 			[self printUnreadRecurisve:item.submenu str:[NSString stringWithFormat:@"  %@", prefix]];
@@ -95,14 +78,20 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
  */
 - (void)updateBarIcon {
 	// TODO: Option: unread count in menubar, Option: highlight color, Option: icon choice
-	if (self.unreadCountTotal > 0) {
-		self.barItem.title = [NSString stringWithFormat:@"%d", self.unreadCountTotal];
-		self.barItem.image = [RSSIcon templateIcon:16 tint:[NSColor rssOrange]];
-	} else {
-		self.barItem.title = @"";
-		self.barItem.image = [RSSIcon templateIcon:16 tint:nil];
-		self.barItem.image.template = YES;
-	}
+	dispatch_async(dispatch_get_main_queue(), ^{
+		if (self.unreadCountTotal > 0 && [UserPrefs defaultYES:@"globalUnreadCount"]) {
+			self.barItem.title = [NSString stringWithFormat:@"%d", self.unreadCountTotal];
+		} else {
+			self.barItem.title = @"";
+		}
+		
+		if (self.unreadCountTotal > 0 && [UserPrefs defaultYES:@"tintMenuBarIcon"]) {
+			self.barItem.image = [RSSIcon templateIcon:16 tint:[NSColor rssOrange]];
+		} else {
+			self.barItem.image = [RSSIcon templateIcon:16 tint:nil];
+			self.barItem.image.template = YES;
+		}
+	});
 //	NSLog(@"==> %d", self.unreadCountTotal);
 //	[self printUnreadRecurisve:self.barItem.menu str:@""];
 }
@@ -118,7 +107,10 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	NSMenu *menu = [NSMenu new];
 	menu.autoenablesItems = NO;
 	[self addTitle:NSLocalizedString(@"Pause Updates", nil) selector:@selector(pauseUpdates:) toMenu:menu tag:TagPauseUpdates];
-	[self addTitle:NSLocalizedString(@"Update all feeds", nil) selector:@selector(updateAllFeeds:) toMenu:menu tag:TagUpdateFeed];
+	NSMenuItem *updateAll = [self addTitle:NSLocalizedString(@"Update all feeds", nil) selector:@selector(updateAllFeeds:) toMenu:menu tag:TagUpdateFeed];
+	if ([UserPrefs defaultYES:@"globalUpdateAll"] == NO)
+		updateAll.hidden = YES;
+	
 	[menu addItem:[NSMenuItem separatorItem]];
 	[self defaultHeaderForMenu:menu scope:ScopeGlobal];
 	
@@ -128,11 +120,13 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 			[menu addItem:[self menuItemForFeedConfig:fc unread:&_unreadCountTotal]];
 		}
 	}
+	[self updateMenuHeaderEnabled:menu hasUnread:(self.unreadCountTotal > 0)];
 	[self updateBarIcon];
 	
 	[menu addItem:[NSMenuItem separatorItem]];
-	[self addTitle:NSLocalizedString(@"Preferences", nil) selector:@selector(openPreferences) toMenu:menu tag:TagPreferences];
-	menu.itemArray.lastObject.keyEquivalent = @",";
+	
+	NSMenuItem *prefs = [self addTitle:NSLocalizedString(@"Preferences", nil) selector:@selector(openPreferences) toMenu:menu tag:TagPreferences];
+	prefs.keyEquivalent = @",";
 	[menu addItemWithTitle:NSLocalizedString(@"Quit", nil) action:@selector(terminate:) keyEquivalent:@"q"];
 	return menu;
 }
@@ -148,7 +142,7 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	NSMenuItem *item;
 	if (config.typ == SEPARATOR) {
 		item = [NSMenuItem separatorItem];
-		item.representedObject = [MenuItemInfo withID:config.objectID];
+		[item setReaderInfo:config.objectID unread:0];
 		return item;
 	}
 	int count = 0;
@@ -158,9 +152,10 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 		item = [self groupItem:config unread:&count];
 	}
 	*unread += count;
-	item.representedObject = [MenuItemInfo withID:config.objectID];
+	[item setReaderInfo:config.objectID unread:0];
+	// !!!: fix that double count
 	[item markReadAndUpdateTitle:-count];
-	[self updateMenuHeader:item.submenu hasUnread:(count > 0)];
+	[self updateMenuHeaderEnabled:item.submenu hasUnread:(count > 0)];
 	return item;
 }
 
@@ -171,20 +166,25 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
  @param unread Pointer to an int that will be incremented for each unread item.
  */
 - (NSMenuItem*)feedItem:(FeedConfig*)config unread:(int*)unread {
-	static NSImage *defaultRSSIcon;
-	if (!defaultRSSIcon)
-		defaultRSSIcon = [RSSIcon iconWithSize:16];
-	
 	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:config.name action:@selector(openFeedURL:) keyEquivalent:@""];
 	item.target = self;
-	item.submenu = [self defaultHeaderForMenu:nil scope:ScopeLocal];
+	item.submenu = [self defaultHeaderForMenu:nil scope:ScopeFeed];
 	for (FeedItem *obj in config.feed.items) {
 		if (obj.unread) ++(*unread);
 		[item.submenu addItem:[self feedEntryItem:obj]];
 	}
 	item.toolTip = config.feed.subtitle;
 	item.enabled = (config.feed.items.count > 0);
-	item.image = defaultRSSIcon;
+	
+	// set icon
+	dispatch_async(dispatch_get_main_queue(), ^{
+		static NSImage *defaultRSSIcon;
+		if (!defaultRSSIcon)
+			defaultRSSIcon = [RSSIcon iconWithSize:16];
+		item.image = defaultRSSIcon;
+	});
+	
+	item.tag = ScopeFeed;
 	return item;
 }
 
@@ -195,17 +195,21 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
  @param unread Pointer to an int that will be incremented for each unread item.
  */
 - (NSMenuItem*)groupItem:(FeedConfig*)config unread:(int*)unread {
-	static NSImage *groupIcon;
-	if (!groupIcon) {
-		groupIcon = [NSImage imageNamed:NSImageNameFolder];
-		groupIcon.size = NSMakeSize(16, 16);
-	}
 	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:config.name action:nil keyEquivalent:@""];
-	item.image = groupIcon;
 	item.submenu = [self defaultHeaderForMenu:nil scope:ScopeGroup];
 	for (FeedConfig *obj in config.sortedChildren) {
 		[item.submenu addItem: [self menuItemForFeedConfig:obj unread:unread]];
 	}
+	// set icon
+	dispatch_async(dispatch_get_main_queue(), ^{
+		static NSImage *groupIcon;
+		if (!groupIcon) {
+			groupIcon = [NSImage imageNamed:NSImageNameFolder];
+			groupIcon.size = NSMakeSize(16, 16);
+		}
+		item.image = groupIcon;
+	});
+	item.tag = ScopeGroup;
 	return item;
 }
 
@@ -215,7 +219,7 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 - (NSMenuItem*)feedEntryItem:(FeedItem*)item {
 	NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle:item.title action:@selector(openFeedURL:) keyEquivalent:@""];
 	mi.target = self;
-	mi.representedObject = [MenuItemInfo withID:item.objectID unread:(item.unread ? 1 : 0)];
+	[mi setReaderInfo:item.objectID unread:(item.unread ? 1 : 0)];
 	//mi.toolTip = item.abstract;
 	// TODO: Do regex during save, not during display. Its here for testing purposes ...
 	if (item.abstract.length > 0) {
@@ -224,9 +228,37 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	}
 	mi.enabled = (item.link.length > 0);
 	mi.state = (item.unread ? NSControlStateValueOn : NSControlStateValueOff);
-	mi.tag = ScopeLocal;
+	mi.tag = ScopeFeed;
 	return mi;
 }
+
+/**
+ Helper function to insert a menu item with @c target @c = @c self
+ */
+- (NSMenuItem*)addTitle:(NSString*)title selector:(SEL)selector toMenu:(NSMenu*)menu tag:(MenuItemTag)tag {
+	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:title action:selector keyEquivalent:@""];
+	item.target = self;
+	item.tag = tag;
+	[item applyUserSettingsDisplay];
+	[menu addItem:item];
+	return item;
+}
+
+/**
+ Helper function to copy an existing menu item and set the option key modifier
+ */
+- (NSMenuItem*)addAlternateItem:(NSMenuItem*)alternateParent withTitle:(NSString*)title toMenu:(NSMenu*)menu {
+	NSMenuItem *alt = [alternateParent copy];
+	alt.title = title;
+	alt.keyEquivalentModifierMask = NSEventModifierFlagOption;
+	if (!alt.hidden) // hidden will be ignored if alternate is YES
+		alt.alternate = YES;
+	[menu addItem:alt];
+	return alt;
+}
+
+
+#pragma mark - Default Menu Header Items
 
 
 /**
@@ -242,35 +274,46 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 		menu = [NSMenu new];
 		menu.autoenablesItems = NO;
 	}
-	// TODO: hide items according to preferences
+	
+	NSMenuItem *item = [self addTitle:NSLocalizedString(@"Open all unread", nil) selector:@selector(openAllUnread:) toMenu:menu tag:TagOpenAllUnread | scope];
+	[self addAlternateItem:item withTitle:[NSString stringWithFormat:NSLocalizedString(@"Open a few unread (%d)", nil), 3] toMenu:menu];
 	[self addTitle:NSLocalizedString(@"Mark all read", nil) selector:@selector(markAllRead:) toMenu:menu tag:TagMarkAllRead | scope];
 	[self addTitle:NSLocalizedString(@"Mark all unread", nil) selector:@selector(markAllUnread:) toMenu:menu tag:TagMarkAllUnread | scope];
-	[self addTitle:NSLocalizedString(@"Open all unread", nil) selector:@selector(openAllUnread:) toMenu:menu tag:TagOpenAllUnread | scope];
-	
-	NSMenuItem *openSomeUrls = [menu.itemArray.lastObject copy];
-	openSomeUrls.title = [NSString stringWithFormat:NSLocalizedString(@"Open a few unread (%d)", nil), 3];
-	openSomeUrls.alternate = YES;
-	openSomeUrls.keyEquivalentModifierMask = NSEventModifierFlagOption;
-	[menu addItem:openSomeUrls];
 	
 	[menu addItem:[NSMenuItem separatorItem]];
 	return menu;
 }
 
-- (void)updateMenuHeader:(NSMenu*)menu hasUnread:(BOOL)flag {
-//	[menu itemWithTag:MenuItemTag_FeedMarkAllRead].enabled = flag;
-//	[menu itemWithTag:MenuItemTag_FeedMarkAllUnread].enabled = !flag;
-//	[menu itemWithTag:MenuItemTag_FeedOpenAllUnread].enabled = flag;
+- (void)setItemUpdateAllHidden:(BOOL)hidden {
+	[self.barItem.menu itemWithTag:TagUpdateFeed].hidden = hidden;
 }
 
-/**
- Helper function to insert a menu item with @c target @c = @c self
- */
-- (void)addTitle:(NSString*)title selector:(SEL)selector toMenu:(NSMenu*)menu tag:(MenuItemTag)tag {
-	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:title action:selector keyEquivalent:@""];
-	item.target = self;
-	item.tag = tag;
-	[menu addItem:item];
+- (void)updateMenuHeaders:(BOOL)recursive {
+	[self updateMenuHeaderHidden:self.barItem.menu recursive:recursive];
+}
+
+- (void)updateMenuHeaderHidden:(NSMenu*)menu recursive:(BOOL)flag {
+	for (NSMenuItem *item in menu.itemArray) {
+		[item applyUserSettingsDisplay];
+		if (flag && item.hasSubmenu) {
+			[self updateMenuHeaderHidden:item.submenu recursive:YES];
+		}
+	}
+}
+
+- (void)updateMenuHeaderEnabled:(NSMenu*)menu hasUnread:(BOOL)flag {
+	int stopAfter = 4; // 3 (+1 alternate)
+	for (NSMenuItem *item in menu.itemArray) {
+		switch (item.tag & TagMaskType) {
+			case TagMarkAllRead:   item.enabled = flag; break;
+			case TagMarkAllUnread: item.enabled = !flag; break;
+			case TagOpenAllUnread: item.enabled = flag; break;
+			default: continue; // wrong tag, ignore
+		}
+		--stopAfter;
+		if (stopAfter < 0)
+			break; // break early after all header items have been processed
+	}
 }
 
 
@@ -330,7 +373,7 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	}];
 	stopAfter = maxItemCount;
 	int total = [sender siblingsDescendantItemInfo:^int(NSMenuItem *item, int count) {
-		if (item.tag & ScopeLocal) {
+		if (item.tag & ScopeFeed) {
 			if (stopAfter <= 0) return -1;
 			--stopAfter;
 		}
@@ -386,17 +429,16 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
  @param sender A menu item containing either a @c FeedItem or a @c FeedConfig.
  */
 - (void)openFeedURL:(NSMenuItem*)sender {
-	MenuItemInfo *info = sender.representedObject;
-	if (![info isKindOfClass:[MenuItemInfo class]]) return;
-	
-	id obj = [StoreCoordinator objectWithID:info.objID];
+	if (!sender.hasReaderInfo)
+		return;
 	NSString *url = nil;
+	id obj = [sender requestCoreDataObject];
 	if ([obj isKindOfClass:[FeedConfig class]]) {
 		url = [[(FeedConfig*)obj feed] link];
 	} else if ([obj isKindOfClass:[FeedItem class]]) {
 		FeedItem *feed = obj;
 		url = [feed link];
-		if (sender.hasUnread) {
+		if ([sender hasUnread]) {
 			feed.unread = NO;
 			[sender markReadAndUpdateTitle:1];
 			[self updateAcestors:sender markRead:1];
@@ -422,22 +464,6 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 
 
 /**
- Perform a fetch request to the Core Data storage to retrieve the feed item associated with the @c representedObject.
-
- @param sender The @c NSMenuItem that contains the Core Data reference.
- @return Returns @c nil if the menu item has no @c representedObject or the contained class doesn't match.
- */
-- (FeedConfig*)requestFeedConfigForMenuItem:(NSMenuItem*)sender {
-	MenuItemInfo *info = sender.representedObject;
-	if (![info isKindOfClass:[MenuItemInfo class]])
-		return nil;
-	id obj = [StoreCoordinator objectWithID:info.objID];
-	if (![obj isKindOfClass:[FeedConfig class]])
-		return nil;
-	return obj;
-}
-
-/**
  Iterate over all feed items from siblings and contained children.
 
  @param sender @c NSMenuItem that was clicked during the action (e.g., "open all unread")
@@ -445,7 +471,9 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
  */
 - (void)siblingsDescendantFeedConfigs:(NSMenuItem*)sender block:(FeedConfigRecursiveItemsBlock)block {
 	if (sender.parentItem) {
-		[[self requestFeedConfigForMenuItem:sender.parentItem] descendantFeedItems:block];
+		FeedConfig *obj = [sender requestCoreDataObject];
+		if ([obj isKindOfClass:[FeedConfig class]]) // important: this could be a FeedItem
+			[obj descendantFeedItems:block];
 	} else {
 		// Sadly we can't just fetch the list of FeedItems since it is not ordered (in case open 10 at a time)
 		@autoreleasepool {
@@ -480,8 +508,8 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
  @return Unread count for parent element (total count if parent is @c nil)
  */
 - (int)getAncestorUnreadCount:(NSMenuItem*)sender {
-	if ([sender.parentItem.representedObject isKindOfClass:[MenuItemInfo class]])
-		return sender.parentItem.unreadCount;
+	if ([sender.parentItem hasReaderInfo])
+		return [sender.parentItem unreadCount];
 	return self.unreadCountTotal;
 }
 

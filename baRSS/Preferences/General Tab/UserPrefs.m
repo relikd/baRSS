@@ -20,30 +20,19 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
+#import "UserPrefs.h"
 
-@interface MenuItemInfo : NSObject
-@property (strong) NSManagedObjectID *objID;
-+ (instancetype)withID:(NSManagedObjectID*)oid;
-+ (instancetype)withID:(NSManagedObjectID*)oid unread:(int)count;
+@implementation UserPrefs
+
++ (BOOL)defaultYES:(NSString*)key {
+	if ([[NSUserDefaults standardUserDefaults] objectForKey:key] == NULL) {
+		return YES;
+	}
+	return [[NSUserDefaults standardUserDefaults] boolForKey:key];
+}
+
++ (BOOL)defaultNO:(NSString*)key {
+	return [[NSUserDefaults standardUserDefaults] boolForKey:key];
+}
+
 @end
-
-
-@interface NSMenuItem (MenuItemInfo)
-/**
- Iteration block for descendants of @c NSMenuItem.
-
- @param count The number of sub-elements contained in that @c NSMenuItem. 1 for @c FeedItems at the deepest layer.
-              Otherwise the number of (updated) descendants.
- @return Return how many elements are updated in this block execution. If none were changed return @c 0.
-                If execution should be stopped early, return @c -1.
- */
-typedef int (^MenuItemInfoRecursiveBlock) (NSMenuItem *item, int count);
-
-- (BOOL)hasUnread;
-- (int)unreadCount;
-- (void)markReadAndUpdateTitle:(int)count;
-- (void)markAncestorsRead:(int)count;
-- (int)siblingsDescendantItemInfo:(MenuItemInfoRecursiveBlock)block unreadEntriesOnly:(BOOL)flag;
-@end
-

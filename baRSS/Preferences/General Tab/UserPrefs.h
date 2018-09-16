@@ -20,39 +20,9 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import "SettingsGeneral.h"
-#import "AppHook.h"
-#import "BarMenu.h"
+#import <Foundation/Foundation.h>
 
-@implementation SettingsGeneral
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-}
-
-- (IBAction)checkmarkClicked:(NSButton*)sender {
-	// TODO: Could be optimized by updating only the relevant parts
-	[[(AppHook*)NSApp barMenu] rebuildMenu];
-}
-
-- (IBAction)changeMenuBarIconSetting:(NSButton*)sender {
-	[[(AppHook*)NSApp barMenu] updateBarIcon];
-}
-
-- (IBAction)changeMenuHeaderSetting:(NSButton*)sender {
-	BOOL recursive = YES;
-	NSString *bindingKey = [[sender infoForBinding:@"value"] valueForKey:NSObservedKeyPathKey];
-	if ([bindingKey containsString:@"values.global"]) {
-		recursive = NO; // item is in menu bar menu, no need to go recursive
-	}
-	[[(AppHook*)NSApp barMenu] updateMenuHeaders:recursive];
-}
-
-- (IBAction)changeMenuItemUpdateAllHidden:(NSButton*)sender {
-	BOOL checked = (sender.state == NSControlStateValueOn);
-	[[(AppHook*)NSApp barMenu] setItemUpdateAllHidden:!checked];
-}
-
-// TODO: show list of installed browsers and make menu choosable
-
+@interface UserPrefs : NSObject
++ (BOOL)defaultYES:(NSString*)key;
++ (BOOL)defaultNO:(NSString*)key;
 @end

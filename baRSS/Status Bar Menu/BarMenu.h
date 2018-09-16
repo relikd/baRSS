@@ -24,4 +24,7 @@
 
 @interface BarMenu : NSObject <NSMenuDelegate>
 - (void)rebuildMenu;
+- (void)updateBarIcon;
+- (void)updateMenuHeaders:(BOOL)recursive;
+- (void)setItemUpdateAllHidden:(BOOL)hidden;
 @end

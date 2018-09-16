@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		541A90F221257D77002680A6 /* MenuItemInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 541A90F121257D77002680A6 /* MenuItemInfo.m */; };
 		54209E942117325100F3B5EF /* DrawImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 54209E932117325100F3B5EF /* DrawImage.m */; };
+		543695D5214EFD9800DA979D /* NSMenuItem+Info.m in Sources */ = {isa = PBXBuildFile; fileRef = 543695D4214EFD9800DA979D /* NSMenuItem+Info.m */; };
 		544B011A2114B41200386E5C /* ModalSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* ModalSheet.m */; };
 		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
 		544DCCB9212A2B4D002DBC46 /* RSXML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML.framework */; };
@@ -20,6 +20,7 @@
 		546FC44421189975007CC3A3 /* SettingsGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 546FC44221189975007CC3A3 /* SettingsGeneral.xib */; };
 		546FC4472118A8E6007CC3A3 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 546FC4462118A8E6007CC3A3 /* Preferences.xib */; };
 		5477D34E21233C62002BA27F /* FeedConfig+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 5477D34D21233C62002BA27F /* FeedConfig+Ext.m */; };
+		5496B511214D6275003ED4ED /* UserPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5496B510214D6275003ED4ED /* UserPrefs.m */; };
 		54ACC28621061B3C0020715F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54ACC28521061B3C0020715F /* Assets.xcassets */; };
 		54ACC28C21061B3C0020715F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28B21061B3C0020715F /* main.m */; };
 		54ACC29521061E270020715F /* FeedDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29421061E270020715F /* FeedDownload.m */; };
@@ -56,10 +57,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		541A90F021257D77002680A6 /* MenuItemInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MenuItemInfo.h; sourceTree = "<group>"; };
-		541A90F121257D77002680A6 /* MenuItemInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MenuItemInfo.m; sourceTree = "<group>"; };
 		54209E922117325100F3B5EF /* DrawImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawImage.h; sourceTree = "<group>"; };
 		54209E932117325100F3B5EF /* DrawImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawImage.m; sourceTree = "<group>"; };
+		543695D3214EFD9800DA979D /* NSMenuItem+Info.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMenuItem+Info.h"; sourceTree = "<group>"; };
+		543695D4214EFD9800DA979D /* NSMenuItem+Info.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMenuItem+Info.m"; sourceTree = "<group>"; };
 		544B01182114B41200386E5C /* ModalSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSheet.h; sourceTree = "<group>"; };
 		544B01192114B41200386E5C /* ModalSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalSheet.m; sourceTree = "<group>"; };
 		544B011B2114EE9100386E5C /* AppHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppHook.h; sourceTree = "<group>"; };
@@ -75,6 +76,8 @@
 		546FC4462118A8E6007CC3A3 /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
 		5477D34C21233C62002BA27F /* FeedConfig+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FeedConfig+Ext.h"; sourceTree = "<group>"; };
 		5477D34D21233C62002BA27F /* FeedConfig+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "FeedConfig+Ext.m"; sourceTree = "<group>"; };
+		5496B50F214D6275003ED4ED /* UserPrefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserPrefs.h; sourceTree = "<group>"; };
+		5496B510214D6275003ED4ED /* UserPrefs.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserPrefs.m; sourceTree = "<group>"; };
 		54ACC27C21061B3B0020715F /* baRSS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = baRSS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		54ACC28321061B3B0020715F /* DBv1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DBv1.xcdatamodel; sourceTree = "<group>"; };
 		54ACC28521061B3C0020715F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -108,8 +111,8 @@
 		541A90EF21257D4F002680A6 /* Status Bar Menu */ = {
 			isa = PBXGroup;
 			children = (
-				541A90F021257D77002680A6 /* MenuItemInfo.h */,
-				541A90F121257D77002680A6 /* MenuItemInfo.m */,
+				543695D3214EFD9800DA979D /* NSMenuItem+Info.h */,
+				543695D4214EFD9800DA979D /* NSMenuItem+Info.m */,
 				54FE73D1212316CD003EAC65 /* BarMenu.h */,
 				54FE73D2212316CD003EAC65 /* BarMenu.m */,
 			);
@@ -128,6 +131,8 @@
 		546FC44521189ADC007CC3A3 /* General Tab */ = {
 			isa = PBXGroup;
 			children = (
+				5496B50F214D6275003ED4ED /* UserPrefs.h */,
+				5496B510214D6275003ED4ED /* UserPrefs.m */,
 				546FC44021189975007CC3A3 /* SettingsGeneral.h */,
 				546FC44121189975007CC3A3 /* SettingsGeneral.m */,
 				546FC44221189975007CC3A3 /* SettingsGeneral.xib */,
@@ -293,12 +298,13 @@
 				54ACC28C21061B3C0020715F /* main.m in Sources */,
 				54FE73D3212316CD003EAC65 /* BarMenu.m in Sources */,
 				544B011A2114B41200386E5C /* ModalSheet.m in Sources */,
+				543695D5214EFD9800DA979D /* NSMenuItem+Info.m in Sources */,
 				54ACC29821061FBA0020715F /* Preferences.m in Sources */,
+				5496B511214D6275003ED4ED /* UserPrefs.m in Sources */,
 				546FC43D21188AD5007CC3A3 /* SettingsFeeds.m in Sources */,
 				54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */,
 				54209E942117325100F3B5EF /* DrawImage.m in Sources */,
 				54FE73D021220DEC003EAC65 /* StoreCoordinator.m in Sources */,
-				541A90F221257D77002680A6 /* MenuItemInfo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
