@@ -25,6 +25,7 @@
 #import "DrawImage.h"
 #import "Preferences.h"
 #import "NSMenuItem+Info.h"
+#import "NSMenuItem+Generate.h"
 #import "UserPrefs.h"
 
 
@@ -117,7 +118,7 @@
 	self.unreadCountTotal = 0;
 	@autoreleasepool {
 		for (FeedConfig *fc in [StoreCoordinator sortedFeedConfigItems]) {
-			[menu addItem:[self menuItemForFeedConfig:fc unread:&_unreadCountTotal]];
+			[menu addItem:[self generateMenuItem:fc unread:&_unreadCountTotal]];
 		}
 	}
 	[self updateMenuHeaderEnabled:menu hasUnread:(self.unreadCountTotal > 0)];
@@ -132,104 +133,56 @@
 }
 
 /**
- Create and return a new @c NSMenuItem from the objects attributes.
+ Generate menu item with all its sub-menus. @c FeedConfig type is evaluated automatically.
 
- @param config @c FeedConfig object that represents a superior feed element.
- @param unread Pointer to an int that will be incremented for each unread item.
- @return Return a fully configured Separator item OR group item OR feed item. (but not @c FeedItem item)
+ @param unread Pointer to an unread count. Will be incremented while traversing through sub-menus.
  */
-- (NSMenuItem*)menuItemForFeedConfig:(FeedConfig*)config unread:(int*)unread {
-	NSMenuItem *item;
-	if (config.typ == SEPARATOR) {
-		item = [NSMenuItem separatorItem];
-		[item setReaderInfo:config.objectID unread:0];
+- (NSMenuItem*)generateMenuItem:(FeedConfig*)config unread:(int*)unread {
+	NSMenuItem *item = [NSMenuItem feedConfig:config];
+	int count = 0;
+	if (item.tag == ScopeFeed) {
+		count += [self setSubmenuForFeedScope:item config:config];
+	} else if (item.tag == ScopeGroup) {
+		[self setSubmenuForGroupScope:item config:config unread:&count];
+	} else { // Separator item
 		return item;
 	}
-	int count = 0;
-	if (config.typ == FEED) {
-		item = [self feedItem:config unread:&count];
-	} else if (config.typ == GROUP) {
-		item = [self groupItem:config unread:&count];
-	}
 	*unread += count;
-	[item setReaderInfo:config.objectID unread:0];
-	// !!!: fix that double count
 	[item markReadAndUpdateTitle:-count];
 	[self updateMenuHeaderEnabled:item.submenu hasUnread:(count > 0)];
 	return item;
 }
 
 /**
- Create and return a new @c NSMenuItem from the objects attributes.
- 
- @param config @c FeedConfig object that represents a superior feed element.
- @param unread Pointer to an int that will be incremented for each unread item.
- */
-- (NSMenuItem*)feedItem:(FeedConfig*)config unread:(int*)unread {
-	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:config.name action:@selector(openFeedURL:) keyEquivalent:@""];
-	item.target = self;
-	item.submenu = [self defaultHeaderForMenu:nil scope:ScopeFeed];
-	for (FeedItem *obj in config.feed.items) {
-		if (obj.unread) ++(*unread);
-		[item.submenu addItem:[self feedEntryItem:obj]];
-	}
-	item.toolTip = config.feed.subtitle;
-	item.enabled = (config.feed.items.count > 0);
-	
-	// set icon
-	dispatch_async(dispatch_get_main_queue(), ^{
-		static NSImage *defaultRSSIcon;
-		if (!defaultRSSIcon)
-			defaultRSSIcon = [RSSIcon iconWithSize:16];
-		item.image = defaultRSSIcon;
-	});
-	
-	item.tag = ScopeFeed;
-	return item;
-}
+ Set subitems for a @c FeedConfig group item. Namely various @c FeedConfig and @c FeedItem items.
 
-/**
- Create and return a new @c NSMenuItem from the objects attributes.
- 
- @param config @c FeedConfig object that represents a group item.
- @param unread Pointer to an int that will be incremented for each unread item.
+ @param item The item where the menu will be appended.
+ @param config A @c FeedConfig group item.
+ @param unread Pointer to an unread count. Will be incremented while traversing through sub-menus.
  */
-- (NSMenuItem*)groupItem:(FeedConfig*)config unread:(int*)unread {
-	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:config.name action:nil keyEquivalent:@""];
+- (void)setSubmenuForGroupScope:(NSMenuItem*)item config:(FeedConfig*)config unread:(int*)unread {
 	item.submenu = [self defaultHeaderForMenu:nil scope:ScopeGroup];
 	for (FeedConfig *obj in config.sortedChildren) {
-		[item.submenu addItem: [self menuItemForFeedConfig:obj unread:unread]];
+		[item.submenu addItem: [self generateMenuItem:obj unread:unread]];
 	}
-	// set icon
-	dispatch_async(dispatch_get_main_queue(), ^{
-		static NSImage *groupIcon;
-		if (!groupIcon) {
-			groupIcon = [NSImage imageNamed:NSImageNameFolder];
-			groupIcon.size = NSMakeSize(16, 16);
-		}
-		item.image = groupIcon;
-	});
-	item.tag = ScopeGroup;
-	return item;
 }
 
 /**
- Create and return a new @c NSMenuItem from @c FeedItem attributes.
+ Set subitems for a @c FeedConfig feed item. Namely its @c FeedItem items.
+
+ @param item The item where the menu will be appended.
+ @param config For which item the menu should be generated. Attribute @c feed should be populated.
+ @return Unread count for feed.
  */
-- (NSMenuItem*)feedEntryItem:(FeedItem*)item {
-	NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle:item.title action:@selector(openFeedURL:) keyEquivalent:@""];
-	mi.target = self;
-	[mi setReaderInfo:item.objectID unread:(item.unread ? 1 : 0)];
-	//mi.toolTip = item.abstract;
-	// TODO: Do regex during save, not during display. Its here for testing purposes ...
-	if (item.abstract.length > 0) {
-		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<[^>]*>" options:kNilOptions error:nil];
-		mi.toolTip = [regex stringByReplacingMatchesInString:item.abstract options:kNilOptions range:NSMakeRange(0, item.abstract.length) withTemplate:@""];
+- (int)setSubmenuForFeedScope:(NSMenuItem*)item config:(FeedConfig*)config {
+	item.submenu = [self defaultHeaderForMenu:nil scope:ScopeFeed];
+	int count = 0;
+	for (FeedItem *obj in config.feed.items) {
+		if (obj.unread) ++count;
+		[item.submenu addItem:[[NSMenuItem feedItem:obj] setAction:@selector(openFeedURL:) target:self]];
 	}
-	mi.enabled = (item.link.length > 0);
-	mi.state = (item.unread ? NSControlStateValueOn : NSControlStateValueOff);
-	mi.tag = ScopeFeed;
-	return mi;
+	[item setAction:@selector(openFeedURL:) target:self];
+	return count;
 }
 
 /**
@@ -242,19 +195,6 @@
 	[item applyUserSettingsDisplay];
 	[menu addItem:item];
 	return item;
-}
-
-/**
- Helper function to copy an existing menu item and set the option key modifier
- */
-- (NSMenuItem*)addAlternateItem:(NSMenuItem*)alternateParent withTitle:(NSString*)title toMenu:(NSMenu*)menu {
-	NSMenuItem *alt = [alternateParent copy];
-	alt.title = title;
-	alt.keyEquivalentModifierMask = NSEventModifierFlagOption;
-	if (!alt.hidden) // hidden will be ignored if alternate is YES
-		alt.alternate = YES;
-	[menu addItem:alt];
-	return alt;
 }
 
 
@@ -276,7 +216,7 @@
 	}
 	
 	NSMenuItem *item = [self addTitle:NSLocalizedString(@"Open all unread", nil) selector:@selector(openAllUnread:) toMenu:menu tag:TagOpenAllUnread | scope];
-	[self addAlternateItem:item withTitle:[NSString stringWithFormat:NSLocalizedString(@"Open a few unread (%d)", nil), 3] toMenu:menu];
+	[menu addItem:[item alternateWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Open a few unread (%d)", nil), 3]]];
 	[self addTitle:NSLocalizedString(@"Mark all read", nil) selector:@selector(markAllRead:) toMenu:menu tag:TagMarkAllRead | scope];
 	[self addTitle:NSLocalizedString(@"Mark all unread", nil) selector:@selector(markAllUnread:) toMenu:menu tag:TagMarkAllUnread | scope];
 	
@@ -471,7 +411,7 @@
  */
 - (void)siblingsDescendantFeedConfigs:(NSMenuItem*)sender block:(FeedConfigRecursiveItemsBlock)block {
 	if (sender.parentItem) {
-		FeedConfig *obj = [sender requestCoreDataObject];
+		FeedConfig *obj = [sender.parentItem requestCoreDataObject];
 		if ([obj isKindOfClass:[FeedConfig class]]) // important: this could be a FeedItem
 			[obj descendantFeedItems:block];
 	} else {

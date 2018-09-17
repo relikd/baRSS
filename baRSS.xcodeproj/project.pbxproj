@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		54209E942117325100F3B5EF /* DrawImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 54209E932117325100F3B5EF /* DrawImage.m */; };
 		543695D5214EFD9800DA979D /* NSMenuItem+Info.m in Sources */ = {isa = PBXBuildFile; fileRef = 543695D4214EFD9800DA979D /* NSMenuItem+Info.m */; };
+		543695D8214F1F2700DA979D /* NSMenuItem+Generate.m in Sources */ = {isa = PBXBuildFile; fileRef = 543695D7214F1F2700DA979D /* NSMenuItem+Generate.m */; };
 		544B011A2114B41200386E5C /* ModalSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* ModalSheet.m */; };
 		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
 		544DCCB9212A2B4D002DBC46 /* RSXML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML.framework */; };
@@ -61,6 +62,8 @@
 		54209E932117325100F3B5EF /* DrawImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawImage.m; sourceTree = "<group>"; };
 		543695D3214EFD9800DA979D /* NSMenuItem+Info.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMenuItem+Info.h"; sourceTree = "<group>"; };
 		543695D4214EFD9800DA979D /* NSMenuItem+Info.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMenuItem+Info.m"; sourceTree = "<group>"; };
+		543695D6214F1F2700DA979D /* NSMenuItem+Generate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMenuItem+Generate.h"; sourceTree = "<group>"; };
+		543695D7214F1F2700DA979D /* NSMenuItem+Generate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMenuItem+Generate.m"; sourceTree = "<group>"; };
 		544B01182114B41200386E5C /* ModalSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSheet.h; sourceTree = "<group>"; };
 		544B01192114B41200386E5C /* ModalSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalSheet.m; sourceTree = "<group>"; };
 		544B011B2114EE9100386E5C /* AppHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppHook.h; sourceTree = "<group>"; };
@@ -113,6 +116,8 @@
 			children = (
 				543695D3214EFD9800DA979D /* NSMenuItem+Info.h */,
 				543695D4214EFD9800DA979D /* NSMenuItem+Info.m */,
+				543695D6214F1F2700DA979D /* NSMenuItem+Generate.h */,
+				543695D7214F1F2700DA979D /* NSMenuItem+Generate.m */,
 				54FE73D1212316CD003EAC65 /* BarMenu.h */,
 				54FE73D2212316CD003EAC65 /* BarMenu.m */,
 			);
@@ -290,6 +295,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				543695D8214F1F2700DA979D /* NSMenuItem+Generate.m in Sources */,
 				54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */,
 				544B011D2114EE9100386E5C /* AppHook.m in Sources */,
 				546FC44321189975007CC3A3 /* SettingsGeneral.m in Sources */,
