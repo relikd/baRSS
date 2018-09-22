@@ -25,4 +25,6 @@
 @interface UserPrefs : NSObject
 + (BOOL)defaultYES:(NSString*)key;
 + (BOOL)defaultNO:(NSString*)key;
++ (NSString*)getHttpApplication;
++ (void)setHttpApplication:(NSString*)bundleID;
 @end

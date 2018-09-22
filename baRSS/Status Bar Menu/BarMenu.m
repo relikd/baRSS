@@ -78,7 +78,7 @@
  Update menu bar icon and text according to unread count and user preferences.
  */
 - (void)updateBarIcon {
-	// TODO: Option: unread count in menubar, Option: highlight color, Option: icon choice
+	// TODO: Option: icon choice
 	dispatch_async(dispatch_get_main_queue(), ^{
 		if (self.unreadCountTotal > 0 && [UserPrefs defaultYES:@"globalUnreadCount"]) {
 			self.barItem.title = [NSString stringWithFormat:@"%d", self.unreadCountTotal];
@@ -394,9 +394,8 @@
  @param urls A list of @c NSURL objects that will be opened immediatelly in bulk.
  */
 - (void)openURLsWithPreferredBrowser:(NSArray<NSURL*>*)urls {
-	// TODO: lookup preferred browser in user preferences
 	if (urls.count == 0) return;
-//	[[NSWorkspace sharedWorkspace] openURLs:urls withAppBundleIdentifier:@"com.apple.Safari" options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
+	[[NSWorkspace sharedWorkspace] openURLs:urls withAppBundleIdentifier:[UserPrefs getHttpApplication] options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
 }
 
 

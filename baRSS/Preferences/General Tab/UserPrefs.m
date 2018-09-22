@@ -35,4 +35,12 @@
 	return [[NSUserDefaults standardUserDefaults] boolForKey:key];
 }
 
++ (NSString*)getHttpApplication {
+	return [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultHttpApplication"];
+}
+
++ (void)setHttpApplication:(NSString*)bundleID {
+	[[NSUserDefaults standardUserDefaults] setObject:bundleID forKey:@"defaultHttpApplication"];
+}
+
 @end

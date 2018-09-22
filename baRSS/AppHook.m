@@ -31,14 +31,26 @@
 	return self;
 }
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+- (void)applicationWillFinishLaunching:(NSNotification *)notification {
 	_barMenu = [BarMenu new];
+	NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
+	[appleEventManager setEventHandler:self andSelector:@selector(handleGetURLEvent:withReplyEvent:)
+						 forEventClass:kInternetEventClass andEventID:kAEGetURL];
+}
+
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	printf("up and running\n");
 //	https://feeds.feedburner.com/simpledesktops
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
 	
+}
+
+- (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
+	NSString *url = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
+	// TODO: Open feed edit sheet in preferences
+	NSLog(@"%@", url);
 }
 
 
