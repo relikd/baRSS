@@ -8,6 +8,8 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SettingsGeneral">
             <connections>
+                <outlet property="popupDefaultRSSReader" destination="tJe-jL-nUu" id="DUq-ti-Drf"/>
+                <outlet property="popupHttpApplication" destination="BcN-gW-jBg" id="X2r-Nn-igN"/>
                 <outlet property="view" destination="mbb-wD-pDD" id="Syb-4w-ekh"/>
             </connections>
         </customObject>
@@ -42,7 +44,7 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="changeMenuItemUpdateAllHidden:" target="-2" id="12D-ge-tzs"/>
+                        <action selector="changeMenuItemUpdateAll:" target="-2" id="Zb8-Oi-JVr"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalUpdateAll" id="FrQ-u0-lFo">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -327,7 +329,7 @@
                     </textFieldCell>
                 </textField>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="36q-Dv-PLf">
-                    <rect key="frame" x="18" y="49" width="133" height="17"/>
+                    <rect key="frame" x="18" y="76" width="133" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Menu bar icon:" id="Mkr-3d-gmN">
                         <font key="font" metaFont="system"/>
@@ -336,33 +338,34 @@
                     </textFieldCell>
                 </textField>
                 <imageView focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="usG-bX-431">
-                    <rect key="frame" x="156" y="42" width="32" height="32"/>
+                    <rect key="frame" x="156" y="69" width="32" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <imageCell key="cell" selectable="YES" editable="YES" focusRingType="none" alignment="left" imageScaling="proportionallyDown" imageFrameStyle="grayBezel" image="NSBookmarksTemplate" id="QxY-0c-aDo"/>
                 </imageView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2sG-NO-OJz">
-                    <rect key="frame" x="18" y="22" width="133" height="17"/>
+                    <rect key="frame" x="18" y="49" width="133" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Open URL in:" id="vNb-i3-dvE">
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Open URLs with:" id="vNb-i3-dvE">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BcN-gW-jBg">
-                    <rect key="frame" x="155" y="17" width="148" height="26"/>
+                    <rect key="frame" x="155" y="44" width="148" height="26"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <popUpButtonCell key="cell" type="push" title="Default" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="qW6-vv-pdE" id="R91-En-pHg">
+                    <popUpButtonCell key="cell" type="push" title="-- list --" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="qW6-vv-pdE" id="R91-En-pHg">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="menu"/>
                         <menu key="menu" id="M0i-AE-1LS">
                             <items>
-                                <menuItem title="Default" state="on" id="qW6-vv-pdE"/>
-                                <menuItem title="Safari" id="RTt-ZJ-ZHv"/>
-                                <menuItem title="other …" id="hSc-D3-fq8"/>
+                                <menuItem title="-- list --" state="on" id="qW6-vv-pdE"/>
                             </items>
                         </menu>
                     </popUpButtonCell>
+                    <connections>
+                        <action selector="changeHttpApplication:" target="-2" id="Cyb-ab-VNu"/>
+                    </connections>
                 </popUpButton>
                 <customView toolTip="Show in menu bar" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="P4Y-i1-MGE" customClass="SettingsIconGlobal">
                     <rect key="frame" x="20" y="260" width="18" height="18"/>
@@ -401,7 +404,7 @@
                     </userDefinedRuntimeAttributes>
                 </customView>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tec-F3-9cE">
-                    <rect key="frame" x="201" y="48" width="46" height="18"/>
+                    <rect key="frame" x="201" y="75" width="46" height="18"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <buttonCell key="cell" type="check" title="Tint" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="19k-mc-RLe">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -417,6 +420,31 @@
                         </binding>
                     </connections>
                 </button>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TC5-cu-zUi">
+                    <rect key="frame" x="18" y="22" width="133" height="17"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Default RSS Reader:" id="wvK-Oz-Kk3">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tJe-jL-nUu">
+                    <rect key="frame" x="155" y="17" width="148" height="26"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <popUpButtonCell key="cell" type="push" title="-- list --" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="4Gg-hZ-mh4" id="saR-9h-TWE">
+                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="menu"/>
+                        <menu key="menu" id="8gY-aZ-fCb">
+                            <items>
+                                <menuItem title="-- list --" state="on" id="4Gg-hZ-mh4"/>
+                            </items>
+                        </menu>
+                    </popUpButtonCell>
+                    <connections>
+                        <action selector="changeDefaultRSSReader:" target="-2" id="ul1-1K-oJb"/>
+                    </connections>
+                </popUpButton>
             </subviews>
             <point key="canvasLocation" x="140" y="-155.5"/>
         </customView>
