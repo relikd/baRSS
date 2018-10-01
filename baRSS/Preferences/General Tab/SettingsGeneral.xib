@@ -28,6 +28,7 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
+                        <action selector="changeStartOnLogin:" target="-2" id="e05-eb-6ni"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.startOnLogin" id="LnI-lN-nUf">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>

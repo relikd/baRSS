@@ -24,6 +24,7 @@
 #import "AppHook.h"
 #import "BarMenu.h"
 #import "UserPrefs.h"
+#import <ServiceManagement/ServiceManagement.h>
 
 
 @interface SettingsGeneral()
@@ -45,6 +46,16 @@
 }
 
 #pragma mark - UI interaction with IBAction
+
+- (IBAction)changeStartOnLogin:(NSButton *)sender {
+	// launchctl list | grep de.relikd
+	CFStringRef helperIdentifier = CFBridgingRetain(@"de.relikd.baRSS-Helper");
+	Boolean setOnLogin = (sender.state == NSControlStateValueOn);
+	if (!helperIdentifier || !SMLoginItemSetEnabled(helperIdentifier, setOnLogin))
+		sender.state = (setOnLogin ? NSControlStateValueOff : NSControlStateValueOn); // restore prev state
+	if (helperIdentifier)
+		CFRelease(helperIdentifier);
+}
 
 - (IBAction)changeHttpApplication:(NSPopUpButton *)sender {
 	[UserPrefs setHttpApplication:sender.selectedItem.representedObject];
@@ -170,6 +181,7 @@
  @return Return @c YES if operation was successfull. @c NO otherwise.
  */
 - (BOOL)setDefaultRSSApplication:(NSString*)bundleID {
+	// TODO: Does not work with sandboxing.
 	CFStringRef bundleIDRef = CFBridgingRetain(bundleID);
 	if (!bundleIDRef)
 		return NO;
