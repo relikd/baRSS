@@ -30,6 +30,8 @@
 + (void)saveContext:(NSManagedObjectContext*)context;
 + (void)deleteUnreferencedFeeds;
 + (NSArray<FeedConfig*>*)sortedFeedConfigItems;
++ (NSArray<FeedConfig*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll;
++ (NSDate*)nextScheduledUpdate;
 + (id)objectWithID:(NSManagedObjectID*)objID;
-+ (Feed*)createFeedFrom:(RSParsedFeed*)obj inContext:(NSManagedObjectContext*)context;
++ (void)overwriteConfig:(FeedConfig*)config withFeed:(RSParsedFeed*)obj;
 @end

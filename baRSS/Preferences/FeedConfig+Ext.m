@@ -40,6 +40,12 @@
 	return [self.children sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];
 }
 
+- (NSIndexPath *)indexPath {
+	if (self.parent == nil)
+		return [NSIndexPath indexPathWithIndex:(NSUInteger)self.sortIndex];
+	return [self.parent.indexPath indexPathByAddingIndex:(NSUInteger)self.sortIndex];
+}
+
 /**
  Iterate over all descendant @c FeedItems in sub groups
  
@@ -59,6 +65,25 @@
 		}
 	}
 	return YES;
+}
+
+/// @return Time interval respecting the selected unit. E.g., returns @c 180 for @c '3m'
+- (NSTimeInterval)timeInterval {
+	static const int unit[] = {1, 60, 3600, 86400, 604800}; // smhdw
+	return self.refreshNum * unit[self.refreshUnit % 5];
+}
+
+/// Calculate date from @c refreshNum and @c refreshUnit and set as next scheduled feed update.
+- (void)calculateAndSetScheduled {
+	self.scheduled = [[NSDate date] dateByAddingTimeInterval:[self timeInterval]];
+}
+
+/// Update item with @c mergeChanges:YES and save the context
+- (void)mergeChangesAndSave {
+	[self.managedObjectContext performBlockAndWait:^{
+		[self.managedObjectContext refreshObject:self mergeChanges:YES];
+		[self.managedObjectContext save:nil];
+	}];
 }
 
 /// @return Formatted string for update interval ( e.g., @c 30m or @c 12h )
