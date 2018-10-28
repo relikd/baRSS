@@ -22,6 +22,7 @@
 
 #import "BarMenu.h"
 #import "StoreCoordinator.h"
+#import "FeedDownload.h"
 #import "DrawImage.h"
 #import "Preferences.h"
 #import "NSMenuItem+Info.h"
@@ -44,12 +45,34 @@
 	self.barItem = [NSStatusBar.systemStatusBar statusItemWithLength:NSVariableStatusItemLength];
 	self.barItem.highlightMode = YES;
 	[self rebuildMenu];
-//	[self donothing];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkChange:) name:@"baRSS-notification-network-status-change" object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedUpdated:) name:@"baRSS-notification-feed-updated" object:nil];
+	[FeedDownload registerNetworkChangeNotification];
+	[FeedDownload performSelectorInBackground:@selector(scheduleNextUpdate:) withObject:[NSNumber numberWithBool:NO]];
 	return self;
+}
+
+- (void)dealloc {
+	[FeedDownload unregisterNetworkChangeNotification];
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)networkChange:(NSNotification*)notify {
+	BOOL available = [[notify object] boolValue];
+	[self.barItem.menu itemWithTag:TagUpdateFeed].enabled = available;
+	[self updateBarIcon];
+	// TODO: Disable 'update all' menu item?
+}
+
+- (void)feedUpdated:(NSNotification*)notify {
+	FeedConfig *config = notify.object;
+	NSLog(@"%@", config.indexPath);
+	[self rebuildMenu];
 }
 
 - (void)rebuildMenu {
 	self.barItem.menu = [self generateMainMenu];
+	[self updateBarIcon];
 }
 
 - (void)donothing {
@@ -79,13 +102,14 @@
  */
 - (void)updateBarIcon {
 	// TODO: Option: icon choice
+	// TODO: Show paused icon if no internet connection
 	dispatch_async(dispatch_get_main_queue(), ^{
 		if (self.unreadCountTotal > 0 && [UserPrefs defaultYES:@"globalUnreadCount"]) {
 			self.barItem.title = [NSString stringWithFormat:@"%d", self.unreadCountTotal];
 		} else {
 			self.barItem.title = @"";
 		}
-		
+		// BOOL hasNet = [FeedDownload isNetworkReachable];
 		if (self.unreadCountTotal > 0 && [UserPrefs defaultYES:@"tintMenuBarIcon"]) {
 			self.barItem.image = [RSSIcon templateIcon:16 tint:[NSColor rssOrange]];
 		} else {
@@ -122,7 +146,6 @@
 		}
 	}
 	[self updateMenuHeaderEnabled:menu hasUnread:(self.unreadCountTotal > 0)];
-	[self updateBarIcon];
 	
 	[menu addItem:[NSMenuItem separatorItem]];
 	
@@ -285,7 +308,8 @@
 }
 
 - (void)updateAllFeeds:(NSMenuItem*)sender {
-	NSLog(@"1update all");
+	// TODO: Disable 'update all' menu item during update?
+	[FeedDownload scheduleNextUpdate:YES];
 }
 
 /**

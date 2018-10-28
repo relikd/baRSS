@@ -24,5 +24,9 @@
 #import <RSXML/RSXML.h>
 
 @interface FeedDownload : NSObject
-+ (void)getFeed:(NSString *)url block:(void(^)(RSParsedFeed *feed, NSError* error, NSHTTPURLResponse* response))block;
++ (void)newFeed:(NSString *)url block:(void(^)(RSParsedFeed *feed, NSError* error, NSHTTPURLResponse* response))block;
++ (void)registerNetworkChangeNotification;
++ (void)unregisterNetworkChangeNotification;
++ (BOOL)isNetworkReachable;
++ (void)scheduleNextUpdate:(BOOL)forceUpdate;
 @end

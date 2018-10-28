@@ -63,30 +63,92 @@
 	return result;
 }
 
++ (NSArray<FeedConfig*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll {
+	NSManagedObjectContext *moc = [self getContext];
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: FeedConfig.entity.name];
+	if (!forceAll) {
+		fr.predicate = [NSPredicate predicateWithFormat:@"type = %d AND scheduled <= %@", FEED, [NSDate date]];
+	} else {
+		fr.predicate = [NSPredicate predicateWithFormat:@"type = %d", FEED];
+	}
+	NSError *err;
+	NSArray *result = [moc executeFetchRequest:fr error:&err];
+	if (err) NSLog(@"%@", err);
+	return result;
+}
+
++ (NSDate*)nextScheduledUpdate {
+	NSExpression *exp = [NSExpression expressionForFunction:@"min:" arguments:@[[NSExpression expressionForKeyPath:@"scheduled"]]];
+	NSExpressionDescription *expDesc = [[NSExpressionDescription alloc] init];
+	[expDesc setName:@"earliestDate"];
+	[expDesc setExpression:exp];
+	[expDesc setExpressionResultType:NSDateAttributeType];
+	
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: FeedConfig.entity.name];
+	fr.predicate = [NSPredicate predicateWithFormat:@"type = %d", FEED];
+	[fr setResultType:NSDictionaryResultType];
+	[fr setPropertiesToFetch:@[expDesc]];
+	
+	NSError *err;
+	NSArray *fetchResults = [[self getContext] executeFetchRequest:fr error:&err];
+	if (err) NSLog(@"%@", err);
+	return [fetchResults firstObject][@"earliestDate"]; // can be nil
+}
+
 + (id)objectWithID:(NSManagedObjectID*)objID {
 	return [[self getContext] objectWithID:objID];
 }
 
-+ (Feed*)createFeedFrom:(RSParsedFeed*)obj inContext:(NSManagedObjectContext*)context {
+
++ (void)overwriteConfig:(FeedConfig*)config withFeed:(RSParsedFeed*)obj {
+	NSArray<NSString*> *readURLs = [self alreadyReadURLsInFeed:config.feed];
+	[config.managedObjectContext performBlockAndWait:^{
+		if (config.feed)
+			[config.managedObjectContext deleteObject:(NSManagedObject*)config.feed];
+		if (obj) {
+			config.feed = [StoreCoordinator createFeedFrom:obj inContext:config.managedObjectContext alreadyRead:readURLs];
+		}
+	}];
+}
+
+#pragma mark - Helper methods -
+
++ (FeedItem*)createFeedItemFrom:(RSParsedArticle*)entry inContext:(NSManagedObjectContext*)context {
+	FeedItem *b = [[FeedItem alloc] initWithEntity:FeedItem.entity insertIntoManagedObjectContext:context];
+	b.guid = entry.guid;
+	b.title = entry.title;
+	b.abstract = entry.abstract;
+	b.body = entry.body;
+	b.author = entry.author;
+	b.link = entry.link;
+	b.published = entry.datePublished;
+	return b;
+}
+
++ (Feed*)createFeedFrom:(RSParsedFeed*)obj inContext:(NSManagedObjectContext*)context alreadyRead:(NSArray<NSString*>*)urls {
 	Feed *a = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:context];
 	a.title = obj.title;
 	a.subtitle = obj.subtitle;
 	a.link = obj.link;
-	for (RSParsedArticle *entry in obj.articles) {
-		FeedItem *b = [[FeedItem alloc] initWithEntity:FeedItem.entity insertIntoManagedObjectContext:context];
-		b.guid = entry.guid;
-		b.title = entry.title;
-		b.abstract = entry.abstract;
-		b.body = entry.body;
-		b.author = entry.author;
-		b.link = entry.link;
-		b.published = entry.datePublished;
-		// TODO: remove NSLog()
-		if (!entry.datePublished)
-			NSLog(@"No date for feed '%@'", obj.urlString);
+	for (RSParsedArticle *article in obj.articles) {
+		FeedItem *b = [self createFeedItemFrom:article inContext:context];
+		if ([urls containsObject:b.link]) {
+			b.unread = NO;
+		}
 		[a addItemsObject:b];
 	}
 	return a;
+}
+
++ (NSArray<NSString*>*)alreadyReadURLsInFeed:(Feed*)local {
+	if (!local || !local.items) return nil;
+	NSMutableArray<NSString*> *mArr = [NSMutableArray arrayWithCapacity:local.items.count];
+	for (FeedItem *f in local.items) {
+		if (!f.unread) {
+			[mArr addObject:f.link];
+		}
+	}
+	return mArr;
 }
 
 @end

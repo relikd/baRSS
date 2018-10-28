@@ -35,6 +35,8 @@
 @property (weak) IBOutlet NSPopover *warningPopover;
 
 @property (copy) NSString *previousURL;
+@property (copy) NSString *httpDate;
+@property (copy) NSString *httpEtag;
 @property (strong) NSError *feedError;
 @property (strong) RSParsedFeed *feedResult;
 
@@ -107,15 +109,19 @@
 		item.refreshUnit = (int16_t)self.refreshUnit.indexOfSelectedItem;
 	
 	if (self.shouldDeletePrevArticles) {
+		[StoreCoordinator overwriteConfig:item withFeed:self.feedResult];
 		[item.managedObjectContext performBlockAndWait:^{
-			if (item.feed)
-				[item.managedObjectContext deleteObject:(NSManagedObject*)item.feed];
-			if (self.feedResult)
-				item.feed = [StoreCoordinator createFeedFrom:self.feedResult inContext:item.managedObjectContext];
+			// TODO: move to separate function and add icon download
+			if (!item.meta) {
+				item.meta = [[FeedMeta alloc] initWithEntity:FeedMeta.entity insertIntoManagedObjectContext:item.managedObjectContext];
+			}
+			item.meta.httpEtag = self.httpEtag;
+			item.meta.httpModified = self.httpDate;
 		}];
 	}
 	if ([item.managedObjectContext hasChanges]) {
 		self.objectIsModified = YES;
+		[item calculateAndSetScheduled];
 		[item.managedObjectContext performBlockAndWait:^{
 			[item.managedObjectContext refreshObject:item mergeChanges:YES];
 		}];
@@ -146,11 +152,16 @@
 		self.feedError = nil;
 		[self.spinnerURL startAnimation:nil];
 		[self.spinnerName startAnimation:nil];
-		[FeedDownload getFeed:self.previousURL block:^(RSParsedFeed *result, NSError *error, NSHTTPURLResponse* response) {
+		[FeedDownload newFeed:self.previousURL block:^(RSParsedFeed *result, NSError *error, NSHTTPURLResponse* response) {
 			self.feedResult = result;
-//			[httpResponse allHeaderFields][@"Date"]; // @"Expires", @"Last-Modified"
-//			[httpResponse allHeaderFields][@"Etag"];
+			self.httpDate = [response allHeaderFields][@"Date"]; // @"Expires", @"Last-Modified"
+			self.httpEtag = [response allHeaderFields][@"Etag"];
 			dispatch_async(dispatch_get_main_queue(), ^{
+				if (response && ![response.URL.absoluteString isEqualToString:self.url.stringValue]) {
+					// URL was redirected, so replace original text field value with new one
+					self.url.stringValue = response.URL.absoluteString;
+					self.previousURL = self.url.stringValue;
+				}
 				// TODO: play error sound?
 				self.feedError = error; // warning indicator .hidden is bound to feedError
 				self.objectNeedsSaving = YES; // stays YES if this block runs after updateRepresentedObject:

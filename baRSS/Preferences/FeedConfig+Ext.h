@@ -42,8 +42,11 @@ typedef BOOL (^FeedConfigRecursiveItemsBlock) (FeedConfig *parent, FeedItem *ite
 
 @property (getter=typ, setter=setTyp:) FeedConfigType typ;
 @property (readonly) NSArray<FeedConfig*> *sortedChildren;
+@property (readonly) NSIndexPath *indexPath;
 
 - (BOOL)descendantFeedItems:(FeedConfigRecursiveItemsBlock)block;
+- (void)calculateAndSetScheduled;
+- (void)mergeChangesAndSave;
 - (NSString*)readableRefreshString;
 - (NSString*)readableDescription;
 @end

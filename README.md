@@ -35,7 +35,7 @@ ToDo
 	- [ ] Tick mark feed items based on prefs
 	- [ ] Open a few links (# editable)
 	- [ ] Performance: Update menu partially
-	- [ ] Start on login
+	- [x] Start on login
 	- [x] Make it system default application
 	- [ ] Display license info (e.g., RSXML)
 	- [ ] Short article names
@@ -47,14 +47,16 @@ ToDo
 - [ ] Status menu
 	- [ ] Update menu header after mark (un)read
 	- [ ] Pause updates functionality
-	- [ ] Update all feeds functionality
+	- [x] Update all feeds functionality
+	- [ ] Hold only relevant information in memory
 
 
 - [ ] Edit feed
 	- [ ] Show statistics
 		- [ ] How often gets the feed updated (min, max, avg)
 		- [ ] Automatically choose best interval?
-	- [ ] Auto fix 301 Redirect or ask user
+		- [ ] Show time of next update
+	- [x] Auto fix 301 Redirect or ask user
 	- [ ] Make `feed://` URLs clickable
 	- [ ] Feeds with authentication
 	- [ ] Show proper feed icon
@@ -64,15 +66,18 @@ ToDo
 - [ ] Other
 	- [ ] App Icon
 	- [ ] Translate text to different languages
-	- [ ] Automatically update feeds with chosen interval
-		- [ ] Reuse ETag and Modification date
-		- [ ] Append only new items, keep sorting
-		- [ ] Delete old ones eventually
+	- [x] Automatically update feeds with chosen interval
+		- [x] Reuse ETag and Modification date
+		- ~~[ ] Append only new items, keep sorting~~
+		- [x] Delete old ones eventually
+		- [x] Pause on internet connection lost
+	- [ ] Download with ephemeral url session?
 	- [ ] Purge cache
 		- [ ] Manually or automatically
 		- [ ] Add something to restore a broken state
 	- [ ] Code Documentation (mostly methods)
 	- [ ] Add Sandboxing
+		- [ ] Disable Startup checkbox (or other workaround)
 
 
 - [ ] Additional features
