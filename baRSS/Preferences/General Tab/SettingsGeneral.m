@@ -24,6 +24,7 @@
 #import "AppHook.h"
 #import "BarMenu.h"
 #import "UserPrefs.h"
+#import "StoreCoordinator.h"
 #import <ServiceManagement/ServiceManagement.h>
 
 
@@ -57,6 +58,15 @@
 		CFRelease(helperIdentifier);
 }
 
+- (IBAction)fixCache:(NSButton *)sender {
+	[StoreCoordinator deleteUnreferencedFeeds];
+	[StoreCoordinator restoreUnreadCount];
+}
+
+- (IBAction)changeMenuBarIconSetting:(NSButton*)sender {
+	[[(AppHook*)NSApp barMenu] updateBarIcon];
+}
+
 - (IBAction)changeHttpApplication:(NSPopUpButton *)sender {
 	[UserPrefs setHttpApplication:sender.selectedItem.representedObject];
 }
@@ -66,31 +76,6 @@
 		// in case anything went wrong, restore previous selection
 		[self selectBundleID:[self defaultBundleIdForScheme:@"feed"] inPopup:sender];
 	}
-}
-
-// TODO: add self to login items
-
-- (IBAction)checkmarkClicked:(NSButton*)sender {
-	// TODO: Could be optimized by updating only the relevant parts
-	[[(AppHook*)NSApp barMenu] rebuildMenu];
-}
-
-- (IBAction)changeMenuBarIconSetting:(NSButton*)sender {
-	[[(AppHook*)NSApp barMenu] updateBarIcon];
-}
-
-- (IBAction)changeMenuHeaderSetting:(NSButton*)sender {
-	BOOL recursive = YES;
-	NSString *bindingKey = [[sender infoForBinding:@"value"] valueForKey:NSObservedKeyPathKey];
-	if ([bindingKey containsString:@"values.global"]) {
-		recursive = NO; // item is in menu bar menu, no need to go recursive
-	}
-	[[(AppHook*)NSApp barMenu] updateMenuHeaders:recursive];
-}
-
-- (IBAction)changeMenuItemUpdateAll:(NSButton*)sender {
-	BOOL checked = (sender.state == NSControlStateValueOn);
-	[[(AppHook*)NSApp barMenu] setItemUpdateAllHidden:!checked];
 }
 
 #pragma mark - Helper methods

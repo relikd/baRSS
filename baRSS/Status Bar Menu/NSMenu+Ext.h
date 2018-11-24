@@ -20,21 +20,13 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Foundation/Foundation.h>
-#import "DBv1+CoreDataModel.h"
-#import "FeedConfig+Ext.h"
+#import <Cocoa/Cocoa.h>
 
-@class RSParsedFeed;
-
-@interface StoreCoordinator : NSObject
-+ (NSManagedObjectContext*)getMainContext;
-+ (NSManagedObjectContext*)createChildContext;
-+ (void)saveContext:(NSManagedObjectContext*)context andParent:(BOOL)flag;
-+ (NSArray<FeedConfig*>*)sortedFeedConfigItemsInContext:(nonnull NSManagedObjectContext*)context;
-+ (NSArray<FeedConfig*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc;
-+ (NSDate*)nextScheduledUpdate;
-+ (int)totalNumberOfUnreadFeeds;
-// Restore sound state
-+ (void)deleteUnreferencedFeeds;
-+ (void)restoreUnreadCount;
+@interface NSMenu (Ext)
++ (instancetype)menuWithDelegate:(id<NSMenuDelegate>)target;
+- (instancetype)submenuWithIndex:(int)index isFeed:(BOOL)flag;
+- (void)replaceSeparatorStringsWithActualSeparator;
+- (BOOL)isMainMenu;
+- (BOOL)isFeedMenu;
+- (NSInteger)getFeedConfigOffsetAndUpdateUnread:(BOOL)hasUnread;
 @end

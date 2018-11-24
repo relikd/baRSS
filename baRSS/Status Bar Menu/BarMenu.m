@@ -25,16 +25,20 @@
 #import "FeedDownload.h"
 #import "DrawImage.h"
 #import "Preferences.h"
-#import "NSMenuItem+Info.h"
-#import "NSMenuItem+Generate.h"
 #import "UserPrefs.h"
+#import "NSMenu+Ext.h"
+#import "NSMenuItem+Ext.h"
+#import "Feed+Ext.h"
+#import "Constants.h"
 
 
 @interface BarMenu()
 @property (strong) NSStatusItem *barItem;
 @property (strong) Preferences *prefWindow;
-@property (weak) NSMenu *mm;
 @property (assign) int unreadCountTotal;
+@property (strong) NSArray<FeedConfig*> *allFeeds;
+@property (strong) NSArray<NSManagedObjectID*> *currentOpenMenu;
+@property (strong) NSManagedObjectContext *readContext;
 @end
 
 
@@ -44,9 +48,20 @@
 	self = [super init];
 	self.barItem = [NSStatusBar.systemStatusBar statusItemWithLength:NSVariableStatusItemLength];
 	self.barItem.highlightMode = YES;
-	[self rebuildMenu];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkChange:) name:@"baRSS-notification-network-status-change" object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedUpdated:) name:@"baRSS-notification-feed-updated" object:nil];
+	self.barItem.menu = [NSMenu menuWithDelegate:self];
+	
+	// Unread counter
+	self.unreadCountTotal = 0;
+	[self updateBarIcon];
+	dispatch_async(dispatch_get_main_queue(), ^{
+		self.unreadCountTotal = [StoreCoordinator totalNumberOfUnreadFeeds];
+		[self updateBarIcon];
+	});
+	
+	// Register for notifications
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedUpdated:) name:kNotificationFeedUpdated object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkChanged:) name:kNotificationNetworkStatusChanged object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(unreadCountChanged:) name:kNotificationTotalUnreadCountChanged object:nil];
 	[FeedDownload registerNetworkChangeNotification];
 	[FeedDownload performSelectorInBackground:@selector(scheduleNextUpdate:) withObject:[NSNumber numberWithBool:NO]];
 	return self;
@@ -55,46 +70,6 @@
 - (void)dealloc {
 	[FeedDownload unregisterNetworkChangeNotification];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-- (void)networkChange:(NSNotification*)notify {
-	BOOL available = [[notify object] boolValue];
-	[self.barItem.menu itemWithTag:TagUpdateFeed].enabled = available;
-	[self updateBarIcon];
-	// TODO: Disable 'update all' menu item?
-}
-
-- (void)feedUpdated:(NSNotification*)notify {
-	FeedConfig *config = notify.object;
-	NSLog(@"%@", config.indexPath);
-	[self rebuildMenu];
-}
-
-- (void)rebuildMenu {
-	self.barItem.menu = [self generateMainMenu];
-	[self updateBarIcon];
-}
-
-- (void)donothing {
-	dispatch_async(dispatch_get_main_queue(), ^{
-		[self.mm itemAtIndex:4].title = [NSString stringWithFormat:@"%@", [NSDate date]];
-	});
-	sleep(1);
-	[self performSelectorInBackground:@selector(donothing) withObject:nil];
-}
-// TODO: remove debugging stuff
-- (void)printUnreadRecurisve:(NSMenu*)menu str:(NSString*)prefix {
-	for (NSMenuItem *item in menu.itemArray) {
-		if (![item hasReaderInfo]) continue;
-		id obj = [item requestCoreDataObject];
-		if ([obj isKindOfClass:[FeedItem class]] && ([obj unread] > 0 || item.unreadCount > 0))
-			NSLog(@"%@ %@ (%d == %d)", prefix, item.title, item.unreadCount, [obj unread]);
-		else if ([item hasUnread])
-			NSLog(@"%@ %@ (%d)", prefix, item.title, item.unreadCount);
-		if (item.hasSubmenu) {
-			[self printUnreadRecurisve:item.submenu str:[NSString stringWithFormat:@"  %@", prefix]];
-		}
-	}
 }
 
 /**
@@ -117,170 +92,229 @@
 			self.barItem.image.template = YES;
 		}
 	});
-//	NSLog(@"==> %d", self.unreadCountTotal);
-//	[self printUnreadRecurisve:self.barItem.menu str:@""];
 }
 
 
-#pragma mark - Menu Generator
+#pragma mark - Notification callback methods -
 
 
 /**
- Builds main menu with items on the very first menu level. Including Preferences, Quit, etc.
+ Callback method fired when network conditions change.
+
+ @param notify Notification object contains a @c BOOL value indicating the current status.
  */
-- (NSMenu*)generateMainMenu {
-	NSMenu *menu = [NSMenu new];
-	menu.autoenablesItems = NO;
-	[self addTitle:NSLocalizedString(@"Pause Updates", nil) selector:@selector(pauseUpdates:) toMenu:menu tag:TagPauseUpdates];
-	NSMenuItem *updateAll = [self addTitle:NSLocalizedString(@"Update all feeds", nil) selector:@selector(updateAllFeeds:) toMenu:menu tag:TagUpdateFeed];
-	if ([UserPrefs defaultYES:@"globalUpdateAll"] == NO)
-		updateAll.hidden = YES;
-	
-	[menu addItem:[NSMenuItem separatorItem]];
-	[self defaultHeaderForMenu:menu scope:ScopeGlobal];
-	
-	self.unreadCountTotal = 0;
-	@autoreleasepool {
-		for (FeedConfig *fc in [StoreCoordinator sortedFeedConfigItems]) {
-			[menu addItem:[self generateMenuItem:fc unread:&_unreadCountTotal]];
+- (void)networkChanged:(NSNotification*)notify {
+	BOOL available = [[notify object] boolValue];
+	[self.barItem.menu itemWithTag:TagUpdateFeed].enabled = available;
+	[self updateBarIcon];
+}
+
+/**
+ Callback method fired when feeds have been updated and the total unread count needs update.
+
+ @param notify Notification object contains the unread count difference to the current count. May be negative.
+ */
+- (void)unreadCountChanged:(NSNotification*)notify {
+	self.unreadCountTotal += [[notify object] intValue];
+	[self updateBarIcon];
+}
+
+/**
+ Callback method fired when feeds have been updated in the background.
+ */
+- (void)feedUpdated:(NSNotification*)notify {
+	if (self.barItem.menu.numberOfItems > 0) {
+		// update items only if menu is already open (e.g., during background update)
+		[self.readContext refreshAllObjects]; // because self.allFeeds is the same context
+		[self recursiveUpdateMenu:self.barItem.menu withFeed:nil];
+	}
+}
+
+/**
+ Called recursively for all @c FeedConfig children.
+ If the projected submenu in @c menu does not exist, all subsequent children are skipped in @c FeedConfig.
+ The title and unread count is updated for all menu items. @c FeedItem menus are completely re-generated.
+
+ @param config If @c nil the root object (@c self.allFeeds) is used.
+ */
+- (void)recursiveUpdateMenu:(NSMenu*)menu withFeed:(FeedConfig*)config {
+	if (config.feed.items.count > 0) { // deepest menu level, feed items
+		[menu removeAllItems];
+		[self insertDefaultHeaderForAllMenus:menu scope:ScopeFeed hasUnread:(config.unreadCount > 0)];
+		for (FeedItem *fi in config.feed.items) {
+			NSMenuItem *mi = [menu addItemWithTitle:@"" action:@selector(openFeedURL:) keyEquivalent:@""];
+			mi.target = self;
+			[mi setFeedItem:fi];
+		}
+	} else {
+		BOOL hasUnread = (config ? config.unreadCount > 0 : self.unreadCountTotal > 0);
+		NSInteger offset = [menu getFeedConfigOffsetAndUpdateUnread:hasUnread];
+		for (FeedConfig *child in (config ? config.children : self.allFeeds)) {
+			NSMenuItem *item = [menu itemAtIndex:offset + child.sortIndex];
+			[item setTitleAndUnreadCount:child];
+			if (item.submenu.numberOfItems > 0)
+				[self recursiveUpdateMenu:[item submenu] withFeed:child];
 		}
 	}
-	[self updateMenuHeaderEnabled:menu hasUnread:(self.unreadCountTotal > 0)];
+}
+
+
+#pragma mark - Menu Delegate & Menu Generation -
+
+
+// Get rid of everything that is not needed when the system bar menu isnt open.
+- (void)menuDidClose:(NSMenu*)menu {
+	if ([menu isMainMenu]) {
+		self.allFeeds = nil;
+		[self.readContext reset];
+		self.readContext = nil;
+		self.barItem.menu = [NSMenu menuWithDelegate:self];
+	}
+}
+
+// If main menu load inital set of items, then find item based on index path.
+- (NSInteger)numberOfItemsInMenu:(NSMenu*)menu {
+	if ([menu isMainMenu]) {
+		[self.readContext reset]; // will be ignored if nil
+		self.readContext = [StoreCoordinator createChildContext];
+		self.allFeeds = [StoreCoordinator sortedFeedConfigItemsInContext:self.readContext];
+		self.currentOpenMenu = [self.allFeeds valueForKeyPath:@"objectID"];
+	} else {
+		FeedConfig *conf = [self configAtIndexPathStr:menu.title];
+		[self.readContext refreshObject:conf mergeChanges:YES];
+		self.currentOpenMenu = [(conf.typ == FEED ? conf.feed.items : [conf sortedChildren]) valueForKeyPath:@"objectID"];
+	}
+	return (NSInteger)[self.currentOpenMenu count];
+}
+
+/**
+ Find @c FeedConfig item in array @c self.allFeeds that is already loaded.
+
+ @param indexString Path as string that is stored in @c NSMenu title
+ */
+- (FeedConfig*)configAtIndexPathStr:(NSString*)indexString {
+	NSArray<NSString*> *parts = [indexString componentsSeparatedByString:@"."];
+	NSInteger firstIndex = [[parts objectAtIndex:1] integerValue];
+	FeedConfig *changing = [self.allFeeds objectAtIndex:(NSUInteger)firstIndex];
+	for (NSUInteger i = 2; i < parts.count; i++) {
+		NSInteger childIndex = [[parts objectAtIndex:i] integerValue];
+		BOOL err = YES;
+		for (FeedConfig *c in changing.children) {
+			if (c.sortIndex == childIndex) {
+				err = NO;
+				changing = c;
+				break; // Exit early. Should be faster than sorted children method.
+			}
+		}
+		NSAssert(!err, @"ERROR configAtIndex: Shouldn't happen. Something wrong with indexing.");
+	}
+	return changing;
+}
+
+// Lazy populate the system bar menus when needed.
+- (BOOL)menu:(NSMenu*)menu updateItem:(NSMenuItem*)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel {
+	NSManagedObjectID *moid = [self.currentOpenMenu objectAtIndex:(NSUInteger)index];
+	id obj = [self.readContext objectWithID:moid];
+	[self.readContext refreshObject:obj mergeChanges:YES];
 	
+	if ([obj isKindOfClass:[FeedConfig class]]) {
+		[item setFeedConfig:obj];
+		if ([(FeedConfig*)obj typ] == FEED) {
+			item.target = self;
+			item.action = @selector(openFeedURL:);
+		}
+	} else if ([obj isKindOfClass:[FeedItem class]]) {
+		[item setFeedItem:obj];
+		item.target = self;
+		item.action = @selector(openFeedURL:);
+	}
+	if (menu.numberOfItems == index + 1) {
+		int unreadCount = self.unreadCountTotal; // if parent == nil
+		if ([obj isKindOfClass:[FeedItem class]]) {
+			unreadCount = [[[(FeedItem*)obj feed] config] unreadCount];
+		} else if ([(FeedConfig*)obj parent]) {
+			unreadCount = [[(FeedConfig*)obj parent] unreadCount];
+		}
+		[self finalizeMenu:menu hasUnread:(unreadCount > 0)];
+		self.currentOpenMenu = nil;
+	}
+	return YES;
+}
+
+/**
+ Add default menu items that are present in each menu as header.
+
+ @param flag If @c NO, 'Open all unread' and 'Mark all read' will be disabled.
+ */
+- (void)finalizeMenu:(NSMenu*)menu hasUnread:(BOOL)flag {
+	BOOL isMainMenu = [menu isMainMenu];
+	MenuItemTag scope;
+	if (isMainMenu)              scope = ScopeGlobal;
+	else if ([menu isFeedMenu])  scope = ScopeFeed;
+	else                         scope = ScopeGroup;
+	
+	[menu replaceSeparatorStringsWithActualSeparator];
+	[self insertDefaultHeaderForAllMenus:menu scope:scope hasUnread:flag];
+	if (isMainMenu) {
+		[self insertMainMenuHeader:menu];
+	}
+}
+
+/**
+ Insert items 'Open all unread', 'Mark all read' and 'Mark all unread' at index 0.
+
+ @param flag If @c NO, 'Open all unread' and 'Mark all read' will be disabled.
+ */
+- (void)insertDefaultHeaderForAllMenus:(NSMenu*)menu scope:(MenuItemTag)scope hasUnread:(BOOL)flag {
+	NSMenuItem *item1 = [self itemTitle:NSLocalizedString(@"Open all unread", nil) selector:@selector(openAllUnread:) tag:TagOpenAllUnread | scope];
+	NSMenuItem *item2 = [item1 alternateWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Open a few unread (%d)", nil), 3]];
+	NSMenuItem *item3 = [self itemTitle:NSLocalizedString(@"Mark all read", nil) selector:@selector(markAllReadOrUnread:) tag:TagMarkAllRead | scope];
+	NSMenuItem *item4 = [self itemTitle:NSLocalizedString(@"Mark all unread", nil) selector:@selector(markAllReadOrUnread:) tag:TagMarkAllUnread | scope];
+	item1.enabled = flag;
+	item2.enabled = flag;
+	item3.enabled = flag;
+	// TODO: disable item3 if all items are unread?
+	[menu insertItem:item1 atIndex:0];
+	[menu insertItem:item2 atIndex:1];
+	[menu insertItem:item3 atIndex:2];
+	[menu insertItem:item4 atIndex:3];
+	[menu insertItem:[NSMenuItem separatorItem] atIndex:4];
+}
+
+/**
+ Insert default menu items for the main menu only. Like 'Pause Updates', 'Update all feeds', 'Preferences' and 'Quit'.
+ */
+- (void)insertMainMenuHeader:(NSMenu*)menu {
+	NSMenuItem *item1 = [self itemTitle:NSLocalizedString(@"Pause Updates", nil) selector:@selector(pauseUpdates:) tag:TagPauseUpdates];
+	NSMenuItem *item2 = [self itemTitle:NSLocalizedString(@"Update all feeds", nil) selector:@selector(updateAllFeeds:) tag:TagUpdateFeed];
+	if ([UserPrefs defaultYES:@"globalUpdateAll"] == NO)
+		item2.hidden = YES;
+	if (![FeedDownload isNetworkReachable])
+		item2.enabled = NO;
+	[menu insertItem:item1 atIndex:0];
+	[menu insertItem:item2 atIndex:1];
+	[menu insertItem:[NSMenuItem separatorItem] atIndex:2];
+	// < feed content >
 	[menu addItem:[NSMenuItem separatorItem]];
-	
-	NSMenuItem *prefs = [self addTitle:NSLocalizedString(@"Preferences", nil) selector:@selector(openPreferences) toMenu:menu tag:TagPreferences];
+	NSMenuItem *prefs = [self itemTitle:NSLocalizedString(@"Preferences", nil) selector:@selector(openPreferences) tag:TagPreferences];
 	prefs.keyEquivalent = @",";
+	[menu addItem:prefs];
 	[menu addItemWithTitle:NSLocalizedString(@"Quit", nil) action:@selector(terminate:) keyEquivalent:@"q"];
-	return menu;
 }
 
 /**
- Generate menu item with all its sub-menus. @c FeedConfig type is evaluated automatically.
-
- @param unread Pointer to an unread count. Will be incremented while traversing through sub-menus.
+ Helper method to generate a new @c NSMenuItem.
  */
-- (NSMenuItem*)generateMenuItem:(FeedConfig*)config unread:(int*)unread {
-	NSMenuItem *item = [NSMenuItem feedConfig:config];
-	int count = 0;
-	if (item.tag == ScopeFeed) {
-		count += [self setSubmenuForFeedScope:item config:config];
-	} else if (item.tag == ScopeGroup) {
-		[self setSubmenuForGroupScope:item config:config unread:&count];
-	} else { // Separator item
-		return item;
-	}
-	*unread += count;
-	[item markReadAndUpdateTitle:-count];
-	[self updateMenuHeaderEnabled:item.submenu hasUnread:(count > 0)];
-	return item;
-}
-
-/**
- Set subitems for a @c FeedConfig group item. Namely various @c FeedConfig and @c FeedItem items.
-
- @param item The item where the menu will be appended.
- @param config A @c FeedConfig group item.
- @param unread Pointer to an unread count. Will be incremented while traversing through sub-menus.
- */
-- (void)setSubmenuForGroupScope:(NSMenuItem*)item config:(FeedConfig*)config unread:(int*)unread {
-	item.submenu = [self defaultHeaderForMenu:nil scope:ScopeGroup];
-	for (FeedConfig *obj in config.sortedChildren) {
-		[item.submenu addItem: [self generateMenuItem:obj unread:unread]];
-	}
-}
-
-/**
- Set subitems for a @c FeedConfig feed item. Namely its @c FeedItem items.
-
- @param item The item where the menu will be appended.
- @param config For which item the menu should be generated. Attribute @c feed should be populated.
- @return Unread count for feed.
- */
-- (int)setSubmenuForFeedScope:(NSMenuItem*)item config:(FeedConfig*)config {
-	item.submenu = [self defaultHeaderForMenu:nil scope:ScopeFeed];
-	int count = 0;
-	for (FeedItem *obj in config.feed.items) {
-		if (obj.unread) ++count;
-		[item.submenu addItem:[[NSMenuItem feedItem:obj] setAction:@selector(openFeedURL:) target:self]];
-	}
-	[item setAction:@selector(openFeedURL:) target:self];
-	return count;
-}
-
-/**
- Helper function to insert a menu item with @c target @c = @c self
- */
-- (NSMenuItem*)addTitle:(NSString*)title selector:(SEL)selector toMenu:(NSMenu*)menu tag:(MenuItemTag)tag {
+- (NSMenuItem*)itemTitle:(NSString*)title selector:(SEL)selector tag:(MenuItemTag)tag {
 	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:title action:selector keyEquivalent:@""];
 	item.target = self;
 	item.tag = tag;
 	[item applyUserSettingsDisplay];
-	[menu addItem:item];
 	return item;
 }
 
 
-#pragma mark - Default Menu Header Items
-
-
-/**
- Append header items to menu accoring to user preferences.
- 
- @note If @c menu is @c nil a new menu is created and returned.
- @param menu The menu where the items should be appended.
- @param scope Tag will be concatenated with that scope (Global, Group or Local).
- @return Will return the menu item provided or create a new one if menu was @c nil.
- */
-- (NSMenu*)defaultHeaderForMenu:(NSMenu*)menu scope:(MenuItemTag)scope {
-	if (!menu) {
-		menu = [NSMenu new];
-		menu.autoenablesItems = NO;
-	}
-	
-	NSMenuItem *item = [self addTitle:NSLocalizedString(@"Open all unread", nil) selector:@selector(openAllUnread:) toMenu:menu tag:TagOpenAllUnread | scope];
-	[menu addItem:[item alternateWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Open a few unread (%d)", nil), 3]]];
-	[self addTitle:NSLocalizedString(@"Mark all read", nil) selector:@selector(markAllRead:) toMenu:menu tag:TagMarkAllRead | scope];
-	[self addTitle:NSLocalizedString(@"Mark all unread", nil) selector:@selector(markAllUnread:) toMenu:menu tag:TagMarkAllUnread | scope];
-	
-	[menu addItem:[NSMenuItem separatorItem]];
-	return menu;
-}
-
-- (void)setItemUpdateAllHidden:(BOOL)hidden {
-	[self.barItem.menu itemWithTag:TagUpdateFeed].hidden = hidden;
-}
-
-- (void)updateMenuHeaders:(BOOL)recursive {
-	[self updateMenuHeaderHidden:self.barItem.menu recursive:recursive];
-}
-
-- (void)updateMenuHeaderHidden:(NSMenu*)menu recursive:(BOOL)flag {
-	for (NSMenuItem *item in menu.itemArray) {
-		[item applyUserSettingsDisplay];
-		if (flag && item.hasSubmenu) {
-			[self updateMenuHeaderHidden:item.submenu recursive:YES];
-		}
-	}
-}
-
-- (void)updateMenuHeaderEnabled:(NSMenu*)menu hasUnread:(BOOL)flag {
-	int stopAfter = 4; // 3 (+1 alternate)
-	for (NSMenuItem *item in menu.itemArray) {
-		switch (item.tag & TagMaskType) {
-			case TagMarkAllRead:   item.enabled = flag; break;
-			case TagMarkAllUnread: item.enabled = !flag; break;
-			case TagOpenAllUnread: item.enabled = flag; break;
-			default: continue; // wrong tag, ignore
-		}
-		--stopAfter;
-		if (stopAfter < 0)
-			break; // break early after all header items have been processed
-	}
-}
-
-
-#pragma mark - Menu Actions
+#pragma mark - Menu Actions -
 
 
 /**
@@ -297,117 +331,100 @@
 	[self.prefWindow showWindow:nil];
 }
 
+/**
+ Callback method after user closes the preferences window.
+ */
 - (void)preferencesClosed:(id)sender {
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:self.prefWindow.window];
 	self.prefWindow = nil;
 }
 
-
+/**
+ Called when user clicks on 'Pause Updates' in the main menu (only).
+ */
 - (void)pauseUpdates:(NSMenuItem*)sender {
 	NSLog(@"1pause");
 }
 
+/**
+ Called when user clicks on 'Update all feeds' in the main menu (only).
+ */
 - (void)updateAllFeeds:(NSMenuItem*)sender {
 	// TODO: Disable 'update all' menu item during update?
 	[FeedDownload scheduleNextUpdate:YES];
 }
 
 /**
- Combined selector for menu action.
- 
- @note @c sender.tag includes @c ScopeLocal, @c ScopeGroup @b or @c ScopeGlobal.
- @param sender @c NSMenuItem that was clicked during the action (e.g., "open all unread")
+ Called when user clicks on 'Open all unread' or 'Open a few unread ...' on any scope level.
  */
 - (void)openAllUnread:(NSMenuItem*)sender {
-	int maxItemCount = INT_MAX;
+	NSMutableArray<NSURL*> *urls = [NSMutableArray<NSURL*> array];
+	__block int maxItemCount = INT_MAX;
 	if (sender.isAlternate)
 		maxItemCount = 3; // TODO: read from preferences
 	
-	__block int stopAfter = maxItemCount;
-	NSMutableArray<NSURL*> *urls = [NSMutableArray<NSURL*> array];
-	[self siblingsDescendantFeedConfigs:sender block:^BOOL(FeedConfig *parent, FeedItem *item) {
-		if (stopAfter <= 0)
-			return NO; // stop further processing
-		if (item.unread && item.link.length > 0) {
-			[urls addObject:[NSURL URLWithString:item.link]];
-			item.unread = NO;
-			--stopAfter;
+	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
+	[sender iterateSorted:YES inContext:moc overDescendentFeeds:^(Feed *feed, BOOL *cancel) {
+		int itemSum = 0;
+		for (FeedItem *i in feed.items) {
+			if (itemSum >= maxItemCount) {
+				break;
+			}
+			if (i.unread && i.link.length > 0) {
+				[urls addObject:[NSURL URLWithString:i.link]];
+				i.unread = NO;
+				++itemSum;
+			}
 		}
-		return YES;
+		if (itemSum > 0) {
+			[feed.config markUnread:-itemSum ancestorsOnly:NO];
+			maxItemCount -= itemSum;
+		}
+		*cancel = (maxItemCount <= 0);
 	}];
-	stopAfter = maxItemCount;
-	int total = [sender siblingsDescendantItemInfo:^int(NSMenuItem *item, int count) {
-		if (item.tag & ScopeFeed) {
-			if (stopAfter <= 0) return -1;
-			--stopAfter;
-		}
-		[item markReadAndUpdateTitle:count];
-		return count;
-	} unreadEntriesOnly:YES];
-	[self updateAcestors:sender markRead:total];
 	[self openURLsWithPreferredBrowser:urls];
+	[StoreCoordinator saveContext:moc andParent:YES];
+	[moc reset];
 }
 
 /**
- Combined selector for menu action.
- 
- @note @c sender.tag includes @c ScopeLocal, @c ScopeGroup @b or @c ScopeGlobal.
- @param sender @c NSMenuItem that was clicked during the action (e.g., "mark all read")
+ Called when user clicks on 'Mark all read' @b or 'Mark all unread' on any scope level.
  */
-- (void)markAllRead:(NSMenuItem*)sender {
-	[self siblingsDescendantFeedConfigs:sender block:^BOOL(FeedConfig *parent, FeedItem *item) {
-		if (item.unread)
-			item.unread = NO;
-		return YES;
+- (void)markAllReadOrUnread:(NSMenuItem*)sender {
+	BOOL markRead = ((sender.tag & TagMaskType) == TagMarkAllRead);
+	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
+	[sender iterateSorted:NO inContext:moc overDescendentFeeds:^(Feed *feed, BOOL *cancel) {
+		if (markRead) [feed markAllItemsRead];
+		else          [feed markAllItemsUnread];
 	}];
-	int total = [sender siblingsDescendantItemInfo:^int(NSMenuItem *item, int count) {
-		[item markReadAndUpdateTitle:count];
-		return count;
-	} unreadEntriesOnly:YES];
-	[self updateAcestors:sender markRead:total];
+	[StoreCoordinator saveContext:moc andParent:YES];
+	[moc reset];
 }
 
 /**
- Combined selector for menu action.
- 
- @note @c sender.tag includes @c ScopeLocal, @c ScopeGroup @b or @c ScopeGlobal.
- @param sender @c NSMenuItem that was clicked during the action (e.g., "mark all unread")
- */
-- (void)markAllUnread:(NSMenuItem*)sender {
-	[self siblingsDescendantFeedConfigs:sender block:^BOOL(FeedConfig *parent, FeedItem *item) {
-		if (item.unread == NO)
-			item.unread = YES;
-		return YES;
-	}];
-	int total = [sender siblingsDescendantItemInfo:^int(NSMenuItem *item, int count) {
-		if (count > item.unreadCount)
-			[item markReadAndUpdateTitle:(item.unreadCount - count)];
-		return count;
-	} unreadEntriesOnly:NO];
-	[self updateAcestors:sender markRead:([self getAncestorUnreadCount:sender] - total)];
-}
+ Called when user clicks on a single feed item or the feed group.
 
-/**
- Called when user clicks on a single feed item or the superior feed.
-
- @param sender A menu item containing either a @c FeedItem or a @c FeedConfig.
+ @param sender A menu item containing either a @c FeedItem or a @c FeedConfig objectID.
  */
 - (void)openFeedURL:(NSMenuItem*)sender {
-	if (!sender.hasReaderInfo)
+	NSManagedObjectID *oid = sender.representedObject;
+	if (!oid)
 		return;
 	NSString *url = nil;
-	id obj = [sender requestCoreDataObject];
+	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
+	id obj = [moc objectWithID:oid];
 	if ([obj isKindOfClass:[FeedConfig class]]) {
 		url = [[(FeedConfig*)obj feed] link];
 	} else if ([obj isKindOfClass:[FeedItem class]]) {
 		FeedItem *feed = obj;
 		url = [feed link];
-		if ([sender hasUnread]) {
+		if (feed.unread) {
 			feed.unread = NO;
-			[sender markReadAndUpdateTitle:1];
-			[self updateAcestors:sender markRead:1];
+			[feed.feed.config markUnread:-1 ancestorsOnly:NO];
+			[StoreCoordinator saveContext:moc andParent:YES];
 		}
 	}
+	[moc reset];
 	if (!url || url.length == 0) return;
 	[self openURLsWithPreferredBrowser:@[[NSURL URLWithString:url]]];
 }
@@ -420,60 +437,6 @@
 - (void)openURLsWithPreferredBrowser:(NSArray<NSURL*>*)urls {
 	if (urls.count == 0) return;
 	[[NSWorkspace sharedWorkspace] openURLs:urls withAppBundleIdentifier:[UserPrefs getHttpApplication] options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
-}
-
-
-#pragma mark - Iterating over items and propagating unread count
-
-
-/**
- Iterate over all feed items from siblings and contained children.
-
- @param sender @c NSMenuItem that was clicked during the action (e.g., "open all unread")
- @param block Iterate over all FeedItems on the deepest layer.
- */
-- (void)siblingsDescendantFeedConfigs:(NSMenuItem*)sender block:(FeedConfigRecursiveItemsBlock)block {
-	if (sender.parentItem) {
-		FeedConfig *obj = [sender.parentItem requestCoreDataObject];
-		if ([obj isKindOfClass:[FeedConfig class]]) // important: this could be a FeedItem
-			[obj descendantFeedItems:block];
-	} else {
-		// Sadly we can't just fetch the list of FeedItems since it is not ordered (in case open 10 at a time)
-		@autoreleasepool {
-			for (FeedConfig *config in [StoreCoordinator sortedFeedConfigItems]) {
-				if ([config descendantFeedItems:block] == NO)
-					break;
-			}
-		}
-	}
-}
-
-/**
- Recursively update all parent's unread count and total unread count.
-
- @param sender Current menu item, parent will be called recursively on this element.
- @param count The amount by which the unread count is adjusted. If negative, items will be marked as unread.
- */
-- (void)updateAcestors:(NSMenuItem*)sender markRead:(int)count {
-	[sender markAncestorsRead:count];
-	self.unreadCountTotal -= count;
-	if (self.unreadCountTotal < 0) {
-		NSLog(@"Should never happen. Global unread count < 0");
-		self.unreadCountTotal = 0;
-	}
-	[self updateBarIcon];
-}
-
-/**
- Get unread count from the parent menu item. If there is none, get the total unread count
-
- @param sender Current menu item, parent will be called on this element.
- @return Unread count for parent element (total count if parent is @c nil)
- */
-- (int)getAncestorUnreadCount:(NSMenuItem*)sender {
-	if ([sender.parentItem hasReaderInfo])
-		return [sender.parentItem unreadCount];
-	return self.unreadCountTotal;
 }
 
 @end

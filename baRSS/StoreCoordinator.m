@@ -26,11 +26,19 @@
 
 @implementation StoreCoordinator
 
-+ (NSManagedObjectContext*)getContext {
++ (NSManagedObjectContext*)getMainContext {
 	return [(AppHook*)NSApp persistentContainer].viewContext;
 }
 
-+ (void)saveContext:(NSManagedObjectContext*)context {
++ (NSManagedObjectContext*)createChildContext {
+	NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+	[context setParentContext:[self getMainContext]];
+	context.undoManager = nil;
+	//context.automaticallyMergesChangesFromParent = YES;
+	return context;
+}
+
++ (void)saveContext:(NSManagedObjectContext*)context andParent:(BOOL)flag {
 	// Performs the save action for the application, which is to send the save: message to the application's managed object context. Any encountered errors are presented to the user.
 	if (![context commitEditing]) {
 		NSLog(@"%@:%@ unable to commit editing before saving", [self class], NSStringFromSelector(_cmd));
@@ -40,31 +48,22 @@
 		// Customize this code block to include application-specific recovery steps.
 		[[NSApplication sharedApplication] presentError:error];
 	}
+	if (flag && context.parentContext) {
+		[self saveContext:context.parentContext andParent:flag];
+	}
 }
 
-+ (void)deleteUnreferencedFeeds {
-	NSManagedObjectContext *moc = [self getContext];
-	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName:Feed.entity.name];
-	fr.predicate = [NSPredicate predicateWithFormat:@"config = NULL"];
-	NSBatchDeleteRequest *bdr = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fr];
-	NSError *err;
-	[moc executeRequest:bdr error:&err];
-	if (err) NSLog(@"%@", err);
-}
-
-+ (NSArray<FeedConfig*>*)sortedFeedConfigItems {
-	NSManagedObjectContext *moc = [self getContext];
++ (NSArray<FeedConfig*>*)sortedFeedConfigItemsInContext:(NSManagedObjectContext*)context {
 	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: FeedConfig.entity.name];
 	fr.predicate = [NSPredicate predicateWithFormat:@"parent = NULL"]; // %@", parent
 	fr.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]];
 	NSError *err;
-	NSArray *result = [moc executeFetchRequest:fr error:&err];
+	NSArray *result = [context executeFetchRequest:fr error:&err];
 	if (err) NSLog(@"%@", err);
 	return result;
 }
 
-+ (NSArray<FeedConfig*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll {
-	NSManagedObjectContext *moc = [self getContext];
++ (NSArray<FeedConfig*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc {
 	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: FeedConfig.entity.name];
 	if (!forceAll) {
 		fr.predicate = [NSPredicate predicateWithFormat:@"type = %d AND scheduled <= %@", FEED, [NSDate date]];
@@ -78,7 +77,10 @@
 }
 
 + (NSDate*)nextScheduledUpdate {
-	NSExpression *exp = [NSExpression expressionForFunction:@"min:" arguments:@[[NSExpression expressionForKeyPath:@"scheduled"]]];
+	// Always get context first, or 'FeedConfig.entity.name' may not be available on app start
+	NSManagedObjectContext *moc = [self getMainContext];
+	NSExpression *exp = [NSExpression expressionForFunction:@"min:"
+												  arguments:@[[NSExpression expressionForKeyPath:@"scheduled"]]];
 	NSExpressionDescription *expDesc = [[NSExpressionDescription alloc] init];
 	[expDesc setName:@"earliestDate"];
 	[expDesc setExpression:exp];
@@ -90,65 +92,79 @@
 	[fr setPropertiesToFetch:@[expDesc]];
 	
 	NSError *err;
-	NSArray *fetchResults = [[self getContext] executeFetchRequest:fr error:&err];
+	NSArray *fetchResults = [moc executeFetchRequest:fr error:&err];
 	if (err) NSLog(@"%@", err);
-	return [fetchResults firstObject][@"earliestDate"]; // can be nil
+	return fetchResults.firstObject[@"earliestDate"]; // can be nil
 }
 
-+ (id)objectWithID:(NSManagedObjectID*)objID {
-	return [[self getContext] objectWithID:objID];
++ (int)totalNumberOfUnreadFeeds {
+	// Always get context first, or 'FeedConfig.entity.name' may not be available on app start
+	NSManagedObjectContext *moc = [self getMainContext];
+	NSExpression *exp = [NSExpression expressionForFunction:@"sum:"
+												  arguments:@[[NSExpression expressionForKeyPath:@"unreadCount"]]];
+	NSExpressionDescription *expDesc = [[NSExpressionDescription alloc] init];
+	[expDesc setName:@"totalUnread"];
+	[expDesc setExpression:exp];
+	[expDesc setExpressionResultType:NSInteger32AttributeType];
+	
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: FeedConfig.entity.name];
+	fr.predicate = [NSPredicate predicateWithFormat:@"type = %d", FEED];
+	[fr setResultType:NSDictionaryResultType];
+	[fr setPropertiesToFetch:@[expDesc]];
+	
+	NSError *err;
+	NSArray *fetchResults = [moc executeFetchRequest:fr error:&err];
+	if (err) NSLog(@"%@", err);
+	return [fetchResults.firstObject[@"totalUnread"] intValue];
 }
 
+//+ (void)addToSortIndex:(int)num start:(int)index parent:(FeedConfig*)config inContext:(NSManagedObjectContext*)moc {
+//	NSBatchUpdateRequest *ur = [[NSBatchUpdateRequest alloc] initWithEntityName: FeedConfig.entity.name];
+//	ur.predicate = [NSPredicate predicateWithFormat:@"parent = %@ AND sortIndex >= %d", config, index];
+//	ur.propertiesToUpdate = @{@"sortIndex": [NSExpression expressionWithFormat: @"sortIndex + %d", num]};
+//	ur.resultType = NSUpdatedObjectsCountResultType;//NSUpdatedObjectIDsResultType;//NSStatusOnlyResultType;
+//	NSError *err;
+//	NSBatchUpdateResult *result = [moc executeRequest:ur error:&err];
+//	if (err) NSLog(@"%@", err);
+//	NSLog(@"Result: %@", result.result);
+//	//[NSManagedObjectContext mergeChangesFromRemoteContextSave:@{NSUpdatedObjectsKey : result.result} intoContexts:@[moc]];
+//}
 
-+ (void)overwriteConfig:(FeedConfig*)config withFeed:(RSParsedFeed*)obj {
-	NSArray<NSString*> *readURLs = [self alreadyReadURLsInFeed:config.feed];
-	[config.managedObjectContext performBlockAndWait:^{
-		if (config.feed)
-			[config.managedObjectContext deleteObject:(NSManagedObject*)config.feed];
-		if (obj) {
-			config.feed = [StoreCoordinator createFeedFrom:obj inContext:config.managedObjectContext alreadyRead:readURLs];
+#pragma mark - Restore Sound State -
+
++ (void)deleteUnreferencedFeeds {
+	NSManagedObjectContext *moc = [self getMainContext];
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName:Feed.entity.name];
+	fr.predicate = [NSPredicate predicateWithFormat:@"config = NULL"];
+	NSBatchDeleteRequest *bdr = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fr];
+	NSError *err;
+	[moc executeRequest:bdr error:&err];
+	if (err) NSLog(@"%@", err);
+}
+
++ (void)restoreUnreadCount {
+	NSManagedObjectContext *moc = [self getMainContext];
+	NSError *err;
+	NSArray *confs = [moc executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName: FeedConfig.entity.name] error:&err];
+	if (err) NSLog(@"%@", err);
+	NSArray *feeds = [moc executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName: Feed.entity.name] error:&err];
+	if (err) NSLog(@"%@", err);
+	[moc performBlock:^{
+		for (FeedConfig *conf in confs) {
+			conf.unreadCount = 0;
+		}
+		for (Feed *feed in feeds) {
+			int count = 0;
+			for (FeedItem *item in feed.items) {
+				if (item.unread) ++count;
+			}
+			FeedConfig *parent = feed.config;
+			while (parent) {
+				parent.unreadCount += count;
+				parent = parent.parent;
+			}
 		}
 	}];
-}
-
-#pragma mark - Helper methods -
-
-+ (FeedItem*)createFeedItemFrom:(RSParsedArticle*)entry inContext:(NSManagedObjectContext*)context {
-	FeedItem *b = [[FeedItem alloc] initWithEntity:FeedItem.entity insertIntoManagedObjectContext:context];
-	b.guid = entry.guid;
-	b.title = entry.title;
-	b.abstract = entry.abstract;
-	b.body = entry.body;
-	b.author = entry.author;
-	b.link = entry.link;
-	b.published = entry.datePublished;
-	return b;
-}
-
-+ (Feed*)createFeedFrom:(RSParsedFeed*)obj inContext:(NSManagedObjectContext*)context alreadyRead:(NSArray<NSString*>*)urls {
-	Feed *a = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:context];
-	a.title = obj.title;
-	a.subtitle = obj.subtitle;
-	a.link = obj.link;
-	for (RSParsedArticle *article in obj.articles) {
-		FeedItem *b = [self createFeedItemFrom:article inContext:context];
-		if ([urls containsObject:b.link]) {
-			b.unread = NO;
-		}
-		[a addItemsObject:b];
-	}
-	return a;
-}
-
-+ (NSArray<NSString*>*)alreadyReadURLsInFeed:(Feed*)local {
-	if (!local || !local.items) return nil;
-	NSMutableArray<NSString*> *mArr = [NSMutableArray arrayWithCapacity:local.items.count];
-	for (FeedItem *f in local.items) {
-		if (!f.unread) {
-			[mArr addObject:f.link];
-		}
-	}
-	return mArr;
 }
 
 @end

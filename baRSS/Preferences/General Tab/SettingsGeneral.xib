@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.18"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -45,7 +45,6 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="changeMenuItemUpdateAll:" target="-2" id="Zb8-Oi-JVr"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalUpdateAll" id="FrQ-u0-lFo">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -62,7 +61,6 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="changeMenuHeaderSetting:" target="-2" id="Tte-Vw-oMq"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalOpenUnread" id="c20-0p-cPb">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -79,7 +77,6 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="changeMenuHeaderSetting:" target="-2" id="zRA-Ht-Qj1"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.groupOpenUnread" id="mCn-aE-DwT">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -96,7 +93,6 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="changeMenuHeaderSetting:" target="-2" id="4sR-3H-A6H"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.feedOpenUnread" id="Qyh-BN-P74">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -113,7 +109,6 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="changeMenuHeaderSetting:" target="-2" id="gcu-x5-gUa"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalMarkRead" id="uiO-3M-xfT">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -130,7 +125,6 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="changeMenuHeaderSetting:" target="-2" id="rTt-3J-rkn"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.groupMarkRead" id="YLZ-t8-Jbk">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -147,7 +141,6 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="changeMenuHeaderSetting:" target="-2" id="2cM-mG-Lnw"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.feedMarkRead" id="mYj-26-0OV">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -164,7 +157,6 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="changeMenuHeaderSetting:" target="-2" id="anc-id-9sf"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.globalMarkUnread" id="drp-87-kfY">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -181,7 +173,6 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="changeMenuHeaderSetting:" target="-2" id="98j-A6-A2m"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.groupMarkUnread" id="bJP-0I-l7t">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -198,7 +189,6 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="changeMenuHeaderSetting:" target="-2" id="Muv-3Y-LU0"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.feedMarkUnread" id="mRu-7M-3bu">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -232,7 +222,6 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="checkmarkClicked:" target="-2" id="PUq-gk-16h"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.groupUnreadCount" id="Mg5-xJ-L3n">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -249,7 +238,6 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="checkmarkClicked:" target="-2" id="dfY-Sm-GHz"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.feedUnreadCount" id="hnm-Q2-kbs">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -266,7 +254,6 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="checkmarkClicked:" target="-2" id="hzW-x5-kBO"/>
                         <binding destination="iU7-KA-nY5" name="value" keyPath="values.feedTickMark" id="xKL-Lh-tBL">
                             <dictionary key="options">
                                 <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
@@ -446,6 +433,17 @@
                         <action selector="changeDefaultRSSReader:" target="-2" id="ul1-1K-oJb"/>
                     </connections>
                 </popUpButton>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QwE-M7-q2R">
+                    <rect key="frame" x="206" y="279" width="100" height="32"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <buttonCell key="cell" type="push" title="Fix Cache" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ady-2s-Ggm">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="fixCache:" target="-2" id="gbM-hA-UVF"/>
+                    </connections>
+                </button>
             </subviews>
             <point key="canvasLocation" x="140" y="-155.5"/>
         </customView>

@@ -109,22 +109,13 @@
 		item.refreshUnit = (int16_t)self.refreshUnit.indexOfSelectedItem;
 	
 	if (self.shouldDeletePrevArticles) {
-		[StoreCoordinator overwriteConfig:item withFeed:self.feedResult];
-		[item.managedObjectContext performBlockAndWait:^{
-			// TODO: move to separate function and add icon download
-			if (!item.meta) {
-				item.meta = [[FeedMeta alloc] initWithEntity:FeedMeta.entity insertIntoManagedObjectContext:item.managedObjectContext];
-			}
-			item.meta.httpEtag = self.httpEtag;
-			item.meta.httpModified = self.httpDate;
-		}];
+		[item updateRSSFeed:self.feedResult];
+		[item setEtag:self.httpEtag modified:self.httpDate];
 	}
 	if ([item.managedObjectContext hasChanges]) {
 		self.objectIsModified = YES;
 		[item calculateAndSetScheduled];
-		[item.managedObjectContext performBlockAndWait:^{
-			[item.managedObjectContext refreshObject:item mergeChanges:YES];
-		}];
+		[item.managedObjectContext refreshObject:item mergeChanges:YES];
 	}
 }
 
@@ -222,9 +213,7 @@
 		NSString *name = ((NSTextField*)self.view).stringValue;
 		if (![item.name isEqualToString: name]) {
 			item.name = name;
-			[item.managedObjectContext performBlockAndWait:^{
-				[item.managedObjectContext refreshObject:item mergeChanges:YES];
-			}];
+			[item.managedObjectContext refreshObject:item mergeChanges:YES];
 			[self.delegate modalDidUpdateFeedConfig:item];
 		}
 	}

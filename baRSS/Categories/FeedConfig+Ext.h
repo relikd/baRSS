@@ -22,7 +22,7 @@
 
 #import "FeedConfig+CoreDataClass.h"
 
-@class FeedItem;
+@class FeedItem, RSParsedFeed;
 
 @interface FeedConfig (Ext)
 /// Enum type to distinguish different @c FeedConfig types
@@ -31,22 +31,18 @@ typedef enum int16_t {
 	FEED = 1,
 	SEPARATOR = 2
 } FeedConfigType;
-/**
- Iteration block for descendants of @c FeedItem.
-
- @param parent The parent @c FeedConfig where this @c FeedItem belongs to.
- @param item Currently processed @c FeedItem.
- @return Return @c YES to continue processing. Return @c NO to stop processing and exit early.
- */
-typedef BOOL (^FeedConfigRecursiveItemsBlock) (FeedConfig *parent, FeedItem *item);
 
 @property (getter=typ, setter=setTyp:) FeedConfigType typ;
-@property (readonly) NSArray<FeedConfig*> *sortedChildren;
-@property (readonly) NSIndexPath *indexPath;
 
-- (BOOL)descendantFeedItems:(FeedConfigRecursiveItemsBlock)block;
+- (NSArray<FeedConfig*>*)sortedChildren;
+- (NSIndexPath*)indexPath;
+- (void)markUnread:(int)count ancestorsOnly:(BOOL)flag;
 - (void)calculateAndSetScheduled;
-- (void)mergeChangesAndSave;
+- (BOOL)iterateSorted:(BOOL)ordered overDescendantFeeds:(void(^)(Feed*,BOOL*))block;
+
+- (void)setEtag:(NSString*)etag modified:(NSString*)modified;
+- (void)updateRSSFeed:(RSParsedFeed*)obj;
+
 - (NSString*)readableRefreshString;
 - (NSString*)readableDescription;
 @end

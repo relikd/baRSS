@@ -21,7 +21,9 @@
 //  SOFTWARE.
 
 #import "FeedConfig+Ext.h"
-#import "Feed+CoreDataClass.h"
+#import "Feed+Ext.h"
+#import "FeedMeta+CoreDataClass.h"
+#import "Constants.h"
 
 @implementation FeedConfig (Ext)
 /// Enum tpye getter see @c FeedConfigType
@@ -34,37 +36,34 @@
 
  @return Sorted array of @c FeedConfig items.
  */
-- (NSArray<FeedConfig *> *)sortedChildren {
+- (NSArray<FeedConfig*>*)sortedChildren {
 	if (self.children.count == 0)
 		return nil;
 	return [self.children sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];
 }
 
-- (NSIndexPath *)indexPath {
+/// IndexPath for sorted children starting with root index.
+- (NSIndexPath*)indexPath {
 	if (self.parent == nil)
 		return [NSIndexPath indexPathWithIndex:(NSUInteger)self.sortIndex];
-	return [self.parent.indexPath indexPathByAddingIndex:(NSUInteger)self.sortIndex];
+	return [[self.parent indexPath] indexPathByAddingIndex:(NSUInteger)self.sortIndex];
 }
 
 /**
- Iterate over all descendant @c FeedItems in sub groups
- 
- @param block Will yield the current parent config and feed item. Return @c NO to cancel iteration.
- @return Returns @c NO if the iteration was canceled early. Otherwise @c YES.
+ Change unread counter for all parents recursively. Result will never be negative.
+
+ @param count If negative, mark items read.
  */
-- (BOOL)descendantFeedItems:(FeedConfigRecursiveItemsBlock)block {
-	if (self.children.count > 0) {
-		for (FeedConfig *config in self.sortedChildren) {
-			if ([config descendantFeedItems:block] == NO)
-				return NO;
-		}
-	} else if (self.feed.items.count > 0) {
-		for (FeedItem* item in self.feed.items) {
-			if (block(self, item) == NO)
-				return NO;
-		}
+- (void)markUnread:(int)count ancestorsOnly:(BOOL)flag {
+	FeedConfig *par = (flag ? self.parent : self);
+	while (par) {
+		[self.managedObjectContext refreshObject:par mergeChanges:YES];
+		par.unreadCount += count;
+		NSAssert(par.unreadCount >= 0, @"ERROR ancestorsMarkUnread: Count should never be negative.");
+		par = par.parent;
 	}
-	return YES;
+	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged
+														object:[NSNumber numberWithInt:count]];
 }
 
 /// @return Time interval respecting the selected unit. E.g., returns @c 180 for @c '3m'
@@ -78,13 +77,45 @@
 	self.scheduled = [[NSDate date] dateByAddingTimeInterval:[self timeInterval]];
 }
 
-/// Update item with @c mergeChanges:YES and save the context
-- (void)mergeChangesAndSave {
-	[self.managedObjectContext performBlockAndWait:^{
-		[self.managedObjectContext refreshObject:self mergeChanges:YES];
-		[self.managedObjectContext save:nil];
-	}];
+/// Update FeedMeta or create new one if needed.
+- (void)setEtag:(NSString*)etag modified:(NSString*)modified {
+	// TODO: move to separate function and add icon download
+	if (!self.meta) {
+		self.meta = [[FeedMeta alloc] initWithEntity:FeedMeta.entity insertIntoManagedObjectContext:self.managedObjectContext];
+	}
+	self.meta.httpEtag = etag;
+	self.meta.httpModified = modified;
 }
+
+/// Delete any existing feed object and parse new one. Read state will be copied.
+- (void)updateRSSFeed:(RSParsedFeed*)obj {
+	NSArray<NSString*> *readURLs = [self.feed alreadyReadURLs];
+	int unreadBefore = self.unreadCount;
+	int unreadAfter = 0;
+	if (self.feed)
+		[self.managedObjectContext deleteObject:(NSManagedObject*)self.feed];
+	if (obj) {
+		// TODO: update and dont re-create each time
+		self.feed = [Feed feedFromRSS:obj inContext:self.managedObjectContext alreadyRead:readURLs unread:&unreadAfter];
+	}
+	[self markUnread:(unreadAfter - unreadBefore) ancestorsOnly:NO];
+}
+
+- (BOOL)iterateSorted:(BOOL)ordered overDescendantFeeds:(void(^)(Feed*,BOOL*))block  {
+	if (self.feed) {
+		BOOL stopEarly = NO;
+		block(self.feed, &stopEarly);
+		if (stopEarly) return NO;
+	} else {
+		for (FeedConfig *fc in (ordered ? [self sortedChildren] : self.children)) {
+			if (![fc iterateSorted:ordered overDescendantFeeds:block])
+				return NO;
+		}
+	}
+	return YES;
+}
+
+#pragma mark - Printing -
 
 /// @return Formatted string for update interval ( e.g., @c 30m or @c 12h )
 - (NSString*)readableRefreshString {
