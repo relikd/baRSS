@@ -21,7 +21,6 @@
 //  SOFTWARE.
 
 #import "SettingsFeeds.h"
-#import "AppHook.h"
 #import "BarMenu.h"
 #import "ModalSheet.h"
 #import "ModalFeedEdit.h"
@@ -47,27 +46,16 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[self.outlineView registerForDraggedTypes:[NSArray arrayWithObject:dragNodeType]];
 	[self.dataStore setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];
 	
-	NSManagedObjectContext *childContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
-	[childContext setParentContext:[(AppHook*)NSApp persistentContainer].viewContext];
-//	childContext.automaticallyMergesChangesFromParent = YES;
-	NSUndoManager *um = [[NSUndoManager alloc] init];
-	um.groupsByEvent = NO;
-	um.levelsOfUndo = 30;
-	childContext.undoManager = um;
+	self.undoManager = [[NSUndoManager alloc] init];
+	self.undoManager.groupsByEvent = NO;
+	self.undoManager.levelsOfUndo = 30;
 	
-	self.dataStore.managedObjectContext = childContext;
-	self.undoManager = self.dataStore.managedObjectContext.undoManager;
+	self.dataStore.managedObjectContext = [StoreCoordinator createChildContext];
+	self.dataStore.managedObjectContext.undoManager = self.undoManager;
 }
 
-- (void)saveAndRebuildMenu {
-	[self.dataStore.managedObjectContext performBlock:^{
-		[StoreCoordinator saveContext:self.dataStore.managedObjectContext];
-		[[(AppHook*)NSApp barMenu] rebuildMenu]; // updating individual items was way to complicated ...
-		[self.dataStore.managedObjectContext.parentContext performBlock:^{
-			[StoreCoordinator saveContext:self.dataStore.managedObjectContext.parentContext];
-		}];
-
-	}];
+- (void)saveChanges {
+	[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
 }
 
 - (IBAction)addFeed:(id)sender {
@@ -84,7 +72,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	sp.name = @"---";
 	sp.typ = SEPARATOR;
 	[self.undoManager endUndoGrouping];
-	[self saveAndRebuildMenu];
+	[self saveChanges];
 }
 
 - (IBAction)remove:(id)sender {
@@ -93,7 +81,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		[self incrementIndicesBy:-1 forSubsequentNodes:path];
 	[self.dataStore remove:sender];
 	[self.undoManager endUndoGrouping];
-	[self saveAndRebuildMenu];
+	[self saveChanges];
 }
 
 - (IBAction)doubleClickOutlineView:(NSOutlineView*)sender {
@@ -139,7 +127,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 }
 
 - (void)modalDidUpdateFeedConfig:(FeedConfig*)config {
-	[self saveAndRebuildMenu];
+	[self saveChanges]; // TODO: adjust total count
 }
 
 - (FeedConfig*)insertSortedItemAtSelection {
@@ -178,7 +166,8 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		root = [root descendantNodeAtIndexPath:parentPath];
 	
 	for (NSUInteger i = [path indexAtPosition:path.length - 1]; i < root.childNodes.count; i++) {
-		((FeedConfig*)[root.childNodes[i] representedObject]).sortIndex += val;
+		FeedConfig *conf = [root.childNodes[i] representedObject];
+		conf.sortIndex += val;
 	}
 }
 
@@ -197,7 +186,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 - (void)outlineView:(NSOutlineView *)outlineView draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation {
 	[self.undoManager endUndoGrouping];
 	if (self.dataStore.managedObjectContext.hasChanges) {
-		[self saveAndRebuildMenu];
+		[self saveChanges];
 	} else {
 		[self.undoManager disableUndoRegistration];
 		[self.undoManager undoNestedGroup];
@@ -228,6 +217,11 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 			--updateIndex;
 		}
 	}
+	for (NSUInteger i = self.currentlyDraggedNodes.count; i > 0; i--) { // sorted that way to handle children first
+		FeedConfig *fc = [self.currentlyDraggedNodes[i - 1] representedObject];
+		[fc.managedObjectContext refreshObject:fc mergeChanges:YES]; // make sure unreadCount is correct
+		[fc markUnread:-fc.unreadCount ancestorsOnly:YES];
+	}
 	
 	// decrement sort indices at source
 	for (NSTreeNode *node in self.currentlyDraggedNodes)
@@ -243,6 +237,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	for (NSUInteger i = 0; i < self.currentlyDraggedNodes.count; i++) {
 		FeedConfig *fc = [self.currentlyDraggedNodes[i] representedObject];
 		fc.sortIndex = (int32_t)(updateIndex + i);
+		[fc markUnread:fc.unreadCount ancestorsOnly:YES];
 	}
 	return YES;
 }
@@ -322,14 +317,16 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (void)undo:(id)sender {
 	[self.undoManager undo];
+	[StoreCoordinator restoreUnreadCount];
+	[self saveChanges];
 	[self.dataStore rearrangeObjects]; // update ordering
-	[self saveAndRebuildMenu];
 }
 
 - (void)redo:(id)sender {
 	[self.undoManager redo];
+	[StoreCoordinator restoreUnreadCount];
+	[self saveChanges];
 	[self.dataStore rearrangeObjects]; // update ordering
-	[self saveAndRebuildMenu];
 }
 
 - (void)enterPressed:(id)sender {

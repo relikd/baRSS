@@ -20,21 +20,11 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Foundation/Foundation.h>
-#import "DBv1+CoreDataModel.h"
-#import "FeedConfig+Ext.h"
+#ifndef Constants_h
+#define Constants_h
 
-@class RSParsedFeed;
+static NSString *kNotificationFeedUpdated = @"baRSS-notification-feed-updated";
+static NSString *kNotificationNetworkStatusChanged = @"baRSS-notification-network-status-changed";
+static NSString *kNotificationTotalUnreadCountChanged = @"baRSS-notification-total-unread-count-changed";
 
-@interface StoreCoordinator : NSObject
-+ (NSManagedObjectContext*)getMainContext;
-+ (NSManagedObjectContext*)createChildContext;
-+ (void)saveContext:(NSManagedObjectContext*)context andParent:(BOOL)flag;
-+ (NSArray<FeedConfig*>*)sortedFeedConfigItemsInContext:(nonnull NSManagedObjectContext*)context;
-+ (NSArray<FeedConfig*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc;
-+ (NSDate*)nextScheduledUpdate;
-+ (int)totalNumberOfUnreadFeeds;
-// Restore sound state
-+ (void)deleteUnreferencedFeeds;
-+ (void)restoreUnreadCount;
-@end
+#endif /* Constants_h */

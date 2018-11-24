@@ -21,6 +21,7 @@
 //  SOFTWARE.
 
 #import "FeedDownload.h"
+#import "Constants.h"
 #import "StoreCoordinator.h"
 #import <SystemConfiguration/SystemConfiguration.h>
 
@@ -95,21 +96,25 @@ static BOOL _isReachable = NO;
 	BOOL forceAll = [timer.userInfo boolValue];
 	// TODO: check internet connection
 	// TODO: disable menu item 'update all' during update
-	NSArray<FeedConfig*> *list = [StoreCoordinator getListOfFeedsThatNeedUpdate:forceAll];
+	__block NSManagedObjectContext *childContext = [StoreCoordinator createChildContext];
+	NSArray<FeedConfig*> *list = [StoreCoordinator getListOfFeedsThatNeedUpdate:forceAll inContext:childContext];
 	if (list.count == 0) {
 		NSLog(@"ERROR: Something went wrong, timer fired too early.");
+		[childContext reset];
+		childContext = nil;
 		// thechnically should never happen, anyway we need to reset the timer
 		[self scheduleNextUpdate:NO]; // NO, since forceAll will get ALL items and shouldn't be 0
 		return; // nothing to do here
 	}
-	NSUndoManager *um = list.firstObject.managedObjectContext.undoManager;
-	[um beginUndoGrouping];
 	dispatch_group_t group = dispatch_group_create();
 	for (FeedConfig *c in list) {
 		[self downloadFeedForConfig:c group:group];
 	}
 	dispatch_group_notify(group, dispatch_get_main_queue(), ^{
-		[um endUndoGrouping];
+		[StoreCoordinator saveContext:childContext andParent:YES];
+		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedUpdated object:nil];
+		[childContext reset];
+		childContext = nil;
 		[self scheduleNextUpdate:NO]; // after forced update, continue regular cycle
 	});
 }
@@ -118,20 +123,21 @@ static BOOL _isReachable = NO;
 	if (!_isReachable) return;
 	dispatch_group_enter(group);
 	[[[NSURLSession sharedSession] dataTaskWithRequest:[self newRequest:config] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-		[config.managedObjectContext.undoManager beginUndoGrouping];
-		if (error) {
-			int16_t n = config.errorCount + 1;
-			config.errorCount = (n < 1 ? 1 : (n > 19 ? 19 : n)); // between: 2 sec and 6 days
-			NSTimeInterval retryWaitTime = pow(2, config.errorCount); // 2^n seconds
-			config.scheduled = [NSDate dateWithTimeIntervalSinceNow:retryWaitTime];
-			// TODO: remove logging
-			NSLog(@"Error loading: %@ (%d)", response.URL, config.errorCount);
-		} else {
-			config.errorCount = 0; // reset counter
-			[self downloadSuccessful:data forFeed:config response:(NSHTTPURLResponse*)response];
-		}
-		[config.managedObjectContext.undoManager endUndoGrouping];
-		dispatch_group_leave(group);
+		[config.managedObjectContext performBlock:^{
+			// core data block inside of url session block; otherwise config access will EXC_BAD_INSTRUCTION
+			if (error) {
+				int16_t n = config.errorCount + 1;
+				config.errorCount = (n < 1 ? 1 : (n > 19 ? 19 : n)); // between: 2 sec and 6 days
+				NSTimeInterval retryWaitTime = pow(2, config.errorCount); // 2^n seconds
+				config.scheduled = [NSDate dateWithTimeIntervalSinceNow:retryWaitTime];
+				// TODO: remove logging
+				NSLog(@"Error loading: %@ (%d)", response.URL, config.errorCount);
+			} else {
+				config.errorCount = 0; // reset counter
+				[self downloadSuccessful:data forFeed:config response:(NSHTTPURLResponse*)response];
+			}
+			dispatch_group_leave(group);
+		}];
 	}] resume];
 }
 
@@ -143,15 +149,16 @@ static BOOL _isReachable = NO;
 		if (parsed) {
 			// TODO: add support for media player?
 			// <enclosure url="https://url.mp3" length="63274022" type="audio/mpeg" />
-			[StoreCoordinator overwriteConfig:config withFeed:parsed];
+			[config updateRSSFeed:parsed];
 		}
 	}
-	config.meta.httpModified = [http allHeaderFields][@"Date"]; // @"Expires", @"Last-Modified"
-	config.meta.httpEtag = [http allHeaderFields][@"Etag"];
+	[config setEtag:[http allHeaderFields][@"Etag"] modified:[http allHeaderFields][@"Date"]]; // @"Expires", @"Last-Modified"
 	// Don't update redirected url since it happened in the background; User may not recognize url
 	[config calculateAndSetScheduled];
-	[config mergeChangesAndSave];
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"baRSS-notification-feed-updated" object:config];
+//	[config mergeChangesAndSave];
+//	[config.managedObjectContext performBlock:^{
+//		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedUpdated object:config.objectID];
+//	}];
 }
 
 
@@ -190,7 +197,7 @@ static void networkReachabilityCallback(SCNetworkReachabilityRef target, SCNetwo
 	if (_reachability == NULL)
 		return;
 	_isReachable = [FeedDownload hasConnectivity:flags];
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"baRSS-notification-network-status-change"
+	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationNetworkStatusChanged
 														object:[NSNumber numberWithBool:_isReachable]];
 	if (_isReachable)    {
 		NSLog(@"reachable");

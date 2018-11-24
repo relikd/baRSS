@@ -42,26 +42,14 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	TagMaskType = 0xFFF0,
 };
 
+@class FeedConfig, Feed, FeedItem;
 
-@interface NSMenuItem (Info)
-/**
- Iteration block for descendants of @c NSMenuItem.
- 
- @param count The number of sub-elements contained in that @c NSMenuItem. 1 for @c FeedItems at the deepest layer.
- Otherwise the number of (updated) descendants.
- @return Return how many elements are updated in this block execution. If none were changed return @c 0.
- If execution should be stopped early, return @c -1.
- */
-typedef int (^ReaderInfoRecursiveBlock) (NSMenuItem *item, int count);
+@interface NSMenuItem (Feed)
+- (NSMenuItem*)alternateWithTitle:(NSString*)title;
 
-- (BOOL)hasUnread;
-- (int)unreadCount;
-- (BOOL)hasReaderInfo;
-- (void)setReaderInfo:(NSManagedObjectID*)oid unread:(int)count;
-- (id)requestCoreDataObject;
+- (void)setFeedConfig:(FeedConfig*)config;
+- (void)setFeedItem:(FeedItem*)item;
+- (void)setTitleAndUnreadCount:(FeedConfig*)config;
+- (void)iterateSorted:(BOOL)ordered inContext:(NSManagedObjectContext*)moc overDescendentFeeds:(void(^)(Feed *feed, BOOL *cancel))block;
 - (void)applyUserSettingsDisplay;
-- (void)markReadAndUpdateTitle:(int)count;
-- (void)countInTitle:(BOOL)show;
-- (void)markAncestorsRead:(int)count;
-- (int)siblingsDescendantItemInfo:(ReaderInfoRecursiveBlock)block unreadEntriesOnly:(BOOL)flag;
 @end

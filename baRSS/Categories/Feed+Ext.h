@@ -20,14 +20,13 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
+#import "Feed+CoreDataClass.h"
 
-@class FeedConfig, FeedItem;
+@class RSParsedFeed;
 
-@interface NSMenuItem (Generate)
-+ (NSMenuItem*)feedConfig:(FeedConfig*)config;
-+ (NSMenuItem*)feedItem:(FeedItem*)item;
-- (NSMenuItem*)alternateWithTitle:(NSString*)title;
-
-- (NSMenuItem*)setAction:(nullable SEL)action target:(nullable id)target;
+@interface Feed (Ext)
++ (Feed*)feedFromRSS:(RSParsedFeed*)obj inContext:(NSManagedObjectContext*)context alreadyRead:(NSArray<NSString*>*)urls unread:(int*)unreadCount;
+- (NSArray<NSString*>*)alreadyReadURLs;
+- (void)markAllItemsRead;
+- (void)markAllItemsUnread;
 @end

@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		54195883218A061100581B79 /* Feed+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54195882218A061100581B79 /* Feed+Ext.m */; };
+		54195886218E1BDB00581B79 /* NSMenu+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54195885218E1BDB00581B79 /* NSMenu+Ext.m */; };
 		54209E942117325100F3B5EF /* DrawImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 54209E932117325100F3B5EF /* DrawImage.m */; };
-		543695D5214EFD9800DA979D /* NSMenuItem+Info.m in Sources */ = {isa = PBXBuildFile; fileRef = 543695D4214EFD9800DA979D /* NSMenuItem+Info.m */; };
-		543695D8214F1F2700DA979D /* NSMenuItem+Generate.m in Sources */ = {isa = PBXBuildFile; fileRef = 543695D7214F1F2700DA979D /* NSMenuItem+Generate.m */; };
+		543695D8214F1F2700DA979D /* NSMenuItem+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 543695D7214F1F2700DA979D /* NSMenuItem+Ext.m */; };
 		544B011A2114B41200386E5C /* ModalSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* ModalSheet.m */; };
 		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
 		544DCCB9212A2B4D002DBC46 /* RSXML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML.framework */; };
@@ -71,12 +72,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		54195881218A061100581B79 /* Feed+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Feed+Ext.h"; sourceTree = "<group>"; };
+		54195882218A061100581B79 /* Feed+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Feed+Ext.m"; sourceTree = "<group>"; };
+		54195884218E1BDB00581B79 /* NSMenu+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMenu+Ext.h"; sourceTree = "<group>"; };
+		54195885218E1BDB00581B79 /* NSMenu+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMenu+Ext.m"; sourceTree = "<group>"; };
+		541958872190FF1200581B79 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		54209E922117325100F3B5EF /* DrawImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawImage.h; sourceTree = "<group>"; };
 		54209E932117325100F3B5EF /* DrawImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawImage.m; sourceTree = "<group>"; };
-		543695D3214EFD9800DA979D /* NSMenuItem+Info.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMenuItem+Info.h"; sourceTree = "<group>"; };
-		543695D4214EFD9800DA979D /* NSMenuItem+Info.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMenuItem+Info.m"; sourceTree = "<group>"; };
-		543695D6214F1F2700DA979D /* NSMenuItem+Generate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMenuItem+Generate.h"; sourceTree = "<group>"; };
-		543695D7214F1F2700DA979D /* NSMenuItem+Generate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMenuItem+Generate.m"; sourceTree = "<group>"; };
+		543695D6214F1F2700DA979D /* NSMenuItem+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMenuItem+Ext.h"; sourceTree = "<group>"; };
+		543695D7214F1F2700DA979D /* NSMenuItem+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMenuItem+Ext.m"; sourceTree = "<group>"; };
 		544B01182114B41200386E5C /* ModalSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSheet.h; sourceTree = "<group>"; };
 		544B01192114B41200386E5C /* ModalSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalSheet.m; sourceTree = "<group>"; };
 		544B011B2114EE9100386E5C /* AppHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppHook.h; sourceTree = "<group>"; };
@@ -136,13 +140,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		54195880218A05E700581B79 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				5477D34C21233C62002BA27F /* FeedConfig+Ext.h */,
+				5477D34D21233C62002BA27F /* FeedConfig+Ext.m */,
+				54195881218A061100581B79 /* Feed+Ext.h */,
+				54195882218A061100581B79 /* Feed+Ext.m */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
 		541A90EF21257D4F002680A6 /* Status Bar Menu */ = {
 			isa = PBXGroup;
 			children = (
-				543695D3214EFD9800DA979D /* NSMenuItem+Info.h */,
-				543695D4214EFD9800DA979D /* NSMenuItem+Info.m */,
-				543695D6214F1F2700DA979D /* NSMenuItem+Generate.h */,
-				543695D7214F1F2700DA979D /* NSMenuItem+Generate.m */,
+				543695D6214F1F2700DA979D /* NSMenuItem+Ext.h */,
+				543695D7214F1F2700DA979D /* NSMenuItem+Ext.m */,
+				54195884218E1BDB00581B79 /* NSMenu+Ext.h */,
+				54195885218E1BDB00581B79 /* NSMenu+Ext.m */,
 				54FE73D1212316CD003EAC65 /* BarMenu.h */,
 				54FE73D2212316CD003EAC65 /* BarMenu.m */,
 			);
@@ -174,8 +189,6 @@
 		546FC44D2118B357007CC3A3 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
-				5477D34C21233C62002BA27F /* FeedConfig+Ext.h */,
-				5477D34D21233C62002BA27F /* FeedConfig+Ext.m */,
 				54ACC29621061FBA0020715F /* Preferences.h */,
 				54ACC29721061FBA0020715F /* Preferences.m */,
 				546FC4462118A8E6007CC3A3 /* Preferences.xib */,
@@ -211,6 +224,7 @@
 			children = (
 				544B011B2114EE9100386E5C /* AppHook.h */,
 				544B011C2114EE9100386E5C /* AppHook.m */,
+				541958872190FF1200581B79 /* Constants.h */,
 				541A90EF21257D4F002680A6 /* Status Bar Menu */,
 				54FE73CE21220DEC003EAC65 /* StoreCoordinator.h */,
 				54FE73CF21220DEC003EAC65 /* StoreCoordinator.m */,
@@ -218,6 +232,7 @@
 				54ACC29421061E270020715F /* FeedDownload.m */,
 				54209E922117325100F3B5EF /* DrawImage.h */,
 				54209E932117325100F3B5EF /* DrawImage.m */,
+				54195880218A05E700581B79 /* Categories */,
 				546FC44D2118B357007CC3A3 /* Preferences */,
 				54ACC28521061B3C0020715F /* Assets.xcassets */,
 				54ACC28A21061B3C0020715F /* Info.plist */,
@@ -366,7 +381,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				543695D8214F1F2700DA979D /* NSMenuItem+Generate.m in Sources */,
+				543695D8214F1F2700DA979D /* NSMenuItem+Ext.m in Sources */,
 				54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */,
 				544B011D2114EE9100386E5C /* AppHook.m in Sources */,
 				546FC44321189975007CC3A3 /* SettingsGeneral.m in Sources */,
@@ -375,11 +390,12 @@
 				54ACC28C21061B3C0020715F /* main.m in Sources */,
 				54FE73D3212316CD003EAC65 /* BarMenu.m in Sources */,
 				544B011A2114B41200386E5C /* ModalSheet.m in Sources */,
-				543695D5214EFD9800DA979D /* NSMenuItem+Info.m in Sources */,
 				54ACC29821061FBA0020715F /* Preferences.m in Sources */,
+				54195886218E1BDB00581B79 /* NSMenu+Ext.m in Sources */,
 				5496B511214D6275003ED4ED /* UserPrefs.m in Sources */,
 				546FC43D21188AD5007CC3A3 /* SettingsFeeds.m in Sources */,
 				54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */,
+				54195883218A061100581B79 /* Feed+Ext.m in Sources */,
 				54209E942117325100F3B5EF /* DrawImage.m in Sources */,
 				54FE73D021220DEC003EAC65 /* StoreCoordinator.m in Sources */,
 			);
