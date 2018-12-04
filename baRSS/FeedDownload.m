@@ -70,7 +70,7 @@ static BOOL _isReachable = NO;
 
 + (void)scheduleNextUpdate:(BOOL)forceUpdate {
 	static NSTimer *_updateTimer;
-	@synchronized (_updateTimer) {
+	@synchronized (_updateTimer) { // TODO: dig into analyzer warning
 		if (_updateTimer) {
 			[_updateTimer invalidate];
 			_updateTimer = nil;
@@ -112,7 +112,7 @@ static BOOL _isReachable = NO;
 	}
 	dispatch_group_notify(group, dispatch_get_main_queue(), ^{
 		[StoreCoordinator saveContext:childContext andParent:YES];
-		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedUpdated object:nil];
+		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedUpdated object:[list valueForKeyPath:@"objectID"]];
 		[childContext reset];
 		childContext = nil;
 		[self scheduleNextUpdate:NO]; // after forced update, continue regular cycle

@@ -60,7 +60,7 @@
 
 - (IBAction)fixCache:(NSButton *)sender {
 	[StoreCoordinator deleteUnreferencedFeeds];
-	[StoreCoordinator restoreUnreadCount];
+	[StoreCoordinator restoreFeedCountsAndIndexPaths];
 }
 
 - (IBAction)changeMenuBarIconSetting:(NSButton*)sender {

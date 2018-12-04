@@ -31,76 +31,40 @@
 /// Enum type setter see @c FeedConfigType
 - (void)setTyp:(FeedConfigType)typ { self.type = typ; }
 
-/**
- Sorted children array based on sort order provided in feed settings.
 
- @return Sorted array of @c FeedConfig items.
- */
+#pragma mark - Handle Children And Parents -
+
+
+/// @return IndexPath as semicolon separated string for sorted children starting with root index.
+- (NSString*)indexPathString {
+	if (self.parent == nil)
+		return [NSString stringWithFormat:@"%d", self.sortIndex];
+	return [[self.parent indexPathString] stringByAppendingFormat:@".%d", self.sortIndex];
+}
+
+/// @return Children sorted by attribute @c sortIndex (same order as in preferences).
 - (NSArray<FeedConfig*>*)sortedChildren {
 	if (self.children.count == 0)
 		return nil;
 	return [self.children sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];
 }
 
-/// IndexPath for sorted children starting with root index.
-- (NSIndexPath*)indexPath {
+/// @return @c NSArray of all ancestors: First object is root. Last object is the @c FeedConfig that executed the command.
+- (NSMutableArray<FeedConfig*>*)allParents {
 	if (self.parent == nil)
-		return [NSIndexPath indexPathWithIndex:(NSUInteger)self.sortIndex];
-	return [[self.parent indexPath] indexPathByAddingIndex:(NSUInteger)self.sortIndex];
+		return [NSMutableArray arrayWithObject:self];
+	NSMutableArray *arr = [self.parent allParents];
+	[arr addObject:self];
+	return arr;
 }
 
 /**
- Change unread counter for all parents recursively. Result will never be negative.
+ Iterate over all descenden feeds.
 
- @param count If negative, mark items read.
+ @param ordered If @c YES items are executed in the same order they are listed in the menu. Pass @n NO for a speed-up.
+ @param block Set @c cancel to @c YES to stop execution of further descendants.
+ @return @c NO if execution was stopped with @c cancel @c = @c YES in @c block.
  */
-- (void)markUnread:(int)count ancestorsOnly:(BOOL)flag {
-	FeedConfig *par = (flag ? self.parent : self);
-	while (par) {
-		[self.managedObjectContext refreshObject:par mergeChanges:YES];
-		par.unreadCount += count;
-		NSAssert(par.unreadCount >= 0, @"ERROR ancestorsMarkUnread: Count should never be negative.");
-		par = par.parent;
-	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged
-														object:[NSNumber numberWithInt:count]];
-}
-
-/// @return Time interval respecting the selected unit. E.g., returns @c 180 for @c '3m'
-- (NSTimeInterval)timeInterval {
-	static const int unit[] = {1, 60, 3600, 86400, 604800}; // smhdw
-	return self.refreshNum * unit[self.refreshUnit % 5];
-}
-
-/// Calculate date from @c refreshNum and @c refreshUnit and set as next scheduled feed update.
-- (void)calculateAndSetScheduled {
-	self.scheduled = [[NSDate date] dateByAddingTimeInterval:[self timeInterval]];
-}
-
-/// Update FeedMeta or create new one if needed.
-- (void)setEtag:(NSString*)etag modified:(NSString*)modified {
-	// TODO: move to separate function and add icon download
-	if (!self.meta) {
-		self.meta = [[FeedMeta alloc] initWithEntity:FeedMeta.entity insertIntoManagedObjectContext:self.managedObjectContext];
-	}
-	self.meta.httpEtag = etag;
-	self.meta.httpModified = modified;
-}
-
-/// Delete any existing feed object and parse new one. Read state will be copied.
-- (void)updateRSSFeed:(RSParsedFeed*)obj {
-	NSArray<NSString*> *readURLs = [self.feed alreadyReadURLs];
-	int unreadBefore = self.unreadCount;
-	int unreadAfter = 0;
-	if (self.feed)
-		[self.managedObjectContext deleteObject:(NSManagedObject*)self.feed];
-	if (obj) {
-		// TODO: update and dont re-create each time
-		self.feed = [Feed feedFromRSS:obj inContext:self.managedObjectContext alreadyRead:readURLs unread:&unreadAfter];
-	}
-	[self markUnread:(unreadAfter - unreadBefore) ancestorsOnly:NO];
-}
-
 - (BOOL)iterateSorted:(BOOL)ordered overDescendantFeeds:(void(^)(Feed*,BOOL*))block  {
 	if (self.feed) {
 		BOOL stopEarly = NO;
@@ -115,7 +79,45 @@
 	return YES;
 }
 
+
+#pragma mark - Update Feed And Meta -
+
+
+/// Delete any existing feed object and parse new one. Read state will be copied.
+- (void)updateRSSFeed:(RSParsedFeed*)obj {
+	if (!self.feed) {
+		self.feed = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:self.managedObjectContext];
+		self.feed.indexPath = [self indexPathString];
+	}
+	int32_t unreadBefore = self.feed.unreadCount;
+	[self.feed updateWithRSS:obj];
+	NSNumber *cDiff = [NSNumber numberWithInteger:self.feed.unreadCount - unreadBefore];
+	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:cDiff];
+}
+
+/// Update FeedMeta or create new one if needed.
+- (void)setEtag:(NSString*)etag modified:(NSString*)modified {
+	if (!self.meta) {
+		self.meta = [[FeedMeta alloc] initWithEntity:FeedMeta.entity insertIntoManagedObjectContext:self.managedObjectContext];
+	}
+	if (![self.meta.httpEtag isEqualToString:etag])         self.meta.httpEtag = etag;
+	if (![self.meta.httpModified isEqualToString:modified]) self.meta.httpModified = modified;
+}
+
+/// Calculate date from @c refreshNum and @c refreshUnit and set as next scheduled feed update.
+- (void)calculateAndSetScheduled {
+	self.scheduled = [[NSDate date] dateByAddingTimeInterval:[self timeInterval]];
+}
+
+/// @return Time interval respecting the selected unit. E.g., returns @c 180 for @c '3m'
+- (NSTimeInterval)timeInterval {
+	static const int unit[] = {1, 60, 3600, 86400, 604800}; // smhdw
+	return self.refreshNum * unit[self.refreshUnit % 5];
+}
+
+
 #pragma mark - Printing -
+
 
 /// @return Formatted string for update interval ( e.g., @c 30m or @c 12h )
 - (NSString*)readableRefreshString {

@@ -27,14 +27,16 @@
 @class RSParsedFeed;
 
 @interface StoreCoordinator : NSObject
-+ (NSManagedObjectContext*)getMainContext;
+// Managing contexts
 + (NSManagedObjectContext*)createChildContext;
 + (void)saveContext:(NSManagedObjectContext*)context andParent:(BOOL)flag;
-+ (NSArray<FeedConfig*>*)sortedFeedConfigItemsInContext:(nonnull NSManagedObjectContext*)context;
+// Feed update
 + (NSArray<FeedConfig*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc;
 + (NSDate*)nextScheduledUpdate;
-+ (int)totalNumberOfUnreadFeeds;
+// Feed display
++ (NSInteger)unreadCountForIndexPathString:(NSString*)str;
++ (NSArray*)sortedObjectIDsForParent:(id)parent isFeed:(BOOL)flag inContext:(NSManagedObjectContext*)moc;
 // Restore sound state
 + (void)deleteUnreferencedFeeds;
-+ (void)restoreUnreadCount;
++ (void)restoreFeedCountsAndIndexPaths;
 @end

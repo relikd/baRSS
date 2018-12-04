@@ -33,16 +33,15 @@ typedef enum int16_t {
 } FeedConfigType;
 
 @property (getter=typ, setter=setTyp:) FeedConfigType typ;
-
-- (NSArray<FeedConfig*>*)sortedChildren;
-- (NSIndexPath*)indexPath;
-- (void)markUnread:(int)count ancestorsOnly:(BOOL)flag;
-- (void)calculateAndSetScheduled;
-- (BOOL)iterateSorted:(BOOL)ordered overDescendantFeeds:(void(^)(Feed*,BOOL*))block;
-
-- (void)setEtag:(NSString*)etag modified:(NSString*)modified;
+// Handle children and parents
+- (NSString*)indexPathString;
+- (NSMutableArray<FeedConfig*>*)allParents;
+- (BOOL)iterateSorted:(BOOL)ordered overDescendantFeeds:(void(^)(Feed *feed, BOOL* cancel))block;
+// Update feed and meta
 - (void)updateRSSFeed:(RSParsedFeed*)obj;
-
+- (void)setEtag:(NSString*)etag modified:(NSString*)modified;
+- (void)calculateAndSetScheduled;
+// Printing
 - (NSString*)readableRefreshString;
 - (NSString*)readableDescription;
 @end
