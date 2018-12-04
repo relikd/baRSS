@@ -27,8 +27,50 @@
 
 @implementation Feed (Ext)
 
-+ (FeedItem*)createFeedItemFrom:(RSParsedArticle*)entry inContext:(NSManagedObjectContext*)context {
-	FeedItem *b = [[FeedItem alloc] initWithEntity:FeedItem.entity insertIntoManagedObjectContext:context];
+/**
+ Replace feed title, subtitle and link (if changed). Also adds new articles and removes old ones.
+ */
+- (void)updateWithRSS:(RSParsedFeed*)obj {
+	if (![self.title isEqualToString:obj.title])       self.title = obj.title;
+	if (![self.subtitle isEqualToString:obj.subtitle]) self.subtitle = obj.subtitle;
+	if (![self.link isEqualToString:obj.link])         self.link = obj.link;
+	
+	NSMutableSet<NSString*> *urls = [[self.items valueForKeyPath:@"link"] mutableCopy];
+	if ([self addMissingArticles:obj updateLinks:urls]) // will remove links in 'urls' that should be kept
+		[self deleteArticlesWithLink:urls]; // remove old, outdated articles
+}
+
+/**
+ Append new articles and increment their sortIndex. Update article counter and unread counter on the way.
+
+ @param urls Input will be used to identify new articles. Output will contain URLs that aren't present in the feed anymore.
+ @return @c YES if new items were added, @c NO otherwise.
+ */
+- (BOOL)addMissingArticles:(RSParsedFeed*)obj updateLinks:(NSMutableSet<NSString*>*)urls {
+	int latestID = [[self.items valueForKeyPath:@"@max.sortIndex"] intValue];
+	__block int newOnes = 0;
+	[obj.articles enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(RSParsedArticle * _Nonnull article, BOOL * _Nonnull stop) {
+		// reverse enumeration ensures correct article order
+		if ([urls containsObject:article.link]) {
+			[urls removeObject:article.link];
+		} else {
+			newOnes += 1;
+			[self insertArticle:article atIndex:latestID + newOnes];
+		}
+	}];
+	if (newOnes == 0) return NO;
+	self.articleCount += newOnes;
+	self.unreadCount += newOnes; // new articles are by definition unread
+	return YES;
+}
+
+/**
+ Create article based on input and insert into core data storage.
+ */
+- (void)insertArticle:(RSParsedArticle*)entry atIndex:(int)idx {
+	FeedItem *b = [[FeedItem alloc] initWithEntity:FeedItem.entity insertIntoManagedObjectContext:self.managedObjectContext];
+	b.sortIndex = (int32_t)idx;
+	b.unread = YES;
 	b.guid = entry.guid;
 	b.title = entry.title;
 	b.abstract = entry.abstract;
@@ -36,54 +78,72 @@
 	b.author = entry.author;
 	b.link = entry.link;
 	b.published = entry.datePublished;
-	return b;
+	[self addItemsObject:b];
 }
 
-+ (Feed*)feedFromRSS:(RSParsedFeed*)obj inContext:(NSManagedObjectContext*)context alreadyRead:(NSArray<NSString*>*)urls unread:(int*)unreadCount {
-	Feed *a = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:context];
-	a.title = obj.title;
-	a.subtitle = obj.subtitle;
-	a.link = obj.link;
-	for (RSParsedArticle *article in obj.articles) {
-		FeedItem *b = [self createFeedItemFrom:article inContext:context];
-		if ([urls containsObject:b.link]) {
-			b.unread = NO;
-		} else {
-			*unreadCount += 1;
-		}
-		[a addItemsObject:b];
-	}
-	return a;
-}
-
-- (NSArray<NSString*>*)alreadyReadURLs {
-	if (!self.items || self.items.count == 0) return nil;
-	NSMutableArray<NSString*> *mArr = [NSMutableArray arrayWithCapacity:self.items.count];
-	for (FeedItem *f in self.items) {
-		if (!f.unread) {
-			[mArr addObject:f.link];
+/**
+ Delete all items where @c link matches one of the URLs in the @c NSSet.
+ */
+- (void)deleteArticlesWithLink:(NSMutableSet<NSString*>*)urls {
+	if (!urls || urls.count == 0)
+		return;
+	
+	self.articleCount -= (int32_t)urls.count;
+	for (FeedItem *item in self.items) {
+		if ([urls containsObject:item.link]) {
+			[urls removeObject:item.link];
+			if (item.unread)
+				self.unreadCount -= 1;
+			// TODO: keep unread articles?
+			[item.managedObjectContext deleteObject:item];
+			if (urls.count == 0)
+				break;
 		}
 	}
-	return mArr;
 }
 
-- (void)markAllItemsRead {
-	[self markAllArticlesRead:YES];
+/**
+ @return Articles sorted by attribute @c sortIndex with descending order (newest items first).
+ */
+- (NSArray<FeedItem*>*)sortedArticles {
+	if (self.items.count == 0)
+		return nil;
+	return [self.items sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:NO]]];
 }
 
-- (void)markAllItemsUnread {
-	[self markAllArticlesRead:NO];
+/**
+ For all articles set @c unread @c = @c NO
+
+ @return Change in unread count. (0 or negative number)
+ */
+- (int)markAllItemsRead {
+	return [self markAllArticlesRead:YES];
 }
 
-- (void)markAllArticlesRead:(BOOL)readFlag {
-	int count = 0;
+/**
+ For all articles set @c unread @c = @c YES
+
+ @return Change in unread count. (0 or positive number)
+ */
+- (int)markAllItemsUnread {
+	return [self markAllArticlesRead:NO];
+}
+
+/**
+ Mark all articles read or unread and update @c unreadCount
+
+ @param readFlag @c YES: mark items read; @c NO: mark items unread
+ */
+- (int)markAllArticlesRead:(BOOL)readFlag {
 	for (FeedItem *i in self.items) {
-		if (i.unread == readFlag) {
+		if (i.unread == readFlag)
 			i.unread = !readFlag;
-			++count;
-		}
 	}
-	[self.config markUnread:(readFlag ? -count : +count) ancestorsOnly:NO];
+	int32_t oldCount = self.unreadCount;
+	int32_t newCount = (readFlag ? 0 : self.articleCount);
+	if (self.unreadCount != newCount)
+		self.unreadCount = newCount;
+	return newCount - oldCount;
 }
 
 @end

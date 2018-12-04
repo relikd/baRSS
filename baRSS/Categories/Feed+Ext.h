@@ -25,8 +25,9 @@
 @class RSParsedFeed;
 
 @interface Feed (Ext)
-+ (Feed*)feedFromRSS:(RSParsedFeed*)obj inContext:(NSManagedObjectContext*)context alreadyRead:(NSArray<NSString*>*)urls unread:(int*)unreadCount;
-- (NSArray<NSString*>*)alreadyReadURLs;
-- (void)markAllItemsRead;
-- (void)markAllItemsUnread;
+- (void)updateWithRSS:(RSParsedFeed*)obj;
+- (NSArray<FeedItem*>*)sortedArticles;
+
+- (int)markAllItemsRead;
+- (int)markAllItemsUnread;
 @end

@@ -39,6 +39,19 @@ typedef NS_ENUM(char, DisplaySetting) {
 
 @implementation NSMenuItem (Feed)
 
+#pragma mark - General helper methods -
+
+/**
+ Helper method to generate a new @c NSMenuItem.
+ */
++ (NSMenuItem*)itemWithTitle:(NSString*)title action:(SEL)selector target:(id)target tag:(MenuItemTag)tag {
+	NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:title action:selector keyEquivalent:@""];
+	item.target = target;
+	item.tag = tag;
+	[item applyUserSettingsDisplay];
+	return item;
+}
+
 /**
  Create a copy of an existing menu item and set it's option key modifier.
  */
@@ -54,17 +67,31 @@ typedef NS_ENUM(char, DisplaySetting) {
 }
 
 /**
- Set title based on preferences either with or without unread count in parenthesis.
+ Convenient method to set @c target and @c action simultaneously.
  */
-- (void)setTitleAndUnreadCount:(FeedConfig*)config {
-	if (config.unreadCount > 0 &&
-		((config.typ == FEED && [UserPrefs defaultYES:@"feedUnreadCount"]) ||
-		 (config.typ == GROUP && [UserPrefs defaultYES:@"groupUnreadCount"])))
-	{
-		self.title = [NSString stringWithFormat:@"%@ (%d)", config.name, config.unreadCount];
-	} else {
-		self.title = config.name;
+- (void)setTarget:(id)target action:(SEL)selector {
+	self.target = target;
+	self.action = selector;
+}
+
+
+#pragma mark - Set properties based on Core Data object -
+
+
+/**
+ Set title based on preferences either with or without unread count in parenthesis.
+ 
+ @return Number of unread items. (@b warning: May return @c 0 if visibility is disabled in @c UserPrefs)
+ */
+- (NSInteger)setTitleAndUnreadCount:(FeedConfig*)config {
+	NSInteger uCount = 0;
+	if (config.typ == FEED && [UserPrefs defaultYES:@"feedUnreadCount"]) {
+		uCount = config.feed.unreadCount;
+	} else if (config.typ == GROUP && [UserPrefs defaultYES:@"groupUnreadCount"]) {
+		uCount = [self.submenu coreDataUnreadCount];
 	}
+	self.title = (uCount > 0 ? [NSString stringWithFormat:@"%@ (%ld)", config.name, uCount] : config.name);
+	return uCount;
 }
 
 /**
@@ -73,10 +100,10 @@ typedef NS_ENUM(char, DisplaySetting) {
 - (void)setFeedConfig:(FeedConfig*)config {
 	self.representedObject = config.objectID;
 	if (config.typ == SEPARATOR) {
-		self.title = @"---SEPARATOR---";
+		self.title = kSeparatorItemTitle;
 	} else {
-		[self setTitleAndUnreadCount:config];
 		self.submenu = [self.menu submenuWithIndex:config.sortIndex isFeed:(config.typ == FEED)];
+		[self setTitleAndUnreadCount:config]; // after submenu is set
 		if (config.typ == FEED) {
 			[self configureAsFeed:config];
 		} else {
@@ -140,7 +167,7 @@ typedef NS_ENUM(char, DisplaySetting) {
 /**
  @return @c FeedConfig object if @c representedObject contains a valid @c NSManagedObjectID.
  */
-- (FeedConfig*)feedConfig:(NSManagedObjectContext*)moc {
+- (FeedConfig*)requestConfig:(NSManagedObjectContext*)moc {
 	if (!self.representedObject || ![self.representedObject isKindOfClass:[NSManagedObjectID class]])
 		return nil;
 	FeedConfig *config = [moc objectWithID:self.representedObject];
@@ -157,10 +184,10 @@ typedef NS_ENUM(char, DisplaySetting) {
  */
 - (void)iterateSorted:(BOOL)ordered inContext:(NSManagedObjectContext*)moc overDescendentFeeds:(void(^)(Feed*,BOOL*))block {
 	if (self.parentItem) {
-		[[self.parentItem feedConfig:moc] iterateSorted:ordered overDescendantFeeds:block];
+		[[self.parentItem requestConfig:moc] iterateSorted:ordered overDescendantFeeds:block];
 	} else {
 		for (NSMenuItem *item in self.menu.itemArray) {
-			FeedConfig *fc = [item feedConfig:moc];
+			FeedConfig *fc = [item requestConfig:moc];
 			if (fc != nil) { // All groups and feeds; Ignore default header
 				if (![fc iterateSorted:ordered overDescendantFeeds:block])
 					return;

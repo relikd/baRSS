@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+static NSString *kSeparatorItemTitle = @"---SEPARATOR---";
+
 /// @c NSMenuItem options that are assigned to the @c tag attribute.
 typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 	/// Item visible at the very first menu level
@@ -45,11 +47,13 @@ typedef NS_OPTIONS(NSInteger, MenuItemTag) {
 @class FeedConfig, Feed, FeedItem;
 
 @interface NSMenuItem (Feed)
++ (NSMenuItem*)itemWithTitle:(NSString*)title action:(SEL)selector target:(id)target tag:(MenuItemTag)tag;
 - (NSMenuItem*)alternateWithTitle:(NSString*)title;
+- (void)setTarget:(id)target action:(SEL)selector;
 
 - (void)setFeedConfig:(FeedConfig*)config;
 - (void)setFeedItem:(FeedItem*)item;
-- (void)setTitleAndUnreadCount:(FeedConfig*)config;
+- (NSInteger)setTitleAndUnreadCount:(FeedConfig*)config;
+
 - (void)iterateSorted:(BOOL)ordered inContext:(NSManagedObjectContext*)moc overDescendentFeeds:(void(^)(Feed *feed, BOOL *cancel))block;
-- (void)applyUserSettingsDisplay;
 @end

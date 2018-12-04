@@ -21,10 +21,13 @@
 //  SOFTWARE.
 
 #import "NSMenu+Ext.h"
-#import "NSMenuItem+Ext.h"
+#import "StoreCoordinator.h"
 
 @implementation NSMenu (Ext)
 
+#pragma mark - Generator -
+
+/// @return New main menu with target delegate.
 + (instancetype)menuWithDelegate:(id<NSMenuDelegate>)target {
 	NSMenu *menu = [[NSMenu alloc] initWithTitle:@"M"];
 	menu.autoenablesItems = NO;
@@ -32,70 +35,88 @@
 	return menu;
 }
 
+/// @return New menu with old title and delegate. Index path in title is appended.
 - (instancetype)submenuWithIndex:(int)index isFeed:(BOOL)flag {
-	NSMenu *menu = [NSMenu new];
+	NSMenu *menu = [NSMenu menuWithDelegate:self.delegate];
 	menu.title = [NSString stringWithFormat:@"%c%@.%d", (flag ? 'F' : 'G'), self.title, index];
-	menu.autoenablesItems = NO;
-	menu.delegate = self.delegate;
 	return menu;
 }
 
+/// @return New menu with old title and delegate.
+- (instancetype)cleanInstanceCopy {
+	NSMenu *menu = [NSMenu menuWithDelegate:self.delegate];
+	menu.title = self.title;
+	return menu;
+}
+
+
+#pragma mark - Properties -
+
+
+/// @return @c YES if menu is status bar menu.
+- (BOOL)isMainMenu {
+	return [self.title isEqualToString:@"M"];
+}
+
+/// @return @c YES if menu contains feed articles only.
+- (BOOL)isFeedMenu {
+	return [self.title characterAtIndex:0] == 'F';
+}
+
+/// @return Either @c ScopeGlobal, @c ScopeGroup or @c ScopeFeed.
+- (MenuItemTag)scope {
+	if ([self isFeedMenu]) return ScopeFeed;
+	if ([self isMainMenu]) return ScopeGlobal;
+	return ScopeGroup;
+}
+
+/// @return Index offset of the first Core Data feed item (may be separator), skipping default header and main menu header.
+- (NSInteger)feedConfigOffset {
+	for (NSInteger i = 0; i < self.numberOfItems; i++) {
+		if ([[[self itemAtIndex:i] representedObject] isKindOfClass:[NSManagedObjectID class]])
+			return i;
+	}
+	return 0;
+}
+
+/// Perform Core Data fetch request and return unread count for all descendent items.
+- (NSInteger)coreDataUnreadCount {
+	NSUInteger loc = [self.title rangeOfString:@"."].location;
+	NSString *path = nil;
+	if (loc != NSNotFound)
+		path = [self.title substringFromIndex:loc + 1];
+	return [StoreCoordinator unreadCountForIndexPathString:path];
+}
+
+
+#pragma mark - Modify Menu -
+
+
+/// Loop over default header and enable 'OpenAllUnread' and 'TagMarkAllRead' based on unread count.
+- (void)autoEnableMenuHeader:(BOOL)hasUnread {
+	for (NSMenuItem *item in self.itemArray) {
+		if (item.representedObject)
+			return; // default menu has no represented object
+		switch (item.tag & TagMaskType) {
+			case TagOpenAllUnread: case TagMarkAllRead:
+				item.enabled = hasUnread;
+			default: break;
+		}
+		//[item applyUserSettingsDisplay]; // should not change while menu is open
+	}
+}
+
+/// Loop over menu and replace all separator items (text) with actual separator.
 - (void)replaceSeparatorStringsWithActualSeparator {
 	for (NSInteger i = 0; i < self.numberOfItems; i++) {
 		NSMenuItem *oldItem = [self itemAtIndex:i];
-		if ([oldItem.title isEqualToString:@"---SEPARATOR---"]) {
+		if ([oldItem.title isEqualToString:kSeparatorItemTitle]) {
 			NSMenuItem *newItem = [NSMenuItem separatorItem];
 			newItem.representedObject = oldItem.representedObject;
 			[self removeItemAtIndex:i];
 			[self insertItem:newItem atIndex:i];
 		}
 	}
-}
-
-- (BOOL)isMainMenu {
-	return [self.title isEqualToString:@"M"];
-}
-
-- (BOOL)isFeedMenu {
-	return [self.title characterAtIndex:0] == 'F';
-}
-
-//- (void)iterateMenuItems:(void(^)(NSMenuItem*,BOOL))block atIndexPath:(NSIndexPath*)path  {
-//	NSMenu *m = self;
-//	for (NSUInteger u = 0; u < path.length; u++) {
-//		NSUInteger i = [path indexAtPosition:u];
-//		for (NSMenuItem *item in m.itemArray) {
-//			if (![item.representedObject isKindOfClass:[NSManagedObjectID class]]) {
-//				continue; // not a core data item
-//			}
-//			if (i == 0) {
-//				BOOL isFinalItem = (u == path.length - 1);
-//				block(item, isFinalItem);
-//				if (isFinalItem) return; // item found!
-//				m = item.submenu;
-//				break; // cancel evaluation of remaining items
-//			}
-//			i -= 1;
-//		}
-//	}
-//	return; // whenever a menu inbetween is nil (e.g., wasn't set yet)
-//}
-
-- (NSInteger)getFeedConfigOffsetAndUpdateUnread:(BOOL)hasUnread {
-	for (NSInteger i = 0; i < self.numberOfItems; i++) {
-		NSMenuItem *item = [self itemAtIndex:i];
-		if ([item.representedObject isKindOfClass:[NSManagedObjectID class]]) {
-			return i;
-		} else {
-			//[item applyUserSettingsDisplay]; // should not change while menu is open
-			switch (item.tag & TagMaskType) {
-				case TagOpenAllUnread: case TagMarkAllRead:
-					item.enabled = hasUnread;
-				default: break;
-			}
-		}
-	}
-	return 0;
 }
 
 @end

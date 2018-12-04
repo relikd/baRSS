@@ -34,7 +34,7 @@ ToDo
 	- [ ] Choose status bar icon?
 	- [ ] Tick mark feed items based on prefs
 	- [ ] Open a few links (# editable)
-	- [ ] Performance: Update menu partially
+	- [x] Performance: Update menu partially
 	- [x] Start on login
 	- [x] Make it system default application
 	- [ ] Display license info (e.g., RSXML)
@@ -45,10 +45,11 @@ ToDo
 
 
 - [ ] Status menu
-	- [ ] Update menu header after mark (un)read
+	- [x] Update menu header after mark (un)read
 	- [ ] Pause updates functionality
 	- [x] Update all feeds functionality
-	- [ ] Hold only relevant information in memory
+	- [x] Hold only relevant information in memory
+	- [ ] Icon for paused / no internet state
 
 
 - [ ] Edit feed
@@ -68,7 +69,7 @@ ToDo
 	- [ ] Translate text to different languages
 	- [x] Automatically update feeds with chosen interval
 		- [x] Reuse ETag and Modification date
-		- ~~[ ] Append only new items, keep sorting~~
+		- [x] Append only new items, keep sorting
 		- [x] Delete old ones eventually
 		- [x] Pause on internet connection lost
 	- [ ] Download with ephemeral url session?
@@ -85,7 +86,7 @@ ToDo
 	- [ ] Notification Center
 	- [ ] Sleep timer. (e.g., disable updates during working hours)
 	- [ ] Pure image feed? (show images directly in menu)
-	- [ ] Infinite storage. (load more button)
+	- ~~[ ] Infinite storage. (load more button)~~
 	- [ ] Automatically open feed items?
 	- [ ] Per feed launch application (e.g., for podcasts)
 		- [ ] Per group setting to exclude unread count from menu bar

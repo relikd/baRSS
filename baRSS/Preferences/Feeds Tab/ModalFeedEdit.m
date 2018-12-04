@@ -111,6 +111,7 @@
 	if (self.shouldDeletePrevArticles) {
 		[item updateRSSFeed:self.feedResult];
 		[item setEtag:self.httpEtag modified:self.httpDate];
+		// TODO: add icon download
 	}
 	if ([item.managedObjectContext hasChanges]) {
 		self.objectIsModified = YES;

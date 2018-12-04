@@ -26,6 +26,8 @@
 
 @implementation StoreCoordinator
 
+#pragma mark - Managing contexts -
+
 + (NSManagedObjectContext*)getMainContext {
 	return [(AppHook*)NSApp persistentContainer].viewContext;
 }
@@ -53,20 +55,14 @@
 	}
 }
 
-+ (NSArray<FeedConfig*>*)sortedFeedConfigItemsInContext:(NSManagedObjectContext*)context {
-	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: FeedConfig.entity.name];
-	fr.predicate = [NSPredicate predicateWithFormat:@"parent = NULL"]; // %@", parent
-	fr.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]];
-	NSError *err;
-	NSArray *result = [context executeFetchRequest:fr error:&err];
-	if (err) NSLog(@"%@", err);
-	return result;
-}
+#pragma mark - Feed Update -
 
 + (NSArray<FeedConfig*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc {
+	// TODO: Get Feed instead of FeedConfig
 	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: FeedConfig.entity.name];
 	if (!forceAll) {
-		fr.predicate = [NSPredicate predicateWithFormat:@"type = %d AND scheduled <= %@", FEED, [NSDate date]];
+		// when fetching also get those feeds that would need update soon (now + 30s)
+		fr.predicate = [NSPredicate predicateWithFormat:@"type = %d AND scheduled <= %@", FEED, [NSDate dateWithTimeIntervalSinceNow:+30]];
 	} else {
 		fr.predicate = [NSPredicate predicateWithFormat:@"type = %d", FEED];
 	}
@@ -97,7 +93,9 @@
 	return fetchResults.firstObject[@"earliestDate"]; // can be nil
 }
 
-+ (int)totalNumberOfUnreadFeeds {
+#pragma mark - Feed Display -
+
++ (NSInteger)unreadCountForIndexPathString:(NSString*)str {
 	// Always get context first, or 'FeedConfig.entity.name' may not be available on app start
 	NSManagedObjectContext *moc = [self getMainContext];
 	NSExpression *exp = [NSExpression expressionForFunction:@"sum:"
@@ -107,15 +105,29 @@
 	[expDesc setExpression:exp];
 	[expDesc setExpressionResultType:NSInteger32AttributeType];
 	
-	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: FeedConfig.entity.name];
-	fr.predicate = [NSPredicate predicateWithFormat:@"type = %d", FEED];
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: Feed.entity.name];
+	if (str && str.length > 0)
+		fr.predicate = [NSPredicate predicateWithFormat:@"indexPath BEGINSWITH %@", str];
 	[fr setResultType:NSDictionaryResultType];
 	[fr setPropertiesToFetch:@[expDesc]];
 	
 	NSError *err;
 	NSArray *fetchResults = [moc executeFetchRequest:fr error:&err];
 	if (err) NSLog(@"%@", err);
-	return [fetchResults.firstObject[@"totalUnread"] intValue];
+	return [fetchResults.firstObject[@"totalUnread"] integerValue];
+}
+
++ (NSArray*)sortedObjectIDsForParent:(id)parent isFeed:(BOOL)flag inContext:(NSManagedObjectContext*)moc {
+//	NSManagedObjectContext *moc = [self getMainContext];
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: (flag ? FeedItem.entity : FeedConfig.entity).name];
+	fr.predicate = [NSPredicate predicateWithFormat:(flag ? @"feed.config = %@" : @"parent = %@"), parent];
+	fr.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:!flag]];
+	[fr setResultType:NSManagedObjectIDResultType];
+	
+	NSError *err;
+	NSArray *fetchResults = [moc executeFetchRequest:fr error:&err];
+	if (err) NSLog(@"%@", err);
+	return fetchResults;
 }
 
 //+ (void)addToSortIndex:(int)num start:(int)index parent:(FeedConfig*)config inContext:(NSManagedObjectContext*)moc {
@@ -142,27 +154,23 @@
 	if (err) NSLog(@"%@", err);
 }
 
-+ (void)restoreUnreadCount {
++ (void)restoreFeedCountsAndIndexPaths {
 	NSManagedObjectContext *moc = [self getMainContext];
 	NSError *err;
-	NSArray *confs = [moc executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName: FeedConfig.entity.name] error:&err];
-	if (err) NSLog(@"%@", err);
-	NSArray *feeds = [moc executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName: Feed.entity.name] error:&err];
+	NSArray *result = [moc executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName: Feed.entity.name] error:&err];
 	if (err) NSLog(@"%@", err);
 	[moc performBlock:^{
-		for (FeedConfig *conf in confs) {
-			conf.unreadCount = 0;
-		}
-		for (Feed *feed in feeds) {
-			int count = 0;
-			for (FeedItem *item in feed.items) {
-				if (item.unread) ++count;
-			}
-			FeedConfig *parent = feed.config;
-			while (parent) {
-				parent.unreadCount += count;
-				parent = parent.parent;
-			}
+		for (Feed *feed in result) {
+			int16_t totalCount = (int16_t)feed.items.count;
+			int16_t unreadCount = (int16_t)[[feed.items valueForKeyPath:@"@sum.unread"] integerValue];
+			if (feed.articleCount != totalCount)
+				feed.articleCount = totalCount;
+			if (feed.unreadCount != unreadCount)
+				feed.unreadCount = unreadCount; // remember to update global total unread count
+			
+			NSString *pathStr = [feed.config indexPathString];
+			if (![feed.indexPath isEqualToString:pathStr])
+				feed.indexPath = pathStr;
 		}
 	}];
 }

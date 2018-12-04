@@ -26,6 +26,7 @@
 #import "ModalFeedEdit.h"
 #import "DrawImage.h"
 #import "StoreCoordinator.h"
+#import "Constants.h"
 
 @interface SettingsFeeds () <ModalEditDelegate>
 @property (weak) IBOutlet NSOutlineView *outlineView;
@@ -77,11 +78,14 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (IBAction)remove:(id)sender {
 	[self.undoManager beginUndoGrouping];
-	for (NSIndexPath *path in self.dataStore.selectionIndexPaths)
-		[self incrementIndicesBy:-1 forSubsequentNodes:path];
+	NSArray<NSTreeNode*> *parentNodes = [self.dataStore.selectedNodes valueForKeyPath:@"parentNode"];
 	[self.dataStore remove:sender];
+	for (NSTreeNode *parent in parentNodes) {
+		[self restoreOrderingAndIndexPathStr:parent];
+	}
 	[self.undoManager endUndoGrouping];
 	[self saveChanges];
+	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
 }
 
 - (IBAction)doubleClickOutlineView:(NSOutlineView*)sender {
@@ -126,48 +130,58 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	}];
 }
 
+/// Called after an item was modified. May be called twice if download was still in progress.
 - (void)modalDidUpdateFeedConfig:(FeedConfig*)config {
-	[self saveChanges]; // TODO: adjust total count
+	[self saveChanges];
+	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
 }
 
+
+#pragma mark - Helper -
+
+/// Insert @c FeedConfig item either after current selection or inside selected folder (if expanded)
 - (FeedConfig*)insertSortedItemAtSelection {
-	NSIndexPath *selectedIndex = [self.dataStore selectionIndexPath];
-	if (selectedIndex == NULL)
-		selectedIndex = [NSIndexPath new];
-	NSIndexPath *insertIndex = selectedIndex;
-	
-	FeedConfig *selected = [[[self.dataStore arrangedObjects] descendantNodeAtIndexPath:selectedIndex] representedObject];
-	NSUInteger lastIndex = (selected ? selected.children.count : self.dataStore.arrangedObjects.childNodes.count);
-	BOOL groupSelected = (selected.typ == GROUP);
-	
-	if (!groupSelected) {
-		lastIndex = (NSUInteger)selected.sortIndex + 1; // insert after selection
-		insertIndex = [insertIndex indexPathByRemovingLastIndex];
-		[self incrementIndicesBy:+1 forSubsequentNodes:selectedIndex];
-		--selected.sortIndex; // insert after selection
-	}
-	
 	FeedConfig *newItem = [[FeedConfig alloc] initWithEntity:FeedConfig.entity insertIntoManagedObjectContext:self.dataStore.managedObjectContext];
-	[self.dataStore insertObject:newItem atArrangedObjectIndexPath:[insertIndex indexPathByAddingIndex:lastIndex]];
-	// First insert, then parent, else troubles
-	newItem.sortIndex = (int32_t)lastIndex;
-	newItem.parent = (groupSelected ? selected : selected.parent);
+	NSTreeNode *selection = [[self.dataStore selectedNodes] firstObject];
+	NSIndexPath *pth = nil;
+	
+	if (!selection) { // append to root
+		pth = [NSIndexPath indexPathWithIndex:[self.dataStore arrangedObjects].childNodes.count]; // or 0 to append at front
+	} else if ([self.outlineView isItemExpanded:selection]) { // append to group (if open)
+		pth = [selection.indexPath indexPathByAddingIndex:0]; // or 'selection.childNodes.count' to append at end
+	} else { // append before / after selected item
+		pth = selection.indexPath;
+		// remove the two lines below to insert infront of selection (instead of after selection)
+		NSUInteger lastIdx = [pth indexAtPosition:pth.length - 1];
+		pth = [[pth indexPathByRemovingLastIndex] indexPathByAddingIndex:lastIdx + 1];
+	}
+	[self.dataStore insertObject:newItem atArrangedObjectIndexPath:pth];
+
+	if (pth.length > 2) { // some subfolder; not root folder (has parent!)
+		NSTreeNode *parentNode = [[self.dataStore arrangedObjects] descendantNodeAtIndexPath:pth].parentNode;
+		newItem.parent = parentNode.representedObject;
+		[self restoreOrderingAndIndexPathStr:parentNode];
+	} else {
+		[self restoreOrderingAndIndexPathStr:[self.dataStore arrangedObjects]]; // .parent = nil
+	}
 	return newItem;
 }
 
-
-#pragma mark - Import & Export of Data
-
-
-- (void)incrementIndicesBy:(int)val forSubsequentNodes:(NSIndexPath*)path {
-	NSIndexPath *parentPath = [path indexPathByRemovingLastIndex];
-	NSTreeNode *root = [self.dataStore arrangedObjects];
-	if (parentPath.length > 0)
-		root = [root descendantNodeAtIndexPath:parentPath];
-	
-	for (NSUInteger i = [path indexAtPosition:path.length - 1]; i < root.childNodes.count; i++) {
-		FeedConfig *conf = [root.childNodes[i] representedObject];
-		conf.sortIndex += val;
+/// Loop over all descendants and update @c sortIndex @c (FeedConfig) as well as all @c indexPath @c (Feed)
+- (void)restoreOrderingAndIndexPathStr:(NSTreeNode*)parent {
+	NSArray<NSTreeNode*> *children = parent.childNodes;
+	for (NSUInteger i = 0; i < children.count; i++) {
+		NSTreeNode *n = [children objectAtIndex:i];
+		FeedConfig *fc = n.representedObject;
+		// Re-calculate sort index for all affected parents
+		if (fc.sortIndex != (int32_t)i)
+			fc.sortIndex = (int32_t)i;
+		// Re-calculate index path for all contained feed items
+		[fc iterateSorted:NO overDescendantFeeds:^(Feed *feed, BOOL *cancel) {
+			NSString *pthStr = [feed.config indexPathString];
+			if (![feed.indexPath isEqualToString:pthStr])
+				feed.indexPath = pthStr;
+		}];
 	}
 }
 
@@ -196,49 +210,20 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index {
-	NSArray<NSTreeNode *> *dstChildren = [item childNodes];
-	if (!item || !dstChildren)
-		dstChildren = [self.dataStore arrangedObjects].childNodes;
+	NSTreeNode *destParent = (item != nil ? item : [self.dataStore arrangedObjects]);
+	NSUInteger idx = (NSUInteger)index;
+	if (index == -1) // drag items on folder or root drop
+		idx = destParent.childNodes.count;
+	NSIndexPath *dest = [destParent indexPath];
 	
-	BOOL isFolderDrag = (index == -1);
-	NSUInteger insertIndex = (isFolderDrag ? dstChildren.count : (NSUInteger)index);
-	// index where the items will be moved to, but not final since items above can vanish
-	NSIndexPath *dest = [item indexPath];
-	if (!dest) dest = [NSIndexPath indexPathWithIndex:insertIndex];
-	else       dest = [dest indexPathByAddingIndex:insertIndex];
+	NSArray<NSTreeNode*> *previousParents = [self.currentlyDraggedNodes valueForKeyPath:@"parentNode"];
+	[self.dataStore moveNodes:self.currentlyDraggedNodes toIndexPath:[dest indexPathByAddingIndex:idx]];
 	
-	// decrement index for every item that is dragged from the same location (above the destination)
-	NSUInteger updateIndex = insertIndex;
-	for (NSTreeNode *node in self.currentlyDraggedNodes) {
-		NSIndexPath *nodesPath = [node indexPath];
-		if ([[nodesPath indexPathByRemovingLastIndex] isEqualTo:[dest indexPathByRemovingLastIndex]] &&
-			insertIndex > [nodesPath indexAtPosition:nodesPath.length - 1])
-		{
-			--updateIndex;
-		}
+	for (NSTreeNode *node in previousParents) {
+		[self restoreOrderingAndIndexPathStr:node];
 	}
-	for (NSUInteger i = self.currentlyDraggedNodes.count; i > 0; i--) { // sorted that way to handle children first
-		FeedConfig *fc = [self.currentlyDraggedNodes[i - 1] representedObject];
-		[fc.managedObjectContext refreshObject:fc mergeChanges:YES]; // make sure unreadCount is correct
-		[fc markUnread:-fc.unreadCount ancestorsOnly:YES];
-	}
+	[self restoreOrderingAndIndexPathStr:destParent];
 	
-	// decrement sort indices at source
-	for (NSTreeNode *node in self.currentlyDraggedNodes)
-		[self incrementIndicesBy:-1 forSubsequentNodes:[node indexPath]];
-	// increment sort indices at destination
-	if (!isFolderDrag)
-		[self incrementIndicesBy:(int)self.currentlyDraggedNodes.count forSubsequentNodes:dest];
-	
-	// move items
-	[self.dataStore moveNodes:self.currentlyDraggedNodes toIndexPath:dest];
-	
-	// set sort indices for dragged items
-	for (NSUInteger i = 0; i < self.currentlyDraggedNodes.count; i++) {
-		FeedConfig *fc = [self.currentlyDraggedNodes[i] representedObject];
-		fc.sortIndex = (int32_t)(updateIndex + i);
-		[fc markUnread:fc.unreadCount ancestorsOnly:YES];
-	}
 	return YES;
 }
 
@@ -317,15 +302,15 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (void)undo:(id)sender {
 	[self.undoManager undo];
-	[StoreCoordinator restoreUnreadCount];
 	[self saveChanges];
+	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
 	[self.dataStore rearrangeObjects]; // update ordering
 }
 
 - (void)redo:(id)sender {
 	[self.undoManager redo];
-	[StoreCoordinator restoreUnreadCount];
 	[self saveChanges];
+	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
 	[self.dataStore rearrangeObjects]; // update ordering
 }
 

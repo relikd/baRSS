@@ -21,12 +21,20 @@
 //  SOFTWARE.
 
 #import <Cocoa/Cocoa.h>
+#import "NSMenuItem+Ext.h"
 
 @interface NSMenu (Ext)
+// Generator
 + (instancetype)menuWithDelegate:(id<NSMenuDelegate>)target;
 - (instancetype)submenuWithIndex:(int)index isFeed:(BOOL)flag;
-- (void)replaceSeparatorStringsWithActualSeparator;
+- (instancetype)cleanInstanceCopy;
+// Properties
 - (BOOL)isMainMenu;
 - (BOOL)isFeedMenu;
-- (NSInteger)getFeedConfigOffsetAndUpdateUnread:(BOOL)hasUnread;
+- (MenuItemTag)scope;
+- (NSInteger)feedConfigOffset;
+- (NSInteger)coreDataUnreadCount;
+// Modify menu
+- (void)replaceSeparatorStringsWithActualSeparator;
+- (void)autoEnableMenuHeader:(BOOL)hasUnread;
 @end
