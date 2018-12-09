@@ -27,6 +27,7 @@
 - (void)calculateAndSetScheduled;
 
 - (void)setEtag:(NSString*)etag modified:(NSString*)modified;
+- (void)setEtagAndModified:(NSHTTPURLResponse*)http;
 - (BOOL)setURL:(NSString*)url refresh:(int32_t)refresh unit:(int16_t)unit;
 
 - (NSString*)readableRefreshString;

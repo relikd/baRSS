@@ -24,12 +24,16 @@
 
 @implementation FeedMeta (Ext)
 
-/// Increment @c errorCount (max. 19) and set new @c scheduled (2^N seconds, max. 6 days).
+/// Increment @c errorCount and set new @c scheduled date (2^N minutes, max. 5.7 days).
 - (void)setErrorAndPostponeSchedule {
-	int16_t n = self.errorCount + 1;
-	self.errorCount = (n < 1 ? 1 : (n > 19 ? 19 : n)); // between: 2 sec and 6 days
-	NSTimeInterval retryWaitTime = pow(2, self.errorCount); // 2^n seconds
+	if (self.errorCount < 0)
+		self.errorCount = 0;
+	int16_t n = self.errorCount + 1; // always increment errorCount (can be used to indicate bad feeds)
+	NSTimeInterval retryWaitTime = pow(2, (n > 13 ? 13 : n)) * 60; // 2^N (between: 2 minutes and 5.7 days)
+	self.errorCount = n;
 	self.scheduled = [NSDate dateWithTimeIntervalSinceNow:retryWaitTime];
+	// TODO: remove logging
+	NSLog(@"ERROR: Feed download failed: %@ (errorCount: %d)", self.url, n);
 }
 
 /// Calculate date from @c refreshNum and @c refreshUnit and set as next scheduled feed update.
@@ -42,6 +46,12 @@
 - (void)setEtag:(NSString*)etag modified:(NSString*)modified {
 	if (![self.etag isEqualToString:etag])         self.etag = etag;
 	if (![self.modified isEqualToString:modified]) self.modified = modified;
+}
+
+/// Read header field "Etag" and "Date" and set @c .etag and @c .modified.
+- (void)setEtagAndModified:(NSHTTPURLResponse*)http {
+	NSDictionary *header = [http allHeaderFields];
+	[self setEtag:header[@"Etag"] modified:header[@"Date"]]; // @"Expires", @"Last-Modified"
 }
 
 /**

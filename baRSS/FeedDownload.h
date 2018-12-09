@@ -24,9 +24,15 @@
 #import <RSXML/RSXML.h>
 
 @interface FeedDownload : NSObject
-+ (void)newFeed:(NSString *)url block:(void(^)(RSParsedFeed *feed, NSError* error, NSHTTPURLResponse* response))block;
+// Register for network change notifications
 + (void)registerNetworkChangeNotification;
 + (void)unregisterNetworkChangeNotification;
-+ (BOOL)isNetworkReachable;
-+ (void)scheduleNextUpdateForced:(BOOL)flag;
+// Scheduled feed update
++ (void)newFeed:(NSString *)url block:(void(^)(RSParsedFeed *feed, NSError* error, NSHTTPURLResponse* response))block;
++ (void)scheduleUpdateForUpcomingFeeds;
++ (void)forceUpdateAllFeeds;
+// User interaction
++ (BOOL)allowNetworkConnection;
++ (BOOL)isPaused;
++ (void)setPaused:(BOOL)flag;
 @end

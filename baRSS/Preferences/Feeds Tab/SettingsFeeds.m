@@ -181,7 +181,6 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		FeedGroup *fg = [children objectAtIndex:i].representedObject;
 		if (fg.sortIndex != (int32_t)i)
 			fg.sortIndex = (int32_t)i;
-		NSLog(@"%@ - %d", fg.name, fg.sortIndex);
 		[fg iterateSorted:NO overDescendantFeeds:^(Feed *feed, BOOL *cancel) {
 			[feed calculateAndSetIndexPathString];
 		}];
@@ -259,13 +258,14 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	BOOL isFeed = (fg.typ == FEED);
 	BOOL isSeperator = (fg.typ == SEPARATOR);
 	BOOL isRefreshColumn = [tableColumn.identifier isEqualToString:@"RefreshColumn"];
+	BOOL refreshDisabled = (!isFeed || fg.refreshStr.length == 0 || [fg.refreshStr characterAtIndex:0] == '0');
 	
 	NSString *cellIdent = (isRefreshColumn ? @"cellRefresh" : (isSeperator ? @"cellSeparator" : @"cellFeed"));
 	// owner is nil to prohibit repeated awakeFromNib calls
 	NSTableCellView *cellView = [self.outlineView makeViewWithIdentifier:cellIdent owner:nil];
 	
 	if (isRefreshColumn) {
-		cellView.textField.stringValue = (isFeed && fg.refreshStr.length > 0 ? fg.refreshStr : @"");
+		cellView.textField.stringValue = (refreshDisabled ? (isFeed ? @"--" : @"") : fg.refreshStr);
 	} else if (isSeperator) {
 		return cellView; // the refresh cell is already skipped with the above if condition
 	} else {
@@ -281,10 +281,8 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 			cellView.imageView.image = defaultRSSIcon;
 		}
 	}
-	if (isFeed) {// also for refresh column
-		BOOL feedDisbaled = (fg.refreshStr.length == 0 || [fg.refreshStr characterAtIndex:0] == '0');
-		cellView.textField.textColor = (feedDisbaled ? [NSColor disabledControlTextColor] : [NSColor controlTextColor]);
-	}
+	// also for refresh column
+	cellView.textField.textColor = (isFeed && refreshDisabled ? [NSColor disabledControlTextColor] : [NSColor controlTextColor]);
 	return cellView;
 }
 

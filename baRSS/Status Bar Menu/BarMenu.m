@@ -89,7 +89,7 @@
 		} else {
 			self.barItem.title = @"";
 		}
-		// BOOL hasNet = [FeedDownload isNetworkReachable];
+		// BOOL hasNet = [FeedDownload allowNetworkConnection];
 		if (self.unreadCountTotal > 0 && [UserPrefs defaultYES:@"tintMenuBarIcon"]) {
 			self.barItem.image = [RSSIcon templateIcon:16 tint:[NSColor rssOrange]];
 		} else {
@@ -281,13 +281,14 @@
  Insert default menu items for the main menu only. Like 'Pause Updates', 'Update all feeds', 'Preferences' and 'Quit'.
  */
 - (void)insertMainMenuHeader:(NSMenu*)menu {
-	NSMenuItem *item1 = [NSMenuItem itemWithTitle:NSLocalizedString(@"Pause Updates", nil)
-										   action:@selector(pauseUpdates:) target:self tag:TagPauseUpdates];
+	NSMenuItem *item1 = [NSMenuItem itemWithTitle:@"" action:@selector(pauseUpdates:) target:self tag:TagPauseUpdates];
 	NSMenuItem *item2 = [NSMenuItem itemWithTitle:NSLocalizedString(@"Update all feeds", nil)
 										   action:@selector(updateAllFeeds:) target:self tag:TagUpdateFeed];
+	item1.title = ([FeedDownload isPaused] ?
+				   NSLocalizedString(@"Resume Updates", nil) : NSLocalizedString(@"Pause Updates", nil));
 	if ([UserPrefs defaultYES:@"globalUpdateAll"] == NO)
 		item2.hidden = YES;
-	if (![FeedDownload isNetworkReachable])
+	if (![FeedDownload allowNetworkConnection])
 		item2.enabled = NO;
 	[menu insertItem:item1 atIndex:0];
 	[menu insertItem:item2 atIndex:1];
@@ -325,22 +326,21 @@
 - (void)preferencesClosed:(id)sender {
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:self.prefWindow.window];
 	self.prefWindow = nil;
-	[FeedDownload scheduleNextUpdateForced:NO];
+	[FeedDownload scheduleUpdateForUpcomingFeeds];
 }
 
 /**
  Called when user clicks on 'Pause Updates' in the main menu (only).
  */
 - (void)pauseUpdates:(NSMenuItem*)sender {
-	NSLog(@"1pause");
+	[FeedDownload setPaused:![FeedDownload isPaused]];
 }
 
 /**
  Called when user clicks on 'Update all feeds' in the main menu (only).
  */
 - (void)updateAllFeeds:(NSMenuItem*)sender {
-	// TODO: Disable 'update all' menu item during update?
-	[FeedDownload scheduleNextUpdateForced:YES];
+	[FeedDownload forceUpdateAllFeeds];
 }
 
 /**
