@@ -44,12 +44,12 @@ ToDo
 		- [ ] Append or replace
 
 
-- [ ] Status menu
+- [x] Status menu
 	- [x] Update menu header after mark (un)read
-	- [ ] Pause updates functionality
+	- [x] Pause updates functionality
 	- [x] Update all feeds functionality
 	- [x] Hold only relevant information in memory
-	- [ ] Icon for paused / no internet state
+	- [x] Icon for paused / no internet state
 
 
 - [ ] Edit feed

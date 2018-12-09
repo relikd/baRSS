@@ -23,16 +23,19 @@
 #import "DrawImage.h"
 
 @implementation NSColor (RandomColor)
+/// @return Color with random R, G, B values for testing purposes
 + (NSColor*)randomColor {
 	return [NSColor colorWithRed:(arc4random()%50+20)/100.0
 						   green:(arc4random()%50+20)/100.0
 							blue:(arc4random()%50+20)/100.0
 						   alpha:1];
 }
+/// @return Orange color that is typically used for RSS
 + (NSColor*)rssOrange {
 	return [NSColor colorWithCalibratedRed:0.984 green:0.639 blue:0.227 alpha:1.0];
 }
 @end
+
 
 // ################################################################
 // #
@@ -48,6 +51,7 @@
 -(id)initWithCoder:(NSCoder*)c{self=[super initWithCoder:c];if(self)[self initialize];return self;}
 
 //#if !TARGET_INTERFACE_BUILDER #endif
+/// Prepare view content to autoresize when rescaling
 - (void)initialize {
 	_contentScale = 1.0;
 	_imageView = [NSImageView imageViewWithImage:[self drawnImage]];
@@ -56,6 +60,12 @@
 	[self addSubview:_imageView];
 }
 
+/**
+ Designated initializer. Will add rounded corners and background color.
+
+ @param w Square size of icon.
+ @param s Scaling factor of the content image.
+ */
 - (instancetype)initWithSize:(CGFloat)w scale:(CGFloat)s {
 	self = [super initWithFrame:NSMakeRect(0, 0, w, w)];
 	self.roundness = 40;
@@ -64,6 +74,9 @@
 	return self;
 }
 
+/**
+ @return New image with drawn content. Will call @c drawImageInRect:
+ */
 - (NSImage*)drawnImage {
 	return [NSImage imageWithSize:self.frame.size flipped:NO drawingHandler:^BOOL(NSRect rect) {
 		[self drawImageInRect:rect];
@@ -71,16 +84,21 @@
 	}];
 }
 
+/// Set roundness factor for rounded corners (background). This setter ensures a percent value between 0 and 1.
 - (void)setRoundness:(CGFloat)r {
 	_roundness = 0.5 * (r < 0 ? 0 : r > 100 ? 100 : r);
 }
 
+/// @return MIN( width, height )
 - (CGFloat)shorterSide {
 	if (self.frame.size.width < self.frame.size.height)
 		return self.frame.size.width;
 	return self.frame.size.height;
 }
 
+/**
+ Draw background image, rounded corners and scaled image content
+ */
 - (void)drawImageInRect:(NSRect)r {
 	const CGFloat s = [self shorterSide];
 	CGContextRef c = [[NSGraphicsContext currentContext] CGContext];
@@ -107,6 +125,7 @@
 }
 @end
 
+
 // ################################################################
 // #
 // #  RSSIcon
@@ -114,6 +133,10 @@
 // ################################################################
 
 @implementation RSSIcon // content scale 0.75 works fine
+
+/**
+ @return Default RSS icon for feeds that are missing an icon. (Not used in system bar).
+ */
 + (NSImage*)iconWithSize:(CGFloat)s {
 	RSSIcon *icon = [[RSSIcon alloc] initWithSize:s scale:0.7];
 	icon.barsColor = [NSColor whiteColor];
@@ -121,12 +144,25 @@
 	return [icon drawnImage];
 }
 
-+ (NSImage*)templateIcon:(CGFloat)s tint:(NSColor*)color {
+/**
+ Returns new @c NSImage with background (tinted or not) and connection error (if set).
+
+ @param s Square image size
+ @param color Tint color of icon. Either untintend (white) or highlighted (rss orange).
+ @param conn If @c YES show small pause icon in right upper corner.
+ */
++ (NSImage*)systemBarIcon:(CGFloat)s tint:(NSColor*)color noConnection:(BOOL)conn {
 	RSSIcon *icon = [[RSSIcon alloc] initWithSize:s scale:0.7];
 	icon.color = (color ? color : [NSColor blackColor]);
+	icon.noConnection = conn;
+//	icon.showBackground = !conn;
+//	icon.contentScale = (conn ? 0.9 : 0.7);
 	return [icon drawnImage];
 }
 
+/**
+ Draw two rss bars (or paused icon) and tint color or gradient color.
+ */
 - (void)drawImageInRect:(NSRect)r {
 	[super drawImageInRect:r];
 	
@@ -145,11 +181,33 @@
 	CGPathAddArc(bars, NULL, 0, 0, s * 0.45, 0, M_PI_2, NO);
 	CGPathCloseSubpath(bars);
 	// 2nd bar
-	CGPathMoveToPoint(bars, NULL, 0, s);
-	CGPathAddArc(bars, NULL, 0, 0, s, M_PI_2, 0, YES);
-	CGPathAddLineToPoint(bars, NULL, s * 0.8, 0);
-	CGPathAddArc(bars, NULL, 0, 0, s * 0.8, 0, M_PI_2, NO);
-	CGPathCloseSubpath(bars);
+	if (_noConnection) {
+		CGAffineTransform at = CGAffineTransformMake(0.5, 0, 0, 0.5, s * 0.5, s * 0.5);
+		// X icon
+//		CGPathMoveToPoint(bars, &at, 0, s * 0.2);
+//		CGPathAddLineToPoint(bars, &at, s * 0.3, s * 0.5);
+//		CGPathAddLineToPoint(bars, &at, 0, s * 0.8);
+//		CGPathAddLineToPoint(bars, &at, s * 0.2, s);
+//		CGPathAddLineToPoint(bars, &at, s * 0.5, s * 0.7);
+//		CGPathAddLineToPoint(bars, &at, s * 0.8, s);
+//		CGPathAddLineToPoint(bars, &at, s, s * 0.8);
+//		CGPathAddLineToPoint(bars, &at, s * 0.7, s * 0.5);
+//		CGPathAddLineToPoint(bars, &at, s, s * 0.2);
+//		CGPathAddLineToPoint(bars, &at, s * 0.8, 0);
+//		CGPathAddLineToPoint(bars, &at, s * 0.5, s * 0.3);
+//		CGPathAddLineToPoint(bars, &at, s * 0.2, 0);
+//		CGPathCloseSubpath(bars);
+		// Pause icon
+//		CGPathMoveToPoint(bars, &at, s * 0.2, s * 0.2);
+		CGPathAddRect(bars, &at, CGRectMake(s*0.1, 0, s*0.3, s));
+		CGPathAddRect(bars, &at, CGRectMake(s*0.6, 0, s*0.3, s));
+	} else {
+		CGPathMoveToPoint(bars, NULL, 0, s);
+		CGPathAddArc(bars, NULL, 0, 0, s, M_PI_2, 0, YES);
+		CGPathAddLineToPoint(bars, NULL, s * 0.8, 0);
+		CGPathAddArc(bars, NULL, 0, 0, s * 0.8, 0, M_PI_2, NO);
+		CGPathCloseSubpath(bars);
+	}
 	
 	CGContextAddPath(c, bars);
 	
@@ -170,6 +228,9 @@
 	CGPathRelease(bars);
 }
 
+/**
+ Apply gradient to current context clipping.
+ */
 - (void)drawGradient:(CGContextRef)c side:(CGFloat)w {
 	CGFloat h = 0, s = 1, b = 1, a = 1;
 	@try {
@@ -194,6 +255,7 @@
 }
 @end
 
+
 // ################################################################
 // #
 // #  SettingsIconGlobal
@@ -201,6 +263,9 @@
 // ################################################################
 
 @implementation SettingsIconGlobal // content scale 0.7 works fine
+/**
+ Draw icon for preferences; showing the status bar and an open menu. (single colors contour)
+ */
 - (void)drawImageInRect:(NSRect)r {
 	[super drawImageInRect:r]; // add path of rounded rect
 	
@@ -227,6 +292,7 @@
 }
 @end
 
+
 // ################################################################
 // #
 // #  SettingsIconGroup
@@ -234,6 +300,9 @@
 // ################################################################
 
 @implementation SettingsIconGroup // content scale 0.8 works fine
+/**
+ Draw icon for preferences; showing the mac typcial folder icon. (single colors contour)
+ */
 - (void)drawImageInRect:(NSRect)r {
 	[super drawImageInRect:r];
 	
@@ -287,6 +356,7 @@
 }
 @end
 
+
 // ################################################################
 // #
 // #  DrawSeparator
@@ -294,6 +364,9 @@
 // ################################################################
 
 @implementation DrawSeparator
+/**
+ Draw separator line in @c NSOutlineView
+ */
 - (void)drawRect:(NSRect)dirtyRect {
 	NSGradient *grdnt = [[NSGradient alloc] initWithStartingColor:[NSColor darkGrayColor] endingColor:[[NSColor darkGrayColor] colorWithAlphaComponent:0.0]];
 	NSRect separatorRect = NSMakeRect(1, self.frame.size.height / 2.0 - 1, self.frame.size.width - 2, 2);
@@ -301,5 +374,3 @@
 	[grdnt drawInBezierPath:rounded angle:0];
 }
 @end
-
-
