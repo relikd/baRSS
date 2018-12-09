@@ -23,6 +23,10 @@
 #ifndef Constants_h
 #define Constants_h
 
+// TODO: Add support for media player?
+// <enclosure url="https://url.mp3" length="63274022" type="audio/mpeg" />
+// TODO: Disable 'update all' menu item during update?
+
 static NSString *kNotificationFeedUpdated = @"baRSS-notification-feed-updated";
 static NSString *kNotificationNetworkStatusChanged = @"baRSS-notification-network-status-changed";
 static NSString *kNotificationTotalUnreadCountChanged = @"baRSS-notification-total-unread-count-changed";
