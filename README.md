@@ -73,10 +73,10 @@ ToDo
 		- [x] Delete old ones eventually
 		- [x] Pause on internet connection lost
 	- [ ] Download with ephemeral url session?
-	- [ ] Purge cache
-		- [ ] Manually or automatically
-		- [ ] Add something to restore a broken state
-	- [ ] Code Documentation (mostly methods)
+	- [x] Purge cache
+		- [x] Manually or automatically
+		- [x] Add something to restore a broken state
+	- [x] Code Documentation (mostly methods)
 	- [ ] Add Sandboxing
 		- [ ] Disable Startup checkbox (or other workaround)
 

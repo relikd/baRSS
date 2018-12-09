@@ -20,28 +20,14 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import "FeedConfig+CoreDataClass.h"
+#import "FeedMeta+CoreDataClass.h"
 
-@class FeedItem, RSParsedFeed;
-
-@interface FeedConfig (Ext)
-/// Enum type to distinguish different @c FeedConfig types
-typedef enum int16_t {
-	GROUP = 0,
-	FEED = 1,
-	SEPARATOR = 2
-} FeedConfigType;
-
-@property (getter=typ, setter=setTyp:) FeedConfigType typ;
-// Handle children and parents
-- (NSString*)indexPathString;
-- (NSMutableArray<FeedConfig*>*)allParents;
-- (BOOL)iterateSorted:(BOOL)ordered overDescendantFeeds:(void(^)(Feed *feed, BOOL* cancel))block;
-// Update feed and meta
-- (void)updateRSSFeed:(RSParsedFeed*)obj;
-- (void)setEtag:(NSString*)etag modified:(NSString*)modified;
+@interface FeedMeta (Ext)
+- (void)setErrorAndPostponeSchedule;
 - (void)calculateAndSetScheduled;
-// Printing
+
+- (void)setEtag:(NSString*)etag modified:(NSString*)modified;
+- (BOOL)setURL:(NSString*)url refresh:(int32_t)refresh unit:(int16_t)unit;
+
 - (NSString*)readableRefreshString;
-- (NSString*)readableDescription;
 @end

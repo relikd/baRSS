@@ -20,16 +20,31 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import "FeedConfig+Ext.h"
+#import "FeedGroup+Ext.h"
+#import "FeedMeta+Ext.h"
 #import "Feed+Ext.h"
-#import "FeedMeta+CoreDataClass.h"
-#import "Constants.h"
 
-@implementation FeedConfig (Ext)
-/// Enum tpye getter see @c FeedConfigType
-- (FeedConfigType)typ { return (FeedConfigType)self.type; }
-/// Enum type setter see @c FeedConfigType
-- (void)setTyp:(FeedConfigType)typ { self.type = typ; }
+@implementation FeedGroup (Ext)
+/// Enum tpye getter see @c FeedGroupType
+- (FeedGroupType)typ { return (FeedGroupType)self.type; }
+/// Enum type setter see @c FeedGroupType
+- (void)setTyp:(FeedGroupType)typ { self.type = typ; }
+
+
+/// Create new instance and set @c Feed and @c FeedMeta if group type is @c FEED
++ (instancetype)newGroup:(FeedGroupType)type inContext:(NSManagedObjectContext*)moc {
+	FeedGroup *fg = [[FeedGroup alloc] initWithEntity: FeedGroup.entity insertIntoManagedObjectContext:moc];
+	fg.typ = type;
+	if (type == FEED)
+		fg.feed = [Feed newFeedAndMetaInContext:moc];
+	return fg;
+}
+
+/// Set name and refreshStr attributes. @note Only values that differ will be updated.
+- (void)setName:(NSString*)name andRefreshString:(NSString*)refreshStr {
+	if (![self.name isEqualToString: name])            self.name = name;
+	if (![self.refreshStr isEqualToString:refreshStr]) self.refreshStr = refreshStr;
+}
 
 
 #pragma mark - Handle Children And Parents -
@@ -43,14 +58,14 @@
 }
 
 /// @return Children sorted by attribute @c sortIndex (same order as in preferences).
-- (NSArray<FeedConfig*>*)sortedChildren {
+- (NSArray<FeedGroup*>*)sortedChildren {
 	if (self.children.count == 0)
 		return nil;
 	return [self.children sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];
 }
 
-/// @return @c NSArray of all ancestors: First object is root. Last object is the @c FeedConfig that executed the command.
-- (NSMutableArray<FeedConfig*>*)allParents {
+/// @return @c NSArray of all ancestors: First object is root. Last object is the @c FeedGroup that executed the command.
+- (NSMutableArray<FeedGroup*>*)allParents {
 	if (self.parent == nil)
 		return [NSMutableArray arrayWithObject:self];
 	NSMutableArray *arr = [self.parent allParents];
@@ -71,8 +86,8 @@
 		block(self.feed, &stopEarly);
 		if (stopEarly) return NO;
 	} else {
-		for (FeedConfig *fc in (ordered ? [self sortedChildren] : self.children)) {
-			if (![fc iterateSorted:ordered overDescendantFeeds:block])
+		for (FeedGroup *fg in (ordered ? [self sortedChildren] : self.children)) {
+			if (![fg iterateSorted:ordered overDescendantFeeds:block])
 				return NO;
 		}
 	}
@@ -80,49 +95,8 @@
 }
 
 
-#pragma mark - Update Feed And Meta -
-
-
-/// Delete any existing feed object and parse new one. Read state will be copied.
-- (void)updateRSSFeed:(RSParsedFeed*)obj {
-	if (!self.feed) {
-		self.feed = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:self.managedObjectContext];
-		self.feed.indexPath = [self indexPathString];
-	}
-	int32_t unreadBefore = self.feed.unreadCount;
-	[self.feed updateWithRSS:obj];
-	NSNumber *cDiff = [NSNumber numberWithInteger:self.feed.unreadCount - unreadBefore];
-	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:cDiff];
-}
-
-/// Update FeedMeta or create new one if needed.
-- (void)setEtag:(NSString*)etag modified:(NSString*)modified {
-	if (!self.meta) {
-		self.meta = [[FeedMeta alloc] initWithEntity:FeedMeta.entity insertIntoManagedObjectContext:self.managedObjectContext];
-	}
-	if (![self.meta.httpEtag isEqualToString:etag])         self.meta.httpEtag = etag;
-	if (![self.meta.httpModified isEqualToString:modified]) self.meta.httpModified = modified;
-}
-
-/// Calculate date from @c refreshNum and @c refreshUnit and set as next scheduled feed update.
-- (void)calculateAndSetScheduled {
-	self.scheduled = [[NSDate date] dateByAddingTimeInterval:[self timeInterval]];
-}
-
-/// @return Time interval respecting the selected unit. E.g., returns @c 180 for @c '3m'
-- (NSTimeInterval)timeInterval {
-	static const int unit[] = {1, 60, 3600, 86400, 604800}; // smhdw
-	return self.refreshNum * unit[self.refreshUnit % 5];
-}
-
-
 #pragma mark - Printing -
 
-
-/// @return Formatted string for update interval ( e.g., @c 30m or @c 12h )
-- (NSString*)readableRefreshString {
-	return [NSString stringWithFormat:@"%d%c", self.refreshNum, [@"smhdw" characterAtIndex:self.refreshUnit % 5]];
-}
 
 /// @return Simplified description of the feed object.
 - (NSString*)readableDescription {
@@ -130,7 +104,7 @@
 		case SEPARATOR: return @"-------------";
 		case GROUP: return [NSString stringWithFormat:@"%@", self.name];
 		case FEED:
-			return [NSString stringWithFormat:@"%@ (%@) - %@", self.name, self.url, [self readableRefreshString]];
+			return [NSString stringWithFormat:@"%@ (%@) - %@", self.name, self.feed.meta.url, self.refreshStr];
 	}
 }
 

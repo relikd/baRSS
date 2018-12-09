@@ -27,8 +27,9 @@
 #import "Preferences.h"
 #import "UserPrefs.h"
 #import "NSMenu+Ext.h"
-#import "Feed+Ext.h"
 #import "Constants.h"
+#import "Feed+Ext.h"
+#import "FeedGroup+Ext.h"
 
 
 @interface BarMenu()
@@ -52,15 +53,14 @@
 	// Unread counter
 	self.unreadCountTotal = 0;
 	[self updateBarIcon];
-	[self reloadUnreadCountAndUpdateBarIcon];
+	[self asyncReloadUnreadCountAndUpdateBarIcon];
 	
 	// Register for notifications
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedUpdated:) name:kNotificationFeedUpdated object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkChanged:) name:kNotificationNetworkStatusChanged object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(unreadCountChanged:) name:kNotificationTotalUnreadCountChanged object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadUnreadCountAndUpdateBarIcon) name:kNotificationTotalUnreadCountReset object:nil];
-	[FeedDownload registerNetworkChangeNotification];
-	[FeedDownload performSelectorInBackground:@selector(scheduleNextUpdate:) withObject:[NSNumber numberWithBool:NO]];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(asyncReloadUnreadCountAndUpdateBarIcon) name:kNotificationTotalUnreadCountReset object:nil];
+	[FeedDownload registerNetworkChangeNotification]; // will call update scheduler
 	return self;
 }
 
@@ -72,7 +72,7 @@
 #pragma mark - Update Menu Bar Icon -
 
 /// Regardless of current unread count, perform new core data fetch on total unread count and update icon.
-- (void)reloadUnreadCountAndUpdateBarIcon {
+- (void)asyncReloadUnreadCountAndUpdateBarIcon {
 	dispatch_async(dispatch_get_main_queue(), ^{
 		self.unreadCountTotal = [StoreCoordinator unreadCountForIndexPathString:nil];
 		[self updateBarIcon];
@@ -130,10 +130,10 @@
 		// update items only if menu is already open (e.g., during background update)
 		NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 		for (NSManagedObjectID *oid in notify.object) {
-			FeedConfig *fc = [moc objectWithID:oid];
-			NSMenu *menu = [self fixUnreadCountForSubmenus:fc];
+			Feed *feed = [moc objectWithID:oid];
+			NSMenu *menu = [self fixUnreadCountForSubmenus:feed];
 			if (!menu || menu.numberOfItems > 0)
-				[self rebuiltFeedItems:fc.feed inMenu:menu]; // deepest menu level, feed items
+				[self rebuiltFeedArticle:feed inMenu:menu]; // deepest menu level, feed items
 		}
 		[self.barItem.menu autoEnableMenuHeader:(self.unreadCountTotal > 0)]; // once per multi-feed update
 		[moc reset];
@@ -143,15 +143,14 @@
 /**
  Go through all parent menus and reset the menu title and unread count
 
- @param config Should contain a @c Feed object in @c config.feed.
- @return @c NSMenu containing @c FeedItem. Will be @c nil if user hasn't open the menu yet.
+ @return @c NSMenu containing @c FeedArticle. Will be @c nil if user hasn't open the menu yet.
  */
-- (nullable NSMenu*)fixUnreadCountForSubmenus:(FeedConfig*)config {
+- (nullable NSMenu*)fixUnreadCountForSubmenus:(Feed*)feed {
 	NSMenu *menu = self.barItem.menu;
-	for (FeedConfig *conf in [config allParents]) {
-		NSInteger offset = [menu feedConfigOffset];
-		NSMenuItem *item = [menu itemAtIndex:offset + conf.sortIndex];
-		NSInteger unread = [item setTitleAndUnreadCount:conf];
+	for (FeedGroup *parent in [feed.group allParents]) {
+		NSInteger offset = [menu feedDataOffset];
+		NSMenuItem *item = [menu itemAtIndex:offset + parent.sortIndex];
+		NSInteger unread = [item setTitleAndUnreadCount:parent];
 		menu = item.submenu;
 		if (!menu || menu.numberOfItems == 0)
 			return nil;
@@ -168,17 +167,17 @@
  @param feed Corresponding @c Feed to @c NSMenu.
  @param menu Deepest menu level which contains only feed items.
  */
-- (void)rebuiltFeedItems:(Feed*)feed inMenu:(NSMenu*)menu {
+- (void)rebuiltFeedArticle:(Feed*)feed inMenu:(NSMenu*)menu {
 	if (self.currentOpenMenu != menu) {
 		// if the menu isn't open, re-create it dynamically instead
 		menu.itemArray.firstObject.parentItem.submenu = [menu cleanInstanceCopy];
 	} else {
 		[menu removeAllItems];
 		[self insertDefaultHeaderForAllMenus:menu hasUnread:(feed.unreadCount > 0)];
-		for (FeedItem *fi in [feed sortedArticles]) {
+		for (FeedArticle *fa in [feed sortedArticles]) {
 			NSMenuItem *mi = [menu addItemWithTitle:@"" action:@selector(openFeedURL:) keyEquivalent:@""];
 			mi.target = self;
-			[mi setFeedItem:fi];
+			[mi setFeedArticle:fa];
 		}
 	}
 }
@@ -219,12 +218,12 @@
 /// Lazy populate system bar menus when needed.
 - (BOOL)menu:(NSMenu*)menu updateItem:(NSMenuItem*)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel {
 	id obj = [self.readContext objectWithID:[self.objectIDsForMenu objectAtIndex:(NSUInteger)index]];
-	if ([obj isKindOfClass:[FeedConfig class]]) {
-		[item setFeedConfig:obj];
-		if ([(FeedConfig*)obj typ] == FEED)
+	if ([obj isKindOfClass:[FeedGroup class]]) {
+		[item setFeedGroup:obj];
+		if ([(FeedGroup*)obj typ] == FEED)
 			[item setTarget:self action:@selector(openFeedURL:)];
-	} else if ([obj isKindOfClass:[FeedItem class]]) {
-		[item setFeedItem:obj];
+	} else if ([obj isKindOfClass:[FeedArticle class]]) {
+		[item setFeedArticle:obj];
 		[item setTarget:self action:@selector(openFeedURL:)];
 	}
 	
@@ -243,7 +242,7 @@
 - (void)finalizeMenu:(NSMenu*)menu object:(id)obj {
 	NSInteger unreadCount = self.unreadCountTotal; // if parent == nil
 	if ([menu isFeedMenu]) {
-		unreadCount = [(FeedItem*)obj feed].unreadCount;
+		unreadCount = ((FeedArticle*)obj).feed.unreadCount;
 	} else if (![menu isMainMenu]) {
 		unreadCount = [menu coreDataUnreadCount];
 	}
@@ -326,6 +325,7 @@
 - (void)preferencesClosed:(id)sender {
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:self.prefWindow.window];
 	self.prefWindow = nil;
+	[FeedDownload scheduleNextUpdateForced:NO];
 }
 
 /**
@@ -340,7 +340,7 @@
  */
 - (void)updateAllFeeds:(NSMenuItem*)sender {
 	// TODO: Disable 'update all' menu item during update?
-	[FeedDownload scheduleNextUpdate:YES];
+	[FeedDownload scheduleNextUpdateForced:YES];
 }
 
 /**
@@ -354,11 +354,11 @@
 	
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	[sender iterateSorted:YES inContext:moc overDescendentFeeds:^(Feed *feed, BOOL *cancel) {
-		for (FeedItem *i in [feed sortedArticles]) { // TODO: open oldest articles first?
+		for (FeedArticle *fa in [feed sortedArticles]) { // TODO: open oldest articles first?
 			if (maxItemCount <= 0) break;
-			if (i.unread && i.link.length > 0) {
-				[urls addObject:[NSURL URLWithString:i.link]];
-				i.unread = NO;
+			if (fa.unread && fa.link.length > 0) {
+				[urls addObject:[NSURL URLWithString:fa.link]];
+				fa.unread = NO;
 				feed.unreadCount -= 1;
 				self.unreadCountTotal -= 1;
 				maxItemCount -= 1;
@@ -389,7 +389,7 @@
 /**
  Called when user clicks on a single feed item or the feed group.
 
- @param sender A menu item containing either a @c FeedItem or a @c FeedConfig objectID.
+ @param sender A menu item containing either a @c FeedArticle or a @c FeedGroup objectID.
  */
 - (void)openFeedURL:(NSMenuItem*)sender {
 	NSManagedObjectID *oid = sender.representedObject;
@@ -398,14 +398,14 @@
 	NSString *url = nil;
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	id obj = [moc objectWithID:oid];
-	if ([obj isKindOfClass:[FeedConfig class]]) {
-		url = [[(FeedConfig*)obj feed] link];
-	} else if ([obj isKindOfClass:[FeedItem class]]) {
-		FeedItem *item = obj;
-		url = [item link];
-		if (item.unread) {
-			item.unread = NO;
-			item.feed.unreadCount -= 1;
+	if ([obj isKindOfClass:[FeedGroup class]]) {
+		url = ((FeedGroup*)obj).feed.link;
+	} else if ([obj isKindOfClass:[FeedArticle class]]) {
+		FeedArticle *fa = obj;
+		url = fa.link;
+		if (fa.unread) {
+			fa.unread = NO;
+			fa.feed.unreadCount -= 1;
 			self.unreadCountTotal -= 1;
 			[self updateBarIcon];
 			[StoreCoordinator saveContext:moc andParent:YES];

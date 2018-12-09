@@ -25,8 +25,8 @@
 #import "BarMenu.h"
 #import "UserPrefs.h"
 #import "StoreCoordinator.h"
-#import <ServiceManagement/ServiceManagement.h>
 
+#import <ServiceManagement/ServiceManagement.h>
 
 @interface SettingsGeneral()
 @property (weak) IBOutlet NSPopUpButton *popupHttpApplication;
@@ -48,6 +48,7 @@
 
 #pragma mark - UI interaction with IBAction
 
+/// Run helper application to add thyself to startup items.
 - (IBAction)changeStartOnLogin:(NSButton *)sender {
 	// launchctl list | grep de.relikd
 	CFStringRef helperIdentifier = CFBridgingRetain(@"de.relikd.baRSS-Helper");

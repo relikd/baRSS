@@ -25,6 +25,7 @@
 #import "StoreCoordinator.h"
 #import "DrawImage.h"
 #import "UserPrefs.h"
+#import "FeedGroup+Ext.h"
 
 /// User preferences for displaying menu items
 typedef NS_ENUM(char, DisplaySetting) {
@@ -83,42 +84,42 @@ typedef NS_ENUM(char, DisplaySetting) {
  
  @return Number of unread items. (@b warning: May return @c 0 if visibility is disabled in @c UserPrefs)
  */
-- (NSInteger)setTitleAndUnreadCount:(FeedConfig*)config {
+- (NSInteger)setTitleAndUnreadCount:(FeedGroup*)fg {
 	NSInteger uCount = 0;
-	if (config.typ == FEED && [UserPrefs defaultYES:@"feedUnreadCount"]) {
-		uCount = config.feed.unreadCount;
-	} else if (config.typ == GROUP && [UserPrefs defaultYES:@"groupUnreadCount"]) {
+	if (fg.typ == FEED && [UserPrefs defaultYES:@"feedUnreadCount"]) {
+		uCount = fg.feed.unreadCount;
+	} else if (fg.typ == GROUP && [UserPrefs defaultYES:@"groupUnreadCount"]) {
 		uCount = [self.submenu coreDataUnreadCount];
 	}
-	self.title = (uCount > 0 ? [NSString stringWithFormat:@"%@ (%ld)", config.name, uCount] : config.name);
+	self.title = (uCount > 0 ? [NSString stringWithFormat:@"%@ (%ld)", fg.name, uCount] : fg.name);
 	return uCount;
 }
 
 /**
- Fully configures a Separator item OR group item OR feed item. (but not @c FeedItem item)
+ Fully configures a Separator item OR group item OR feed item. (but not @c FeedArticle item)
  */
-- (void)setFeedConfig:(FeedConfig*)config {
-	self.representedObject = config.objectID;
-	if (config.typ == SEPARATOR) {
+- (void)setFeedGroup:(FeedGroup*)fg {
+	self.representedObject = fg.objectID;
+	if (fg.typ == SEPARATOR) {
 		self.title = kSeparatorItemTitle;
 	} else {
-		self.submenu = [self.menu submenuWithIndex:config.sortIndex isFeed:(config.typ == FEED)];
-		[self setTitleAndUnreadCount:config]; // after submenu is set
-		if (config.typ == FEED) {
-			[self configureAsFeed:config];
+		self.submenu = [self.menu submenuWithIndex:fg.sortIndex isFeed:(fg.typ == FEED)];
+		[self setTitleAndUnreadCount:fg]; // after submenu is set
+		if (fg.typ == FEED) {
+			[self configureAsFeed:fg];
 		} else {
-			[self configureAsGroup:config];
+			[self configureAsGroup:fg];
 		}
 	}
 }
 
 /**
- Configure menu item to be used as a container for @c FeedItem entries (incl. feed icon).
+ Configure menu item to be used as a container for @c FeedArticle entries (incl. feed icon).
  */
-- (void)configureAsFeed:(FeedConfig*)config {
+- (void)configureAsFeed:(FeedGroup*)fg {
 	self.tag = ScopeFeed;
-	self.toolTip = config.feed.subtitle;
-	self.enabled = (config.feed.items.count > 0);
+	self.toolTip = fg.feed.subtitle;
+	self.enabled = (fg.feed.articles.count > 0);
 	// set icon
 	dispatch_async(dispatch_get_main_queue(), ^{
 		static NSImage *defaultRSSIcon;
@@ -131,9 +132,9 @@ typedef NS_ENUM(char, DisplaySetting) {
 /**
  Configure menu item to be used as a container for multiple feeds.
  */
-- (void)configureAsGroup:(FeedConfig*)config {
+- (void)configureAsGroup:(FeedGroup*)fg {
 	self.tag = ScopeGroup;
-	self.enabled = (config.children.count > 0);
+	self.enabled = (fg.children.count > 0);
 	// set icon
 	dispatch_async(dispatch_get_main_queue(), ^{
 		static NSImage *groupIcon;
@@ -146,50 +147,50 @@ typedef NS_ENUM(char, DisplaySetting) {
 }
 
 /**
- Populate @c NSMenuItem based on the attributes of a @c FeedItem.
+ Populate @c NSMenuItem based on the attributes of a @c FeedArticle.
  */
-- (void)setFeedItem:(FeedItem*)item {
-	self.title = item.title;
+- (void)setFeedArticle:(FeedArticle*)fa {
+	self.title = fa.title;
 	self.tag = ScopeFeed;
-	self.enabled = (item.link.length > 0);
-	self.state = (item.unread ? NSControlStateValueOn : NSControlStateValueOff);
-	self.representedObject = item.objectID;
+	self.enabled = (fa.link.length > 0);
+	self.state = (fa.unread ? NSControlStateValueOn : NSControlStateValueOff);
+	self.representedObject = fa.objectID;
 	//mi.toolTip = item.abstract;
 	// TODO: Do regex during save, not during display. Its here for testing purposes ...
-	if (item.abstract.length > 0) {
+	if (fa.abstract.length > 0) {
 		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<[^>]*>" options:kNilOptions error:nil];
-		self.toolTip = [regex stringByReplacingMatchesInString:item.abstract options:kNilOptions range:NSMakeRange(0, item.abstract.length) withTemplate:@""];
+		self.toolTip = [regex stringByReplacingMatchesInString:fa.abstract options:kNilOptions range:NSMakeRange(0, fa.abstract.length) withTemplate:@""];
 	}
 }
 
 #pragma mark - Helper -
 
 /**
- @return @c FeedConfig object if @c representedObject contains a valid @c NSManagedObjectID.
+ @return @c FeedGroup object if @c representedObject contains a valid @c NSManagedObjectID.
  */
-- (FeedConfig*)requestConfig:(NSManagedObjectContext*)moc {
+- (FeedGroup*)requestGroup:(NSManagedObjectContext*)moc {
 	if (!self.representedObject || ![self.representedObject isKindOfClass:[NSManagedObjectID class]])
 		return nil;
-	FeedConfig *config = [moc objectWithID:self.representedObject];
-	if (![config isKindOfClass:[FeedConfig class]])
+	FeedGroup *fg = [moc objectWithID:self.representedObject];
+	if (![fg isKindOfClass:[FeedGroup class]])
 		return nil;
-	return config;
+	return fg;
 }
 
 /**
- Perform @c block on every @c FeedConfig in the items menu or any of its submenues.
+ Perform @c block on every @c FeedGroup in the items menu or any of its submenues.
 
  @param ordered Whether order matters or not. If all items are processed anyway, pass @c NO for a speedup.
  @param block Set cancel to @c YES to stop enumeration early.
  */
 - (void)iterateSorted:(BOOL)ordered inContext:(NSManagedObjectContext*)moc overDescendentFeeds:(void(^)(Feed*,BOOL*))block {
 	if (self.parentItem) {
-		[[self.parentItem requestConfig:moc] iterateSorted:ordered overDescendantFeeds:block];
+		[[self.parentItem requestGroup:moc] iterateSorted:ordered overDescendantFeeds:block];
 	} else {
 		for (NSMenuItem *item in self.menu.itemArray) {
-			FeedConfig *fc = [item requestConfig:moc];
-			if (fc != nil) { // All groups and feeds; Ignore default header
-				if (![fc iterateSorted:ordered overDescendantFeeds:block])
+			FeedGroup *fg = [item requestGroup:moc];
+			if (fg != nil) { // All groups and feeds; Ignore default header
+				if (![fg iterateSorted:ordered overDescendantFeeds:block])
 					return;
 			}
 		}

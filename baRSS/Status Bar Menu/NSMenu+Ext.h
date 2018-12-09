@@ -32,7 +32,7 @@
 - (BOOL)isMainMenu;
 - (BOOL)isFeedMenu;
 - (MenuItemTag)scope;
-- (NSInteger)feedConfigOffset;
+- (NSInteger)feedDataOffset;
 - (NSInteger)coreDataUnreadCount;
 // Modify menu
 - (void)replaceSeparatorStringsWithActualSeparator;

@@ -24,6 +24,7 @@
 
 @implementation UserPrefs
 
+/// @return @c YES if key is not set. Otherwise, return user defaults property from plist.
 + (BOOL)defaultYES:(NSString*)key {
 	if ([[NSUserDefaults standardUserDefaults] objectForKey:key] == NULL) {
 		return YES;
@@ -31,14 +32,17 @@
 	return [[NSUserDefaults standardUserDefaults] boolForKey:key];
 }
 
+/// @return @c NO if key is not set. Otherwise, return user defaults property from plist.
 + (BOOL)defaultNO:(NSString*)key {
 	return [[NSUserDefaults standardUserDefaults] boolForKey:key];
 }
 
+/// @return User configured custom browser. Or @c nil if not set yet. (which will fallback to default browser)
 + (NSString*)getHttpApplication {
 	return [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultHttpApplication"];
 }
 
+/// Store custom browser bundle id to user defaults.
 + (void)setHttpApplication:(NSString*)bundleID {
 	[[NSUserDefaults standardUserDefaults] setObject:bundleID forKey:@"defaultHttpApplication"];
 }

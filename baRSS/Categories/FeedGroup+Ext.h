@@ -20,11 +20,25 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
+#import "FeedGroup+CoreDataClass.h"
 
-@interface ModalSheet : NSPanel
-@property (readonly) BOOL closeInitiated;
+@interface FeedGroup (Ext)
+/// Enum type to distinguish different @c FeedGroup types: @c GROUP, @c FEED, @c SEPARATOR
+typedef enum int16_t {
+	/// Other types: @c GROUP, @c FEED, @c SEPARATOR
+	GROUP = 0,
+	FEED = 1,
+	SEPARATOR = 2
+} FeedGroupType;
 
-+ (instancetype)modalWithView:(NSView*)content;
-- (void)setDoneEnabled:(BOOL)accept;
+@property (readonly) FeedGroupType typ;
+
++ (instancetype)newGroup:(FeedGroupType)type inContext:(NSManagedObjectContext*)context;
+- (void)setName:(NSString*)name andRefreshString:(NSString*)refreshStr;
+// Handle children and parents
+- (NSString*)indexPathString;
+- (NSMutableArray<FeedGroup*>*)allParents;
+- (BOOL)iterateSorted:(BOOL)ordered overDescendantFeeds:(void(^)(Feed *feed, BOOL* cancel))block;
+// Printing
+- (NSString*)readableDescription;
 @end

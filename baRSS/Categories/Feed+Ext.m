@@ -21,23 +21,48 @@
 //  SOFTWARE.
 
 #import "Feed+Ext.h"
-#import "FeedConfig+Ext.h"
-#import "FeedItem+CoreDataClass.h"
+#import "FeedMeta+Ext.h"
+#import "FeedGroup+Ext.h"
+#import "FeedArticle+CoreDataClass.h"
+#import "Constants.h"
+
 #import <RSXML/RSXML.h>
 
 @implementation Feed (Ext)
 
+/// Instantiates new @c Feed and @c FeedMeta entities in context.
++ (instancetype)newFeedAndMetaInContext:(NSManagedObjectContext*)moc {
+	Feed *feed = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:moc];
+	feed.meta = [[FeedMeta alloc] initWithEntity:FeedMeta.entity insertIntoManagedObjectContext:moc];
+	return feed;
+}
+
+/// Call @c indexPathString on @c .group and update @c .indexPath if current value is different.
+- (void)calculateAndSetIndexPathString {
+	NSString *pthStr = [self.group indexPathString];
+	if (![self.indexPath isEqualToString:pthStr])
+		self.indexPath = pthStr;
+}
+
+#pragma mark - Update Feed Items -
+
 /**
  Replace feed title, subtitle and link (if changed). Also adds new articles and removes old ones.
  */
-- (void)updateWithRSS:(RSParsedFeed*)obj {
+- (void)updateWithRSS:(RSParsedFeed*)obj postUnreadCountChange:(BOOL)flag {
 	if (![self.title isEqualToString:obj.title])       self.title = obj.title;
 	if (![self.subtitle isEqualToString:obj.subtitle]) self.subtitle = obj.subtitle;
 	if (![self.link isEqualToString:obj.link])         self.link = obj.link;
 	
-	NSMutableSet<NSString*> *urls = [[self.items valueForKeyPath:@"link"] mutableCopy];
-	if ([self addMissingArticles:obj updateLinks:urls]) // will remove links in 'urls' that should be kept
+	int32_t unreadBefore = self.unreadCount;
+	NSMutableSet<NSString*> *urls = [[self.articles valueForKeyPath:@"link"] mutableCopy];
+	[self addMissingArticles:obj updateLinks:urls]; // will remove links in 'urls' that should be kept
+	if (urls.count > 0)
 		[self deleteArticlesWithLink:urls]; // remove old, outdated articles
+	if (flag) {
+		NSNumber *cDiff = [NSNumber numberWithInteger:self.unreadCount - unreadBefore];
+		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:cDiff];
+	}
 }
 
 /**
@@ -47,7 +72,7 @@
  @return @c YES if new items were added, @c NO otherwise.
  */
 - (BOOL)addMissingArticles:(RSParsedFeed*)obj updateLinks:(NSMutableSet<NSString*>*)urls {
-	int latestID = [[self.items valueForKeyPath:@"@max.sortIndex"] intValue];
+	int latestID = [[self.articles valueForKeyPath:@"@max.sortIndex"] intValue];
 	__block int newOnes = 0;
 	[obj.articles enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(RSParsedArticle * _Nonnull article, BOOL * _Nonnull stop) {
 		// reverse enumeration ensures correct article order
@@ -68,17 +93,17 @@
  Create article based on input and insert into core data storage.
  */
 - (void)insertArticle:(RSParsedArticle*)entry atIndex:(int)idx {
-	FeedItem *b = [[FeedItem alloc] initWithEntity:FeedItem.entity insertIntoManagedObjectContext:self.managedObjectContext];
-	b.sortIndex = (int32_t)idx;
-	b.unread = YES;
-	b.guid = entry.guid;
-	b.title = entry.title;
-	b.abstract = entry.abstract;
-	b.body = entry.body;
-	b.author = entry.author;
-	b.link = entry.link;
-	b.published = entry.datePublished;
-	[self addItemsObject:b];
+	FeedArticle *fa = [[FeedArticle alloc] initWithEntity:FeedArticle.entity insertIntoManagedObjectContext:self.managedObjectContext];
+	fa.sortIndex = (int32_t)idx;
+	fa.unread = YES;
+	fa.guid = entry.guid;
+	fa.title = entry.title;
+	fa.abstract = entry.abstract;
+	fa.body = entry.body;
+	fa.author = entry.author;
+	fa.link = entry.link;
+	fa.published = entry.datePublished;
+	[self addArticlesObject:fa];
 }
 
 /**
@@ -87,28 +112,29 @@
 - (void)deleteArticlesWithLink:(NSMutableSet<NSString*>*)urls {
 	if (!urls || urls.count == 0)
 		return;
-	
 	self.articleCount -= (int32_t)urls.count;
-	for (FeedItem *item in self.items) {
-		if ([urls containsObject:item.link]) {
-			[urls removeObject:item.link];
-			if (item.unread)
+	for (FeedArticle *fa in self.articles) {
+		if ([urls containsObject:fa.link]) {
+			[urls removeObject:fa.link];
+			if (fa.unread)
 				self.unreadCount -= 1;
 			// TODO: keep unread articles?
-			[item.managedObjectContext deleteObject:item];
+			[fa.managedObjectContext deleteObject:fa];
 			if (urls.count == 0)
 				break;
 		}
 	}
 }
 
+#pragma mark - Article Properties -
+
 /**
  @return Articles sorted by attribute @c sortIndex with descending order (newest items first).
  */
-- (NSArray<FeedItem*>*)sortedArticles {
-	if (self.items.count == 0)
+- (NSArray<FeedArticle*>*)sortedArticles {
+	if (self.articles.count == 0)
 		return nil;
-	return [self.items sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:NO]]];
+	return [self.articles sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:NO]]];
 }
 
 /**
@@ -135,9 +161,9 @@
  @param readFlag @c YES: mark items read; @c NO: mark items unread
  */
 - (int)markAllArticlesRead:(BOOL)readFlag {
-	for (FeedItem *i in self.items) {
-		if (i.unread == readFlag)
-			i.unread = !readFlag;
+	for (FeedArticle *fa in self.articles) {
+		if (fa.unread == readFlag)
+			fa.unread = !readFlag;
 	}
 	int32_t oldCount = self.unreadCount;
 	int32_t newCount = (readFlag ? 0 : self.articleCount);

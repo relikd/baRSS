@@ -23,6 +23,9 @@
 #import "FeedDownload.h"
 #import "Constants.h"
 #import "StoreCoordinator.h"
+#import "Feed+Ext.h"
+#import "FeedMeta+Ext.h"
+
 #import <SystemConfiguration/SystemConfiguration.h>
 
 static SCNetworkReachabilityRef _reachability = NULL;
@@ -31,6 +34,7 @@ static BOOL _isReachable = NO;
 
 @implementation FeedDownload
 
+/// @return New request with no caching policy and timeout interval of 30 seconds.
 + (NSMutableURLRequest*)newRequestURL:(NSString*)url {
 	NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
 	req.timeoutInterval = 30;
@@ -40,16 +44,20 @@ static BOOL _isReachable = NO;
 	return req;
 }
 
-+ (NSURLRequest*)newRequest:(FeedConfig*)config {
-	NSMutableURLRequest *req = [self newRequestURL:config.url];
-	NSString* etag = [config.meta.httpEtag stringByReplacingOccurrencesOfString:@"-gzip" withString:@""];
-	if (config.meta.httpModified.length > 0)
-		[req setValue:config.meta.httpModified forHTTPHeaderField:@"If-Modified-Since"];
+/// @return New request with etag and modified headers set.
++ (NSURLRequest*)newRequest:(FeedMeta*)meta {
+	NSMutableURLRequest *req = [self newRequestURL:meta.url];
+	NSString* etag = [meta.etag stringByReplacingOccurrencesOfString:@"-gzip" withString:@""];
+	if (meta.modified.length > 0)
+		[req setValue:meta.modified forHTTPHeaderField:@"If-Modified-Since"];
 	if (etag.length > 0)
 		[req setValue:etag forHTTPHeaderField:@"If-None-Match"]; // ETag
 	return req;
 }
 
+/**
+ Perform feed download request from URL alone. Not updating any @c Feed item.
+ */
 + (void)newFeed:(NSString *)url block:(void(^)(RSParsedFeed *feed, NSError* error, NSHTTPURLResponse* response))block {
 	[[[NSURLSession sharedSession] dataTaskWithRequest:[self newRequestURL:url] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
 		NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
@@ -59,6 +67,10 @@ static BOOL _isReachable = NO;
 		}
 		RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:url];
 		RSParseFeed(xml, ^(RSParsedFeed * _Nullable parsedFeed, NSError * _Nullable err) {
+			if (!err && (!parsedFeed || parsedFeed.articles.count == 0)) { // TODO: this should be fixed in RSXMLParser
+				NSString *errDesc = NSLocalizedString(@"URL does not contain a RSS feed. Can't parse feed items.", nil);
+				err = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnsupportedURL userInfo:@{NSLocalizedDescriptionKey: errDesc}];
+			}
 			block(parsedFeed, err, httpResponse);
 		});
 	}] resume];
@@ -68,7 +80,12 @@ static BOOL _isReachable = NO;
 #pragma mark - Update existing feeds -
 
 
-+ (void)scheduleNextUpdate:(BOOL)forceUpdate {
+/**
+ Get date of next update schedule and start @c updateTimer.
+
+ @param forceUpdate If @c YES all feeds will be downloaded regardless of scheduled date.
+ */
++ (void)scheduleNextUpdateForced:(BOOL)forceUpdate {
 	static NSTimer *_updateTimer;
 	@synchronized (_updateTimer) { // TODO: dig into analyzer warning
 		if (_updateTimer) {
@@ -80,7 +97,8 @@ static BOOL _isReachable = NO;
 	NSDate *nextTime = [NSDate dateWithTimeIntervalSinceNow:0.2];
 	if (!forceUpdate) {
 		nextTime = [StoreCoordinator nextScheduledUpdate];
-		if (!nextTime || [nextTime timeIntervalSinceNow] < 0) { // mostly, if app was closed for a long time
+		if (!nextTime) return; // no timer means no feeds to update
+		if ([nextTime timeIntervalSinceNow] < 0) { // mostly, if app was closed for a long time
 			nextTime = [NSDate dateWithTimeIntervalSinceNow:2]; // TODO: retry in 2 sec?
 		}
 	}
@@ -91,82 +109,97 @@ static BOOL _isReachable = NO;
 	[[NSRunLoop mainRunLoop] addTimer:_updateTimer forMode:NSRunLoopCommonModes];
 }
 
+/**
+ Called when schedule timer has run out (earliest scheduled date). Or if forced by user request.
+
+ @param timer @c NSTimer @c .userInfo should contain a @c BOOL value whether to force an update of all feeds @c (YES).
+ */
 + (void)scheduledUpdateTimer:(NSTimer*)timer {
 	NSLog(@"fired");
 	BOOL forceAll = [timer.userInfo boolValue];
 	// TODO: check internet connection
 	// TODO: disable menu item 'update all' during update
 	__block NSManagedObjectContext *childContext = [StoreCoordinator createChildContext];
-	NSArray<FeedConfig*> *list = [StoreCoordinator getListOfFeedsThatNeedUpdate:forceAll inContext:childContext];
+	NSArray<Feed*> *list = [StoreCoordinator getListOfFeedsThatNeedUpdate:forceAll inContext:childContext];
 	if (list.count == 0) {
 		NSLog(@"ERROR: Something went wrong, timer fired too early.");
 		[childContext reset];
 		childContext = nil;
 		// thechnically should never happen, anyway we need to reset the timer
-		[self scheduleNextUpdate:NO]; // NO, since forceAll will get ALL items and shouldn't be 0
+		[self scheduleNextUpdateForced:NO]; // NO, since forceAll will get ALL items and shouldn't be 0
 		return; // nothing to do here
 	}
 	dispatch_group_t group = dispatch_group_create();
-	for (FeedConfig *c in list) {
-		[self downloadFeedForConfig:c group:group];
+	for (Feed *feed in list) {
+		[self downloadFeed:feed group:group];
 	}
 	dispatch_group_notify(group, dispatch_get_main_queue(), ^{
 		[StoreCoordinator saveContext:childContext andParent:YES];
 		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedUpdated object:[list valueForKeyPath:@"objectID"]];
 		[childContext reset];
 		childContext = nil;
-		[self scheduleNextUpdate:NO]; // after forced update, continue regular cycle
+		[self scheduleNextUpdateForced:NO]; // after forced update, continue regular cycle
 	});
 }
 
-+ (void)downloadFeedForConfig:(FeedConfig*)config group:(dispatch_group_t)group {
+/**
+ Start download request with existing @c Feed object. Reuses etag and modified headers.
+
+ @param feed @c Feed on which the update is executed.
+ @param group Mutex to count completion of all downloads.
+ */
++ (void)downloadFeed:(Feed*)feed group:(dispatch_group_t)group {
 	if (!_isReachable) return;
 	dispatch_group_enter(group);
-	[[[NSURLSession sharedSession] dataTaskWithRequest:[self newRequest:config] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-		[config.managedObjectContext performBlock:^{
-			// core data block inside of url session block; otherwise config access will EXC_BAD_INSTRUCTION
+	[[[NSURLSession sharedSession] dataTaskWithRequest:[self newRequest:feed.meta] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+		[feed.managedObjectContext performBlock:^{
+			// core data block inside of url session block; otherwise access will EXC_BAD_INSTRUCTION
 			if (error) {
-				int16_t n = config.errorCount + 1;
-				config.errorCount = (n < 1 ? 1 : (n > 19 ? 19 : n)); // between: 2 sec and 6 days
-				NSTimeInterval retryWaitTime = pow(2, config.errorCount); // 2^n seconds
-				config.scheduled = [NSDate dateWithTimeIntervalSinceNow:retryWaitTime];
+				[feed.meta setErrorAndPostponeSchedule];
 				// TODO: remove logging
-				NSLog(@"Error loading: %@ (%d)", response.URL, config.errorCount);
+				NSLog(@"Error loading: %@ (%d)", response.URL, feed.meta.errorCount);
 			} else {
-				config.errorCount = 0; // reset counter
-				[self downloadSuccessful:data forFeed:config response:(NSHTTPURLResponse*)response];
+				feed.meta.errorCount = 0; // reset counter
+				[self downloadSuccessful:data forFeed:feed response:(NSHTTPURLResponse*)response];
 			}
 			dispatch_group_leave(group);
 		}];
 	}] resume];
 }
 
-+ (void)downloadSuccessful:(NSData*)data forFeed:(FeedConfig*)config response:(NSHTTPURLResponse*)http {
+/**
+ Parse RSS feed data and save to persistent store. If HTTP 304 (not modified) skip feed evaluation.
+
+ @param data Raw data from request.
+ @param feed @c Feed on which the update is executed.
+ @param http Download response containing the statusCode and etag / modified headers.
+ */
++ (void)downloadSuccessful:(NSData*)data forFeed:(Feed*)feed response:(NSHTTPURLResponse*)http {
 	if ([http statusCode] != 304) {
 		// should be fine to call synchronous since dataTask is already in the background (always? proof?)
-		RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:config.url];
+		RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:feed.meta.url];
 		RSParsedFeed *parsed = RSParseFeedSync(xml, NULL);
 		if (parsed) {
 			// TODO: add support for media player?
 			// <enclosure url="https://url.mp3" length="63274022" type="audio/mpeg" />
-			[config updateRSSFeed:parsed];
+			[feed updateWithRSS:parsed postUnreadCountChange:YES];
 		}
 	}
-	[config setEtag:[http allHeaderFields][@"Etag"] modified:[http allHeaderFields][@"Date"]]; // @"Expires", @"Last-Modified"
+	[feed.meta setEtag:[http allHeaderFields][@"Etag"] modified:[http allHeaderFields][@"Date"]]; // @"Expires", @"Last-Modified"
 	// Don't update redirected url since it happened in the background; User may not recognize url
-	[config calculateAndSetScheduled];
-//	[config mergeChangesAndSave];
-//	[config.managedObjectContext performBlock:^{
-//		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedUpdated object:config.objectID];
-//	}];
+	[feed.meta calculateAndSetScheduled];
+	// TODO: save changes for this feed only?
+//	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedUpdated object:feed.objectID];
 }
 
 
 #pragma mark - Network Connection -
 
 
+/// External getter to check wheter current network state is reachable.
 + (BOOL)isNetworkReachable { return _isReachable; }
 
+/// Set callback on @c self to listen for network reachability changes.
 + (void)registerNetworkChangeNotification {
 	// https://stackoverflow.com/questions/11240196/notification-when-wifi-connected-os-x
 	if (_reachability != NULL) return;
@@ -184,6 +217,7 @@ static BOOL _isReachable = NO;
 	}
 }
 
+/// Remove @c self callback (network reachability changes).
 + (void)unregisterNetworkChangeNotification {
 	if (_reachability != NULL) {
 		SCNetworkReachabilitySetCallback(_reachability, nil, nil);
@@ -193,6 +227,7 @@ static BOOL _isReachable = NO;
 	}
 }
 
+/// Called when network interface or reachability changes.
 static void networkReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkConnectionFlags flags, void *object) {
 	if (_reachability == NULL)
 		return;
@@ -205,9 +240,10 @@ static void networkReachabilityCallback(SCNetworkReachabilityRef target, SCNetwo
 		NSLog(@"not reachable");
 	}
 	// schedule regardless of state (if not reachable timer will be canceled)
-	[FeedDownload scheduleNextUpdate:NO];
+	[FeedDownload scheduleNextUpdateForced:NO];
 }
 
+/// @return @c YES if network connection established.
 + (BOOL)hasConnectivity:(SCNetworkReachabilityFlags)flags {
 	if ((flags & kSCNetworkReachabilityFlagsReachable) == 0)
 		return NO;
