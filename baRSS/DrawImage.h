@@ -57,9 +57,10 @@ IB_DESIGNABLE
 @interface RSSIcon : DrawImage
 @property (strong) IBInspectable NSColor *barsColor;
 @property (strong) IBInspectable NSColor *gradientColor;
+@property (assign) IBInspectable BOOL noConnection;
 
 + (NSImage*)iconWithSize:(CGFloat)size;
-+ (NSImage*)templateIcon:(CGFloat)size tint:(NSColor*)color;
++ (NSImage*)systemBarIcon:(CGFloat)size tint:(NSColor*)color noConnection:(BOOL)conn;
 @end
 
 //  ---------------------------------------------------------------

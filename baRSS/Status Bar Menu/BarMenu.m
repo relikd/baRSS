@@ -89,11 +89,11 @@
 		} else {
 			self.barItem.title = @"";
 		}
-		// BOOL hasNet = [FeedDownload allowNetworkConnection];
+		BOOL hasNet = [FeedDownload allowNetworkConnection];
 		if (self.unreadCountTotal > 0 && [UserPrefs defaultYES:@"tintMenuBarIcon"]) {
-			self.barItem.image = [RSSIcon templateIcon:16 tint:[NSColor rssOrange]];
+			self.barItem.image = [RSSIcon systemBarIcon:16 tint:[NSColor rssOrange] noConnection:!hasNet];
 		} else {
-			self.barItem.image = [RSSIcon templateIcon:16 tint:nil];
+			self.barItem.image = [RSSIcon systemBarIcon:16 tint:nil noConnection:!hasNet];
 			self.barItem.image.template = YES;
 		}
 	});
@@ -334,6 +334,7 @@
  */
 - (void)pauseUpdates:(NSMenuItem*)sender {
 	[FeedDownload setPaused:![FeedDownload isPaused]];
+	[self updateBarIcon];
 }
 
 /**
