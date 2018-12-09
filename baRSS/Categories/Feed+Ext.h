@@ -25,9 +25,12 @@
 @class RSParsedFeed;
 
 @interface Feed (Ext)
-- (void)updateWithRSS:(RSParsedFeed*)obj;
-- (NSArray<FeedItem*>*)sortedArticles;
-
+// Generator methods / Feed update
++ (instancetype)newFeedAndMetaInContext:(NSManagedObjectContext*)context;
+- (void)calculateAndSetIndexPathString;
+- (void)updateWithRSS:(RSParsedFeed*)obj postUnreadCountChange:(BOOL)flag;
+// Article properties
+- (NSArray<FeedArticle*>*)sortedArticles;
 - (int)markAllItemsRead;
 - (int)markAllItemsUnread;
 @end

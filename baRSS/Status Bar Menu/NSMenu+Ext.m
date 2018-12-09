@@ -70,8 +70,8 @@
 	return ScopeGroup;
 }
 
-/// @return Index offset of the first Core Data feed item (may be separator), skipping default header and main menu header.
-- (NSInteger)feedConfigOffset {
+/// @return Index offset of the first core data feed item (may be separator), skipping default header and main menu header.
+- (NSInteger)feedDataOffset {
 	for (NSInteger i = 0; i < self.numberOfItems; i++) {
 		if ([[[self itemAtIndex:i] representedObject] isKindOfClass:[NSManagedObjectID class]])
 			return i;
@@ -79,7 +79,7 @@
 	return 0;
 }
 
-/// Perform Core Data fetch request and return unread count for all descendent items.
+/// Perform core data fetch request and return unread count for all descendent items.
 - (NSInteger)coreDataUnreadCount {
 	NSUInteger loc = [self.title rangeOfString:@"."].location;
 	NSString *path = nil;

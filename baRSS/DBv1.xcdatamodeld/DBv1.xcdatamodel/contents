@@ -7,24 +7,12 @@
         <attribute name="subtitle" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="unreadCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <relationship name="config" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedConfig" inverseName="feed" inverseEntity="FeedConfig" syncable="YES"/>
-        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FeedItem" inverseName="feed" inverseEntity="FeedItem" syncable="YES"/>
+        <relationship name="articles" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FeedArticle" inverseName="feed" inverseEntity="FeedArticle" syncable="YES"/>
+        <relationship name="group" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedGroup" inverseName="feed" inverseEntity="FeedGroup" syncable="YES"/>
+        <relationship name="icon" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FeedIcon" inverseName="feed" inverseEntity="FeedIcon" syncable="YES"/>
+        <relationship name="meta" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FeedMeta" inverseName="feed" inverseEntity="FeedMeta" syncable="YES"/>
     </entity>
-    <entity name="FeedConfig" representedClassName="FeedConfig" syncable="YES" codeGenerationType="class">
-        <attribute name="errorCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="refreshNum" optional="YES" attributeType="Integer 32" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="refreshUnit" optional="YES" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES" customClassName="NSUInteger" syncable="YES"/>
-        <attribute name="scheduled" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <attribute name="sortIndex" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="type" optional="YES" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="children" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FeedConfig" inverseName="parent" inverseEntity="FeedConfig" syncable="YES"/>
-        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Feed" inverseName="config" inverseEntity="Feed" syncable="YES"/>
-        <relationship name="meta" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FeedMeta" inverseName="config" inverseEntity="FeedMeta" syncable="YES"/>
-        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedConfig" inverseName="children" inverseEntity="FeedConfig" syncable="YES"/>
-    </entity>
-    <entity name="FeedItem" representedClassName="FeedItem" syncable="YES" codeGenerationType="class">
+    <entity name="FeedArticle" representedClassName="FeedArticle" syncable="YES" codeGenerationType="class">
         <attribute name="abstract" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="author" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
@@ -34,18 +22,36 @@
         <attribute name="sortIndex" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="unread" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
-        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="items" inverseEntity="Feed" syncable="YES"/>
+        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="articles" inverseEntity="Feed" syncable="YES"/>
+    </entity>
+    <entity name="FeedGroup" representedClassName="FeedGroup" syncable="YES" codeGenerationType="class">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="refreshStr" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sortIndex" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="children" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FeedGroup" inverseName="parent" inverseEntity="FeedGroup" syncable="YES"/>
+        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Feed" inverseName="group" inverseEntity="Feed" syncable="YES"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedGroup" inverseName="children" inverseEntity="FeedGroup" syncable="YES"/>
+    </entity>
+    <entity name="FeedIcon" representedClassName="FeedIcon" syncable="YES" codeGenerationType="class">
+        <attribute name="icon" optional="YES" attributeType="Binary" customClassName="NSImage" syncable="YES"/>
+        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="icon" inverseEntity="Feed" syncable="YES"/>
     </entity>
     <entity name="FeedMeta" representedClassName="FeedMeta" syncable="YES" codeGenerationType="class">
-        <attribute name="httpEtag" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="httpModified" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="icon" optional="YES" attributeType="Binary" customClassName="NSImage" syncable="YES"/>
-        <relationship name="config" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedConfig" inverseName="meta" inverseEntity="FeedConfig" syncable="YES"/>
+        <attribute name="errorCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="etag" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="modified" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="refreshNum" optional="YES" attributeType="Integer 32" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="refreshUnit" optional="YES" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES" customClassName="NSUInteger" syncable="YES"/>
+        <attribute name="scheduled" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="meta" inverseEntity="Feed" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Feed" positionX="-229.09375" positionY="-2.30859375" width="128" height="165"/>
-        <element name="FeedConfig" positionX="-441.87109375" positionY="-47.390625" width="128" height="225"/>
-        <element name="FeedItem" positionX="-28.140625" positionY="-17.359375" width="128" height="195"/>
-        <element name="FeedMeta" positionX="-234" positionY="72" width="128" height="105"/>
+        <element name="Feed" positionX="-278.84765625" positionY="-112.953125" width="128" height="195"/>
+        <element name="FeedGroup" positionX="-460.37890625" positionY="-111.62890625" width="130.52734375" height="150"/>
+        <element name="FeedArticle" positionX="-96.77734375" positionY="-113.83984375" width="128" height="195"/>
+        <element name="FeedIcon" positionX="-202.79296875" positionY="137.71875" width="128" height="75"/>
+        <element name="FeedMeta" positionX="-348.02734375" positionY="136.89453125" width="128" height="165"/>
     </elements>
 </model>

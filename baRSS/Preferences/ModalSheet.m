@@ -27,12 +27,22 @@
 @end
 
 @implementation ModalSheet
+@synthesize closeInitiated = _closeInitiated;
 
+/// User did click the 'Done' button.
 - (void)didTapDoneButton:(id)sender { [self closeWithResponse:NSModalResponseOK]; }
+/// User did click the 'Cancel' button.
 - (void)didTapCancelButton:(id)sender { [self closeWithResponse:NSModalResponseAbort]; }
+/// Manually disable 'Done' button if a task is still running.
 - (void)setDoneEnabled:(BOOL)accept { self.btnDone.enabled = accept; }
 
+/**
+ Called after user has clicked the 'Done' (Return) or 'Cancel' (Esc) button.
+ Flags controller as being closed @c .closeInitiated @c = @c YES.
+ And removes all subviews (clean up).
+ */
 - (void)closeWithResponse:(NSModalResponse)response {
+	_closeInitiated = YES;
 	// store modal view width and remove subviews to avoid _NSKeyboardFocusClipView issues
 	// first object is always the view of the modal dialog
 	CGFloat w = self.contentView.subviews.firstObject.frame.size.width;
@@ -41,6 +51,12 @@
 	[self.sheetParent endSheet:self returnCode:response];
 }
 
+
+/**
+ Designated initializer for @c ModalSheet.
+
+ @param content @c NSView will be displayed in dialog box. 'Done' and 'Cancel' button will be added automatically.
+ */
 + (instancetype)modalWithView:(NSView*)content {
 	static const int padWindow = 20;
 	static const int padButtons = 12;

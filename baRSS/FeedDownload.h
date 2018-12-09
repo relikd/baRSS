@@ -28,5 +28,5 @@
 + (void)registerNetworkChangeNotification;
 + (void)unregisterNetworkChangeNotification;
 + (BOOL)isNetworkReachable;
-+ (void)scheduleNextUpdate:(BOOL)forceUpdate;
++ (void)scheduleNextUpdateForced:(BOOL)flag;
 @end

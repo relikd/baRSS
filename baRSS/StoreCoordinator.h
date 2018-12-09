@@ -22,16 +22,13 @@
 
 #import <Foundation/Foundation.h>
 #import "DBv1+CoreDataModel.h"
-#import "FeedConfig+Ext.h"
-
-@class RSParsedFeed;
 
 @interface StoreCoordinator : NSObject
 // Managing contexts
 + (NSManagedObjectContext*)createChildContext;
 + (void)saveContext:(NSManagedObjectContext*)context andParent:(BOOL)flag;
 // Feed update
-+ (NSArray<FeedConfig*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc;
++ (NSArray<Feed*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc;
 + (NSDate*)nextScheduledUpdate;
 // Feed display
 + (NSInteger)unreadCountForIndexPathString:(NSString*)str;

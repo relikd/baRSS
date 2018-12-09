@@ -21,18 +21,17 @@
 //  SOFTWARE.
 
 #import "SettingsFeeds.h"
-#import "BarMenu.h"
-#import "ModalSheet.h"
-#import "ModalFeedEdit.h"
+#import "Constants.h"
 #import "DrawImage.h"
 #import "StoreCoordinator.h"
-#import "Constants.h"
+#import "ModalFeedEdit.h"
+#import "Feed+Ext.h"
+#import "FeedGroup+Ext.h"
 
-@interface SettingsFeeds () <ModalEditDelegate>
+@interface SettingsFeeds ()
 @property (weak) IBOutlet NSOutlineView *outlineView;
 @property (weak) IBOutlet NSTreeController *dataStore;
 
-@property (strong) NSViewController<ModalFeedConfigEdit> *modalController;
 @property (strong) NSArray<NSTreeNode*> *currentlyDraggedNodes;
 @property (strong) NSUndoManager *undoManager;
 @end
@@ -60,22 +59,21 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 }
 
 - (IBAction)addFeed:(id)sender {
-	[self showModalForFeedConfig:nil isGroupEdit:NO];
+	[self showModalForFeedGroup:nil isGroupEdit:NO];
 }
 
 - (IBAction)addGroup:(id)sender {
-	[self showModalForFeedConfig:nil isGroupEdit:YES];
+	[self showModalForFeedGroup:nil isGroupEdit:YES];
 }
 
 - (IBAction)addSeparator:(id)sender {
 	[self.undoManager beginUndoGrouping];
-	FeedConfig *sp = [self insertSortedItemAtSelection];
-	sp.name = @"---";
-	sp.typ = SEPARATOR;
+	[self insertFeedGroupAtSelection:SEPARATOR].name = @"---";
 	[self.undoManager endUndoGrouping];
 	[self saveChanges];
 }
 
+/// Remove user selected item from persistent store.
 - (IBAction)remove:(id)sender {
 	[self.undoManager beginUndoGrouping];
 	NSArray<NSTreeNode*> *parentNodes = [self.dataStore.selectedNodes valueForKeyPath:@"parentNode"];
@@ -88,99 +86,104 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
 }
 
+/// Open user selected item for editing.
 - (IBAction)doubleClickOutlineView:(NSOutlineView*)sender {
 	if (sender.clickedRow == -1)
 		return; // ignore clicks on column headers and where no row was selected
-	
-	FeedConfig *fc = [(NSTreeNode*)[sender itemAtRow:sender.clickedRow] representedObject];
-	[self showModalForFeedConfig:fc isGroupEdit:YES]; // yes will be overwritten anyway
+	FeedGroup *fg = [(NSTreeNode*)[sender itemAtRow:sender.clickedRow] representedObject];
+	[self showModalForFeedGroup:fg isGroupEdit:YES]; // yes will be overwritten anyway
 }
 
 
 #pragma mark - Insert & Edit Feed Items
 
 
-- (void)openModalForSelection {
-	[self showModalForFeedConfig:self.dataStore.selectedObjects.firstObject isGroupEdit:YES]; // yes will be overwritten anyway
-}
-
-- (void)showModalForFeedConfig:(FeedConfig*)obj isGroupEdit:(BOOL)group {
-	BOOL existingItem = [obj isKindOfClass:[FeedConfig class]];
-	if (existingItem) {
-		if (obj.typ == SEPARATOR) return;
-		group = (obj.typ == GROUP);
+/**
+ Open a new modal window to edit the selected @c FeedGroup.
+ @note isGroupEdit @c flag will be overwritten if @c FeedGroup parameter is not @c nil.
+ 
+ @param fg @c FeedGroup to be edited. If @c nil a new object will be created at the current selection.
+ @param flag If @c YES open group edit modal dialog. If @c NO open feed edit modal dialog.
+ */
+- (void)showModalForFeedGroup:(FeedGroup*)fg isGroupEdit:(BOOL)flag {
+	if (fg.typ == SEPARATOR) return;
+	[self.undoManager beginUndoGrouping];
+	if (!fg || ![fg isKindOfClass:[FeedGroup class]]) {
+		fg = [self insertFeedGroupAtSelection:(flag ? GROUP : FEED)];
 	}
-	self.modalController = (group ? [ModalGroupEdit new] : [ModalFeedEdit new]);
-	self.modalController.representedObject = obj;
-	self.modalController.delegate = self;
 	
-	[self.view.window beginSheet:[ModalSheet modalWithView:self.modalController.view] completionHandler:^(NSModalResponse returnCode) {
+	ModalEditDialog *editDialog = (fg.typ == GROUP ? [ModalGroupEdit modalWith:fg] : [ModalFeedEdit modalWith:fg]);
+	
+	[self.view.window beginSheet:[editDialog getModalSheet] completionHandler:^(NSModalResponse returnCode) {
 		if (returnCode == NSModalResponseOK) {
-			if (!existingItem) { // create new item
-				[self.undoManager beginUndoGrouping];
-				FeedConfig *item = [self insertSortedItemAtSelection];
-				item.typ = (group ? GROUP : FEED);
-				self.modalController.representedObject = item;
-			}
-			[self.modalController updateRepresentedObject];
-			if (!existingItem)
-				[self.undoManager endUndoGrouping];
+			[editDialog applyChangesToCoreDataObject];
+			[self.undoManager endUndoGrouping];
+		} else {
+			[self.undoManager endUndoGrouping];
+			[self.dataStore.managedObjectContext rollback];
 		}
-		self.modalController = nil;
+		BOOL hasChanges = [self.dataStore.managedObjectContext hasChanges];
+		if (hasChanges) {
+			[self saveChanges];
+			[self.dataStore rearrangeObjects];
+		} else {
+			[self.undoManager disableUndoRegistration];
+			[self.undoManager undoNestedGroup];
+			[self.undoManager enableUndoRegistration];
+		}
 	}];
-}
-
-/// Called after an item was modified. May be called twice if download was still in progress.
-- (void)modalDidUpdateFeedConfig:(FeedConfig*)config {
-	[self saveChanges];
-	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
 }
 
 
 #pragma mark - Helper -
 
-/// Insert @c FeedConfig item either after current selection or inside selected folder (if expanded)
-- (FeedConfig*)insertSortedItemAtSelection {
-	FeedConfig *newItem = [[FeedConfig alloc] initWithEntity:FeedConfig.entity insertIntoManagedObjectContext:self.dataStore.managedObjectContext];
-	NSTreeNode *selection = [[self.dataStore selectedNodes] firstObject];
-	NSIndexPath *pth = nil;
+/// Insert @c FeedGroup item either after current selection or inside selected folder (if expanded)
+- (FeedGroup*)insertFeedGroupAtSelection:(FeedGroupType)type {
+	FeedGroup *fg = [FeedGroup newGroup:type inContext:self.dataStore.managedObjectContext];
+	NSIndexPath *pth = [self indexPathForInsertAtNode:[[self.dataStore selectedNodes] firstObject]];
+	[self.dataStore insertObject:fg atArrangedObjectIndexPath:pth];
 	
-	if (!selection) { // append to root
-		pth = [NSIndexPath indexPathWithIndex:[self.dataStore arrangedObjects].childNodes.count]; // or 0 to append at front
-	} else if ([self.outlineView isItemExpanded:selection]) { // append to group (if open)
-		pth = [selection.indexPath indexPathByAddingIndex:0]; // or 'selection.childNodes.count' to append at end
-	} else { // append before / after selected item
-		pth = selection.indexPath;
-		// remove the two lines below to insert infront of selection (instead of after selection)
-		NSUInteger lastIdx = [pth indexAtPosition:pth.length - 1];
-		pth = [[pth indexPathByRemovingLastIndex] indexPathByAddingIndex:lastIdx + 1];
-	}
-	[self.dataStore insertObject:newItem atArrangedObjectIndexPath:pth];
-
-	if (pth.length > 2) { // some subfolder; not root folder (has parent!)
+	if (pth.length > 1) { // some subfolder and not root folder (has parent!)
 		NSTreeNode *parentNode = [[self.dataStore arrangedObjects] descendantNodeAtIndexPath:pth].parentNode;
-		newItem.parent = parentNode.representedObject;
+		fg.parent = parentNode.representedObject;
 		[self restoreOrderingAndIndexPathStr:parentNode];
 	} else {
 		[self restoreOrderingAndIndexPathStr:[self.dataStore arrangedObjects]]; // .parent = nil
 	}
-	return newItem;
+	return fg;
 }
 
-/// Loop over all descendants and update @c sortIndex @c (FeedConfig) as well as all @c indexPath @c (Feed)
+/**
+ Index path will be selected as follow:
+ - @b root: append at end
+ - @b folder (expanded): append at front
+ - @b else: append after item.
+
+ @return indexPath where item will be inserted.
+ */
+- (NSIndexPath*)indexPathForInsertAtNode:(NSTreeNode*)node {
+	if (!node) { // append to root
+		return [NSIndexPath indexPathWithIndex:[self.dataStore arrangedObjects].childNodes.count]; // or 0 to append at front
+	} else if ([self.outlineView isItemExpanded:node]) { // append to group (if open)
+		return [node.indexPath indexPathByAddingIndex:0]; // or 'selection.childNodes.count' to append at end
+	} else { // append before / after selected item
+		NSIndexPath *pth = node.indexPath;
+		// remove the two lines below to insert infront of selection (instead of after selection)
+		NSUInteger lastIdx = [pth indexAtPosition:pth.length - 1];
+		return [[pth indexPathByRemovingLastIndex] indexPathByAddingIndex:lastIdx + 1];
+	}
+}
+
+/// Loop over all descendants and update @c sortIndex @c (FeedGroup) as well as all @c indexPath @c (Feed)
 - (void)restoreOrderingAndIndexPathStr:(NSTreeNode*)parent {
 	NSArray<NSTreeNode*> *children = parent.childNodes;
 	for (NSUInteger i = 0; i < children.count; i++) {
-		NSTreeNode *n = [children objectAtIndex:i];
-		FeedConfig *fc = n.representedObject;
-		// Re-calculate sort index for all affected parents
-		if (fc.sortIndex != (int32_t)i)
-			fc.sortIndex = (int32_t)i;
-		// Re-calculate index path for all contained feed items
-		[fc iterateSorted:NO overDescendantFeeds:^(Feed *feed, BOOL *cancel) {
-			NSString *pthStr = [feed.config indexPathString];
-			if (![feed.indexPath isEqualToString:pthStr])
-				feed.indexPath = pthStr;
+		FeedGroup *fg = [children objectAtIndex:i].representedObject;
+		if (fg.sortIndex != (int32_t)i)
+			fg.sortIndex = (int32_t)i;
+		NSLog(@"%@ - %d", fg.name, fg.sortIndex);
+		[fg iterateSorted:NO overDescendantFeeds:^(Feed *feed, BOOL *cancel) {
+			[feed calculateAndSetIndexPathString];
 		}];
 	}
 }
@@ -189,6 +192,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 #pragma mark - Dragging Support, Data Source Delegate
 
 
+/// Begin drag-n-drop operation by copying selected nodes to memory
 - (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard {
 	[self.undoManager beginUndoGrouping];
 	[pboard declareTypes:[NSArray arrayWithObject:dragNodeType] owner:self];
@@ -197,6 +201,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	return YES;
 }
 
+/// Finish drag-n-drop operation by saving changes to persistent store
 - (void)outlineView:(NSOutlineView *)outlineView draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation {
 	[self.undoManager endUndoGrouping];
 	if (self.dataStore.managedObjectContext.hasChanges) {
@@ -209,6 +214,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	self.currentlyDraggedNodes = nil;
 }
 
+/// Perform drag-n-drop operation, move nodes to new destination and update all indices
 - (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index {
 	NSTreeNode *destParent = (item != nil ? item : [self.dataStore arrangedObjects]);
 	NSUInteger idx = (NSUInteger)index;
@@ -223,17 +229,16 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		[self restoreOrderingAndIndexPathStr:node];
 	}
 	[self restoreOrderingAndIndexPathStr:destParent];
-	
+
 	return YES;
 }
 
+/// Validate method whether items can be dropped at destination
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index {
-	FeedConfig *fc = [(NSTreeNode*)item representedObject];
-	if (index == -1 && fc.typ != GROUP) { // if drag is on specific item and that item isnt a group
+	NSTreeNode *parent = item;
+	if (index == -1 && [parent isLeaf]) { // if drag is on specific item and that item isnt a group
 		return NSDragOperationNone;
 	}
-	
-	NSTreeNode *parent = item;
 	while (parent != nil) {
 		for (NSTreeNode *node in self.currentlyDraggedNodes) {
 			if (parent == node)
@@ -248,10 +253,11 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 #pragma mark - Data Source Delegate
 
 
+/// Populate @c NSOutlineView data cells with core data object values.
 - (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item {
-	FeedConfig *f = [(NSTreeNode*)item representedObject];
-	BOOL isFeed = (f.typ == FEED);
-	BOOL isSeperator = (f.typ == SEPARATOR);
+	FeedGroup *fg = [(NSTreeNode*)item representedObject];
+	BOOL isFeed = (fg.typ == FEED);
+	BOOL isSeperator = (fg.typ == SEPARATOR);
 	BOOL isRefreshColumn = [tableColumn.identifier isEqualToString:@"RefreshColumn"];
 	
 	NSString *cellIdent = (isRefreshColumn ? @"cellRefresh" : (isSeperator ? @"cellSeparator" : @"cellFeed"));
@@ -259,12 +265,12 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	NSTableCellView *cellView = [self.outlineView makeViewWithIdentifier:cellIdent owner:nil];
 	
 	if (isRefreshColumn) {
-		cellView.textField.stringValue = (!isFeed ? @"" : [f readableRefreshString]);
+		cellView.textField.stringValue = (isFeed && fg.refreshStr.length > 0 ? fg.refreshStr : @"");
 	} else if (isSeperator) {
 		return cellView; // the refresh cell is already skipped with the above if condition
 	} else {
-		cellView.textField.objectValue = f.name;
-		if (f.typ == GROUP) {
+		cellView.textField.objectValue = fg.name;
+		if (fg.typ == GROUP) {
 			cellView.imageView.image = [NSImage imageNamed:NSImageNameFolder];
 		} else {
 			// TODO: load icon
@@ -275,8 +281,10 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 			cellView.imageView.image = defaultRSSIcon;
 		}
 	}
-	if (isFeed) // also for refresh column
-		cellView.textField.textColor = (f.refreshNum == 0 ? [NSColor disabledControlTextColor] : [NSColor controlTextColor]);
+	if (isFeed) {// also for refresh column
+		BOOL feedDisbaled = (fg.refreshStr.length == 0 || [fg.refreshStr characterAtIndex:0] == '0');
+		cellView.textField.textColor = (feedDisbaled ? [NSColor disabledControlTextColor] : [NSColor controlTextColor]);
+	}
 	return cellView;
 }
 
@@ -284,6 +292,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 #pragma mark - Keyboard Commands: undo, redo, copy, enter
 
 
+/// Returning @c NO will result in a Action-Not-Available-Buzzer sound
 - (BOOL)respondsToSelector:(SEL)aSelector {
 	if (aSelector == @selector(undo:)) return [self.undoManager canUndo];
 	if (aSelector == @selector(redo:)) return [self.undoManager canRedo];
@@ -295,11 +304,12 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		if (aSelector == @selector(copy:))
 			return YES;
 		// can edit only if selection is not a separator
-		return (((FeedConfig*)self.dataStore.selectedNodes.firstObject.representedObject).typ != SEPARATOR);
+		return (((FeedGroup*)self.dataStore.selectedNodes.firstObject.representedObject).typ != SEPARATOR);
 	}
 	return [super respondsToSelector:aSelector];
 }
 
+/// Perform undo operation and redraw UI & menu bar unread count
 - (void)undo:(id)sender {
 	[self.undoManager undo];
 	[self saveChanges];
@@ -307,6 +317,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[self.dataStore rearrangeObjects]; // update ordering
 }
 
+/// Perform redo operation and redraw UI & menu bar unread count
 - (void)redo:(id)sender {
 	[self.undoManager redo];
 	[self saveChanges];
@@ -314,10 +325,12 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[self.dataStore rearrangeObjects]; // update ordering
 }
 
+/// User pressed enter; open edit dialog for selected item.
 - (void)enterPressed:(id)sender {
-	[self openModalForSelection];
+	[self showModalForFeedGroup:self.dataStore.selectedObjects.firstObject isGroupEdit:YES]; // yes will be overwritten anyway
 }
 
+/// Copy human readable description of selected nodes to clipboard.
 - (void)copy:(id)sender {
 	NSMutableString *str = [[NSMutableString alloc] init];
 	NSUInteger count = self.dataStore.selectedNodes.count;

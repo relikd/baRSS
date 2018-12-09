@@ -24,5 +24,5 @@
 
 @interface BarMenu : NSObject <NSMenuDelegate>
 - (void)updateBarIcon;
-- (void)reloadUnreadCountAndUpdateBarIcon;
+- (void)asyncReloadUnreadCountAndUpdateBarIcon;
 @end

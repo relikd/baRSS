@@ -21,22 +21,20 @@
 //  SOFTWARE.
 
 #import <Cocoa/Cocoa.h>
+#import "ModalSheet.h"
 
-@class FeedConfig;
+@class FeedGroup;
 
-@protocol ModalEditDelegate <NSObject>
-- (void)modalDidUpdateFeedConfig:(FeedConfig*)config;
+@interface ModalEditDialog : NSViewController
++ (instancetype)modalWith:(FeedGroup*)group;
+- (ModalSheet*)getModalSheet;
+- (void)applyChangesToCoreDataObject;
 @end
 
-@protocol ModalFeedConfigEdit <NSObject>
-@property (weak) id<ModalEditDelegate> delegate;
-- (void)updateRepresentedObject; // must call [item.managedObjectContext refreshObject:item mergeChanges:YES];
+
+@interface ModalFeedEdit : ModalEditDialog <NSTextFieldDelegate>
 @end
 
-
-@interface ModalFeedEdit : NSViewController <ModalFeedConfigEdit, NSTextFieldDelegate>
-@end
-
-@interface ModalGroupEdit : NSViewController <ModalFeedConfigEdit>
+@interface ModalGroupEdit : ModalEditDialog
 @end
 

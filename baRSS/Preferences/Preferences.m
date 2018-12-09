@@ -32,6 +32,7 @@
 
 @implementation Preferences
 
+/// Restore tab selection from previous session
 - (void)windowDidLoad {
 	[super windowDidLoad];
 	NSUInteger idx = (NSUInteger)[[NSUserDefaults standardUserDefaults] integerForKey:@"preferencesTab"];
@@ -40,6 +41,7 @@
 	[self tabClicked:self.window.toolbar.items[idx]];
 }
 
+/// Replace content view according to selected tab
 - (IBAction)tabClicked:(NSToolbarItem *)sender {
 	self.window.contentView = nil;
 	if ([sender.itemIdentifier isEqualToString:@"tabGeneral"]) {
@@ -59,7 +61,7 @@
 @end
 
 
-
+/// A window that does not respond to Cmd-C, Cmd-Z, Cmd-Shift-Z and Enter-pressed events.
 @interface NonRespondingWindow : NSWindow
 @end
 
