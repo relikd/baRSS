@@ -25,6 +25,7 @@
 #import "StoreCoordinator.h"
 #import "Feed+Ext.h"
 #import "FeedMeta+Ext.h"
+#import "FeedGroup+Ext.h"
 
 #import <SystemConfiguration/SystemConfiguration.h>
 
@@ -151,10 +152,15 @@ static BOOL _nextUpdateIsForced = NO;
 
 
 /// @return New request with no caching policy and timeout interval of 30 seconds.
-+ (NSMutableURLRequest*)newRequestURL:(NSString*)url {
-	NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-	req.timeoutInterval = 30;
-	req.cachePolicy = NSURLRequestReloadIgnoringCacheData;
++ (NSMutableURLRequest*)newRequestURL:(NSString*)urlStr {
+	NSURL *url = [NSURL URLWithString:urlStr];
+	if (!url.scheme) {
+		url = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@", urlStr]]; // usually will redirect to https if necessary
+	}
+	NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
+	req.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+	req.HTTPShouldHandleCookies = NO;
+//	req.timeoutInterval = 30;
 //	[req setValue:@"Mon, 10 Sep 2018 10:32:19 GMT" forHTTPHeaderField:@"If-Modified-Since"];
 //	[req setValue:@"wII2pETT9EGmlqyCHBFJpm25/7w" forHTTPHeaderField:@"If-None-Match"]; // ETag
 	return req;
@@ -168,25 +174,25 @@ static BOOL _nextUpdateIsForced = NO;
 		[req setValue:meta.modified forHTTPHeaderField:@"If-Modified-Since"];
 	if (etag.length > 0)
 		[req setValue:etag forHTTPHeaderField:@"If-None-Match"]; // ETag
+	if (!_nextUpdateIsForced) // any FeedMeta-request that is not forced, is a background update
+		req.networkServiceType = NSURLNetworkServiceTypeBackground;
 	return req;
 }
 
 /**
  Perform feed download request from URL alone. Not updating any @c Feed item.
  */
-+ (void)newFeed:(NSString *)url block:(void(^)(RSParsedFeed *feed, NSError* error, NSHTTPURLResponse* response))block {
-	[[[NSURLSession sharedSession] dataTaskWithRequest:[self newRequestURL:url] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
++ (void)newFeed:(NSString *)urlStr block:(void(^)(RSParsedFeed *feed, NSError *error, NSHTTPURLResponse *response))block {
+	[[[NSURLSession sharedSession] dataTaskWithRequest:[self newRequestURL:urlStr] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
 		NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
 		if (error || [httpResponse statusCode] == 304) {
 			block(nil, error, httpResponse);
 			return;
 		}
-		RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:url];
+		RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:urlStr];
 		RSParseFeed(xml, ^(RSParsedFeed * _Nullable parsedFeed, NSError * _Nullable err) {
-			if (!err && (!parsedFeed || parsedFeed.articles.count == 0)) { // TODO: this should be fixed in RSXMLParser
-				NSString *errDesc = NSLocalizedString(@"URL does not contain a RSS feed. Can't parse feed items.", nil);
-				err = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnsupportedURL userInfo:@{NSLocalizedDescriptionKey: errDesc}];
-			}
+			NSAssert(err || parsedFeed, @"Only parse error XOR parsed result can be set. Not both. Neither none.");
+			// TODO: Need for error?: "URL does not contain a RSS feed. Can't parse feed items."
 			block(parsedFeed, err, httpResponse);
 		});
 	}] resume];
@@ -203,31 +209,72 @@ static BOOL _nextUpdateIsForced = NO;
 		return;
 	dispatch_group_enter(group);
 	[[[NSURLSession sharedSession] dataTaskWithRequest:[self newRequest:feed.meta] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-		[feed.managedObjectContext performBlock:^{
-			// core data block inside of url session block; otherwise access will EXC_BAD_INSTRUCTION
-			if (error) {
+		NSHTTPURLResponse *header = (NSHTTPURLResponse*)response;
+		RSParsedFeed *parsed = nil; // can stay nil if !error and statusCode = 304
+		BOOL hasError = (error != nil);
+		if (!error && [header statusCode] != 304) { // only parse if modified
+			RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:header.URL.absoluteString];
+			// should be fine to call synchronous since dataTask is already in the background (always? proof?)
+			parsed = RSParseFeedSync(xml, &error); // reuse error
+			if (error || !parsed || parsed.articles.count == 0) {
+				hasError = YES;
+			}
+		}
+		[feed.managedObjectContext performBlock:^{ // otherwise access on feed will EXC_BAD_INSTRUCTION
+			if (hasError) {
 				[feed.meta setErrorAndPostponeSchedule];
 			} else {
-				[feed.meta setEtagAndModified:(NSHTTPURLResponse*)response];
+				feed.meta.errorCount = 0; // reset counter
+				[feed.meta setEtagAndModified:header];
 				[feed.meta calculateAndSetScheduled];
-				
-				if ([(NSHTTPURLResponse*)response statusCode] != 304) { // only parse if modified
-					// should be fine to call synchronous since dataTask is already in the background (always? proof?)
-					RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:feed.meta.url];
-					RSParsedFeed *parsed = RSParseFeedSync(xml, NULL);
-					if (parsed && parsed.articles.count > 0) {
-						[feed updateWithRSS:parsed postUnreadCountChange:YES];
-						feed.meta.errorCount = 0; // reset counter
-					} else {
-						[feed.meta setErrorAndPostponeSchedule]; // replaces date of 'calculateAndSetScheduled'
-					}
-				}
-				// TODO: save changes for this feed only?
+				if (parsed) [feed updateWithRSS:parsed postUnreadCountChange:YES];
+				// TODO: save changes for this feed only? / Partial Update
 				//[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedUpdated object:feed.objectID];
 			}
 			dispatch_group_leave(group);
 		}];
 	}] resume];
+}
+
+/**
+ Download feed at url and append to persistent store in root folder.
+ On error present user modal alert.
+ */
++ (void)autoDownloadAndParseURL:(NSString*)url {
+	[FeedDownload newFeed:url block:^(RSParsedFeed *feed, NSError *error, NSHTTPURLResponse *response) {
+		if (error) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[NSApp presentError:error];
+			});
+		} else {
+			[FeedDownload autoParseFeedAndAppendToRoot:feed response:response];
+		}
+	}];
+}
+
+/**
+ Create new @c FeedGroup, @c Feed, @c FeedMeta and @c FeedArticle instances and save them to the persistent store.
+ Appends feed to the end of the root folder, so that the user will immediatelly see it.
+ Update duration is set to the default of 30 minutes.
+
+ @param rss Parsed RSS feed. If @c @c nil no feed object will be added.
+ @param response May be @c nil but then feed download URL will not be set.
+ */
++ (void)autoParseFeedAndAppendToRoot:(nonnull RSParsedFeed*)rss response:(NSHTTPURLResponse*)response {
+	if (!rss || rss.articles.count == 0) return;
+	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
+	NSUInteger idx = [StoreCoordinator sortedObjectIDsForParent:nil isFeed:NO inContext:moc].count;
+	FeedGroup *newFeed = [FeedGroup newGroup:FEED inContext:moc];
+	FeedMeta *meta = newFeed.feed.meta;
+	[meta setURL:response.URL.absoluteString refresh:30 unit:RefreshUnitMinutes];
+	[meta calculateAndSetScheduled];
+	[newFeed setName:rss.title andRefreshString:[meta readableRefreshString]];
+	[meta setEtagAndModified:response];
+	[newFeed.feed updateWithRSS:rss postUnreadCountChange:YES];
+	newFeed.sortIndex = (int32_t)idx;
+	[newFeed.feed calculateAndSetIndexPathString];
+	[StoreCoordinator saveContext:moc andParent:YES];
+	[moc reset];
 }
 
 

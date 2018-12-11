@@ -22,6 +22,7 @@
 
 #import "AppHook.h"
 #import "BarMenu.h"
+#import "FeedDownload.h"
 
 @implementation AppHook
 
@@ -40,17 +41,23 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	printf("up and running\n");
-//	https://feeds.feedburner.com/simpledesktops
+//	feed://https://feeds.feedburner.com/simpledesktops
+	[FeedDownload registerNetworkChangeNotification]; // will call update scheduler
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
-	
+	[FeedDownload unregisterNetworkChangeNotification];
 }
 
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
 	NSString *url = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
-	// TODO: Open feed edit sheet in preferences
-	NSLog(@"%@", url);
+	if ([url hasPrefix:@"feed:"]) {
+		// TODO: handle other app schemes like configuration export / import
+		url = [url substringFromIndex:5];
+		if ([url hasPrefix:@"//"])
+			url = [url substringFromIndex:2];
+		[FeedDownload autoDownloadAndParseURL:url];
+	}
 }
 
 

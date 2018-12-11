@@ -44,7 +44,9 @@
 		self.indexPath = pthStr;
 }
 
+
 #pragma mark - Update Feed Items -
+
 
 /**
  Replace feed title, subtitle and link (if changed). Also adds new articles and removes old ones.
@@ -55,10 +57,15 @@
 	if (![self.link isEqualToString:obj.link])         self.link = obj.link;
 	
 	int32_t unreadBefore = self.unreadCount;
+	// Add and remove articles
 	NSMutableSet<NSString*> *urls = [[self.articles valueForKeyPath:@"link"] mutableCopy];
 	[self addMissingArticles:obj updateLinks:urls]; // will remove links in 'urls' that should be kept
 	if (urls.count > 0)
 		[self deleteArticlesWithLink:urls]; // remove old, outdated articles
+	// Get new total article count and post unread-count-change notification
+	int32_t totalCount = (int32_t)self.articles.count;
+	if (self.articleCount != totalCount)
+		self.articleCount = totalCount;
 	if (flag) {
 		NSNumber *cDiff = [NSNumber numberWithInteger:self.unreadCount - unreadBefore];
 		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:cDiff];
@@ -66,35 +73,56 @@
 }
 
 /**
- Append new articles and increment their sortIndex. Update article counter and unread counter on the way.
-
+ Append new articles and increment their sortIndex. Update unread counter on the way.
+ 
+ @note
+ New articles should be in ascending order without any gaps in between.
+ If new article is disjunct from the article before, assume a deleted article re-appeared and mark it as read.
+ 
  @param urls Input will be used to identify new articles. Output will contain URLs that aren't present in the feed anymore.
- @return @c YES if new items were added, @c NO otherwise.
  */
-- (BOOL)addMissingArticles:(RSParsedFeed*)obj updateLinks:(NSMutableSet<NSString*>*)urls {
-	int latestID = [[self.articles valueForKeyPath:@"@max.sortIndex"] intValue];
-	__block int newOnes = 0;
-	[obj.articles enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(RSParsedArticle * _Nonnull article, BOOL * _Nonnull stop) {
+- (void)addMissingArticles:(RSParsedFeed*)obj updateLinks:(NSMutableSet<NSString*>*)urls {
+	int32_t newOnes = 0;
+	int32_t currentIndex = [[self.articles valueForKeyPath:@"@min.sortIndex"] intValue];
+	FeedArticle *lastInserted = nil;
+	BOOL hasGapBetweenNewArticles = NO;
+	
+	for (RSParsedArticle *article in [obj.articles reverseObjectEnumerator]) {
 		// reverse enumeration ensures correct article order
 		if ([urls containsObject:article.link]) {
 			[urls removeObject:article.link];
+			FeedArticle *storedArticle = [self findArticleWithLink:article.link]; // TODO: use two synced arrays?
+			if (storedArticle && storedArticle.sortIndex != currentIndex) {
+				storedArticle.sortIndex = currentIndex;
+			}
+			hasGapBetweenNewArticles = YES;
 		} else {
 			newOnes += 1;
-			[self insertArticle:article atIndex:latestID + newOnes];
+			if (hasGapBetweenNewArticles && lastInserted) { // gap with at least one article inbetween
+				lastInserted.unread = NO;
+				NSLog(@"Ghost item: %@", lastInserted.title);
+				newOnes -= 1;
+			}
+			hasGapBetweenNewArticles = NO;
+			lastInserted = [self insertArticle:article atIndex:currentIndex];
 		}
-	}];
-	if (newOnes == 0) return NO;
-	self.articleCount += newOnes;
-	self.unreadCount += newOnes; // new articles are by definition unread
-	return YES;
+		currentIndex += 1;
+	}
+	if (hasGapBetweenNewArticles && lastInserted) {
+		lastInserted.unread = NO;
+		NSLog(@"Ghost item: %@", lastInserted.title);
+		newOnes -= 1;
+	}
+	if (newOnes > 0)
+		self.unreadCount += newOnes; // new articles are by definition unread
 }
 
 /**
  Create article based on input and insert into core data storage.
  */
-- (void)insertArticle:(RSParsedArticle*)entry atIndex:(int)idx {
+- (FeedArticle*)insertArticle:(RSParsedArticle*)entry atIndex:(int32_t)idx {
 	FeedArticle *fa = [[FeedArticle alloc] initWithEntity:FeedArticle.entity insertIntoManagedObjectContext:self.managedObjectContext];
-	fa.sortIndex = (int32_t)idx;
+	fa.sortIndex = idx;
 	fa.unread = YES;
 	fa.guid = entry.guid;
 	fa.title = entry.title;
@@ -104,6 +132,7 @@
 	fa.link = entry.link;
 	fa.published = entry.datePublished;
 	[self addArticlesObject:fa];
+	return fa;
 }
 
 /**
@@ -126,7 +155,9 @@
 	}
 }
 
+
 #pragma mark - Article Properties -
+
 
 /**
  @return Articles sorted by attribute @c sortIndex with descending order (newest items first).
@@ -135,6 +166,17 @@
 	if (self.articles.count == 0)
 		return nil;
 	return [self.articles sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:NO]]];
+}
+
+/**
+ Iterate over all Articles and return the one where @c .link matches. Or @c nil if no matching article found.
+ */
+- (FeedArticle*)findArticleWithLink:(NSString*)url {
+	for (FeedArticle *a in self.articles) {
+		if ([a.link isEqualToString:url])
+			return a;
+	}
+	return nil;
 }
 
 /**

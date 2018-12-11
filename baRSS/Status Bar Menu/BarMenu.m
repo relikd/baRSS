@@ -60,12 +60,10 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkChanged:) name:kNotificationNetworkStatusChanged object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(unreadCountChanged:) name:kNotificationTotalUnreadCountChanged object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(asyncReloadUnreadCountAndUpdateBarIcon) name:kNotificationTotalUnreadCountReset object:nil];
-	[FeedDownload registerNetworkChangeNotification]; // will call update scheduler
 	return self;
 }
 
 - (void)dealloc {
-	[FeedDownload unregisterNetworkChangeNotification];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
