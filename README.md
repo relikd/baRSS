@@ -31,14 +31,14 @@ ToDo
 - [ ] Preferences
 	- [x] Choose favorite web browser
 		- [x] Show list of installed browsers
-	- [ ] Choose status bar icon?
-	- [ ] Tick mark feed items based on prefs
-	- [ ] Open a few links (# editable)
+	- [ ] ~~Choose status bar icon?~~
+	- [x] Tick mark feed items based on prefs
+	- [x] Open a few links (# editable)
 	- [x] Performance: Update menu partially
 	- [x] Start on login
 	- [x] Make it system default application
 	- [ ] Display license info (e.g., RSXML)
-	- [ ] Short article names
+	- [x] Short article names
 	- [ ] Import / Export (all feeds)
 		- [ ] Support for `.opml` format
 		- [ ] Append or replace
