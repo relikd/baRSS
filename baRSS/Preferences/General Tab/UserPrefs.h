@@ -25,6 +25,10 @@
 @interface UserPrefs : NSObject
 + (BOOL)defaultYES:(NSString*)key;
 + (BOOL)defaultNO:(NSString*)key;
+
 + (NSString*)getHttpApplication;
 + (void)setHttpApplication:(NSString*)bundleID;
+
++ (NSUInteger)openFewLinksLimit; // Change with: 'defaults write de.relikd.baRSS openFewLinksLimit -int 10'
++ (NSUInteger)shortArticleNamesLimit; // Change with: 'defaults write de.relikd.baRSS shortArticleNamesLimit -int 50'
 @end

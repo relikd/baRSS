@@ -37,6 +37,13 @@
 	return [[NSUserDefaults standardUserDefaults] boolForKey:key];
 }
 
+/// @return Return @c defaultInt if key is not set. Otherwise, return user defaults property from plist.
++ (NSInteger)defaultInt:(NSInteger)defaultInt forKey:(NSString*)key {
+	NSInteger ret = [[NSUserDefaults standardUserDefaults] integerForKey:key];
+	if (ret > 0) return ret;
+	return defaultInt;
+}
+
 /// @return User configured custom browser. Or @c nil if not set yet. (which will fallback to default browser)
 + (NSString*)getHttpApplication {
 	return [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultHttpApplication"];
@@ -45,6 +52,18 @@
 /// Store custom browser bundle id to user defaults.
 + (void)setHttpApplication:(NSString*)bundleID {
 	[[NSUserDefaults standardUserDefaults] setObject:bundleID forKey:@"defaultHttpApplication"];
+}
+
+#pragma mark - Hidden Plist Properties -
+
+/// @return The limit on how many links should be opened at the same time, if user holds the option key.
++ (NSUInteger)openFewLinksLimit {
+	return (NSUInteger)[self defaultInt:10 forKey:@"openFewLinksLimit"];
+}
+
+/// @return The limit on when to truncate article titles (Short names setting must be active).
++ (NSUInteger)shortArticleNamesLimit {
+	return (NSUInteger)[self defaultInt:60 forKey:@"shortArticleNamesLimit"];
 }
 
 @end

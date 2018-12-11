@@ -151,9 +151,15 @@ typedef NS_ENUM(char, DisplaySetting) {
  */
 - (void)setFeedArticle:(FeedArticle*)fa {
 	self.title = fa.title;
+	// TODO: It should be enough to get user prefs once per menu build
+	if ([UserPrefs defaultNO:@"feedShortNames"]) {
+		NSUInteger limit = [UserPrefs shortArticleNamesLimit];
+		if (self.title.length > limit)
+			self.title = [NSString stringWithFormat:@"%@…", [self.title substringToIndex:limit-1]];
+	}
 	self.tag = ScopeFeed;
 	self.enabled = (fa.link.length > 0);
-	self.state = (fa.unread ? NSControlStateValueOn : NSControlStateValueOff);
+	self.state = (fa.unread && [UserPrefs defaultYES:@"feedTickMark"] ? NSControlStateValueOn : NSControlStateValueOff);
 	self.representedObject = fa.objectID;
 	//mi.toolTip = item.abstract;
 	// TODO: Do regex during save, not during display. Its here for testing purposes ...

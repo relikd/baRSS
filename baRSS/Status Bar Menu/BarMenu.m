@@ -79,8 +79,6 @@
 
 /// Update menu bar icon and text according to unread count and user preferences.
 - (void)updateBarIcon {
-	// TODO: Option: icon choice
-	// TODO: Show paused icon if no internet connection
 	dispatch_async(dispatch_get_main_queue(), ^{
 		if (self.unreadCountTotal > 0 && [UserPrefs defaultYES:@"globalUnreadCount"]) {
 			self.barItem.title = [NSString stringWithFormat:@"%ld", self.unreadCountTotal];
@@ -88,7 +86,7 @@
 			self.barItem.title = @"";
 		}
 		BOOL hasNet = [FeedDownload allowNetworkConnection];
-		if (self.unreadCountTotal > 0 && [UserPrefs defaultYES:@"tintMenuBarIcon"]) {
+		if (self.unreadCountTotal > 0 && hasNet && [UserPrefs defaultYES:@"tintMenuBarIcon"]) {
 			self.barItem.image = [RSSIcon systemBarIcon:16 tint:[NSColor rssOrange] noConnection:!hasNet];
 		} else {
 			self.barItem.image = [RSSIcon systemBarIcon:16 tint:nil noConnection:!hasNet];
@@ -259,7 +257,8 @@
 	MenuItemTag scope = [menu scope];
 	NSMenuItem *item1 = [NSMenuItem itemWithTitle:NSLocalizedString(@"Open all unread", nil)
 										   action:@selector(openAllUnread:) target:self tag:TagOpenAllUnread | scope];
-	NSMenuItem *item2 = [item1 alternateWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Open a few unread (%d)", nil), 3]];
+	NSMenuItem *item2 = [item1 alternateWithTitle:[NSString stringWithFormat:@"%@ (%lu)",
+												   NSLocalizedString(@"Open a few unread", nil), [UserPrefs openFewLinksLimit]]];
 	NSMenuItem *item3 = [NSMenuItem itemWithTitle:NSLocalizedString(@"Mark all read", nil)
 										   action:@selector(markAllReadOrUnread:) target:self tag:TagMarkAllRead | scope];
 	NSMenuItem *item4 = [NSMenuItem itemWithTitle:NSLocalizedString(@"Mark all unread", nil)
@@ -349,7 +348,7 @@
 	NSMutableArray<NSURL*> *urls = [NSMutableArray<NSURL*> array];
 	__block int maxItemCount = INT_MAX;
 	if (sender.isAlternate)
-		maxItemCount = 3; // TODO: read from preferences
+		maxItemCount = (int)[UserPrefs openFewLinksLimit];
 	
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	[sender iterateSorted:YES inContext:moc overDescendentFeeds:^(Feed *feed, BOOL *cancel) {
