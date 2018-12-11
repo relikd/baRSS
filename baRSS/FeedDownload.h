@@ -28,7 +28,8 @@
 + (void)registerNetworkChangeNotification;
 + (void)unregisterNetworkChangeNotification;
 // Scheduled feed update
-+ (void)newFeed:(NSString *)url block:(void(^)(RSParsedFeed *feed, NSError* error, NSHTTPURLResponse* response))block;
++ (void)newFeed:(NSString *)urlStr block:(void(^)(RSParsedFeed *feed, NSError *error, NSHTTPURLResponse *response))block;
++ (void)autoDownloadAndParseURL:(NSString*)url;
 + (void)scheduleUpdateForUpcomingFeeds;
 + (void)forceUpdateAllFeeds;
 // User interaction

@@ -59,7 +59,7 @@
 
  @return @c YES if refresh interval has changed
  */
-- (BOOL)setURL:(NSString*)url refresh:(int32_t)refresh unit:(int16_t)unit {
+- (BOOL)setURL:(NSString*)url refresh:(int32_t)refresh unit:(RefreshUnitType)unit {
 	BOOL intervalChanged = (self.refreshNum != refresh || self.refreshUnit != unit);
 	if (![self.url isEqualToString:url]) self.url = url;
 	if (self.refreshNum != refresh)      self.refreshNum = refresh;

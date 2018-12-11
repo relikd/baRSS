@@ -23,12 +23,18 @@
 #import "FeedMeta+CoreDataClass.h"
 
 @interface FeedMeta (Ext)
+/// Easy memorable enum type for refresh unit index
+typedef NS_ENUM(int16_t, RefreshUnitType) {
+	/// Other types: @c GROUP, @c FEED, @c SEPARATOR
+	RefreshUnitSeconds = 0, RefreshUnitMinutes = 1, RefreshUnitHours = 2, RefreshUnitDays = 3, RefreshUnitWeeks = 4
+};
+
 - (void)setErrorAndPostponeSchedule;
 - (void)calculateAndSetScheduled;
 
 - (void)setEtag:(NSString*)etag modified:(NSString*)modified;
 - (void)setEtagAndModified:(NSHTTPURLResponse*)http;
-- (BOOL)setURL:(NSString*)url refresh:(int32_t)refresh unit:(int16_t)unit;
+- (BOOL)setURL:(NSString*)url refresh:(int32_t)refresh unit:(RefreshUnitType)unit;
 
 - (NSString*)readableRefreshString;
 @end

@@ -58,7 +58,7 @@ ToDo
 		- [ ] Automatically choose best interval?
 		- [ ] Show time of next update
 	- [x] Auto fix 301 Redirect or ask user
-	- [ ] Make `feed://` URLs clickable
+	- [x] Make `feed://` URLs clickable
 	- [ ] Feeds with authentication
 	- [ ] Show proper feed icon
 		- [ ] Download and store icon file
@@ -86,7 +86,7 @@ ToDo
 	- [ ] Notification Center
 	- [ ] Sleep timer. (e.g., disable updates during working hours)
 	- [ ] Pure image feed? (show images directly in menu)
-	- ~~[ ] Infinite storage. (load more button)~~
+	- [ ] ~~Infinite storage. (load more button)~~
 	- [ ] Automatically open feed items?
 	- [ ] Per feed launch application (e.g., for podcasts)
 		- [ ] Per group setting to exclude unread count from menu bar
