@@ -23,7 +23,7 @@
 #ifndef Constants_h
 #define Constants_h
 
-// TODO: Add support for media player?
+// TODO: Add support for media player? image feed?
 // <enclosure url="https://url.mp3" length="63274022" type="audio/mpeg" />
 // TODO: Disable 'update all' menu item during update?
 
@@ -31,6 +31,7 @@ static NSString *kNotificationFeedUpdated = @"baRSS-notification-feed-updated";
 static NSString *kNotificationNetworkStatusChanged = @"baRSS-notification-network-status-changed";
 static NSString *kNotificationTotalUnreadCountChanged = @"baRSS-notification-total-unread-count-changed";
 static NSString *kNotificationTotalUnreadCountReset = @"baRSS-notification-total-unread-count-reset";
+static NSString *kNotificationFaviconDownloadFinished = @"baRSS-notification-favicon-download-finished";
 
 extern uint64_t dispatch_benchmark(size_t count, void (^block)(void));
 //void benchmark(char *desc, dispatch_block_t b){printf("%s: %llu ns\n", desc, dispatch_benchmark(1, b));}

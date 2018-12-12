@@ -34,7 +34,7 @@
         <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedGroup" inverseName="children" inverseEntity="FeedGroup" syncable="YES"/>
     </entity>
     <entity name="FeedIcon" representedClassName="FeedIcon" syncable="YES" codeGenerationType="class">
-        <attribute name="icon" optional="YES" attributeType="Binary" customClassName="NSImage" syncable="YES"/>
+        <attribute name="icon" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" customClassName="NSImage" syncable="YES"/>
         <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="icon" inverseEntity="Feed" syncable="YES"/>
     </entity>
     <entity name="FeedMeta" representedClassName="FeedMeta" syncable="YES" codeGenerationType="class">
@@ -49,8 +49,8 @@
     </entity>
     <elements>
         <element name="Feed" positionX="-278.84765625" positionY="-112.953125" width="128" height="195"/>
-        <element name="FeedGroup" positionX="-460.37890625" positionY="-111.62890625" width="130.52734375" height="150"/>
         <element name="FeedArticle" positionX="-96.77734375" positionY="-113.83984375" width="128" height="195"/>
+        <element name="FeedGroup" positionX="-460.37890625" positionY="-111.62890625" width="130.52734375" height="150"/>
         <element name="FeedIcon" positionX="-202.79296875" positionY="137.71875" width="128" height="75"/>
         <element name="FeedMeta" positionX="-348.02734375" positionY="136.89453125" width="128" height="165"/>
     </elements>

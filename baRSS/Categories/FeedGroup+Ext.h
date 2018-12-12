@@ -33,6 +33,7 @@ typedef NS_ENUM(int16_t, FeedGroupType) {
 
 + (instancetype)newGroup:(FeedGroupType)type inContext:(NSManagedObjectContext*)context;
 - (void)setName:(NSString*)name andRefreshString:(NSString*)refreshStr;
+- (NSImage*)groupIconImage16;
 // Handle children and parents
 - (NSString*)indexPathString;
 - (NSMutableArray<FeedGroup*>*)allParents;

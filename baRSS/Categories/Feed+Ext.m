@@ -21,11 +21,14 @@
 //  SOFTWARE.
 
 #import "Feed+Ext.h"
+#import "Constants.h"
+#import "DrawImage.h"
 #import "FeedMeta+Ext.h"
 #import "FeedGroup+Ext.h"
+#import "FeedIcon+CoreDataClass.h"
 #import "FeedArticle+CoreDataClass.h"
-#import "Constants.h"
 
+#import <Cocoa/Cocoa.h>
 #import <RSXML/RSXML.h>
 
 @implementation Feed (Ext)
@@ -212,6 +215,21 @@
 	if (self.unreadCount != newCount)
 		self.unreadCount = newCount;
 	return newCount - oldCount;
+}
+
+/**
+ @return Return @c 16x16px image. Either from core data storage or generated default RSS icon.
+ */
+- (NSImage*)iconImage16 {
+	NSData *imgData = self.icon.icon;
+	if (imgData) {
+		return [[NSImage alloc] initWithData:imgData];
+	} else {
+		static NSImage *defaultRSSIcon;
+		if (!defaultRSSIcon)
+			defaultRSSIcon = [RSSIcon iconWithSize:16];
+		return defaultRSSIcon;
+	}
 }
 
 @end

@@ -150,14 +150,23 @@ static BOOL _nextUpdateIsForced = NO;
 
 #pragma mark - Download RSS Feed -
 
+/// @return Base URL part. E.g., https://stackoverflow.com/a/15897956/10616114 ==> https://stackoverflow.com/
++ (NSURL*)hostURL:(NSString*)urlStr {
+	return [[NSURL URLWithString:@"/" relativeToURL:[self fixURL:urlStr]] absoluteURL];
+}
 
-/// @return New request with no caching policy and timeout interval of 30 seconds.
-+ (NSMutableURLRequest*)newRequestURL:(NSString*)urlStr {
+/// Check if any scheme is set. If not, prepend 'http://'.
++ (NSURL*)fixURL:(NSString*)urlStr {
 	NSURL *url = [NSURL URLWithString:urlStr];
 	if (!url.scheme) {
 		url = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@", urlStr]]; // usually will redirect to https if necessary
 	}
-	NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
+	return url;
+}
+
+/// @return New request with no caching policy and timeout interval of 30 seconds.
++ (NSMutableURLRequest*)newRequestURL:(NSString*)urlStr {
+	NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[self fixURL:urlStr]];
 	req.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
 	req.HTTPShouldHandleCookies = NO;
 //	req.timeoutInterval = 30;
@@ -274,7 +283,44 @@ static BOOL _nextUpdateIsForced = NO;
 	newFeed.sortIndex = (int32_t)idx;
 	[newFeed.feed calculateAndSetIndexPathString];
 	[StoreCoordinator saveContext:moc andParent:YES];
+	NSString *faviconURL = newFeed.feed.link;
+	if (faviconURL.length == 0)
+		faviconURL = meta.url;
+	[FeedDownload backgroundDownloadFavicon:faviconURL forFeed:newFeed.feed];
 	[moc reset];
+}
+
+/**
+ Try to download @c favicon.ico and save downscaled image to persistent store.
+ */
++ (void)backgroundDownloadFavicon:(NSString*)urlStr forFeed:(Feed*)feed {
+	NSManagedObjectID *oid = feed.objectID;
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		NSImage *img = [self downloadFavicon:urlStr];
+		if (img) {
+			NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
+			[moc performBlock:^{
+				Feed *f = [moc objectWithID:oid];
+				if (!f.icon)
+					f.icon = [[FeedIcon alloc] initWithEntity:FeedIcon.entity insertIntoManagedObjectContext:moc];
+				f.icon.icon = [img TIFFRepresentation];
+				[StoreCoordinator saveContext:moc andParent:YES];
+				[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFaviconDownloadFinished object:f.objectID];
+				[moc reset];
+			}];
+		}
+	});
+}
+
+/// Download favicon located at http://.../ @c favicon.ico and rescale image to @c 16x16.
++ (NSImage*)downloadFavicon:(NSString*)urlStr {
+	NSURL *favURL = [[self hostURL:urlStr] URLByAppendingPathComponent:@"favicon.ico"];
+	NSImage *img = [[NSImage alloc] initWithContentsOfURL:favURL];
+	if (!img) return nil;
+	return [NSImage imageWithSize:NSMakeSize(16, 16) flipped:NO drawingHandler:^BOOL(NSRect dstRect) {
+		[img drawInRect:dstRect];
+		return YES;
+	}];
 }
 
 

@@ -33,4 +33,5 @@
 - (NSArray<FeedArticle*>*)sortedArticles;
 - (int)markAllItemsRead;
 - (int)markAllItemsUnread;
+- (NSImage*)iconImage16;
 @end

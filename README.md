@@ -60,8 +60,8 @@ ToDo
 	- [x] Auto fix 301 Redirect or ask user
 	- [x] Make `feed://` URLs clickable
 	- [ ] Feeds with authentication
-	- [ ] Show proper feed icon
-		- [ ] Download and store icon file
+	- [x] Show proper feed icon
+		- [x] Download and store icon file
 
 
 - [ ] Other

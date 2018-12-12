@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		540CD14921C094A2004AB594 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 540CD14821C094A2004AB594 /* README.md */; };
 		540F704521B6C16C0022E69D /* FeedMeta+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 540F704421B6C16C0022E69D /* FeedMeta+Ext.m */; };
 		54195883218A061100581B79 /* Feed+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54195882218A061100581B79 /* Feed+Ext.m */; };
 		54195886218E1BDB00581B79 /* NSMenu+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54195885218E1BDB00581B79 /* NSMenu+Ext.m */; };
@@ -73,6 +74,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		540CD14821C094A2004AB594 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		540F704321B6C16C0022E69D /* FeedMeta+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FeedMeta+Ext.h"; sourceTree = "<group>"; };
 		540F704421B6C16C0022E69D /* FeedMeta+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "FeedMeta+Ext.m"; sourceTree = "<group>"; };
 		54195881218A061100581B79 /* Feed+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Feed+Ext.h"; sourceTree = "<group>"; };
@@ -208,6 +210,7 @@
 		54ACC27321061B3B0020715F = {
 			isa = PBXGroup;
 			children = (
+				540CD14821C094A2004AB594 /* README.md */,
 				54ACC27E21061B3B0020715F /* baRSS */,
 				54CC042D2162532800A48795 /* baRSS-Helper */,
 				54ACC27D21061B3B0020715F /* Products */,
@@ -364,6 +367,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				540CD14921C094A2004AB594 /* README.md in Resources */,
 				546FC4472118A8E6007CC3A3 /* Preferences.xib in Resources */,
 				54E88321211B509D00064188 /* ModalFeedEdit.xib in Resources */,
 				54ACC28621061B3C0020715F /* Assets.xcassets in Resources */,
