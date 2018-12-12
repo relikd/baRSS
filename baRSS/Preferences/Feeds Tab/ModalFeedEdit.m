@@ -110,14 +110,21 @@
  Set @c scheduled to a new date if refresh interval was changed.
  */
 - (void)applyChangesToCoreDataObject {
-	FeedMeta *meta = self.feedGroup.feed.meta;
+	Feed *feed = self.feedGroup.feed;
+	FeedMeta *meta = feed.meta;
 	BOOL intervalChanged = [meta setURL:self.previousURL refresh:self.refreshNum.intValue unit:(int16_t)self.refreshUnit.indexOfSelectedItem];
 	if (intervalChanged)
 		[meta calculateAndSetScheduled]; // updateTimer will be scheduled once preferences is closed
 	[self.feedGroup setName:self.name.stringValue andRefreshString:[meta readableRefreshString]];
 	if (self.didDownloadFeed) {
 		[meta setEtag:self.httpEtag modified:self.httpDate];
-		[self.feedGroup.feed updateWithRSS:self.feedResult postUnreadCountChange:YES];
+		[feed updateWithRSS:self.feedResult postUnreadCountChange:YES];
+	}
+	if (!feed.icon) {
+		NSString *faviconURL = feed.link;
+		if (faviconURL.length == 0)
+			faviconURL = meta.url;
+		[FeedDownload backgroundDownloadFavicon:faviconURL forFeed:feed];
 	}
 }
 
@@ -152,7 +159,6 @@
 			self.httpEtag = [response allHeaderFields][@"Etag"];
 			self.httpDate = [response allHeaderFields][@"Date"]; // @"Expires", @"Last-Modified"
 			[self updateTextFieldURL:response.URL.absoluteString andTitle:result.title];
-			// TODO: add icon download
 			// TODO: play error sound?
 			[self.spinnerURL stopAnimation:nil];
 			[self.spinnerName stopAnimation:nil];

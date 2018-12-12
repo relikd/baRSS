@@ -24,6 +24,8 @@
 #import "FeedMeta+Ext.h"
 #import "Feed+Ext.h"
 
+#import <Cocoa/Cocoa.h>
+
 @implementation FeedGroup (Ext)
 /// Enum tpye getter see @c FeedGroupType
 - (FeedGroupType)typ { return (FeedGroupType)self.type; }
@@ -44,6 +46,16 @@
 - (void)setName:(NSString*)name andRefreshString:(NSString*)refreshStr {
 	if (![self.name isEqualToString: name])            self.name = name;
 	if (![self.refreshStr isEqualToString:refreshStr]) self.refreshStr = refreshStr;
+}
+
+/// @return Return static @c 16x16px NSImageNameFolder image.
+- (NSImage*)groupIconImage16 {
+	static NSImage *groupIcon;
+	if (!groupIcon) {
+		groupIcon = [NSImage imageNamed:NSImageNameFolder];
+		groupIcon.size = NSMakeSize(16, 16);
+	}
+	return groupIcon;
 }
 
 

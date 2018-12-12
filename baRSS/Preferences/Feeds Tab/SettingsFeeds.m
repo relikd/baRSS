@@ -22,7 +22,6 @@
 
 #import "SettingsFeeds.h"
 #import "Constants.h"
-#import "DrawImage.h"
 #import "StoreCoordinator.h"
 #import "ModalFeedEdit.h"
 #import "Feed+Ext.h"
@@ -52,11 +51,30 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	
 	self.dataStore.managedObjectContext = [StoreCoordinator createChildContext];
 	self.dataStore.managedObjectContext.undoManager = self.undoManager;
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(faviconDownloadFinished:) name:kNotificationFaviconDownloadFinished object:nil];
 }
 
-- (void)saveChanges {
-	[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
+- (void)dealloc {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
+
+/**
+ Called when the backgroud download of a favicon finished.
+ Notification object contains the updated @c Feed (object id).
+ */
+- (void)faviconDownloadFinished:(NSNotification*)notify {
+	if ([notify.object isKindOfClass:[NSManagedObjectID class]]) {
+		// TODO: Bug: Freshly ownloaded images are deleted on undo. Remove delete cascade rule?
+		NSManagedObject *mo = [self.dataStore.managedObjectContext objectWithID:notify.object];
+		if (!mo) return;
+		[self.dataStore.managedObjectContext refreshObject:mo mergeChanges:YES];
+		[self.dataStore rearrangeObjects];
+	}
+}
+
+#pragma mark - UI Button Interaction
+
 
 - (IBAction)addFeed:(id)sender {
 	[self showModalForFeedGroup:nil isGroupEdit:NO];
@@ -95,8 +113,13 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 }
 
 
-#pragma mark - Insert & Edit Feed Items
+#pragma mark - Insert & Edit Feed Items / Modal Dialog
 
+
+/// Save core data changes of current object context to persistent store
+- (void)saveChanges {
+	[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
+}
 
 /**
  Open a new modal window to edit the selected @c FeedGroup.
@@ -133,9 +156,6 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		}
 	}];
 }
-
-
-#pragma mark - Helper -
 
 /// Insert @c FeedGroup item either after current selection or inside selected folder (if expanded)
 - (FeedGroup*)insertFeedGroupAtSelection:(FeedGroupType)type {
@@ -270,16 +290,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		return cellView; // the refresh cell is already skipped with the above if condition
 	} else {
 		cellView.textField.objectValue = fg.name;
-		if (fg.typ == GROUP) {
-			cellView.imageView.image = [NSImage imageNamed:NSImageNameFolder];
-		} else {
-			// TODO: load icon
-			static NSImage *defaultRSSIcon;
-			if (!defaultRSSIcon)
-				defaultRSSIcon = [RSSIcon iconWithSize:cellView.imageView.frame.size.height];
-			
-			cellView.imageView.image = defaultRSSIcon;
-		}
+		cellView.imageView.image = (fg.typ == GROUP ? [NSImage imageNamed:NSImageNameFolder] : [fg.feed iconImage16]);
 	}
 	// also for refresh column
 	cellView.textField.textColor = (isFeed && refreshDisabled ? [NSColor disabledControlTextColor] : [NSColor controlTextColor]);

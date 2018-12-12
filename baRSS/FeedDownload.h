@@ -23,15 +23,19 @@
 #import <Cocoa/Cocoa.h>
 #import <RSXML/RSXML.h>
 
+@class Feed;
+
 @interface FeedDownload : NSObject
 // Register for network change notifications
 + (void)registerNetworkChangeNotification;
 + (void)unregisterNetworkChangeNotification;
-// Scheduled feed update
-+ (void)newFeed:(NSString *)urlStr block:(void(^)(RSParsedFeed *feed, NSError *error, NSHTTPURLResponse *response))block;
-+ (void)autoDownloadAndParseURL:(NSString*)url;
+// Scheduling
 + (void)scheduleUpdateForUpcomingFeeds;
 + (void)forceUpdateAllFeeds;
+// Downloading
++ (void)newFeed:(NSString *)urlStr block:(void(^)(RSParsedFeed *feed, NSError *error, NSHTTPURLResponse *response))block;
++ (void)autoDownloadAndParseURL:(NSString*)urlStr;
++ (void)backgroundDownloadFavicon:(NSString*)urlStr forFeed:(Feed*)feed;
 // User interaction
 + (BOOL)allowNetworkConnection;
 + (BOOL)isPaused;

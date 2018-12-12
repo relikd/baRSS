@@ -25,6 +25,7 @@
 #import "StoreCoordinator.h"
 #import "DrawImage.h"
 #import "UserPrefs.h"
+#import "Feed+Ext.h"
 #import "FeedGroup+Ext.h"
 
 /// User preferences for displaying menu items
@@ -106,44 +107,16 @@ typedef NS_ENUM(char, DisplaySetting) {
 		self.submenu = [self.menu submenuWithIndex:fg.sortIndex isFeed:(fg.typ == FEED)];
 		[self setTitleAndUnreadCount:fg]; // after submenu is set
 		if (fg.typ == FEED) {
-			[self configureAsFeed:fg];
+			self.tag = ScopeFeed;
+			self.toolTip = fg.feed.subtitle;
+			self.enabled = (fg.feed.articles.count > 0);
+			self.image = [fg.feed iconImage16];
 		} else {
-			[self configureAsGroup:fg];
+			self.tag = ScopeGroup;
+			self.enabled = (fg.children.count > 0);
+			self.image = [fg groupIconImage16];
 		}
 	}
-}
-
-/**
- Configure menu item to be used as a container for @c FeedArticle entries (incl. feed icon).
- */
-- (void)configureAsFeed:(FeedGroup*)fg {
-	self.tag = ScopeFeed;
-	self.toolTip = fg.feed.subtitle;
-	self.enabled = (fg.feed.articles.count > 0);
-	// set icon
-	dispatch_async(dispatch_get_main_queue(), ^{
-		static NSImage *defaultRSSIcon;
-		if (!defaultRSSIcon)
-			defaultRSSIcon = [RSSIcon iconWithSize:16];
-		self.image = defaultRSSIcon;
-	});
-}
-
-/**
- Configure menu item to be used as a container for multiple feeds.
- */
-- (void)configureAsGroup:(FeedGroup*)fg {
-	self.tag = ScopeGroup;
-	self.enabled = (fg.children.count > 0);
-	// set icon
-	dispatch_async(dispatch_get_main_queue(), ^{
-		static NSImage *groupIcon;
-		if (!groupIcon) {
-			groupIcon = [NSImage imageNamed:NSImageNameFolder];
-			groupIcon.size = NSMakeSize(16, 16);
-		}
-		self.image = groupIcon;
-	});
 }
 
 /**
