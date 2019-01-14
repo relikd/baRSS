@@ -35,6 +35,7 @@
 		54E88321211B509D00064188 /* ModalFeedEdit.xib in Resources */ = {isa = PBXBuildFile; fileRef = 54E8831F211B509D00064188 /* ModalFeedEdit.xib */; };
 		54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */; };
 		54F518782162CA4F00EE856C /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54F518772162CA4F00EE856C /* ServiceManagement.framework */; };
+		54F6025D21C1D4170006D338 /* OpmlExport.m in Sources */ = {isa = PBXBuildFile; fileRef = 54F6025C21C1D4170006D338 /* OpmlExport.m */; };
 		54FE73D021220DEC003EAC65 /* StoreCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 54FE73CF21220DEC003EAC65 /* StoreCoordinator.m */; };
 		54FE73D3212316CD003EAC65 /* BarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 54FE73D2212316CD003EAC65 /* BarMenu.m */; };
 /* End PBXBuildFile section */
@@ -119,6 +120,8 @@
 		54E8831E211B509D00064188 /* ModalFeedEdit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalFeedEdit.m; sourceTree = "<group>"; };
 		54E8831F211B509D00064188 /* ModalFeedEdit.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ModalFeedEdit.xib; sourceTree = "<group>"; };
 		54F518772162CA4F00EE856C /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+		54F6025B21C1D4170006D338 /* OpmlExport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpmlExport.h; sourceTree = "<group>"; };
+		54F6025C21C1D4170006D338 /* OpmlExport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OpmlExport.m; sourceTree = "<group>"; };
 		54FE73CE21220DEC003EAC65 /* StoreCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StoreCoordinator.h; sourceTree = "<group>"; };
 		54FE73CF21220DEC003EAC65 /* StoreCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StoreCoordinator.m; sourceTree = "<group>"; };
 		54FE73D1212316CD003EAC65 /* BarMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BarMenu.h; sourceTree = "<group>"; };
@@ -268,6 +271,8 @@
 				54E8831D211B509D00064188 /* ModalFeedEdit.h */,
 				54E8831E211B509D00064188 /* ModalFeedEdit.m */,
 				54E8831F211B509D00064188 /* ModalFeedEdit.xib */,
+				54F6025B21C1D4170006D338 /* OpmlExport.h */,
+				54F6025C21C1D4170006D338 /* OpmlExport.m */,
 			);
 			path = "Feeds Tab";
 			sourceTree = "<group>";
@@ -402,6 +407,7 @@
 				544B011A2114B41200386E5C /* ModalSheet.m in Sources */,
 				54ACC29821061FBA0020715F /* Preferences.m in Sources */,
 				54195886218E1BDB00581B79 /* NSMenu+Ext.m in Sources */,
+				54F6025D21C1D4170006D338 /* OpmlExport.m in Sources */,
 				5496B511214D6275003ED4ED /* UserPrefs.m in Sources */,
 				546FC43D21188AD5007CC3A3 /* SettingsFeeds.m in Sources */,
 				54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */,

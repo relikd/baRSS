@@ -26,6 +26,7 @@
 #import "ModalFeedEdit.h"
 #import "Feed+Ext.h"
 #import "FeedGroup+Ext.h"
+#import "OpmlExport.h"
 
 @interface SettingsFeeds ()
 @property (weak) IBOutlet NSOutlineView *outlineView;
@@ -51,27 +52,8 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	
 	self.dataStore.managedObjectContext = [StoreCoordinator createChildContext];
 	self.dataStore.managedObjectContext.undoManager = self.undoManager;
-	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(faviconDownloadFinished:) name:kNotificationFaviconDownloadFinished object:nil];
 }
 
-- (void)dealloc {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-/**
- Called when the backgroud download of a favicon finished.
- Notification object contains the updated @c Feed (object id).
- */
-- (void)faviconDownloadFinished:(NSNotification*)notify {
-	if ([notify.object isKindOfClass:[NSManagedObjectID class]]) {
-		// TODO: Bug: Freshly ownloaded images are deleted on undo. Remove delete cascade rule?
-		NSManagedObject *mo = [self.dataStore.managedObjectContext objectWithID:notify.object];
-		if (!mo) return;
-		[self.dataStore.managedObjectContext refreshObject:mo mergeChanges:YES];
-		[self.dataStore rearrangeObjects];
-	}
-}
 
 #pragma mark - UI Button Interaction
 
@@ -112,6 +94,24 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[self showModalForFeedGroup:fg isGroupEdit:YES]; // yes will be overwritten anyway
 }
 
+- (IBAction)shareMenu:(NSButton*)sender {
+	if (!sender.menu) {
+		sender.menu = [[NSMenu alloc] initWithTitle:NSLocalizedString(@"Import / Export menu", nil)];
+		sender.menu.autoenablesItems = NO;
+		[sender.menu addItemWithTitle:NSLocalizedString(@"Import Feeds …", nil) action:nil keyEquivalent:@""].tag = 101;
+		[sender.menu addItemWithTitle:NSLocalizedString(@"Export Feeds …", nil) action:nil keyEquivalent:@""].tag = 102;
+		// TODO: Add menus for online sync? email export? etc.
+	}
+	if ([sender.menu popUpMenuPositioningItem:nil atLocation:NSMakePoint(0,sender.frame.size.height) inView:sender]) {
+		NSInteger tag = sender.menu.highlightedItem.tag;
+		if (tag == 101) {
+			[OpmlExport showImportDialog:self.view.window withTreeController:self.dataStore];
+		} else if (tag == 102) {
+			[OpmlExport showExportDialog:self.view.window withContext:self.dataStore.managedObjectContext];
+		}
+	}
+}
+
 
 #pragma mark - Insert & Edit Feed Items / Modal Dialog
 
@@ -129,13 +129,13 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
  @param flag If @c YES open group edit modal dialog. If @c NO open feed edit modal dialog.
  */
 - (void)showModalForFeedGroup:(FeedGroup*)fg isGroupEdit:(BOOL)flag {
-	if (fg.typ == SEPARATOR) return;
+	if (fg.type == SEPARATOR) return;
 	[self.undoManager beginUndoGrouping];
 	if (!fg || ![fg isKindOfClass:[FeedGroup class]]) {
 		fg = [self insertFeedGroupAtSelection:(flag ? GROUP : FEED)];
 	}
 	
-	ModalEditDialog *editDialog = (fg.typ == GROUP ? [ModalGroupEdit modalWith:fg] : [ModalFeedEdit modalWith:fg]);
+	ModalEditDialog *editDialog = (fg.type == GROUP ? [ModalGroupEdit modalWith:fg] : [ModalFeedEdit modalWith:fg]);
 	
 	[self.view.window beginSheet:[editDialog getModalSheet] completionHandler:^(NSModalResponse returnCode) {
 		if (returnCode == NSModalResponseOK) {
@@ -275,8 +275,8 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 /// Populate @c NSOutlineView data cells with core data object values.
 - (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item {
 	FeedGroup *fg = [(NSTreeNode*)item representedObject];
-	BOOL isFeed = (fg.typ == FEED);
-	BOOL isSeperator = (fg.typ == SEPARATOR);
+	BOOL isFeed = (fg.type == FEED);
+	BOOL isSeperator = (fg.type == SEPARATOR);
 	BOOL isRefreshColumn = [tableColumn.identifier isEqualToString:@"RefreshColumn"];
 	BOOL refreshDisabled = (!isFeed || fg.refreshStr.length == 0 || [fg.refreshStr characterAtIndex:0] == '0');
 	
@@ -290,7 +290,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		return cellView; // the refresh cell is already skipped with the above if condition
 	} else {
 		cellView.textField.objectValue = fg.name;
-		cellView.imageView.image = (fg.typ == GROUP ? [NSImage imageNamed:NSImageNameFolder] : [fg.feed iconImage16]);
+		cellView.imageView.image = (fg.type == GROUP ? [NSImage imageNamed:NSImageNameFolder] : [fg.feed iconImage16]);
 	}
 	// also for refresh column
 	cellView.textField.textColor = (isFeed && refreshDisabled ? [NSColor disabledControlTextColor] : [NSColor controlTextColor]);
@@ -303,8 +303,8 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 /// Returning @c NO will result in a Action-Not-Available-Buzzer sound
 - (BOOL)respondsToSelector:(SEL)aSelector {
-	if (aSelector == @selector(undo:)) return [self.undoManager canUndo];
-	if (aSelector == @selector(redo:)) return [self.undoManager canRedo];
+	if (aSelector == @selector(undo:)) return [self.undoManager canUndo] && self.undoManager.groupingLevel == 0;
+	if (aSelector == @selector(redo:)) return [self.undoManager canRedo] && self.undoManager.groupingLevel == 0;
 	if (aSelector == @selector(copy:) || aSelector == @selector(enterPressed:)) {
 		BOOL outlineHasFocus = [[self.view.window firstResponder] isKindOfClass:[NSOutlineView class]];
 		BOOL hasSelection = (self.dataStore.selectedNodes.count > 0);
@@ -313,7 +313,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		if (aSelector == @selector(copy:))
 			return YES;
 		// can edit only if selection is not a separator
-		return (((FeedGroup*)self.dataStore.selectedNodes.firstObject.representedObject).typ != SEPARATOR);
+		return (((FeedGroup*)self.dataStore.selectedNodes.firstObject.representedObject).type != SEPARATOR);
 	}
 	return [super respondsToSelector:aSelector];
 }

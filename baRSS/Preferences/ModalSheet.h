@@ -23,7 +23,8 @@
 #import <Cocoa/Cocoa.h>
 
 @interface ModalSheet : NSPanel
-@property (readonly) BOOL closeInitiated;
+@property (readonly) BOOL didCloseAndSave;
+@property (readonly) BOOL didCloseAndCancel;
 
 + (instancetype)modalWithView:(NSView*)content;
 - (void)setDoneEnabled:(BOOL)accept;

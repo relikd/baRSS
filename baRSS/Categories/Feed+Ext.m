@@ -27,6 +27,7 @@
 #import "FeedGroup+Ext.h"
 #import "FeedIcon+CoreDataClass.h"
 #import "FeedArticle+CoreDataClass.h"
+#import "StoreCoordinator.h"
 
 #import <Cocoa/Cocoa.h>
 #import <RSXML/RSXML.h>
@@ -38,6 +39,15 @@
 	Feed *feed = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:moc];
 	feed.meta = [[FeedMeta alloc] initWithEntity:FeedMeta.entity insertIntoManagedObjectContext:moc];
 	return feed;
+}
+
+/// Instantiates new @c FeedGroup with @c FEED type, set the update interval to @c 30min and @c sortIndex to last root index.
++ (instancetype)appendToRootWithDefaultIntervalInContext:(NSManagedObjectContext*)moc {
+	NSInteger lastIndex = [StoreCoordinator numberRootItemsInContext:moc];
+	FeedGroup *fg = [FeedGroup newGroup:FEED inContext:moc];
+	[fg setParent:nil andSortIndex:(int32_t)lastIndex];
+	[fg.feed.meta setRefresh:30 unit:RefreshUnitMinutes];
+	return fg.feed;
 }
 
 /// Call @c indexPathString on @c .group and update @c .indexPath if current value is different.
@@ -59,12 +69,14 @@
 	if (![self.subtitle isEqualToString:obj.subtitle]) self.subtitle = obj.subtitle;
 	if (![self.link isEqualToString:obj.link])         self.link = obj.link;
 	
+	if (self.group.name.length == 0) // in case a blank group was initialized
+		self.group.name = obj.title;
+	
 	int32_t unreadBefore = self.unreadCount;
 	// Add and remove articles
 	NSMutableSet<NSString*> *urls = [[self.articles valueForKeyPath:@"link"] mutableCopy];
 	[self addMissingArticles:obj updateLinks:urls]; // will remove links in 'urls' that should be kept
-	if (urls.count > 0)
-		[self deleteArticlesWithLink:urls]; // remove old, outdated articles
+	[self deleteArticlesWithLink:urls]; // remove old, outdated articles
 	// Get new total article count and post unread-count-change notification
 	int32_t totalCount = (int32_t)self.articles.count;
 	if (self.articleCount != totalCount)
@@ -144,17 +156,20 @@
 - (void)deleteArticlesWithLink:(NSMutableSet<NSString*>*)urls {
 	if (!urls || urls.count == 0)
 		return;
-	self.articleCount -= (int32_t)urls.count;
 	for (FeedArticle *fa in self.articles) {
 		if ([urls containsObject:fa.link]) {
 			[urls removeObject:fa.link];
 			if (fa.unread)
 				self.unreadCount -= 1;
 			// TODO: keep unread articles?
-			[fa.managedObjectContext deleteObject:fa];
+			[self.managedObjectContext deleteObject:fa];
 			if (urls.count == 0)
 				break;
 		}
+	}
+	NSSet<FeedArticle*> *delArticles = [self.managedObjectContext deletedObjects];
+	if (delArticles.count > 0) {
+		[self removeArticles:delArticles];
 	}
 }
 
@@ -217,19 +232,58 @@
 	return newCount - oldCount;
 }
 
+
+#pragma mark - Icon -
+
+
 /**
  @return Return @c 16x16px image. Either from core data storage or generated default RSS icon.
  */
 - (NSImage*)iconImage16 {
 	NSData *imgData = self.icon.icon;
-	if (imgData) {
-		return [[NSImage alloc] initWithData:imgData];
-	} else {
+	if (imgData)
+	{
+		NSImage *img = [[NSImage alloc] initWithData:imgData];
+		[img setSize:NSMakeSize(16, 16)];
+		return img;
+	}
+	else if (self.articleCount == 0)
+	{
+		static NSImage *warningIcon;
+		if (!warningIcon) {
+			warningIcon = [NSImage imageNamed:NSImageNameCaution];
+			[warningIcon setSize:NSMakeSize(16, 16)];
+		}
+		return warningIcon;
+	}
+	else
+	{
 		static NSImage *defaultRSSIcon;
 		if (!defaultRSSIcon)
 			defaultRSSIcon = [RSSIcon iconWithSize:16];
 		return defaultRSSIcon;
 	}
+}
+
+/**
+ Set (or overwrite) favicon icon or delete relationship if icon is @c nil.
+ 
+ @param overwrite If @c NO write image only if non is set already. Use @c YES if you want to @c nil.
+*/
+- (BOOL)setIcon:(NSImage*)img replaceExisting:(BOOL)overwrite {
+	if (overwrite || !self.icon) { // write if forced or image empty
+		if (img && [img isValid]) {
+			if (!self.icon)
+				self.icon = [[FeedIcon alloc] initWithEntity:FeedIcon.entity insertIntoManagedObjectContext:self.managedObjectContext];
+			self.icon.icon = [img TIFFRepresentation];
+			return YES;
+		} else if (self.icon) {
+			[self.managedObjectContext deleteObject:self.icon];
+			self.icon = nil;
+			return YES;
+		}
+	}
+	return NO;
 }
 
 @end

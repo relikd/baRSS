@@ -21,6 +21,11 @@
 //  SOFTWARE.
 
 #import "FeedMeta+Ext.h"
+#import "Feed+Ext.h"
+#import "FeedGroup+Ext.h"
+
+/// smhdw: [1, 60, 3600, 86400, 604800]
+static const int32_t RefreshUnitValues[] = {1, 60, 3600, 86400, 604800}; // smhdw
 
 @implementation FeedMeta (Ext)
 
@@ -36,41 +41,70 @@
 	NSLog(@"ERROR: Feed download failed: %@ (errorCount: %d)", self.url, n);
 }
 
+- (void)setSucessfulWithResponse:(NSHTTPURLResponse*)response {
+	self.errorCount = 0; // reset counter
+	NSDictionary *header = [response allHeaderFields];
+	[self setEtag:header[@"Etag"] modified:header[@"Date"]]; // @"Expires", @"Last-Modified"
+	[self calculateAndSetScheduled];
+}
+
 /// Calculate date from @c refreshNum and @c refreshUnit and set as next scheduled feed update.
 - (void)calculateAndSetScheduled {
-	NSTimeInterval interval = [self timeInterval]; // 0 if refresh = 0 (update deactivated)
+	NSTimeInterval interval = [self refreshInterval]; // 0 if refresh = 0 (update deactivated)
 	self.scheduled = (interval <= 0 ? nil : [[NSDate date] dateByAddingTimeInterval:interval]);
 }
 
-/// Set etag and modified attributes. @note Only values that differ will be updated.
+/// Set @c url attribute but only if value differs.
+- (void)setUrlIfChanged:(NSString*)url {
+	if (![self.url isEqualToString:url]) self.url = url;
+}
+
+/// Set @c etag and @c modified attributes. Only values that differ will be updated.
 - (void)setEtag:(NSString*)etag modified:(NSString*)modified {
 	if (![self.etag isEqualToString:etag])         self.etag = etag;
 	if (![self.modified isEqualToString:modified]) self.modified = modified;
 }
 
-/// Read header field "Etag" and "Date" and set @c .etag and @c .modified.
-- (void)setEtagAndModified:(NSHTTPURLResponse*)http {
-	NSDictionary *header = [http allHeaderFields];
-	[self setEtag:header[@"Etag"] modified:header[@"Date"]]; // @"Expires", @"Last-Modified"
-}
 
 /**
- Set download url and refresh interval (popup button selection). @note Only values that differ will be updated.
+ Set @c refresh and @c unit from popup button selection. Only values that differ will be updated.
+ Also, calculate and set new @c scheduled date and update FeedGroup @c refreshStr (if changed).
 
  @return @c YES if refresh interval has changed
  */
-- (BOOL)setURL:(NSString*)url refresh:(int32_t)refresh unit:(RefreshUnitType)unit {
+- (BOOL)setRefresh:(int32_t)refresh unit:(RefreshUnitType)unit {
 	BOOL intervalChanged = (self.refreshNum != refresh || self.refreshUnit != unit);
-	if (![self.url isEqualToString:url]) self.url = url;
-	if (self.refreshNum != refresh)      self.refreshNum = refresh;
-	if (self.refreshUnit != unit)        self.refreshUnit = unit;
+	if (self.refreshNum != refresh) self.refreshNum = refresh;
+	if (self.refreshUnit != unit)   self.refreshUnit = unit;
+	
+	if (intervalChanged) {
+		[self calculateAndSetScheduled];
+		NSString *str = [self readableRefreshString];
+		if (![self.feed.group.refreshStr isEqualToString:str])
+			self.feed.group.refreshStr = str;
+	}
 	return intervalChanged;
 }
 
+/**
+ Set properties @c refreshNum and @c refreshUnit to highest possible (integer-dividable-)unit.
+ Only values that differ will be updated.
+ Also, calculate and set new @c scheduled date and update FeedGroup @c refreshStr (if changed).
+ 
+ @return @c YES if refresh interval has changed
+ */
+- (BOOL)setRefreshAndUnitFromInterval:(int32_t)interval {
+	for (RefreshUnitType i = 4; i >= 0; i--) { // start with weeks
+		if (interval % RefreshUnitValues[i] == 0) { // find first unit that is dividable
+			return [self setRefresh:abs(interval) / RefreshUnitValues[i] unit:i];
+		}
+	}
+	return NO; // since loop didn't return, no value was changed
+}
+
 /// @return Time interval respecting the selected unit. E.g., returns @c 180 for @c '3m'
-- (NSTimeInterval)timeInterval {
-	static const int unit[] = {1, 60, 3600, 86400, 604800}; // smhdw
-	return self.refreshNum * unit[self.refreshUnit % 5];
+- (int32_t)refreshInterval {
+	return self.refreshNum * RefreshUnitValues[self.refreshUnit % 5];
 }
 
 /// @return Formatted string for update interval ( e.g., @c 30m or @c 12h )
