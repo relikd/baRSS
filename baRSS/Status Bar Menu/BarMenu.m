@@ -127,6 +127,7 @@
 		NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 		for (NSManagedObjectID *oid in notify.object) {
 			Feed *feed = [moc objectWithID:oid];
+			if (!feed) continue;
 			NSMenu *menu = [self fixUnreadCountForSubmenus:feed];
 			if (!menu || menu.numberOfItems > 0)
 				[self rebuiltFeedArticle:feed inMenu:menu]; // deepest menu level, feed items
@@ -216,7 +217,7 @@
 	id obj = [self.readContext objectWithID:[self.objectIDsForMenu objectAtIndex:(NSUInteger)index]];
 	if ([obj isKindOfClass:[FeedGroup class]]) {
 		[item setFeedGroup:obj];
-		if ([(FeedGroup*)obj typ] == FEED)
+		if ([(FeedGroup*)obj type] == FEED)
 			[item setTarget:self action:@selector(openFeedURL:)];
 	} else if ([obj isKindOfClass:[FeedArticle class]]) {
 		[item setFeedArticle:obj];

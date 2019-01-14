@@ -20,27 +20,12 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import "FeedGroup+CoreDataClass.h"
+#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
-@interface FeedGroup (Ext)
-/// Enum type to distinguish different @c FeedGroup types: @c GROUP, @c FEED, @c SEPARATOR
-typedef NS_ENUM(int16_t, FeedGroupType) {
-	/// Other types: @c GROUP, @c FEED, @c SEPARATOR
-	GROUP = 0, FEED = 1, SEPARATOR = 2
-};
+@class Feed;
 
-/// Overwrites @c type attribute with enum. Use one of: @c GROUP, @c FEED, @c SEPARATOR.
-@property (nonatomic) FeedGroupType type;
-
-+ (instancetype)newGroup:(FeedGroupType)type inContext:(NSManagedObjectContext*)context;
-- (void)setParent:(FeedGroup *)parent andSortIndex:(int32_t)sortIndex;
-- (void)setNameIfChanged:(NSString*)name;
-- (NSImage*)groupIconImage16;
-// Handle children and parents
-- (NSString*)indexPathString;
-- (NSArray<FeedGroup*>*)sortedChildren;
-- (NSMutableArray<FeedGroup*>*)allParents;
-- (BOOL)iterateSorted:(BOOL)ordered overDescendantFeeds:(void(^)(Feed *feed, BOOL* cancel))block;
-// Printing
-- (NSString*)readableDescription;
+@interface OpmlExport : NSObject
++ (void)showImportDialog:(NSWindow*)window withTreeController:(NSTreeController*)tree;
++ (void)showExportDialog:(NSWindow*)window withContext:(NSManagedObjectContext*)moc;
 @end

@@ -87,12 +87,16 @@ typedef NS_ENUM(char, DisplaySetting) {
  */
 - (NSInteger)setTitleAndUnreadCount:(FeedGroup*)fg {
 	NSInteger uCount = 0;
-	if (fg.typ == FEED && [UserPrefs defaultYES:@"feedUnreadCount"]) {
+	if (fg.type == FEED && [UserPrefs defaultYES:@"feedUnreadCount"]) {
 		uCount = fg.feed.unreadCount;
-	} else if (fg.typ == GROUP && [UserPrefs defaultYES:@"groupUnreadCount"]) {
+	} else if (fg.type == GROUP && [UserPrefs defaultYES:@"groupUnreadCount"]) {
 		uCount = [self.submenu coreDataUnreadCount];
 	}
-	self.title = (uCount > 0 ? [NSString stringWithFormat:@"%@ (%ld)", fg.name, uCount] : fg.name);
+	if (uCount > 0) {
+		self.title = [NSString stringWithFormat:@"%@ (%ld)", fg.name, uCount];
+	} else {
+		self.title = (fg.name ? fg.name : @"(error)");
+	}
 	return uCount;
 }
 
@@ -101,12 +105,12 @@ typedef NS_ENUM(char, DisplaySetting) {
  */
 - (void)setFeedGroup:(FeedGroup*)fg {
 	self.representedObject = fg.objectID;
-	if (fg.typ == SEPARATOR) {
+	if (fg.type == SEPARATOR) {
 		self.title = kSeparatorItemTitle;
 	} else {
-		self.submenu = [self.menu submenuWithIndex:fg.sortIndex isFeed:(fg.typ == FEED)];
+		self.submenu = [self.menu submenuWithIndex:fg.sortIndex isFeed:(fg.type == FEED)];
 		[self setTitleAndUnreadCount:fg]; // after submenu is set
-		if (fg.typ == FEED) {
+		if (fg.type == FEED) {
 			self.tag = ScopeFeed;
 			self.toolTip = fg.feed.subtitle;
 			self.enabled = (fg.feed.articles.count > 0);

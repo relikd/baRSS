@@ -30,10 +30,14 @@
 // Feed update
 + (NSArray<Feed*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc;
 + (NSDate*)nextScheduledUpdate;
-// Feed display
+// Main menu display
 + (NSInteger)unreadCountForIndexPathString:(NSString*)str;
 + (NSArray*)sortedObjectIDsForParent:(id)parent isFeed:(BOOL)flag inContext:(NSManagedObjectContext*)moc;
+// OPML import & export
++ (NSInteger)numberRootItemsInContext:(NSManagedObjectContext*)moc;
++ (NSArray<FeedGroup*>*)sortedListOfRootObjectsInContext:(NSManagedObjectContext*)moc;
 // Restore sound state
 + (void)deleteUnreferencedFeeds;
 + (void)restoreFeedCountsAndIndexPaths;
++ (NSArray<Feed*>*)listOfMissingFeedsInContext:(NSManagedObjectContext*)moc;
 @end

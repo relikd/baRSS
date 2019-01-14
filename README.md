@@ -2,9 +2,9 @@
 
 ![screenshot](doc/screenshot.png)
 
-For nearly a decade I've been using the then free version of [RSS Menu](https://itunes.apple.com/us/app/rss-menu/id423069534). However, with the release of macOS Mojave, 32bit applications are no longer supported.
+For nearly a decade I've been using the then free version of [RSS Menu](https://itunes.apple.com/us/app/rss-menu/id423069534). However, with the release of macOS Mojave, 32bit applications are no longer supported. Furthermore, the currently available version in the Mac App Store was last updated in 2014 (as of writing).
 
-*baRSS* is an open source community project and will be available on the AppStore soon (hopefully); free of charge. Everything is built from the ground up with a minimal footprint in mind.
+*baRSS* was build from scratch with a minimal footprint in mind. It will be available on the AppStore eventually. If you want a feature to be added, drop me an email or create an issue. Look at the other issues, in case somebody else already filed one similar. If you like this project and want to say thank you drop me a line (or other stuff like money). Regardless, I'll continue development as long as I'm using it on my own. Admittedly, I've invested way too much time in this project already (1200h+) …
 
 
 Why is this project not written in Swift?
@@ -22,7 +22,14 @@ This project uses a modified version of Brent Simmons [RSXML](https://github.com
 Current project state
 ---------------------
 
-The basic functionality is there. Manually added feeds will be downloaded and stored in an SQLite database. The complete management of feeds is there (sorting, grouping, editing, deleting). The bar menu is functional too, including unread count, URL opening and display.
+All basic functionality is there. What's missing? 
+
+- Authenticated feeds
+- Online sync with other services
+- Automatic feed detection (e.g., YouTube)
+- Text / UI localisation
+
+All in all, the software is in a usable state. The remaining features will be added in the coming weeks.
 
 
 ToDo
@@ -39,9 +46,9 @@ ToDo
 	- [x] Make it system default application
 	- [ ] Display license info (e.g., RSXML)
 	- [x] Short article names
-	- [ ] Import / Export (all feeds)
-		- [ ] Support for `.opml` format
-		- [ ] Append or replace
+	- [x] Import / Export (all feeds)
+		- [x] Support for `.opml` format
+		- [x] Append or replace
 
 
 - [x] Status menu
@@ -79,6 +86,7 @@ ToDo
 	- [x] Code Documentation (mostly methods)
 	- [ ] Add Sandboxing
 		- [ ] Disable Startup checkbox (or other workaround)
+	- [ ] Fix nasty bug: empty feed list (initial state)
 
 
 - [ ] Additional features

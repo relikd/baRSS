@@ -73,6 +73,7 @@
 @property (copy) NSString *previousURL; // check if changed and avoid multiple download
 @property (copy) NSString *httpDate;
 @property (copy) NSString *httpEtag;
+@property (strong) NSImage *favicon;
 @property (strong) NSError *feedError; // download error or xml parser error
 @property (strong) RSParsedFeed *feedResult; // parsed result
 @property (assign) BOOL didDownloadFeed; // check if feed articles need update
@@ -85,6 +86,8 @@
 	[super viewDidLoad];
 	self.previousURL = @"";
 	self.refreshNum.intValue = 30;
+	self.warningIndicator.image = nil;
+	[self.warningIndicator.cell setHighlightsBy:NSNoCellMask];
 	[self populateTextFields:self.feedGroup];
 }
 
@@ -101,6 +104,7 @@
 	if (unit < 0 || unit > self.refreshUnit.numberOfItems - 1)
 		unit = self.refreshUnit.numberOfItems - 1;
 	[self.refreshUnit selectItemAtIndex:unit];
+	self.warningIndicator.image = [fg.feed iconImage16];
 }
 
 #pragma mark - Edit Feed Data
@@ -111,31 +115,27 @@
  */
 - (void)applyChangesToCoreDataObject {
 	Feed *feed = self.feedGroup.feed;
+	[self.feedGroup setNameIfChanged:self.name.stringValue];
 	FeedMeta *meta = feed.meta;
-	BOOL intervalChanged = [meta setURL:self.previousURL refresh:self.refreshNum.intValue unit:(int16_t)self.refreshUnit.indexOfSelectedItem];
-	if (intervalChanged)
-		[meta calculateAndSetScheduled]; // updateTimer will be scheduled once preferences is closed
-	[self.feedGroup setName:self.name.stringValue andRefreshString:[meta readableRefreshString]];
+	[meta setUrlIfChanged:self.previousURL];
+	[meta setRefresh:self.refreshNum.intValue unit:(int16_t)self.refreshUnit.indexOfSelectedItem]; // updateTimer will be scheduled once preferences is closed
 	if (self.didDownloadFeed) {
 		[meta setEtag:self.httpEtag modified:self.httpDate];
 		[feed updateWithRSS:self.feedResult postUnreadCountChange:YES];
-	}
-	if (!feed.icon) {
-		NSString *faviconURL = feed.link;
-		if (faviconURL.length == 0)
-			faviconURL = meta.url;
-		[FeedDownload backgroundDownloadFavicon:faviconURL forFeed:feed];
+		[feed setIcon:self.favicon replaceExisting:YES];
 	}
 }
 
 /**
- Prepare UI (nullify @c result, @c error and start @c ProgressIndicator) and perform HTTP request.
- Articles will be parsed and stored in class variables.
- This should avoid unnecessary core data operations if user decides to cancel the edit.
- The save operation will only be executed if user clicks on the 'OK' button.
+ Prepare UI (nullify @c result, @c error and start @c ProgressIndicator).
+ Also disable 'Done' button during download and re-enable after all downloads are finished.
  */
-- (void)downloadRSS {
-	[self.modalSheet setDoneEnabled:NO];
+- (void)preDownload {
+	[self.modalSheet setDoneEnabled:NO]; // prevent user from closing the dialog during download
+	[self.spinnerURL startAnimation:nil];
+	[self.spinnerName startAnimation:nil];
+	self.warningIndicator.image = nil;
+	self.didDownloadFeed = NO;
 	// Assuming the user has not changed title since the last fetch.
 	// Reset to "" because after download it will be pre-filled with new feed title
 	if ([self.name.stringValue isEqualToString:self.feedResult.title]) {
@@ -145,62 +145,91 @@
 	self.feedError = nil;
 	self.httpEtag = nil;
 	self.httpDate = nil;
-	self.didDownloadFeed = NO;
-	[self.spinnerURL startAnimation:nil];
-	[self.spinnerName startAnimation:nil];
-	
+	self.favicon = nil;
+}
+
+/**
+ All properties will be parsed and stored in class variables.
+ This should avoid unnecessary core data operations if user decides to cancel the edit.
+ The save operation will only be executed if user clicks on the 'OK' button.
+ */
+- (void)downloadRSS {
+	if (self.modalSheet.didCloseAndCancel)
+		return;
+	[self preDownload];
 	[FeedDownload newFeed:self.previousURL block:^(RSParsedFeed *result, NSError *error, NSHTTPURLResponse* response) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			if (self.modalSheet.closeInitiated)
-				return;
-			self.didDownloadFeed = YES;
-			self.feedResult = result;
-			self.feedError = error; // MAIN THREAD!: warning indicator .hidden is bound to feedError
-			self.httpEtag = [response allHeaderFields][@"Etag"];
-			self.httpDate = [response allHeaderFields][@"Date"]; // @"Expires", @"Last-Modified"
-			[self updateTextFieldURL:response.URL.absoluteString andTitle:result.title];
-			// TODO: play error sound?
-			[self.spinnerURL stopAnimation:nil];
-			[self.spinnerName stopAnimation:nil];
-			[self.modalSheet setDoneEnabled:YES];
-		});
+		if (self.modalSheet.didCloseAndCancel)
+			return;
+		self.didDownloadFeed = YES;
+		self.feedResult = result;
+		self.feedError = error;
+		self.httpEtag = [response allHeaderFields][@"Etag"];
+		self.httpDate = [response allHeaderFields][@"Date"]; // @"Expires", @"Last-Modified"
+		[self postDownload:response.URL.absoluteString];
 	}];
 }
 
-/// Set UI TextField values to downloaded values. Title will be updated if TextField is empty. URL on redirect.
-- (void)updateTextFieldURL:(NSString*)responseURL andTitle:(NSString*)feedTitle {
-	// If URL was redirected (e.g., https redirect), replace original text field value with new one
+/**
+ Update UI TextFields with downloaded values.
+ Title will be updated if TextField is empty. URL on redirect.
+ Finally begin favicon download and return control to user (enable 'Done' button).
+ */
+- (void)postDownload:(NSString*)responseURL {
+	if (self.modalSheet.didCloseAndCancel)
+		return;
+	// 1. Stop spinner animation for name field. (keep spinner for URL running until favicon downloaded)
+	// TODO: play error sound?
+	[self.spinnerName stopAnimation:nil];
+	// 2. If URL was redirected, replace original text field value with new one. (e.g., https redirect)
 	if (responseURL.length > 0 && ![responseURL isEqualToString:self.previousURL]) {
 		self.previousURL = responseURL;
 		self.url.stringValue = responseURL;
 	}
-	// Copy feed title to text field. (only if user hasn't set anything else yet)
-	if ([self.name.stringValue isEqualToString:@""] && feedTitle.length > 0) {
-		self.name.stringValue = feedTitle; // no damage to replace an empty string
+	// 3. Copy parsed feed title to text field. (only if user hasn't set anything else yet)
+	NSString *parsedTitle = self.feedResult.title;
+	if (parsedTitle.length > 0 && [self.name.stringValue isEqualToString:@""]) {
+		self.name.stringValue = parsedTitle; // no damage to replace an empty string
+	}
+	// 4. Continue with favicon download (or finish with error)
+	if (self.feedError) {
+		[self finishDownloadWithFavicon:[NSImage imageNamed:NSImageNameCaution]];
+	} else {
+		NSString *faviconURL = self.feedResult.link; // TODO: add support for custom URLs ?
+		if (faviconURL.length == 0)
+			faviconURL = responseURL;
+		[FeedDownload downloadFavicon:faviconURL finished:^(NSImage * _Nullable img) {
+			if (self.modalSheet.didCloseAndCancel)
+				return;
+			self.favicon = img;
+			[self finishDownloadWithFavicon:img];
+		}];
 	}
 }
+
+/**
+ The last step of the download process.
+ Stop spinning animation set favivon image preview (right of url bar) and re-enable 'Done' button.
+ */
+- (void)finishDownloadWithFavicon:(NSImage*)img {
+	if (self.modalSheet.didCloseAndCancel)
+		return;
+	[self.warningIndicator.cell setHighlightsBy: (self.feedError ? NSContentsCellMask : NSNoCellMask)];
+	self.warningIndicator.image = img;
+	[self.spinnerURL stopAnimation:nil];
+	[self.modalSheet setDoneEnabled:YES];
+}
+
 
 #pragma mark - NSTextField Delegate
 
-/// Helper method to check whether url was modified since last download.
-- (BOOL)urlHasChanged {
-	return ![self.previousURL isEqualToString:self.url.stringValue];
-}
-
-/// Hide warning button if an error was present but the user changed the url since.
-- (void)controlTextDidChange:(NSNotification *)obj {
-	if (obj.object == self.url) {
-		self.warningIndicator.hidden = (!self.feedError || [self urlHasChanged]);
-	}
-}
 
 /// Whenever the user finished entering the url (return key or focus change) perform a download request.
 - (void)controlTextDidEndEditing:(NSNotification *)obj {
-	if (obj.object == self.url && [self urlHasChanged]) {
-		if (self.modalSheet.closeInitiated)
-			return;
-		self.previousURL = self.url.stringValue;
-		[self downloadRSS];
+	if (obj.object == self.url) {
+		if (![self.previousURL isEqualToString:self.url.stringValue]) {
+			self.previousURL = self.url.stringValue;
+			[self downloadRSS];
+		}
 	}
 }
 
@@ -244,9 +273,7 @@
 }
 /// Edit of group finished. Save changes to core data object and perform save operation on delegate.
 - (void)applyChangesToCoreDataObject {
-	NSString *name = ((NSTextField*)self.view).stringValue;
-	if (![self.feedGroup.name isEqualToString:name])
-		self.feedGroup.name = name;
+	[self.feedGroup setNameIfChanged:((NSTextField*)self.view).stringValue];
 }
 @end
 

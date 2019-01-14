@@ -28,18 +28,14 @@
 
 @implementation StoreCoordinator
 
-#pragma mark - Managing contexts -
+#pragma mark - Managing contexts
 
-/**
- @return The application main persistent context.
- */
+/// @return The application main persistent context.
 + (NSManagedObjectContext*)getMainContext {
 	return [(AppHook*)NSApp persistentContainer].viewContext;
 }
 
-/**
- New child context with @c NSMainQueueConcurrencyType and without undo manager.
- */
+/// New child context with @c NSMainQueueConcurrencyType and without undo manager.
 + (NSManagedObjectContext*)createChildContext {
 	NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 	[context setParentContext:[self getMainContext]];
@@ -51,7 +47,7 @@
 /**
  Commit changes and perform save operation on @c context.
 
- @param flag If @c YES save any parent context (recursive).
+ @param flag If @c YES save any parent context as well (recursive).
  */
 + (void)saveContext:(NSManagedObjectContext*)context andParent:(BOOL)flag {
 	// Performs the save action for the application, which is to send the save: message to the application's managed object context. Any encountered errors are presented to the user.
@@ -68,7 +64,41 @@
 	}
 }
 
-#pragma mark - Feed Update -
+
+#pragma mark - Helper
+
+/// Perform fetch and return result. If an error occurs, print it to the console.
++ (NSArray*)fetchAllRows:(NSFetchRequest*)req inContext:(NSManagedObjectContext*)moc {
+	NSError *err;
+	NSArray *fetchResults = [moc executeFetchRequest:req error:&err];
+	if (err) NSLog(@"ERROR: Fetch request failed: %@", err);
+	//NSLog(@"%@ ==> %@", req, fetchResults); // debugging
+	return fetchResults;
+}
+
+/// Perform aggregated fetch where result is a single row. Use convenient methods @c fetchDate: or @c fetchInteger:.
++ (id)fetchSingleRow:(NSManagedObjectContext*)moc request:(NSFetchRequest*)req expression:(NSExpression*)exp resultType:(NSAttributeType)type {
+	NSExpressionDescription *expDesc = [[NSExpressionDescription alloc] init];
+	[expDesc setName:@"singleRowAttribute"];
+	[expDesc setExpression:exp];
+	[expDesc setExpressionResultType:type];
+	[req setResultType:NSDictionaryResultType];
+	[req setPropertiesToFetch:@[expDesc]];
+	return [self fetchAllRows:req inContext:moc].firstObject[@"singleRowAttribute"];
+}
+
+/// Convenient method on @c fetchSingleRow: with @c NSDate return type. May be @c nil.
++ (NSDate*)fetchDate:(NSManagedObjectContext*)moc request:(NSFetchRequest*)req expression:(NSExpression*)exp {
+	return [self fetchSingleRow:moc request:req expression:exp resultType:NSDateAttributeType]; // can be nil
+}
+
+/// Convenient method on @c fetchSingleRow: with @c NSInteger return type.
++ (NSInteger)fetchInteger:(NSManagedObjectContext*)moc request:(NSFetchRequest*)req expression:(NSExpression*)exp {
+	return [[self fetchSingleRow:moc request:req expression:exp resultType:NSInteger32AttributeType] integerValue];
+}
+
+
+#pragma mark - Feed Update
 
 /**
  List of @c Feed items that need to be updated. Scheduled time is now (or in past).
@@ -78,39 +108,23 @@
 + (NSArray<Feed*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc {
 	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: Feed.entity.name];
 	if (!forceAll) {
-		// when fetching also get those feeds that would need update soon (now + 30s)
-		fr.predicate = [NSPredicate predicateWithFormat:@"meta.scheduled <= %@", [NSDate dateWithTimeIntervalSinceNow:+30]];
+		// when fetching also get those feeds that would need update soon (now + 10s)
+		fr.predicate = [NSPredicate predicateWithFormat:@"meta.scheduled <= %@", [NSDate dateWithTimeIntervalSinceNow:+10]];
 	}
-	NSError *err;
-	NSArray *result = [moc executeFetchRequest:fr error:&err];
-	if (err) NSLog(@"%@", err);
-	return result;
+	return [self fetchAllRows:fr inContext:moc];
 }
 
-/**
- @return @c NSDate of next (earliest) feed update. May be @c nil.
- */
+/// @return @c NSDate of next (earliest) feed update. May be @c nil.
 + (NSDate*)nextScheduledUpdate {
 	// Always get context first, or 'FeedMeta.entity.name' may not be available on app start
 	NSManagedObjectContext *moc = [self getMainContext];
-	NSExpression *exp = [NSExpression expressionForFunction:@"min:"
-												  arguments:@[[NSExpression expressionForKeyPath:@"scheduled"]]];
-	NSExpressionDescription *expDesc = [[NSExpressionDescription alloc] init];
-	[expDesc setName:@"earliestDate"];
-	[expDesc setExpression:exp];
-	[expDesc setExpressionResultType:NSDateAttributeType];
-	
+	NSExpression *exp = [NSExpression expressionForFunction:@"min:" arguments:@[[NSExpression expressionForKeyPath:@"scheduled"]]];
 	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: FeedMeta.entity.name];
-	[fr setResultType:NSDictionaryResultType];
-	[fr setPropertiesToFetch:@[expDesc]];
-	
-	NSError *err;
-	NSArray *fetchResults = [moc executeFetchRequest:fr error:&err];
-	if (err) NSLog(@"%@", err);
-	return fetchResults.firstObject[@"earliestDate"]; // can be nil
+	return [self fetchDate:moc request:fr expression:exp];
 }
 
-#pragma mark - Feed Display -
+
+#pragma mark - Main Menu Display
 
 /**
  Perform core data fetch request with sum over all unread feeds matching @c str.
@@ -120,23 +134,11 @@
 + (NSInteger)unreadCountForIndexPathString:(NSString*)str {
 	// Always get context first, or 'Feed.entity.name' may not be available on app start
 	NSManagedObjectContext *moc = [self getMainContext];
-	NSExpression *exp = [NSExpression expressionForFunction:@"sum:"
-												  arguments:@[[NSExpression expressionForKeyPath:@"unreadCount"]]];
-	NSExpressionDescription *expDesc = [[NSExpressionDescription alloc] init];
-	[expDesc setName:@"totalUnread"];
-	[expDesc setExpression:exp];
-	[expDesc setExpressionResultType:NSInteger32AttributeType];
-	
+	NSExpression *exp = [NSExpression expressionForFunction:@"sum:" arguments:@[[NSExpression expressionForKeyPath:@"unreadCount"]]];
 	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: Feed.entity.name];
 	if (str && str.length > 0)
 		fr.predicate = [NSPredicate predicateWithFormat:@"indexPath BEGINSWITH %@", str];
-	[fr setResultType:NSDictionaryResultType];
-	[fr setPropertiesToFetch:@[expDesc]];
-	
-	NSError *err;
-	NSArray *fetchResults = [moc executeFetchRequest:fr error:&err];
-	if (err) NSLog(@"%@", err);
-	return [fetchResults.firstObject[@"totalUnread"] integerValue];
+	return [self fetchInteger:moc request:fr expression:exp];
 }
 
 /**
@@ -146,19 +148,34 @@
  @param flag If @c YES request list of @c FeedArticle instead of @c FeedGroup
  */
 + (NSArray*)sortedObjectIDsForParent:(id)parent isFeed:(BOOL)flag inContext:(NSManagedObjectContext*)moc {
-//	NSManagedObjectContext *moc = [self getMainContext];
 	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: (flag ? FeedArticle.entity : FeedGroup.entity).name];
 	fr.predicate = [NSPredicate predicateWithFormat:(flag ? @"feed.group = %@" : @"parent = %@"), parent];
 	fr.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:!flag]];
-	[fr setResultType:NSManagedObjectIDResultType];
-	
-	NSError *err;
-	NSArray *fetchResults = [moc executeFetchRequest:fr error:&err];
-	if (err) NSLog(@"%@", err);
-	return fetchResults;
+	[fr setResultType:NSManagedObjectIDResultType]; // only get ids
+	return [self fetchAllRows:fr inContext:moc];
 }
 
-#pragma mark - Restore Sound State -
+
+#pragma mark - OPML Import & Export
+
+/// @return Count of objects at root level. Also the @c sortIndex for the next item.
++ (NSInteger)numberRootItemsInContext:(NSManagedObjectContext*)moc {
+	NSExpression *exp = [NSExpression expressionForFunction:@"count:" arguments:@[[NSExpression expressionForEvaluatedObject]]];
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: FeedGroup.entity.name];
+	fr.predicate = [NSPredicate predicateWithFormat:@"parent = NULL"];
+	return [self fetchInteger:moc request:fr expression:exp];
+}
+
+/// @return Sorted list of root element objects.
++ (NSArray<FeedGroup*>*)sortedListOfRootObjectsInContext:(NSManagedObjectContext*)moc {
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: FeedGroup.entity.name];
+	fr.predicate = [NSPredicate predicateWithFormat:@"parent = NULL"];
+	fr.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]];
+	return [self fetchAllRows:fr inContext:moc];
+}
+
+
+#pragma mark - Restore Sound State
 
 /**
  Delete all @c Feed items where @c group @c = @c NULL.
@@ -178,9 +195,7 @@
  */
 + (void)restoreFeedCountsAndIndexPaths {
 	NSManagedObjectContext *moc = [self getMainContext];
-	NSError *err;
-	NSArray *result = [moc executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName: Feed.entity.name] error:&err];
-	if (err) NSLog(@"%@", err);
+	NSArray *result = [self fetchAllRows:[NSFetchRequest fetchRequestWithEntityName: Feed.entity.name] inContext:moc];
 	[moc performBlock:^{
 		for (Feed *feed in result) {
 			int16_t totalCount = (int16_t)feed.articles.count;
@@ -192,6 +207,14 @@
 			[feed calculateAndSetIndexPathString];
 		}
 	}];
+}
+
+/// @return All @c Feed items where @c articles.count @c == @c 0
++ (NSArray<Feed*>*)listOfMissingFeedsInContext:(NSManagedObjectContext*)moc {
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: Feed.entity.name];
+	// More accurate but with subquery on FeedArticle: "count(articles) == 0"
+	fr.predicate = [NSPredicate predicateWithFormat:@"articleCount == 0"];
+	return [self fetchAllRows:fr inContext:moc];
 }
 
 @end

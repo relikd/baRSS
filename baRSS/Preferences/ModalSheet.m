@@ -27,12 +27,12 @@
 @end
 
 @implementation ModalSheet
-@synthesize closeInitiated = _closeInitiated;
+@synthesize didCloseAndSave = _didCloseAndSave, didCloseAndCancel = _didCloseAndCancel;
 
 /// User did click the 'Done' button.
 - (void)didTapDoneButton:(id)sender { [self closeWithResponse:NSModalResponseOK]; }
 /// User did click the 'Cancel' button.
-- (void)didTapCancelButton:(id)sender { [self closeWithResponse:NSModalResponseAbort]; }
+- (void)didTapCancelButton:(id)sender { [self closeWithResponse:NSModalResponseCancel]; }
 /// Manually disable 'Done' button if a task is still running.
 - (void)setDoneEnabled:(BOOL)accept { self.btnDone.enabled = accept; }
 
@@ -42,7 +42,8 @@
  And removes all subviews (clean up).
  */
 - (void)closeWithResponse:(NSModalResponse)response {
-	_closeInitiated = YES;
+	_didCloseAndSave = (response == NSModalResponseOK);
+	_didCloseAndCancel = (response != NSModalResponseOK);
 	// store modal view width and remove subviews to avoid _NSKeyboardFocusClipView issues
 	// first object is always the view of the modal dialog
 	CGFloat w = self.contentView.subviews.firstObject.frame.size.width;

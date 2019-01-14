@@ -35,9 +35,22 @@
 // Downloading
 + (void)newFeed:(NSString *)urlStr block:(void(^)(RSParsedFeed *feed, NSError *error, NSHTTPURLResponse *response))block;
 + (void)autoDownloadAndParseURL:(NSString*)urlStr;
-+ (void)backgroundDownloadFavicon:(NSString*)urlStr forFeed:(Feed*)feed;
++ (void)batchDownloadRSSAndFavicons:(NSArray<Feed*> *)list showErrorAlert:(BOOL)flag rssFinished:(void(^)(NSArray<Feed*> *successful, BOOL *cancelFavicons))blockXml finally:(void(^)(BOOL successful))blockFavicon;
++ (void)downloadFavicon:(NSString*)urlStr finished:(void(^)(NSImage * _Nullable img))block ;
 // User interaction
 + (BOOL)allowNetworkConnection;
 + (BOOL)isPaused;
 + (void)setPaused:(BOOL)flag;
 @end
+
+
+/*
+ Developer Tip, error logs see:
+ 
+ Task <..> HTTP load failed (error code: -1003 [12:8])
+ Task <..> finished with error - code: -1003
+ ==> NSURLErrorCannotFindHost in #import <Foundation/NSURLError.h>
+ 
+ TIC TCP Conn Failed [21:0x1d417fb00]: 1:65 Err(65)
+ ==> EHOSTUNREACH in #import <sys/errno.h>
+ */

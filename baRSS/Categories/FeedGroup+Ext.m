@@ -27,25 +27,27 @@
 #import <Cocoa/Cocoa.h>
 
 @implementation FeedGroup (Ext)
-/// Enum tpye getter see @c FeedGroupType
-- (FeedGroupType)typ { return (FeedGroupType)self.type; }
-/// Enum type setter see @c FeedGroupType
-- (void)setTyp:(FeedGroupType)typ { self.type = typ; }
-
 
 /// Create new instance and set @c Feed and @c FeedMeta if group type is @c FEED
 + (instancetype)newGroup:(FeedGroupType)type inContext:(NSManagedObjectContext*)moc {
 	FeedGroup *fg = [[FeedGroup alloc] initWithEntity: FeedGroup.entity insertIntoManagedObjectContext:moc];
-	fg.typ = type;
+	fg.type = type;
 	if (type == FEED)
 		fg.feed = [Feed newFeedAndMetaInContext:moc];
 	return fg;
 }
 
-/// Set name and refreshStr attributes. @note Only values that differ will be updated.
-- (void)setName:(NSString*)name andRefreshString:(NSString*)refreshStr {
-	if (![self.name isEqualToString: name])            self.name = name;
-	if (![self.refreshStr isEqualToString:refreshStr]) self.refreshStr = refreshStr;
+- (void)setParent:(FeedGroup *)parent andSortIndex:(int32_t)sortIndex {
+	self.parent = parent;
+	self.sortIndex = sortIndex;
+	if (self.type == FEED)
+		[self.feed calculateAndSetIndexPathString];
+}
+
+/// Set @c name attribute but only if value differs.
+- (void)setNameIfChanged:(NSString*)name {
+	if (![self.name isEqualToString: name])
+		self.name = name;
 }
 
 /// @return Return static @c 16x16px NSImageNameFolder image.
@@ -112,7 +114,7 @@
 
 /// @return Simplified description of the feed object.
 - (NSString*)readableDescription {
-	switch (self.typ) {
+	switch (self.type) {
 		case SEPARATOR: return @"-------------";
 		case GROUP: return [NSString stringWithFormat:@"%@", self.name];
 		case FEED:
