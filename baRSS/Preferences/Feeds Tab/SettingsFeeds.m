@@ -362,7 +362,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	}
 	[[NSPasteboard generalPasteboard] clearContents];
 	[[NSPasteboard generalPasteboard] setString:str forType:NSPasteboardTypeString];
-	NSLog(@"%@", str);
+	NSLog(@"%@", str); // TODO: drag-n-drop feed to opml?
 }
 
 /**

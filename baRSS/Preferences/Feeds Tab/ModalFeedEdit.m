@@ -157,6 +157,7 @@
 	if (self.modalSheet.didCloseAndCancel)
 		return;
 	[self preDownload];
+	// TODO: parse webpage to find feed links instead (automatic link detection)
 	[FeedDownload newFeed:self.previousURL block:^(RSParsedFeed *result, NSError *error, NSHTTPURLResponse* response) {
 		if (self.modalSheet.didCloseAndCancel)
 			return;
@@ -178,7 +179,6 @@
 	if (self.modalSheet.didCloseAndCancel)
 		return;
 	// 1. Stop spinner animation for name field. (keep spinner for URL running until favicon downloaded)
-	// TODO: play error sound?
 	[self.spinnerName stopAnimation:nil];
 	// 2. If URL was redirected, replace original text field value with new one. (e.g., https redirect)
 	if (responseURL.length > 0 && ![responseURL isEqualToString:self.previousURL]) {
@@ -194,7 +194,7 @@
 	if (self.feedError) {
 		[self finishDownloadWithFavicon:[NSImage imageNamed:NSImageNameCaution]];
 	} else {
-		NSString *faviconURL = self.feedResult.link; // TODO: add support for custom URLs ?
+		NSString *faviconURL = self.feedResult.link;
 		if (faviconURL.length == 0)
 			faviconURL = responseURL;
 		[FeedDownload downloadFavicon:faviconURL finished:^(NSImage * _Nullable img) {

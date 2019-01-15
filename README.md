@@ -36,27 +36,8 @@ ToDo
 ----
 
 - [ ] Preferences
-	- [x] Choose favorite web browser
-		- [x] Show list of installed browsers
 	- [ ] ~~Choose status bar icon?~~
-	- [x] Tick mark feed items based on prefs
-	- [x] Open a few links (# editable)
-	- [x] Performance: Update menu partially
-	- [x] Start on login
-	- [x] Make it system default application
 	- [ ] Display license info (e.g., RSXML)
-	- [x] Short article names
-	- [x] Import / Export (all feeds)
-		- [x] Support for `.opml` format
-		- [x] Append or replace
-
-
-- [x] Status menu
-	- [x] Update menu header after mark (un)read
-	- [x] Pause updates functionality
-	- [x] Update all feeds functionality
-	- [x] Hold only relevant information in memory
-	- [x] Icon for paused / no internet state
 
 
 - [ ] Edit feed
@@ -64,29 +45,15 @@ ToDo
 		- [ ] How often gets the feed updated (min, max, avg)
 		- [ ] Automatically choose best interval?
 		- [ ] Show time of next update
-	- [x] Auto fix 301 Redirect or ask user
-	- [x] Make `feed://` URLs clickable
 	- [ ] Feeds with authentication
-	- [x] Show proper feed icon
-		- [x] Download and store icon file
 
 
 - [ ] Other
 	- [ ] App Icon
 	- [ ] Translate text to different languages
-	- [x] Automatically update feeds with chosen interval
-		- [x] Reuse ETag and Modification date
-		- [x] Append only new items, keep sorting
-		- [x] Delete old ones eventually
-		- [x] Pause on internet connection lost
 	- [ ] Download with ephemeral url session?
-	- [x] Purge cache
-		- [x] Manually or automatically
-		- [x] Add something to restore a broken state
-	- [x] Code Documentation (mostly methods)
 	- [ ] Add Sandboxing
 		- [ ] Disable Startup checkbox (or other workaround)
-	- [x] Fix nasty bug: empty feed list (initial state)
 
 
 - [ ] Additional features
