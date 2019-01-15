@@ -33,7 +33,7 @@
 + (void)scheduleUpdateForUpcomingFeeds;
 + (void)forceUpdateAllFeeds;
 // Downloading
-+ (void)newFeed:(NSString *)urlStr block:(void(^)(RSParsedFeed *feed, NSError *error, NSHTTPURLResponse *response))block;
++ (void)newFeed:(NSString *)urlStr askUser:(nonnull NSString*(^)(NSArray<RSHTMLMetadataFeedLink*> *list))askUser block:(nonnull void(^)(RSParsedFeed *parsed, NSError *error, NSHTTPURLResponse *response))block;
 + (void)autoDownloadAndParseURL:(NSString*)urlStr;
 + (void)batchDownloadRSSAndFavicons:(NSArray<Feed*> *)list showErrorAlert:(BOOL)flag rssFinished:(void(^)(NSArray<Feed*> *successful, BOOL *cancelFavicons))blockXml finally:(void(^)(BOOL successful))blockFavicon;
 + (void)downloadFavicon:(NSString*)urlStr finished:(void(^)(NSImage * _Nullable img))block ;

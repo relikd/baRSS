@@ -190,29 +190,13 @@ static BOOL _nextUpdateIsForced = NO;
 	return req;
 }
 
-/**
- Start download session of RSS or Atom feed, parse feed and return result on the main thread.
- 
- @param block Called when parsing finished or an @c NSURL error occured.
-              If content did not change (status code 304) both, error and result will be @c nil.
-              Will be called on main thread.
- */
-+ (void)parseFeedRequest:(NSURLRequest*)request block:(nonnull void(^)(RSParsedFeed *rss, NSError *error, NSHTTPURLResponse *response))block {
+/// Helper method to start new @c NSURLSession. If @c (http.statusCode==304) then set @c data @c = @c nil.
++ (void)asyncRequest:(NSURLRequest*)request block:(nonnull void(^)(NSData * _Nullable data, NSError * _Nullable error, NSHTTPURLResponse *response))block {
 	[[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
 		NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
-		if (error || [httpResponse statusCode] == 304) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				block(nil, error, httpResponse); // error = nil if status == 304
-			});
-		} else {
-			RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:httpResponse.URL.absoluteString];
-			RSFeedParser *parser = [RSFeedParser parserWithXMLData:xml];
-			[parser parseAsync:^(RSParsedFeed * _Nullable parsedFeed, NSError * _Nullable err) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					block(parsedFeed, err, httpResponse);
-				});
-			}];
-		}
+		if (error || [httpResponse statusCode] == 304)
+			data = nil;
+		block(data, error, httpResponse); // if status == 304, data & error nil
 	}] resume];
 }
 
@@ -221,10 +205,64 @@ static BOOL _nextUpdateIsForced = NO;
 
 
 /**
- Perform feed download request from URL alone. Not updating any @c Feed item.
+ Start download session of RSS or Atom feed, parse feed and return result on the main thread.
+ 
+ @param xmlBlock Called immediately after @c RSXMLData is initialized. E.g., to use this data as HTML parser.
+                 Return @c YES to to exit without calling @c feedBlock.
+                 If @c NO and @c err @c != @c nil skip feed parsing and call @c feedBlock(nil,err,response).
+ @param feedBlock Called when parsing finished or an @c NSURL error occured.
+                  If content did not change (status code 304) both, error and result will be @c nil.
+                  Will be called on main thread.
  */
-+ (void)newFeed:(NSString *)urlStr block:(void(^)(RSParsedFeed *parsed, NSError *error, NSHTTPURLResponse *response))block {
-	[self parseFeedRequest:[self newRequestURL:urlStr] block:block];
++ (void)parseFeedRequest:(NSURLRequest*)request xmlBlock:(nullable BOOL(^)(RSXMLData *xml, NSError **err))xmlBlock feedBlock:(nonnull void(^)(RSParsedFeed *rss, NSError *error, NSHTTPURLResponse *response))feedBlock {
+	[self asyncRequest:request block:^(NSData * _Nullable data, NSError * _Nullable error, NSHTTPURLResponse *response) {
+		RSParsedFeed *result = nil;
+		if (data) { // data = nil if (error || 304)
+			RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:response.URL.absoluteString];
+			if (xmlBlock && xmlBlock(xml, &error)) {
+				return;
+			}
+			if (!error) { // metaBlock may set error
+				RSFeedParser *parser = [RSFeedParser parserWithXMLData:xml];
+				result = [parser parseSync:&error];
+			}
+		}
+		dispatch_async(dispatch_get_main_queue(), ^{
+			feedBlock(result, error, response);
+		});
+	}];
+}
+
+/**
+ Perform feed download request from URL alone. Not updating any @c Feed item.
+
+ @note @c askUser will not be called if url is XML already.
+ 
+ @param urlStr XML URL or HTTP URL that will be parsed to find feed URLs.
+ @param askUser Use @c list to present user a list of detected feed URLs. Always before @c block.
+ @param block Called after webpage has been fully parsed (including html autodetect).
+ */
++ (void)newFeed:(NSString *)urlStr askUser:(nonnull NSString*(^)(NSArray<RSHTMLMetadataFeedLink*> *list))askUser block:(nonnull void(^)(RSParsedFeed *parsed, NSError *error, NSHTTPURLResponse *response))block {
+	[self parseFeedRequest:[self newRequestURL:urlStr] xmlBlock:^BOOL(RSXMLData *xml, NSError **err) {
+		if (![xml.parserClass isHTMLParser])
+			return NO;
+		RSHTMLMetadataParser *parser = [RSHTMLMetadataParser parserWithXMLData:xml];
+		RSHTMLMetadata *parsedMeta = [parser parseSync:err];
+		if (*err)
+			return NO;
+		if (!parsedMeta || parsedMeta.feedLinks.count == 0) {
+			*err = RSXMLMakeErrorWrongParser(RSXMLErrorExpectingFeed, RSXMLErrorExpectingHTML);
+			return NO;
+		}
+		__block NSString *chosenURL = nil;
+		dispatch_sync(dispatch_get_main_queue(), ^{ // sync! (thread is already in background)
+			chosenURL = askUser(parsedMeta.feedLinks);
+		});
+		if (!chosenURL || chosenURL.length == 0)
+			return NO;
+		[self parseFeedRequest:[self newRequestURL:chosenURL] xmlBlock:nil feedBlock:block];
+		return YES;
+	} feedBlock:block];
 }
 
 /**
@@ -246,7 +284,7 @@ static BOOL _nextUpdateIsForced = NO;
 		return;
 	}
 	dispatch_group_enter(group);
-	[self parseFeedRequest:[self newRequest:feed.meta] block:^(RSParsedFeed *rss, NSError *error, NSHTTPURLResponse *response) {
+	[self parseFeedRequest:[self newRequest:feed.meta] xmlBlock:nil feedBlock:^(RSParsedFeed *rss, NSError *error, NSHTTPURLResponse *response) {
 		if (error) {
 			if (alert) [NSApp presentError:error];
 			[feed.meta setErrorAndPostponeSchedule];
@@ -382,6 +420,7 @@ static BOOL _nextUpdateIsForced = NO;
 + (void)downloadFavicon:(NSString*)urlStr finished:(void(^)(NSImage * _Nullable img))block {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		NSURL *favURL = [[self hostURL:urlStr] URLByAppendingPathComponent:@"favicon.ico"];
+		// TODO: fix anonymous session. initWithContentsOfURL: will set cookie in ~/Library/Cookies/
 		NSImage *img = [[NSImage alloc] initWithContentsOfURL:favURL];
 		if (!img || ![img isValid])
 			img = nil;
@@ -437,10 +476,8 @@ static void networkReachabilityCallback(SCNetworkReachabilityRef target, SCNetwo
 	_isReachable = [FeedDownload hasConnectivity:flags];
 	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationNetworkStatusChanged object:@(_isReachable)];
 	if (_isReachable) {
-		NSLog(@"reachable");
 		[FeedDownload resumeUpdates];
 	} else {
-		NSLog(@"not reachable");
 		[FeedDownload pauseUpdates];
 	}
 }
