@@ -92,11 +92,8 @@ typedef NS_ENUM(char, DisplaySetting) {
 	} else if (fg.type == GROUP && [UserPrefs defaultYES:@"groupUnreadCount"]) {
 		uCount = [self.submenu coreDataUnreadCount];
 	}
-	if (uCount > 0) {
-		self.title = [NSString stringWithFormat:@"%@ (%ld)", fg.name, uCount];
-	} else {
-		self.title = (fg.name ? fg.name : @"(error)");
-	}
+	NSString *name = (fg.name ? fg.name : NSLocalizedString(@"(error)", nil));
+	self.title = (uCount == 0 ? name : [NSString stringWithFormat:@"%@ (%ld)", name, uCount]);
 	return uCount;
 }
 

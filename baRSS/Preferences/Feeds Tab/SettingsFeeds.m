@@ -275,25 +275,22 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 /// Populate @c NSOutlineView data cells with core data object values.
 - (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item {
 	FeedGroup *fg = [(NSTreeNode*)item representedObject];
-	BOOL isFeed = (fg.type == FEED);
 	BOOL isSeperator = (fg.type == SEPARATOR);
 	BOOL isRefreshColumn = [tableColumn.identifier isEqualToString:@"RefreshColumn"];
-	BOOL refreshDisabled = (!isFeed || fg.refreshStr.length == 0 || [fg.refreshStr characterAtIndex:0] == '0');
 	
 	NSString *cellIdent = (isRefreshColumn ? @"cellRefresh" : (isSeperator ? @"cellSeparator" : @"cellFeed"));
 	// owner is nil to prohibit repeated awakeFromNib calls
 	NSTableCellView *cellView = [self.outlineView makeViewWithIdentifier:cellIdent owner:nil];
 	
 	if (isRefreshColumn) {
-		cellView.textField.stringValue = (refreshDisabled ? (isFeed ? @"--" : @"") : fg.refreshStr);
+		cellView.textField.objectValue = fg.refreshStr;
+		cellView.textField.textColor = (fg.refreshStr.length > 1 ? [NSColor controlTextColor] : [NSColor disabledControlTextColor]);
 	} else if (isSeperator) {
-		return cellView; // the refresh cell is already skipped with the above if condition
+		return cellView; // refresh cell already skipped with the above if condition
 	} else {
 		cellView.textField.objectValue = fg.name;
 		cellView.imageView.image = (fg.type == GROUP ? [NSImage imageNamed:NSImageNameFolder] : [fg.feed iconImage16]);
 	}
-	// also for refresh column
-	cellView.textField.textColor = (isFeed && refreshDisabled ? [NSColor disabledControlTextColor] : [NSColor controlTextColor]);
 	return cellView;
 }
 

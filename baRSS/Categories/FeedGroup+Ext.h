@@ -22,13 +22,14 @@
 
 #import "FeedGroup+CoreDataClass.h"
 
-@interface FeedGroup (Ext)
 /// Enum type to distinguish different @c FeedGroup types: @c GROUP, @c FEED, @c SEPARATOR
 typedef NS_ENUM(int16_t, FeedGroupType) {
 	/// Other types: @c GROUP, @c FEED, @c SEPARATOR
 	GROUP = 0, FEED = 1, SEPARATOR = 2
 };
 
+
+@interface FeedGroup (Ext)
 /// Overwrites @c type attribute with enum. Use one of: @c GROUP, @c FEED, @c SEPARATOR.
 @property (nonatomic) FeedGroupType type;
 
