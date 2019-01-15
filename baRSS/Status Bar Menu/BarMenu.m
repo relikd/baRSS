@@ -36,6 +36,7 @@
 @property (strong) NSStatusItem *barItem;
 @property (strong) Preferences *prefWindow;
 @property (assign, atomic) NSInteger unreadCountTotal;
+@property (assign) BOOL coreDataEmpty;
 @property (weak) NSMenu *currentOpenMenu;
 @property (strong) NSArray<NSManagedObjectID*> *objectIDsForMenu;
 @property (strong) NSManagedObjectContext *readContext;
@@ -67,7 +68,7 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-#pragma mark - Update Menu Bar Icon -
+#pragma mark - Update Menu Bar Icon
 
 /// Regardless of current unread count, perform new core data fetch on total unread count and update icon.
 - (void)asyncReloadUnreadCountAndUpdateBarIcon {
@@ -96,7 +97,7 @@
 }
 
 
-#pragma mark - Notification callback methods -
+#pragma mark - Notification callback methods
 
 
 /**
@@ -180,7 +181,7 @@
 }
 
 
-#pragma mark - Menu Delegate & Menu Generation -
+#pragma mark - Menu Delegate & Menu Generation
 
 
 /// @c currentOpenMenu is needed when a background update occurs. In case a feed items menu is open.
@@ -206,14 +207,19 @@
 
 /// Perform a core data fatch request, store sorted object ids array and return object count.
 - (NSInteger)numberOfItemsInMenu:(NSMenu*)menu {
-	NSMenuItem *parent = [menu.supermenu itemAtIndex:[menu.supermenu indexOfItemWithSubmenu:menu]];
-	self.readContext = [StoreCoordinator createChildContext]; // will be deleted after menu:updateItem:
-	self.objectIDsForMenu = [StoreCoordinator sortedObjectIDsForParent:parent.representedObject isFeed:[menu isFeedMenu] inContext:self.readContext];
-	return (NSInteger)[self.objectIDsForMenu count];
+	[self prepareContextAndTemporaryObjectIDs:menu];
+	if (_coreDataEmpty) return 1; // only if main menu empty
+	return (NSInteger)self.objectIDsForMenu.count;
 }
 
 /// Lazy populate system bar menus when needed.
 - (BOOL)menu:(NSMenu*)menu updateItem:(NSMenuItem*)item atIndex:(NSInteger)index shouldCancel:(BOOL)shouldCancel {
+	if (_coreDataEmpty) {
+		item.title = NSLocalizedString(@"~~~ list empty ~~~", nil);
+		item.enabled = NO;
+		[self finalizeMenu:menu object:nil];
+		return YES;
+	}
 	id obj = [self.readContext objectWithID:[self.objectIDsForMenu objectAtIndex:(NSUInteger)index]];
 	if ([obj isKindOfClass:[FeedGroup class]]) {
 		[item setFeedGroup:obj];
@@ -226,11 +232,26 @@
 	
 	if (index + 1 == menu.numberOfItems) { // last item of the menu
 		[self finalizeMenu:menu object:obj];
-		self.objectIDsForMenu = nil;
-		[self.readContext reset];
-		self.readContext = nil;
+		[self resetContextAndTemporaryObjectIDs];
 	}
 	return YES;
+}
+
+
+#pragma mark - Helper
+
+
+- (void)prepareContextAndTemporaryObjectIDs:(NSMenu*)menu {
+	NSMenuItem *parent = [menu.supermenu itemAtIndex:[menu.supermenu indexOfItemWithSubmenu:menu]];
+	self.readContext = [StoreCoordinator createChildContext]; // will be deleted after menu:updateItem:
+	self.objectIDsForMenu = [StoreCoordinator sortedObjectIDsForParent:parent.representedObject isFeed:[menu isFeedMenu] inContext:self.readContext];
+	_coreDataEmpty = ([menu isMainMenu] && self.objectIDsForMenu.count == 0); // initial state or no feeds in date store
+}
+
+- (void)resetContextAndTemporaryObjectIDs {
+	self.objectIDsForMenu = nil;
+	[self.readContext reset];
+	self.readContext = nil;
 }
 
 /**
@@ -301,7 +322,7 @@
 }
 
 
-#pragma mark - Menu Actions -
+#pragma mark - Menu Actions
 
 
 /**

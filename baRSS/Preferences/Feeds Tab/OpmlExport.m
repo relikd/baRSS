@@ -233,7 +233,7 @@
 		[child setAttribute:@"rss" forKey:OPMLTypeKey];
 		[child setAttribute:item.feed.link forKey:OPMLHMTLURLKey];
 		[child setAttribute:item.feed.meta.url forKey:OPMLXMLURLKey];
-		NSNumber *refreshNum = [NSNumber numberWithInteger:[item.feed.meta refreshInterval]];
+		NSNumber *refreshNum = [NSNumber numberWithInteger:item.feed.meta.refreshInterval];
 		[child setAttribute:refreshNum forKey:@"refreshInterval"]; // baRSS specific
 	} else {
 		for (FeedGroup *subItem in [item sortedChildren]) {

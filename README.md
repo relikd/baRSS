@@ -86,7 +86,7 @@ ToDo
 	- [x] Code Documentation (mostly methods)
 	- [ ] Add Sandboxing
 		- [ ] Disable Startup checkbox (or other workaround)
-	- [ ] Fix nasty bug: empty feed list (initial state)
+	- [x] Fix nasty bug: empty feed list (initial state)
 
 
 - [ ] Additional features

@@ -29,6 +29,27 @@ static const int32_t RefreshUnitValues[] = {1, 60, 3600, 86400, 604800}; // smhd
 
 @implementation FeedMeta (Ext)
 
+#pragma mark - Getter
+
+/// Check whether update interval is disabled by user (refresh interval is 0).
+- (BOOL)refreshIntervalDisabled {
+	return (self.refreshNum <= 0);
+}
+
+/// @return Time interval respecting the selected unit. E.g., returns @c 180 for @c '3m'
+- (int32_t)refreshInterval {
+	return self.refreshNum * RefreshUnitValues[self.refreshUnit % 5];
+}
+
+/// @return Formatted string for update interval ( e.g., @c 30m or @c 12h )
+- (NSString*)readableRefreshString {
+	if (self.refreshIntervalDisabled)
+		return @"∞"; // ∞ ƒ Ø
+	return [NSString stringWithFormat:@"%d%c", self.refreshNum, [@"smhdw" characterAtIndex:self.refreshUnit % 5]];
+}
+
+#pragma mark - HTTP response
+
 /// Increment @c errorCount and set new @c scheduled date (2^N minutes, max. 5.7 days).
 - (void)setErrorAndPostponeSchedule {
 	if (self.errorCount < 0)
@@ -36,7 +57,7 @@ static const int32_t RefreshUnitValues[] = {1, 60, 3600, 86400, 604800}; // smhd
 	int16_t n = self.errorCount + 1; // always increment errorCount (can be used to indicate bad feeds)
 	NSTimeInterval retryWaitTime = pow(2, (n > 13 ? 13 : n)) * 60; // 2^N (between: 2 minutes and 5.7 days)
 	self.errorCount = n;
-	self.scheduled = [NSDate dateWithTimeIntervalSinceNow:retryWaitTime];
+	[self scheduleNow:retryWaitTime];
 	// TODO: remove logging
 	NSLog(@"ERROR: Feed download failed: %@ (errorCount: %d)", self.url, n);
 }
@@ -45,14 +66,10 @@ static const int32_t RefreshUnitValues[] = {1, 60, 3600, 86400, 604800}; // smhd
 	self.errorCount = 0; // reset counter
 	NSDictionary *header = [response allHeaderFields];
 	[self setEtag:header[@"Etag"] modified:header[@"Date"]]; // @"Expires", @"Last-Modified"
-	[self calculateAndSetScheduled];
+	[self scheduleNow:[self refreshInterval]];
 }
 
-/// Calculate date from @c refreshNum and @c refreshUnit and set as next scheduled feed update.
-- (void)calculateAndSetScheduled {
-	NSTimeInterval interval = [self refreshInterval]; // 0 if refresh = 0 (update deactivated)
-	self.scheduled = (interval <= 0 ? nil : [[NSDate date] dateByAddingTimeInterval:interval]);
-}
+#pragma mark - Setter
 
 /// Set @c url attribute but only if value differs.
 - (void)setUrlIfChanged:(NSString*)url {
@@ -64,7 +81,6 @@ static const int32_t RefreshUnitValues[] = {1, 60, 3600, 86400, 604800}; // smhd
 	if (![self.etag isEqualToString:etag])         self.etag = etag;
 	if (![self.modified isEqualToString:modified]) self.modified = modified;
 }
-
 
 /**
  Set @c refresh and @c unit from popup button selection. Only values that differ will be updated.
@@ -78,7 +94,7 @@ static const int32_t RefreshUnitValues[] = {1, 60, 3600, 86400, 604800}; // smhd
 	if (self.refreshUnit != unit)   self.refreshUnit = unit;
 	
 	if (intervalChanged) {
-		[self calculateAndSetScheduled];
+		[self scheduleNow:[self refreshInterval]];
 		NSString *str = [self readableRefreshString];
 		if (![self.feed.group.refreshStr isEqualToString:str])
 			self.feed.group.refreshStr = str;
@@ -102,14 +118,14 @@ static const int32_t RefreshUnitValues[] = {1, 60, 3600, 86400, 604800}; // smhd
 	return NO; // since loop didn't return, no value was changed
 }
 
-/// @return Time interval respecting the selected unit. E.g., returns @c 180 for @c '3m'
-- (int32_t)refreshInterval {
-	return self.refreshNum * RefreshUnitValues[self.refreshUnit % 5];
-}
-
-/// @return Formatted string for update interval ( e.g., @c 30m or @c 12h )
-- (NSString*)readableRefreshString {
-	return [NSString stringWithFormat:@"%d%c", self.refreshNum, [@"smhdw" characterAtIndex:self.refreshUnit % 5]];
+/// Calculate date from @c refreshNum and @c refreshUnit and set as next scheduled feed update.
+- (void)scheduleNow:(NSTimeInterval)future {
+	if (self.refreshIntervalDisabled) { // update deactivated; manually update with force update all
+		if (self.scheduled != nil) // already nil? Avoid unnecessary core data edits
+			self.scheduled = nil;
+	} else {
+		self.scheduled = [NSDate dateWithTimeIntervalSinceNow:future];
+	}
 }
 
 @end

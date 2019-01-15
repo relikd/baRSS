@@ -128,10 +128,10 @@ static BOOL _nextUpdateIsForced = NO;
 	
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	NSArray<Feed*> *list = [StoreCoordinator getListOfFeedsThatNeedUpdate:updateAll inContext:moc];
-	NSAssert(list.count > 0, @"ERROR: Something went wrong, timer fired too early.");
+	//NSAssert(list.count > 0, @"ERROR: Something went wrong, timer fired too early.");
 	
 	[FeedDownload batchUpdateFeeds:list showErrorAlert:NO finally:^(NSArray<Feed*> *successful, NSArray<Feed*> *failed) {
-		[self postChanges:successful andSaveContext:moc];
+		[self saveContext:moc andPostChanges:successful];
 		[moc reset];
 		[self resumeUpdates]; // always reset the timer
 	}];
@@ -139,19 +139,13 @@ static BOOL _nextUpdateIsForced = NO;
 
 /**
  Perform save on context and all parents. Then post @c FeedUpdated notification.
- Use return value to download additional data.
-
- @return @c YES if @c (list.count @c > @c 0).
-         Return @c NO if context wasn't saved, and no notification was sent.
  */
-+ (BOOL)postChanges:(NSArray<Feed*>*)changedFeeds andSaveContext:(NSManagedObjectContext*)moc {
++ (void)saveContext:(NSManagedObjectContext*)moc andPostChanges:(NSArray<Feed*>*)changedFeeds {
+	[StoreCoordinator saveContext:moc andParent:YES];
 	if (changedFeeds && changedFeeds.count > 0) {
-		[StoreCoordinator saveContext:moc andParent:YES];
 		NSArray<NSManagedObjectID*> *list = [changedFeeds valueForKeyPath:@"objectID"];
 		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedUpdated object:list];
-		return YES;
 	}
-	return NO;
 }
 
 
@@ -279,7 +273,11 @@ static BOOL _nextUpdateIsForced = NO;
 	Feed *f = [Feed appendToRootWithDefaultIntervalInContext:moc];
 	f.meta.url = url;
 	[self batchDownloadRSSAndFavicons:@[f] showErrorAlert:YES rssFinished:^(NSArray<Feed *> *successful, BOOL *cancelFavicons) {
-		*cancelFavicons = ![self postChanges:successful andSaveContext:moc];
+		if (successful.count == 0) {
+			*cancelFavicons = YES;
+		} else {
+			[self saveContext:moc andPostChanges:successful];
+		}
 	} finally:^(BOOL successful) {
 		if (successful) {
 			[StoreCoordinator saveContext:moc andParent:YES];
