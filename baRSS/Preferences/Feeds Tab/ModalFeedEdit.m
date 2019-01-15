@@ -158,7 +158,9 @@
 		return;
 	[self preDownload];
 	// TODO: parse webpage to find feed links instead (automatic link detection)
-	[FeedDownload newFeed:self.previousURL block:^(RSParsedFeed *result, NSError *error, NSHTTPURLResponse* response) {
+	[FeedDownload newFeed:self.previousURL askUser:^NSString *(NSArray<RSHTMLMetadataFeedLink *> *list) {
+		return [self letUserChooseXmlUrlFromList:list];
+	} block:^(RSParsedFeed *result, NSError *error, NSHTTPURLResponse* response) {
 		if (self.modalSheet.didCloseAndCancel)
 			return;
 		self.didDownloadFeed = YES;
@@ -168,6 +170,28 @@
 		self.httpDate = [response allHeaderFields][@"Date"]; // @"Expires", @"Last-Modified"
 		[self postDownload:response.URL.absoluteString];
 	}];
+}
+
+/**
+ If entered URL happens to be a normal webpage, @c RSXML will parse all suitable feed links.
+ Present this list to the user and let her decide which one it should be.
+ 
+ @return Either URL string or @c nil if user canceled the selection.
+ */
+- (NSString*)letUserChooseXmlUrlFromList:(NSArray<RSHTMLMetadataFeedLink*> *)list {
+	if (list.count == 1) // nothing to choose
+		return list.firstObject.link;
+	NSMenu *menu = [[NSMenu alloc] initWithTitle:NSLocalizedString(@"Choose feed menu", nil)];
+	menu.autoenablesItems = NO;
+	for (RSHTMLMetadataFeedLink *fl in list) {
+		[menu addItemWithTitle:fl.title action:nil keyEquivalent:@""];
+	}
+	NSPoint belowURL = NSMakePoint(0,self.url.frame.size.height);
+	if ([menu popUpMenuPositioningItem:nil atLocation:belowURL inView:self.url]) {
+		NSInteger idx = [menu indexOfItem:menu.highlightedItem];
+		return [list objectAtIndex:(NSUInteger)idx].link;
+	}
+	return nil; // user selection canceled
 }
 
 /**

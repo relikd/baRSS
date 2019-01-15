@@ -115,7 +115,6 @@
 			newOnes += 1;
 			if (hasGapBetweenNewArticles && lastInserted) { // gap with at least one article inbetween
 				lastInserted.unread = NO;
-				NSLog(@"Ghost item: %@", lastInserted.title);
 				newOnes -= 1;
 			}
 			hasGapBetweenNewArticles = NO;
@@ -125,7 +124,6 @@
 	}
 	if (hasGapBetweenNewArticles && lastInserted) {
 		lastInserted.unread = NO;
-		NSLog(@"Ghost item: %@", lastInserted.title);
 		newOnes -= 1;
 	}
 	if (newOnes > 0)
