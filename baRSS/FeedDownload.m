@@ -254,7 +254,6 @@ static BOOL _nextUpdateIsForced = NO;
 		} else {
 			[feed.meta setSucessfulWithResponse:response];
 			if (rss) [feed updateWithRSS:rss postUnreadCountChange:YES];
-			// TODO: save changes for this feed only? / Partial Update
 			[successful addObject:feed]; // will be added even if statusCode == 304 (rss == nil)
 		}
 		dispatch_group_leave(group);

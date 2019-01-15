@@ -40,7 +40,6 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-	printf("up and running\n");
 //	feed://https://feeds.feedburner.com/simpledesktops
 	[FeedDownload registerNetworkChangeNotification]; // will call update scheduler
 }

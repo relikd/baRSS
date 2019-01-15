@@ -26,6 +26,8 @@
 // TODO: Add support for media player? image feed?
 // <enclosure url="https://url.mp3" length="63274022" type="audio/mpeg" />
 // TODO: Disable 'update all' menu item during update?
+// TODO: List of hidden preferences for readme
+// TODO: Do we need to search for favicon in places other than '../favicon.ico'?
 
 static NSString *kNotificationFeedUpdated = @"baRSS-notification-feed-updated";
 static NSString *kNotificationNetworkStatusChanged = @"baRSS-notification-network-status-changed";
