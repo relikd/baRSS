@@ -28,6 +28,9 @@
 @interface Preferences ()
 @property (weak) IBOutlet SettingsGeneral *settingsGeneral;
 @property (weak) IBOutlet SettingsFeeds *settingsFeeds;
+@property (weak) IBOutlet NSView *aboutView;
+@property (weak) IBOutlet NSTextField *lblAppName;
+@property (weak) IBOutlet NSTextField *lblAppVersion;
 @end
 
 @implementation Preferences
@@ -48,6 +51,11 @@
 		self.window.contentView = self.settingsGeneral.view;
 	} else if ([sender.itemIdentifier isEqualToString:@"tabFeeds"]) {
 		self.window.contentView = self.settingsFeeds.view;
+	} else if ([sender.itemIdentifier isEqualToString:@"tabAbout"]) {
+		NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
+		self.lblAppName.objectValue = infoDict[@"CFBundleName"];
+		self.lblAppVersion.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Version %@", nil), infoDict[@"CFBundleShortVersionString"]];
+		self.window.contentView = self.aboutView;
 	}
 	
 	self.window.toolbar.selectedItemIdentifier = sender.itemIdentifier;
