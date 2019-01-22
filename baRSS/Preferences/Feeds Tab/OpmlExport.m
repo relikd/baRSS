@@ -55,9 +55,11 @@
 	[sp beginSheetModalForWindow:window completionHandler:^(NSModalResponse result) {
 		if (result == NSModalResponseOK) {
 			BOOL flattened = ([self radioGroupSelection:radioView] == 1);
-			NSString *exportString = [self exportFeedsHierarchical:!flattened inContext:moc];
+			NSArray<FeedGroup*> *list = [StoreCoordinator sortedListOfRootObjectsInContext:moc];
+			NSXMLDocument *doc = [self xmlDocumentForFeeds:list hierarchical:!flattened];
+			NSData *xml = [doc XMLDataWithOptions:NSXMLNodePreserveAttributeOrder | NSXMLNodePrettyPrint];
 			NSError *error;
-			[exportString writeToURL:sp.URL atomically:YES encoding:NSUTF8StringEncoding error:&error];
+			[xml writeToURL:sp.URL options:NSDataWritingAtomic error:&error];
 			if (error) {
 				[NSApp presentError:error];
 			}
@@ -198,50 +200,59 @@
 
 
 /**
- Initiate export of current core data state. Write opml header and all root items.
-
+ Create NSXMLNode structure with application header nodes and body node containing feed items.
+ 
  @param flag If @c YES keep parent-child structure intact. If @c NO ignore all parents and add @c Feed items only.
- @param moc Managed object context.
- @return Save this string to file.
  */
-+ (NSString*)exportFeedsHierarchical:(BOOL)flag inContext:(NSManagedObjectContext*)moc {
-	NSDictionary *info = @{OPMLTitleKey : @"baRSS feeds",
-						   @"ownerName" : @"baRSS",
-						   @"dateCreated" : [self currentDayAsStringISO8601:YES]};
-	RSOPMLItem *doc = [RSOPMLItem itemWithAttributes:info];
-	@autoreleasepool {
-		NSArray<FeedGroup*> *arr = [StoreCoordinator sortedListOfRootObjectsInContext:moc];
-		for (FeedGroup *item in arr) {
-			[self addChild:item toParent:doc hierarchical:flag];
-		}
++ (NSXMLDocument*)xmlDocumentForFeeds:(NSArray<FeedGroup*>*)list hierarchical:(BOOL)flag {
+	NSXMLElement *head = [NSXMLElement elementWithName:@"head"];
+	[head addChild:[NSXMLElement elementWithName:@"title" stringValue:@"baRSS feeds"]];
+	[head addChild:[NSXMLElement elementWithName:@"ownerName" stringValue:@"baRSS"]];
+	[head addChild:[NSXMLElement elementWithName:@"dateCreated" stringValue:[self currentDayAsStringISO8601:YES]]];
+	
+	NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
+	for (FeedGroup *item in list) {
+		[self appendChild:item toNode:body hierarchical:flag];
 	}
-	return [doc exportOPMLAsString];
+	
+	NSXMLElement *opml = [NSXMLElement elementWithName:@"opml"];
+	[opml addAttribute:[NSXMLNode attributeWithName:@"version" stringValue:@"1.0"]];
+	[opml addChild:head];
+	[opml addChild:body];
+	
+	NSXMLDocument *xml = [NSXMLDocument documentWithRootElement:opml];
+	xml.version = @"1.0";
+	xml.characterEncoding = @"UTF-8";
+	return xml;
 }
 
 /**
- Build up @c RSOPMLItem structure recursively. Essentially, re-create same structure as in core data storage.
-
+ Build up @c NSXMLNode structure recursively. Essentially, re-create same structure as in core data storage.
+ 
  @param flag If @c NO don't add groups to export file but continue evaluation of child items.
  */
-+ (void)addChild:(FeedGroup*)item toParent:(RSOPMLItem*)parent hierarchical:(BOOL)flag {
-	RSOPMLItem *child = [RSOPMLItem new];
-	[child setAttribute:item.name forKey:OPMLTitleKey];
-	if (flag || item.type == SEPARATOR || item.feed) {
-		[parent addChild:child]; // dont add item if item is group and hierarchical == NO
-	}
-	
-	if (item.type == SEPARATOR) {
-		[child setAttribute:@"true" forKey:@"separator"]; // baRSS specific
-	} else if (item.feed) {
-		[child setAttribute:@"rss" forKey:OPMLTypeKey];
-		[child setAttribute:item.feed.link forKey:OPMLHMTLURLKey];
-		[child setAttribute:item.feed.meta.url forKey:OPMLXMLURLKey];
-		NSNumber *refreshNum = [NSNumber numberWithInteger:item.feed.meta.refreshInterval];
-		[child setAttribute:refreshNum forKey:@"refreshInterval"]; // baRSS specific
-	} else {
-		for (FeedGroup *subItem in [item sortedChildren]) {
-			[self addChild:subItem toParent:(flag ? child : parent) hierarchical:flag];
++ (void)appendChild:(FeedGroup*)item toNode:(NSXMLElement *)parent hierarchical:(BOOL)flag {
+	if (flag || item.type != GROUP) {
+		// dont add group node if hierarchical == NO
+		NSXMLElement *outline = [NSXMLElement elementWithName:@"outline"];
+		[parent addChild:outline];
+		[outline addAttribute:[NSXMLNode attributeWithName:OPMLTitleKey stringValue:item.name]];
+		[outline addAttribute:[NSXMLNode attributeWithName:OPMLTextKey stringValue:item.name]];
+		
+		if (item.type == SEPARATOR) {
+			[outline addAttribute:[NSXMLNode attributeWithName:@"separator" stringValue:@"true"]]; // baRSS specific
+		} else if (item.feed) {
+			[outline addAttribute:[NSXMLNode attributeWithName:OPMLHMTLURLKey stringValue:item.feed.link]];
+			[outline addAttribute:[NSXMLNode attributeWithName:OPMLXMLURLKey stringValue:item.feed.meta.url]];
+			[outline addAttribute:[NSXMLNode attributeWithName:OPMLTypeKey stringValue:@"rss"]];
+			NSString *intervalStr = [NSString stringWithFormat:@"%d", item.feed.meta.refreshInterval];
+			[outline addAttribute:[NSXMLNode attributeWithName:@"refreshInterval" stringValue:intervalStr]]; // baRSS specific
+			// TODO: option to export unread state?
 		}
+		parent = outline;
+	}
+	for (FeedGroup *subItem in [item sortedChildren]) {
+		[self appendChild:subItem toNode:parent hierarchical:flag];
 	}
 }
 
