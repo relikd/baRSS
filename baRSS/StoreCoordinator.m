@@ -40,7 +40,7 @@
 	NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 	[context setParentContext:[self getMainContext]];
 	context.undoManager = nil;
-	//context.automaticallyMergesChangesFromParent = YES;
+	context.automaticallyMergesChangesFromParent = YES;
 	return context;
 }
 
@@ -137,7 +137,7 @@
 	NSExpression *exp = [NSExpression expressionForFunction:@"sum:" arguments:@[[NSExpression expressionForKeyPath:@"unreadCount"]]];
 	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: Feed.entity.name];
 	if (str && str.length > 0)
-		fr.predicate = [NSPredicate predicateWithFormat:@"indexPath BEGINSWITH %@", str];
+		fr.predicate = [NSPredicate predicateWithFormat:@"indexPath BEGINSWITH %@", [str stringByAppendingString:@"."]];
 	return [self fetchInteger:moc request:fr expression:exp];
 }
 
@@ -192,28 +192,39 @@
 
 /**
  Iterate over all @c Feed and re-calculate @c unreadCount, @c articleCount and @c indexPath.
+ Restore will happend on the main context.
+ 
+ @param list A list of @c Feed objectIDs. Acts like a filter, if @c nil performs a fetch on all feed items.
  */
-+ (void)restoreFeedCountsAndIndexPaths {
++ (void)restoreFeedCountsAndIndexPaths:(NSArray<NSManagedObjectID*>*)list {
 	NSManagedObjectContext *moc = [self getMainContext];
-	NSArray *result = [self fetchAllRows:[NSFetchRequest fetchRequestWithEntityName: Feed.entity.name] inContext:moc];
+	if (!list) {
+		NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: Feed.entity.name];
+		[fr setResultType:NSManagedObjectIDResultType];
+		list = [self fetchAllRows:fr inContext:moc];
+	}
 	[moc performBlock:^{
-		for (Feed *feed in result) {
-			int16_t totalCount = (int16_t)feed.articles.count;
-			int16_t unreadCount = (int16_t)[[feed.articles valueForKeyPath:@"@sum.unread"] integerValue];
-			if (feed.articleCount != totalCount)
-				feed.articleCount = totalCount;
-			if (feed.unreadCount != unreadCount)
-				feed.unreadCount = unreadCount; // remember to update global total unread count
-			[feed calculateAndSetIndexPathString];
+		for (NSManagedObjectID *moi in list) {
+			Feed *f = [moc objectWithID:moi];
+			if ([f isKindOfClass:[Feed class]])
+				[f resetArticleCountAndIndexPathString];
 		}
+		[self saveContext:moc andParent:YES];
 	}];
 }
 
 /// @return All @c Feed items where @c articles.count @c == @c 0
-+ (NSArray<Feed*>*)listOfMissingFeedsInContext:(NSManagedObjectContext*)moc {
++ (NSArray<Feed*>*)listOfFeedsMissingArticlesInContext:(NSManagedObjectContext*)moc {
 	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: Feed.entity.name];
 	// More accurate but with subquery on FeedArticle: "count(articles) == 0"
 	fr.predicate = [NSPredicate predicateWithFormat:@"articleCount == 0"];
+	return [self fetchAllRows:fr inContext:moc];
+}
+
+/// @return All @c Feed items where @c icon is @c nil.
++ (NSArray<Feed*>*)listOfFeedsMissingIconsInContext:(NSManagedObjectContext*)moc {
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: Feed.entity.name];
+	fr.predicate = [NSPredicate predicateWithFormat:@"icon = NULL"];
 	return [self fetchAllRows:fr inContext:moc];
 }
 

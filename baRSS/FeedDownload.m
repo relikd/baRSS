@@ -133,6 +133,13 @@ static BOOL _nextUpdateIsForced = NO;
 	[FeedDownload batchUpdateFeeds:list showErrorAlert:NO finally:^(NSArray<Feed*> *successful, NSArray<Feed*> *failed) {
 		[self saveContext:moc andPostChanges:successful];
 		[moc reset];
+		if (updateAll) { // forced update will also download missing feed icons
+			NSArray<Feed*> *missingIcons = [StoreCoordinator listOfFeedsMissingIconsInContext:moc];
+			[self batchDownloadFavicons:missingIcons replaceExisting:NO finally:^{
+				[self saveContext:moc andPostChanges:successful];
+				[moc reset];
+			}];
+		}
 		[self resumeUpdates]; // always reset the timer
 	}];
 }
@@ -285,14 +292,20 @@ static BOOL _nextUpdateIsForced = NO;
 	}
 	dispatch_group_enter(group);
 	[self parseFeedRequest:[self newRequest:feed.meta] xmlBlock:nil feedBlock:^(RSParsedFeed *rss, NSError *error, NSHTTPURLResponse *response) {
-		if (error) {
-			if (alert) [NSApp presentError:error];
-			[feed.meta setErrorAndPostponeSchedule];
-			[failed addObject:feed];
-		} else {
-			[feed.meta setSucessfulWithResponse:response];
-			if (rss) [feed updateWithRSS:rss postUnreadCountChange:YES];
-			[successful addObject:feed]; // will be added even if statusCode == 304 (rss == nil)
+		if (!feed.isDeleted) {
+			if (error) {
+				if (alert) {
+					NSAlert *alertPopup = [NSAlert alertWithError:error];
+					alertPopup.informativeText = [NSString stringWithFormat:@"Error loading source: %@", response.URL.absoluteString];
+					[alertPopup runModal];
+				}
+				[feed.meta setErrorAndPostponeSchedule];
+				[failed addObject:feed];
+			} else {
+				[feed.meta setSucessfulWithResponse:response];
+				if (rss) [feed updateWithRSS:rss postUnreadCountChange:YES];
+				[successful addObject:feed]; // will be added even if statusCode == 304 (rss == nil)
+			}
 		}
 		dispatch_group_leave(group);
 	}];
@@ -421,6 +434,8 @@ static BOOL _nextUpdateIsForced = NO;
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		NSURL *favURL = [[self hostURL:urlStr] URLByAppendingPathComponent:@"favicon.ico"];
 		// TODO: fix anonymous session. initWithContentsOfURL: will set cookie in ~/Library/Cookies/
+		// TODO: check ~/Library/Caches/de.relikd.baRSS/fsCachedData/
+		// TODO: fix missing favicon by parsing html
 		NSImage *img = [[NSImage alloc] initWithContentsOfURL:favURL];
 		if (!img || ![img isValid])
 			img = nil;

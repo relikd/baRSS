@@ -13,6 +13,7 @@
 		54195886218E1BDB00581B79 /* NSMenu+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54195885218E1BDB00581B79 /* NSMenu+Ext.m */; };
 		54209E942117325100F3B5EF /* DrawImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 54209E932117325100F3B5EF /* DrawImage.m */; };
 		543695D8214F1F2700DA979D /* NSMenuItem+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 543695D7214F1F2700DA979D /* NSMenuItem+Ext.m */; };
+		544936FB21F1E66100DEE9AA /* Statistics.m in Sources */ = {isa = PBXBuildFile; fileRef = 544936FA21F1E66100DEE9AA /* Statistics.m */; };
 		544B011A2114B41200386E5C /* ModalSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* ModalSheet.m */; };
 		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
 		544DCCB9212A2B4D002DBC46 /* RSXML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML.framework */; };
@@ -87,6 +88,8 @@
 		54209E932117325100F3B5EF /* DrawImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawImage.m; sourceTree = "<group>"; };
 		543695D6214F1F2700DA979D /* NSMenuItem+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMenuItem+Ext.h"; sourceTree = "<group>"; };
 		543695D7214F1F2700DA979D /* NSMenuItem+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMenuItem+Ext.m"; sourceTree = "<group>"; };
+		544936F921F1E66100DEE9AA /* Statistics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Statistics.h; sourceTree = "<group>"; };
+		544936FA21F1E66100DEE9AA /* Statistics.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Statistics.m; sourceTree = "<group>"; };
 		544B01182114B41200386E5C /* ModalSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSheet.h; sourceTree = "<group>"; };
 		544B01192114B41200386E5C /* ModalSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalSheet.m; sourceTree = "<group>"; };
 		544B011B2114EE9100386E5C /* AppHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppHook.h; sourceTree = "<group>"; };
@@ -174,6 +177,17 @@
 			path = "Status Bar Menu";
 			sourceTree = "<group>";
 		};
+		544936F721F1E51E00DEE9AA /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				54209E922117325100F3B5EF /* DrawImage.h */,
+				54209E932117325100F3B5EF /* DrawImage.m */,
+				544936F921F1E66100DEE9AA /* Statistics.h */,
+				544936FA21F1E66100DEE9AA /* Statistics.m */,
+			);
+			path = Helper;
+			sourceTree = "<group>";
+		};
 		544FBD4321064AEB008A260C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -241,8 +255,7 @@
 				54FE73CF21220DEC003EAC65 /* StoreCoordinator.m */,
 				54ACC29321061E270020715F /* FeedDownload.h */,
 				54ACC29421061E270020715F /* FeedDownload.m */,
-				54209E922117325100F3B5EF /* DrawImage.h */,
-				54209E932117325100F3B5EF /* DrawImage.m */,
+				544936F721F1E51E00DEE9AA /* Helper */,
 				54195880218A05E700581B79 /* Categories */,
 				546FC44D2118B357007CC3A3 /* Preferences */,
 				54ACC28521061B3C0020715F /* Assets.xcassets */,
@@ -401,6 +414,7 @@
 				546FC44321189975007CC3A3 /* SettingsGeneral.m in Sources */,
 				54ACC29521061E270020715F /* FeedDownload.m in Sources */,
 				5477D34E21233C62002BA27F /* FeedGroup+Ext.m in Sources */,
+				544936FB21F1E66100DEE9AA /* Statistics.m in Sources */,
 				540F704521B6C16C0022E69D /* FeedMeta+Ext.m in Sources */,
 				54ACC28C21061B3C0020715F /* main.m in Sources */,
 				54FE73D3212316CD003EAC65 /* BarMenu.m in Sources */,

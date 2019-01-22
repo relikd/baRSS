@@ -23,7 +23,7 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView id="i0K-k8-GMU" userLabel="View">
             <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
-            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MOX-a1-Yda" userLabel="URL Label">
                     <rect key="frame" x="-2" y="60" width="103" height="17"/>

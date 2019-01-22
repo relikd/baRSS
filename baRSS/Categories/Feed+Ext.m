@@ -57,6 +57,17 @@
 		self.indexPath = pthStr;
 }
 
+/// Reset attributes @c articleCount, @c unreadCount, and @c indexPath.
+- (void)resetArticleCountAndIndexPathString {
+	int16_t totalCount = (int16_t)self.articles.count;
+	int16_t unreadCount = (int16_t)[[self.articles valueForKeyPath:@"@sum.unread"] integerValue];
+	if (self.articleCount != totalCount)
+		self.articleCount = totalCount;
+	if (self.unreadCount != unreadCount)
+		self.unreadCount = unreadCount; // remember to update global total unread count
+	[self calculateAndSetIndexPathString];
+}
+
 
 #pragma mark - Update Feed Items -
 
@@ -144,6 +155,8 @@
 	fa.author = entry.author;
 	fa.link = entry.link;
 	fa.published = entry.datePublished;
+	if (!fa.published)
+		fa.published = entry.dateModified;
 	[self addArticlesObject:fa];
 	return fa;
 }

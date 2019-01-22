@@ -26,6 +26,8 @@
 #import "Feed+Ext.h"
 #import "FeedMeta+Ext.h"
 #import "FeedGroup+Ext.h"
+#import "Statistics.h"
+#import <QuartzCore/QuartzCore.h>
 
 
 #pragma mark - ModalEditDialog -
@@ -46,7 +48,7 @@
 /// @return New @c ModalSheet with its subclass @c .view property as dialog content.
 - (ModalSheet *)getModalSheet {
 	if (!self.modalSheet)
-		self.modalSheet = [ModalSheet modalWithView:self.view];
+		self.modalSheet = [[ModalSheet alloc] initWithView:self.view];
 	return self.modalSheet;
 }
 /// This method should be overridden by subclasses. Used to save changes to persistent store.
@@ -60,7 +62,7 @@
 #pragma mark - ModalFeedEdit -
 
 
-@interface ModalFeedEdit()
+@interface ModalFeedEdit() <RefreshIntervalButtonDelegate>
 @property (weak) IBOutlet NSTextField *url;
 @property (weak) IBOutlet NSTextField *name;
 @property (weak) IBOutlet NSTextField *refreshNum;
@@ -69,6 +71,7 @@
 @property (weak) IBOutlet NSProgressIndicator *spinnerName;
 @property (weak) IBOutlet NSButton *warningIndicator;
 @property (weak) IBOutlet NSPopover *warningPopover;
+@property (strong) NSView *statisticsView;
 
 @property (copy) NSString *previousURL; // check if changed and avoid multiple download
 @property (copy) NSString *httpDate;
@@ -105,6 +108,7 @@
 		unit = self.refreshUnit.numberOfItems - 1;
 	[self.refreshUnit selectItemAtIndex:unit];
 	self.warningIndicator.image = [fg.feed iconImage16];
+	[self statsForCoreDataObject];
 }
 
 #pragma mark - Edit Feed Data
@@ -189,6 +193,7 @@
 	NSPoint belowURL = NSMakePoint(0,self.url.frame.size.height);
 	if ([menu popUpMenuPositioningItem:nil atLocation:belowURL inView:self.url]) {
 		NSInteger idx = [menu indexOfItem:menu.highlightedItem];
+		if (idx < 0) idx = 0; // User hit enter without selection. Assume first item, because PopUpMenu did return YES!
 		return [list objectAtIndex:(NSUInteger)idx].link;
 	}
 	return nil; // user selection canceled
@@ -214,6 +219,8 @@
 	if (parsedTitle.length > 0 && [self.name.stringValue isEqualToString:@""]) {
 		self.name.stringValue = parsedTitle; // no damage to replace an empty string
 	}
+	// TODO: user preference to automatically select refresh interval (selection: None,min,max,avg,median)
+	[self statsForDownloadObject];
 	// 4. Continue with favicon download (or finish with error)
 	if (self.feedError) {
 		[self finishDownloadWithFavicon:[NSImage imageNamed:NSImageNameCaution]];
@@ -241,6 +248,70 @@
 	self.warningIndicator.image = img;
 	[self.spinnerURL stopAnimation:nil];
 	[self.modalSheet setDoneEnabled:YES];
+}
+
+#pragma mark - Feed Statistics
+
+/// Perform statistics on newly downloaded feed item
+- (void)statsForDownloadObject {
+	NSMutableArray<NSDate*> *arr = [NSMutableArray arrayWithCapacity:self.feedResult.articles.count];
+	for (RSParsedArticle *a in self.feedResult.articles) {
+		NSDate *d = a.datePublished;
+		if (!d) d = a.dateModified;
+		if (!d) continue;
+		[arr addObject:d];
+	}
+	[self appendViewWithFeedStatistics:arr count:self.feedResult.articles.count];
+}
+
+/// Perform statistics on stored core data object
+- (void)statsForCoreDataObject {
+	NSArray<FeedArticle*> *articles = [self.feedGroup.feed sortedArticles];
+	[self appendViewWithFeedStatistics:[articles valueForKeyPath:@"published"] count:articles.count];
+}
+
+/// Generate statistics UI with buttons to quickly select refresh unit and duration.
+- (void)appendViewWithFeedStatistics:(NSArray*)dates count:(NSUInteger)count {
+	static const CGFloat statsPadding = 15.f;
+	CGFloat prevHeight = 0.f;
+	if (self.statisticsView != nil) {
+		prevHeight = self.statisticsView.frame.size.height + statsPadding;
+		[self.statisticsView removeFromSuperview];
+		self.statisticsView = nil;
+	}
+	NSDictionary *stats = [Statistics refreshInterval:dates];
+	NSView *v = [Statistics viewForRefreshInterval:stats articleCount:count callback:self];
+	[[self getModalSheet] extendContentViewBy:v.frame.size.height + statsPadding - prevHeight];
+	[v setFrameOrigin:NSMakePoint(0.5f*(NSWidth(self.view.frame) - NSWidth(v.frame)), 0)];
+	[self.view addSubview:v];
+	self.statisticsView = v;
+}
+
+/// Callback method for @c Statistics @c +viewForRefreshInterval:articleCount:callback:
+- (void)refreshIntervalButtonClicked:(NSButton *)sender {
+	NSInteger num = (sender.tag >> 3);
+	NSInteger unit = (sender.tag & 0x7);
+	if (self.refreshNum.integerValue != num) {
+		[self animateControlAttention:self.refreshNum];
+		self.refreshNum.integerValue = num;
+	}
+	if (self.refreshUnit.indexOfSelectedItem != unit) {
+		[self animateControlAttention:self.refreshUnit];
+		[self.refreshUnit selectItemAtIndex:unit];
+	}
+}
+
+/// Helper method to animate @c NSControl to draw user attention. View will be scalled up in a fraction of a second.
+- (void)animateControlAttention:(NSView*)control {
+	CABasicAnimation *scale = [CABasicAnimation animationWithKeyPath:@"transform"];
+	CATransform3D tr = CATransform3DIdentity;
+	tr = CATransform3DTranslate(tr, NSMidX(control.bounds), NSMidY(control.bounds), 0);
+	tr = CATransform3DScale(tr, 1.1, 1.1, 1);
+	tr = CATransform3DTranslate(tr, -NSMidX(control.bounds), -NSMidY(control.bounds), 0);
+	scale.toValue = [NSValue valueWithCATransform3D:tr];
+	scale.duration = 0.15f;
+	scale.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+	[control.layer addAnimation:scale forKey:scale.keyPath];
 }
 
 
