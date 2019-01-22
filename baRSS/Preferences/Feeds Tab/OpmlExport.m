@@ -45,7 +45,7 @@
 /// Display Save File Panel to select export destination. All feeds from core data will be exported.
 + (void)showExportDialog:(NSWindow*)window withContext:(NSManagedObjectContext*)moc {
 	NSSavePanel *sp = [NSSavePanel savePanel];
-	sp.nameFieldStringValue = [NSString stringWithFormat:@"baRSS feeds %@", [self currentDayAsString]];
+	sp.nameFieldStringValue = [NSString stringWithFormat:@"baRSS feeds %@", [self currentDayAsStringISO8601:NO]];
 	sp.allowedFileTypes = @[@"opml"];
 	sp.allowsOtherFileTypes = YES;
 	NSView *radioView = [self radioGroupCreate:@[NSLocalizedString(@"Hierarchical", nil),
@@ -68,6 +68,7 @@
 /// Handle import dialog and perform web requests (feed data & icon). Creates a single undo group.
 + (void)showImportDialog:(NSWindow*)window withTreeController:(NSTreeController*)tree {
 	NSManagedObjectContext *moc = tree.managedObjectContext;
+	//[moc refreshAllObjects];
 	[moc.undoManager beginUndoGrouping];
 	[self showImportDialog:window withContext:moc success:^(NSArray<Feed *> *added) {
 		[StoreCoordinator saveContext:moc andParent:YES];
@@ -204,7 +205,9 @@
  @return Save this string to file.
  */
 + (NSString*)exportFeedsHierarchical:(BOOL)flag inContext:(NSManagedObjectContext*)moc {
-	NSDictionary *info = @{@"dateCreated" : [NSDate date], @"ownerName" : @"baRSS", OPMLTitleKey : @"baRSS feeds"};
+	NSDictionary *info = @{OPMLTitleKey : @"baRSS feeds",
+						   @"ownerName" : @"baRSS",
+						   @"dateCreated" : [self currentDayAsStringISO8601:YES]};
 	RSOPMLItem *doc = [RSOPMLItem itemWithAttributes:info];
 	@autoreleasepool {
 		NSArray<FeedGroup*> *arr = [StoreCoordinator sortedListOfRootObjectsInContext:moc];
@@ -246,10 +249,13 @@
 #pragma mark - Helper
 
 
-/// @return Date formatted as @c yyyy-MM-dd
-+ (NSString*)currentDayAsString {
-	NSDateComponents *now = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear fromDate:[NSDate date]];
-	return  [NSString stringWithFormat:@"%04ld-%02ld-%02ld", now.year, now.month, now.day];
+/// @param flag If @c YES use long internet format for opml file. If @c NO use short format as filename.
++ (NSString*)currentDayAsStringISO8601:(BOOL)flag {
+	if (flag)
+		return [[[NSISO8601DateFormatter alloc] init] stringFromDate:[NSDate date]];
+//	NSDateComponents *now = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear fromDate:[NSDate date]];
+//	return [NSString stringWithFormat:@"%04ld-%02ld-%02ld", now.year, now.month, now.day];
+	return [NSDateFormatter localizedStringFromDate:[NSDate date] dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle];
 }
 
 /// Count items where @c xmlURL key is set.

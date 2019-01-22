@@ -26,6 +26,9 @@
 @property (readonly) BOOL didCloseAndSave;
 @property (readonly) BOOL didCloseAndCancel;
 
-+ (instancetype)modalWithView:(NSView*)content;
+- (instancetype)initWithContentRect:(NSRect)contentRect styleMask:(NSWindowStyleMask)style backing:(NSBackingStoreType)backingStoreType defer:(BOOL)flag NS_UNAVAILABLE;
+- (instancetype)initWithView:(NSView*)content NS_DESIGNATED_INITIALIZER;
+
 - (void)setDoneEnabled:(BOOL)accept;
+- (void)extendContentViewBy:(CGFloat)dy;
 @end

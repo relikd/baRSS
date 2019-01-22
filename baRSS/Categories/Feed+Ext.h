@@ -29,6 +29,7 @@
 + (instancetype)newFeedAndMetaInContext:(NSManagedObjectContext*)context;
 + (instancetype)appendToRootWithDefaultIntervalInContext:(NSManagedObjectContext*)moc;
 - (void)calculateAndSetIndexPathString;
+- (void)resetArticleCountAndIndexPathString;
 - (void)updateWithRSS:(RSParsedFeed*)obj postUnreadCountChange:(BOOL)flag;
 // Article properties
 - (NSArray<FeedArticle*>*)sortedArticles;

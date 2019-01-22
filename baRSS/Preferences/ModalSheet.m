@@ -23,7 +23,7 @@
 #import "ModalSheet.h"
 
 @interface ModalSheet()
-@property (strong) NSButton *btnDone;
+@property (weak) NSButton *btnDone;
 @end
 
 @implementation ModalSheet
@@ -52,15 +52,13 @@
 	[self.sheetParent endSheet:self returnCode:response];
 }
 
-
 /**
- Designated initializer for @c ModalSheet.
+ Designated initializer for @c ModalSheet. 'Done' and 'Cancel' button will be added automatically.
 
- @param content @c NSView will be displayed in dialog box. 'Done' and 'Cancel' button will be added automatically.
+ @param content @c NSView will be displayed in dialog box.
  */
-+ (instancetype)modalWithView:(NSView*)content {
+- (instancetype)initWithView:(NSView*)content {
 	static const int padWindow = 20;
-	static const int padButtons = 12;
 	static const int minWidth = 320;
 	static const int maxWidth = 1200;
 	
@@ -68,48 +66,67 @@
 	if      (prevWidth < minWidth)  prevWidth = minWidth;
 	else if (prevWidth > maxWidth)  prevWidth = maxWidth;
 	
-	NSRect cFrame = NSMakeRect(padWindow, padWindow, prevWidth, content.frame.size.height);
-	NSRect wFrame = CGRectInset(cFrame, -padWindow, -padWindow);
+	NSSize contentSize = NSMakeSize(prevWidth, content.frame.size.height);
+	[content setFrameSize:contentSize];
+	
+	NSSize wSize = NSMakeSize(contentSize.width + 2 * padWindow, contentSize.height + 2 * padWindow);
 	
 	NSWindowStyleMask style = NSWindowStyleMaskTitled | NSWindowStyleMaskResizable | NSWindowStyleMaskFullSizeContentView;
-	ModalSheet *sheet = [[super alloc] initWithContentRect:wFrame styleMask:style backing:NSBackingStoreBuffered defer:NO];
-	
-	// Respond buttons
-	sheet.btnDone = [NSButton buttonWithTitle:NSLocalizedString(@"Done", nil) target:sheet action:@selector(didTapDoneButton:)];
-	sheet.btnDone.keyEquivalent = @"\r"; // Enter / Return
-	sheet.btnDone.autoresizingMask = NSViewMinXMargin | NSViewMaxYMargin;
-	
-	NSButton *btnCancel = [NSButton buttonWithTitle:NSLocalizedString(@"Cancel", nil) target:sheet action:@selector(didTapCancelButton:)];
-	btnCancel.keyEquivalent = [NSString stringWithFormat:@"%c", 0x1b]; // ESC
-	btnCancel.autoresizingMask = NSViewMinXMargin | NSViewMaxYMargin;
-	
-	NSRect align = [sheet.btnDone alignmentRectForFrame:sheet.btnDone.frame];
-	align.origin.x = wFrame.size.width - align.size.width - padWindow;
-	align.origin.y = padWindow;
-	[sheet.btnDone setFrameOrigin:[sheet.btnDone frameForAlignmentRect:align].origin];
-
-	align.origin.x -= [btnCancel alignmentRectForFrame:btnCancel.frame].size.width + padButtons;
-	[btnCancel setFrameOrigin:[btnCancel frameForAlignmentRect:align].origin];
-	
-	// this is equivalent, however I'm not sure if these values will change in a future OS
-//	[btnDone setFrameOrigin:NSMakePoint(wFrame.size.width - btnDone.frame.size.width - 12, 13)]; // =20 with alignment
-//	[btnCancel setFrameOrigin:NSMakePoint(btnDone.frame.origin.x - btnCancel.frame.size.width, 13)];
-	
-	// add all UI elements to the window view
-	content.frame = cFrame;
-	[sheet.contentView addSubview:content];
-	[sheet.contentView addSubview:sheet.btnDone];
-	[sheet.contentView addSubview:btnCancel];
-	
-	// add respond buttons to the window height
-	wFrame.size.height += align.size.height + padButtons;
-	[sheet setContentSize:wFrame.size];
-	
-	// constraints on resizing
-	sheet.minSize = NSMakeSize(minWidth + 2 * padWindow, wFrame.size.height);
-	sheet.maxSize = NSMakeSize(maxWidth, wFrame.size.height);
-	return sheet;
+	self = [super initWithContentRect:NSMakeRect(0, 0, wSize.width, wSize.height) styleMask:style backing:NSBackingStoreBuffered defer:NO];
+	if (self) {
+		NSButton *btnDone = [NSButton buttonWithTitle:NSLocalizedString(@"Done", nil) target:self action:@selector(didTapDoneButton:)];
+		NSButton *btnCancel = [NSButton buttonWithTitle:NSLocalizedString(@"Cancel", nil) target:self action:@selector(didTapCancelButton:)];
+		btnDone.keyEquivalent = @"\r"; // Enter / Return
+		btnCancel.keyEquivalent = [NSString stringWithFormat:@"%c", 0x1b]; // ESC
+		
+		// Make room for buttons
+		wSize.height += btnDone.frame.size.height;
+		[self setContentSize:wSize];
+		
+		// Restrict resizing to width only (after setContentSize:)
+		self.minSize = NSMakeSize(minWidth + 2 * padWindow, wSize.height);
+		self.maxSize = NSMakeSize(maxWidth + 2 * padWindow, wSize.height);
+		
+		// Content view (set origin after setContentSize:)
+		[content setFrameOrigin:NSMakePoint(padWindow, wSize.height - padWindow - contentSize.height)];
+		[self.contentView addSubview:content];
+		
+		// Respond buttons
+		[self placeButtons:@[btnDone, btnCancel] inBottomRightCornerWithPadding:padWindow];
+		[self.contentView addSubview:btnCancel];
+		[self.contentView addSubview:btnDone];
+		self.btnDone = btnDone;
+	}
+	return self;
 }
+
+/**
+ Buttons will stick to the right margin and bottom margin when resizing. Also sets autoresizingMask.
+
+ @param buttons First item is rightmost button. Next buttons will be appended left of that button and so on.
+ @param padding Distance between button and right / bottom edge.
+ */
+- (void)placeButtons:(NSArray<NSButton*> *)buttons inBottomRightCornerWithPadding:(int)padding {
+	NSEdgeInsets edge = buttons.firstObject.alignmentRectInsets;
+	NSPoint p = NSMakePoint(self.contentView.frame.size.width - padding + edge.right, padding - edge.bottom);
+	for (NSButton *btn in buttons) {
+		p.x -= btn.frame.size.width;
+		[btn setFrameOrigin:p];
+		btn.autoresizingMask = NSViewMinXMargin | NSViewMaxYMargin;
+	}
+}
+
+/**
+ Resize modal window by @c dy. Makes room for additional content. Use negative values to shrink window.
+ */
+- (void)extendContentViewBy:(CGFloat)dy {
+	self.minSize = NSMakeSize(self.minSize.width, self.minSize.height + dy);
+	self.maxSize = NSMakeSize(self.maxSize.width, self.maxSize.height + dy);
+	NSRect r = self.frame;
+	r.size.height += dy;
+	[self setFrame:r display:YES animate:YES];
+}
+
 @end
 
 

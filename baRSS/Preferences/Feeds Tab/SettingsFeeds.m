@@ -38,6 +38,7 @@
 
 @implementation SettingsFeeds
 
+// TODO: drag-n-drop feeds to opml file?
 // Declare a string constant for the drag type - to be used when writing and retrieving pasteboard data...
 static NSString *dragNodeType = @"baRSS-feed-drag";
 
@@ -52,37 +53,80 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	
 	self.dataStore.managedObjectContext = [StoreCoordinator createChildContext];
 	self.dataStore.managedObjectContext.undoManager = self.undoManager;
+	self.dataStore.managedObjectContext.automaticallyMergesChangesFromParent = NO;
+}
+
+/**
+ Refresh current context from parent context and start new undo grouping.
+ @note Should be balanced with @c endCoreDataChangeUndoChanges:
+ */
+- (void)beginCoreDataChange {
+	// Does seem to create problems with undo stack if refreshing from parent context
+	//[self.dataStore.managedObjectContext refreshAllObjects];
+	[self.undoManager beginUndoGrouping];
+}
+
+/**
+ End undo grouping and save changes to persistent store. Or undo group if no changes occured.
+ @note Should be balanced with @c beginCoreDataChange
+
+ @param flag If @c YES force @c NSUndoManager to undo the changes immediatelly.
+ @return Returns @c YES if context was saved.
+ */
+- (BOOL)endCoreDataChangeShouldUndo:(BOOL)flag {
+	[self.undoManager endUndoGrouping];
+	if (!flag && self.dataStore.managedObjectContext.hasChanges) {
+		[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
+		return YES;
+	}
+	[self.undoManager disableUndoRegistration];
+	[self.undoManager undoNestedGroup];
+	[self.undoManager enableUndoRegistration];
+	return NO;
+}
+
+/**
+ After the user did undo or redo we can't ensure integrity without doing some additional work.
+ */
+- (void)saveWithUnpredictableChange {
+	NSSet<Feed*> *arr = [self.dataStore.managedObjectContext.insertedObjects
+						 filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"class == %@", [Feed class]]];
+	[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
+	[StoreCoordinator restoreFeedCountsAndIndexPaths:[arr valueForKeyPath:@"objectID"]]; // main context will not create undo group
+	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
+	[self.dataStore rearrangeObjects]; // update ordering
 }
 
 
 #pragma mark - UI Button Interaction
 
 
+/// Add feed button.
 - (IBAction)addFeed:(id)sender {
 	[self showModalForFeedGroup:nil isGroupEdit:NO];
 }
 
+/// Add group button.
 - (IBAction)addGroup:(id)sender {
 	[self showModalForFeedGroup:nil isGroupEdit:YES];
 }
 
+/// Add separator button.
 - (IBAction)addSeparator:(id)sender {
-	[self.undoManager beginUndoGrouping];
+	[self beginCoreDataChange];
 	[self insertFeedGroupAtSelection:SEPARATOR].name = @"---";
-	[self.undoManager endUndoGrouping];
-	[self saveChanges];
+	[self endCoreDataChangeShouldUndo:NO];
 }
 
-/// Remove user selected item from persistent store.
+/// Remove feed button. User has selected one or more item in outline view.
 - (IBAction)remove:(id)sender {
-	[self.undoManager beginUndoGrouping];
+	[self beginCoreDataChange];
 	NSArray<NSTreeNode*> *parentNodes = [self.dataStore.selectedNodes valueForKeyPath:@"parentNode"];
 	[self.dataStore remove:sender];
 	for (NSTreeNode *parent in parentNodes) {
 		[self restoreOrderingAndIndexPathStr:parent];
 	}
-	[self.undoManager endUndoGrouping];
-	[self saveChanges];
+	[self endCoreDataChangeShouldUndo:NO];
 	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
 }
 
@@ -94,6 +138,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[self showModalForFeedGroup:fg isGroupEdit:YES]; // yes will be overwritten anyway
 }
 
+/// Share menu button. Currently only import & export feeds as OPML.
 - (IBAction)shareMenu:(NSButton*)sender {
 	if (!sender.menu) {
 		sender.menu = [[NSMenu alloc] initWithTitle:NSLocalizedString(@"Import / Export menu", nil)];
@@ -116,11 +161,6 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 #pragma mark - Insert & Edit Feed Items / Modal Dialog
 
 
-/// Save core data changes of current object context to persistent store
-- (void)saveChanges {
-	[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
-}
-
 /**
  Open a new modal window to edit the selected @c FeedGroup.
  @note isGroupEdit @c flag will be overwritten if @c FeedGroup parameter is not @c nil.
@@ -130,7 +170,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
  */
 - (void)showModalForFeedGroup:(FeedGroup*)fg isGroupEdit:(BOOL)flag {
 	if (fg.type == SEPARATOR) return;
-	[self.undoManager beginUndoGrouping];
+	[self beginCoreDataChange];
 	if (!fg || ![fg isKindOfClass:[FeedGroup class]]) {
 		fg = [self insertFeedGroupAtSelection:(flag ? GROUP : FEED)];
 	}
@@ -140,19 +180,9 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[self.view.window beginSheet:[editDialog getModalSheet] completionHandler:^(NSModalResponse returnCode) {
 		if (returnCode == NSModalResponseOK) {
 			[editDialog applyChangesToCoreDataObject];
-			[self.undoManager endUndoGrouping];
-		} else {
-			[self.undoManager endUndoGrouping];
-			[self.dataStore.managedObjectContext rollback];
 		}
-		BOOL hasChanges = [self.dataStore.managedObjectContext hasChanges];
-		if (hasChanges) {
-			[self saveChanges];
+		if ([self endCoreDataChangeShouldUndo:(returnCode != NSModalResponseOK)]) {
 			[self.dataStore rearrangeObjects];
-		} else {
-			[self.undoManager disableUndoRegistration];
-			[self.undoManager undoNestedGroup];
-			[self.undoManager enableUndoRegistration];
 		}
 	}];
 }
@@ -213,7 +243,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 /// Begin drag-n-drop operation by copying selected nodes to memory
 - (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard {
-	[self.undoManager beginUndoGrouping];
+	[self beginCoreDataChange];
 	[pboard declareTypes:[NSArray arrayWithObject:dragNodeType] owner:self];
 	[pboard setString:@"dragging" forType:dragNodeType];
 	self.currentlyDraggedNodes = items;
@@ -222,14 +252,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 /// Finish drag-n-drop operation by saving changes to persistent store
 - (void)outlineView:(NSOutlineView *)outlineView draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation {
-	[self.undoManager endUndoGrouping];
-	if (self.dataStore.managedObjectContext.hasChanges) {
-		[self saveChanges];
-	} else {
-		[self.undoManager disableUndoRegistration];
-		[self.undoManager undoNestedGroup];
-		[self.undoManager enableUndoRegistration];
-	}
+	[self endCoreDataChangeShouldUndo:NO];
 	self.currentlyDraggedNodes = nil;
 }
 
@@ -318,17 +341,13 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 /// Perform undo operation and redraw UI & menu bar unread count
 - (void)undo:(id)sender {
 	[self.undoManager undo];
-	[self saveChanges];
-	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
-	[self.dataStore rearrangeObjects]; // update ordering
+	[self saveWithUnpredictableChange];
 }
 
 /// Perform redo operation and redraw UI & menu bar unread count
 - (void)redo:(id)sender {
 	[self.undoManager redo];
-	[self saveChanges];
-	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
-	[self.dataStore rearrangeObjects]; // update ordering
+	[self saveWithUnpredictableChange];
 }
 
 /// User pressed enter; open edit dialog for selected item.
@@ -362,7 +381,6 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	}
 	[[NSPasteboard generalPasteboard] clearContents];
 	[[NSPasteboard generalPasteboard] setString:str forType:NSPasteboardTypeString];
-	NSLog(@"%@", str); // TODO: drag-n-drop feed to opml?
 }
 
 /**

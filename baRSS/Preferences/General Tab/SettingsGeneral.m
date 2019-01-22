@@ -61,7 +61,7 @@
 
 - (IBAction)fixCache:(NSButton *)sender {
 	[StoreCoordinator deleteUnreferencedFeeds];
-	[StoreCoordinator restoreFeedCountsAndIndexPaths];
+	[StoreCoordinator restoreFeedCountsAndIndexPaths:nil];
 }
 
 - (IBAction)changeMenuBarIconSetting:(NSButton*)sender {
