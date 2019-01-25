@@ -37,6 +37,9 @@
 
 @property (strong) NSArray<NSTreeNode*> *currentlyDraggedNodes;
 @property (strong) NSUndoManager *undoManager;
+
+@property (strong) NSTimer *timerStatusInfo;
+@property (strong) NSDateComponentsFormatter *intervalFormatter;
 @end
 
 @implementation SettingsFeeds
@@ -47,7 +50,6 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-	[self activateSpinner:([FeedDownload isUpdating] ? -1 : 0)]; // start spinner if update is in progress when preferences open
 	[self.outlineView registerForDraggedTypes:[NSArray arrayWithObject:dragNodeType]];
 	[self.dataStore setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];
 	
@@ -69,6 +71,64 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 }
 
 
+#pragma mark - Activity Spinner & Status Info
+
+
+/// Initialize status info timer
+- (void)viewWillAppear {
+	self.intervalFormatter = [[NSDateComponentsFormatter alloc] init];
+	self.intervalFormatter.unitsStyle = NSDateComponentsFormatterUnitsStyleShort; // e.g., '30 min'
+	self.intervalFormatter.maximumUnitCount = 1;
+	self.timerStatusInfo = [NSTimer timerWithTimeInterval:NSTimeIntervalSince1970 target:self selector:@selector(keepTimerRunning) userInfo:nil repeats:YES];
+	[[NSRunLoop mainRunLoop] addTimer:self.timerStatusInfo forMode:NSRunLoopCommonModes];
+	// start spinner if update is in progress when preferences open
+	[self activateSpinner:([FeedDownload isUpdating] ? -1 : 0)];
+}
+
+/// Timer cleanup
+- (void)viewWillDisappear {
+	// in viewWillDisappear otherwise dealloc will not be called
+	[self.timerStatusInfo invalidate];
+	self.timerStatusInfo = nil;
+	self.intervalFormatter = nil;
+}
+
+/// Callback method to update status info. Will be called more often when interval is getting shorter.
+- (void)keepTimerRunning {
+	NSDate *date = [FeedDownload dateScheduled];
+	if (date) {
+		double nextFire = fabs(date.timeIntervalSinceNow);
+		if (nextFire > 60) { // update 1/min
+			nextFire = fmod(nextFire, 60); // next update will align with minute
+		} else {
+			nextFire = 1; // update 1/sec
+		}
+		NSString *str = [self.intervalFormatter stringFromTimeInterval: date.timeIntervalSinceNow];
+		self.spinnerLabel.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Next update in %@", nil), str];
+		[self.timerStatusInfo setFireDate:[NSDate dateWithTimeIntervalSinceNow: nextFire]];
+	}
+}
+
+/// Start ( @c c @c > @c 0 ) or stop ( @c c @c = @c 0 ) activity spinner. Also, sets status info.
+- (void)activateSpinner:(NSInteger)c {
+	if (c == 0) {
+		[self.spinner stopAnimation:nil];
+		self.spinnerLabel.stringValue = @"";
+		[self.timerStatusInfo fire];
+	} else {
+		[self.timerStatusInfo setFireDate:[NSDate distantFuture]];
+		[self.spinner startAnimation:nil];
+		if (c == 1) { // exactly one feed
+			self.spinnerLabel.stringValue = NSLocalizedString(@"Updating 1 feed …", nil);
+		} else if (c < 0) { // unknown number of feeds
+			self.spinnerLabel.stringValue = NSLocalizedString(@"Updating feeds …", nil);
+		} else {
+			self.spinnerLabel.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Updating %lu feeds …", nil), c];
+		}
+	}
+}
+
+
 #pragma mark - Notification callback methods
 
 
@@ -87,25 +147,6 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 /// Callback method fired when background feed update begins and ends.
 - (void)updateInProgress:(NSNotification*)notify {
 	[self activateSpinner:[notify.object integerValue]];
-}
-
-/// Start or stop activity spinner (will run on main thread). If @c c @c == @c 0 stop spinner.
-- (void)activateSpinner:(NSInteger)c {
-	dispatch_async(dispatch_get_main_queue(), ^{
-		if (c == 0) {
-			[self.spinner stopAnimation:nil];
-			self.spinnerLabel.stringValue = @"";
-		} else {
-			[self.spinner startAnimation:nil];
-			if (c < 0) { // unknown number of feeds
-				self.spinnerLabel.stringValue = NSLocalizedString(@"Updating feeds …", nil);
-			} else if (c == 1) {
-				self.spinnerLabel.stringValue = NSLocalizedString(@"Updating 1 feed …", nil);
-			} else {
-				self.spinnerLabel.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Updating %lu feeds …", nil), c];
-			}
-		}
-	});
 }
 
 
@@ -133,6 +174,8 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[self.undoManager endUndoGrouping];
 	if (!flag && self.dataStore.managedObjectContext.hasChanges) {
 		[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
+		[FeedDownload scheduleUpdateForUpcomingFeeds];
+		[self.timerStatusInfo fire];
 		return YES;
 	}
 	[self.undoManager disableUndoRegistration];

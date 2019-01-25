@@ -39,7 +39,7 @@ ToDo
 	- [ ] Show statistics
 		- [x] How often gets the feed updated (min, max, avg)
 		- [ ] Automatically choose best interval?
-		- [ ] Show time of next update
+		- [x] Show time of next update
 	- [ ] Feeds with authentication
 
 
