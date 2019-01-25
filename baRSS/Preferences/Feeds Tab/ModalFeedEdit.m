@@ -126,7 +126,7 @@
 	if (self.didDownloadFeed) {
 		[meta setEtag:self.httpEtag modified:self.httpDate];
 		[feed updateWithRSS:self.feedResult postUnreadCountChange:YES];
-		[feed setIcon:self.favicon replaceExisting:YES];
+		[feed setIconImage:self.favicon];
 	}
 }
 
@@ -161,7 +161,6 @@
 	if (self.modalSheet.didCloseAndCancel)
 		return;
 	[self preDownload];
-	// TODO: parse webpage to find feed links instead (automatic link detection)
 	[FeedDownload newFeed:self.previousURL askUser:^NSString *(NSArray<RSHTMLMetadataFeedLink *> *list) {
 		return [self letUserChooseXmlUrlFromList:list];
 	} block:^(RSParsedFeed *result, NSError *error, NSHTTPURLResponse* response) {

@@ -54,13 +54,14 @@
 	// Unread counter
 	self.unreadCountTotal = 0;
 	[self updateBarIcon];
-	[self asyncReloadUnreadCountAndUpdateBarIcon];
+	[self asyncReloadUnreadCountAndUpdateBarIcon:nil];
 	
 	// Register for notifications
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedUpdated:) name:kNotificationFeedUpdated object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedIconUpdated:) name:kNotificationFeedIconUpdated object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkChanged:) name:kNotificationNetworkStatusChanged object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(unreadCountChanged:) name:kNotificationTotalUnreadCountChanged object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(asyncReloadUnreadCountAndUpdateBarIcon) name:kNotificationTotalUnreadCountReset object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(asyncReloadUnreadCountAndUpdateBarIcon:) name:kNotificationTotalUnreadCountReset object:nil];
 	return self;
 }
 
@@ -70,12 +71,20 @@
 
 #pragma mark - Update Menu Bar Icon
 
-/// Regardless of current unread count, perform new core data fetch on total unread count and update icon.
-- (void)asyncReloadUnreadCountAndUpdateBarIcon {
-	dispatch_async(dispatch_get_main_queue(), ^{
-		self.unreadCountTotal = [StoreCoordinator unreadCountForIndexPathString:nil];
+/**
+ If notification has @c object use this object to set unread count directly.
+ If @c object is @c nil perform core data fetch on total unread count and update icon.
+ */
+- (void)asyncReloadUnreadCountAndUpdateBarIcon:(NSNotification*)notify {
+	if (notify.object) { // set unread count directly
+		self.unreadCountTotal = [[notify object] integerValue];
 		[self updateBarIcon];
-	});
+	} else {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			self.unreadCountTotal = [StoreCoordinator unreadCountForIndexPathString:nil];
+			[self updateBarIcon];
+		});
+	}
 }
 
 /// Update menu bar icon and text according to unread count and user preferences.
@@ -117,23 +126,38 @@
  @param notify Notification object contains the unread count difference to the current count. May be negative.
  */
 - (void)unreadCountChanged:(NSNotification*)notify {
-	self.unreadCountTotal += [[notify object] intValue];
+	self.unreadCountTotal += [[notify object] integerValue];
 	[self updateBarIcon];
 }
 
 /// Callback method fired when feeds have been updated in the background.
 - (void)feedUpdated:(NSNotification*)notify {
+	[self updateFeed:notify.object updateIconOnly:NO];
+}
+
+- (void)feedIconUpdated:(NSNotification*)notify {
+	[self updateFeed:notify.object updateIconOnly:YES];
+}
+
+
+#pragma mark - Rebuild menu after background feed update
+
+
+/**
+ Use this method to update a single menu item and all ancestors unread count.
+ If the menu isn't currently open, nothing will happen.
+ 
+ @param oid @c NSManagedObjectID must be a @c Feed instance object id.
+ */
+- (void)updateFeed:(NSManagedObjectID*)oid updateIconOnly:(BOOL)flag {
 	if (self.barItem.menu.numberOfItems > 0) {
 		// update items only if menu is already open (e.g., during background update)
 		NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
-		for (NSManagedObjectID *oid in notify.object) {
-			Feed *feed = [moc objectWithID:oid];
-			if (!feed) continue;
+		Feed *feed = [moc objectWithID:oid];
+		if ([feed isKindOfClass:[Feed class]]) {
 			NSMenu *menu = [self fixUnreadCountForSubmenus:feed];
-			if (!menu || menu.numberOfItems > 0)
-				[self rebuiltFeedArticle:feed inMenu:menu]; // deepest menu level, feed items
+			if (!flag) [self rebuiltFeedArticle:feed inMenu:menu]; // deepest menu level, feed items
 		}
-		[self.barItem.menu autoEnableMenuHeader:(self.unreadCountTotal > 0)]; // once per multi-feed update
 		[moc reset];
 	}
 }
@@ -145,18 +169,27 @@
  */
 - (nullable NSMenu*)fixUnreadCountForSubmenus:(Feed*)feed {
 	NSMenu *menu = self.barItem.menu;
+	[menu autoEnableMenuHeader:(self.unreadCountTotal > 0)];
 	for (FeedGroup *parent in [feed.group allParents]) {
-		NSInteger offset = [menu feedDataOffset];
-		NSMenuItem *item = [menu itemAtIndex:offset + parent.sortIndex];
+		NSInteger itemIndex = [menu feedDataOffset] + parent.sortIndex;
+		NSMenuItem *item = [menu itemAtIndex:itemIndex];
 		NSInteger unread = [item setTitleAndUnreadCount:parent];
 		menu = item.submenu;
+		
+		if (parent == feed.group) {
+			// Always set icon. Will flip warning icon to default icon if article count changes.
+			item.image = [feed iconImage16];
+			item.enabled = (feed.articles.count > 0);
+			return menu;
+		}
+		
 		if (!menu || menu.numberOfItems == 0)
 			return nil;
 		if (unread == 0) // if != 0 then 'setTitleAndUnreadCount' was successful (UserPrefs visible)
 			unread = [menu coreDataUnreadCount];
-		[menu autoEnableMenuHeader:(unread > 0)]; // of submenu (including: feed items menu)
+		[menu autoEnableMenuHeader:(unread > 0)]; // of submenu but not articles menu (will be rebuild anyway)
 	}
-	return menu;
+	return nil;
 }
 
 /**
@@ -166,6 +199,8 @@
  @param menu Deepest menu level which contains only feed items.
  */
 - (void)rebuiltFeedArticle:(Feed*)feed inMenu:(NSMenu*)menu {
+	if (!menu || menu.numberOfItems == 0) // not opened yet
+		return;
 	if (self.currentOpenMenu != menu) {
 		// if the menu isn't open, re-create it dynamically instead
 		menu.itemArray.firstObject.parentItem.submenu = [menu cleanInstanceCopy];
@@ -360,6 +395,7 @@
  Called when user clicks on 'Update all feeds' in the main menu (only).
  */
 - (void)updateAllFeeds:(NSMenuItem*)sender {
+	[self asyncReloadUnreadCountAndUpdateBarIcon:nil];
 	[FeedDownload forceUpdateAllFeeds];
 }
 

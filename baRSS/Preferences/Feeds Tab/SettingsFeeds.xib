@@ -10,6 +10,8 @@
             <connections>
                 <outlet property="dataStore" destination="JPf-gH-wxm" id="9qy-D6-L4R"/>
                 <outlet property="outlineView" destination="wP9-Vd-f79" id="nKf-fc-7Np"/>
+                <outlet property="spinner" destination="fos-vP-s2s" id="zZp-Op-ftK"/>
+                <outlet property="spinnerLabel" destination="44U-lx-hnq" id="GGB-H5-7LV"/>
                 <outlet property="view" destination="zfc-Ie-Sdx" id="65R-bK-FDI"/>
             </connections>
         </customObject>
@@ -182,20 +184,8 @@ CA
                         <binding destination="JPf-gH-wxm" name="enabled" keyPath="canRemove" id="XYY-gx-tiN"/>
                     </connections>
                 </button>
-                <button toolTip="Add new line separator" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kn9-pd-A47">
-                    <rect key="frame" x="96" y="-1" width="25" height="23"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <buttonCell key="cell" type="smallSquare" title="---" alternateTitle="Add separator" bezelStyle="smallSquare" image="NSPathTemplate" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="r9B-nl-XkX">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="addSeparator:" target="-2" id="dVQ-ge-moI"/>
-                        <binding destination="JPf-gH-wxm" name="enabled" keyPath="canInsert" id="2aK-XU-RUD"/>
-                    </connections>
-                </button>
                 <button toolTip="Add new grouping folder" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jPg-sh-1Az">
-                    <rect key="frame" x="72" y="-1" width="25" height="23"/>
+                    <rect key="frame" x="64" y="-1" width="25" height="23"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <buttonCell key="cell" type="smallSquare" alternateTitle="Add group" bezelStyle="smallSquare" image="NSPathTemplate" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rPk-c8-lMe">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -208,9 +198,21 @@ CA
                         <binding destination="JPf-gH-wxm" name="enabled" keyPath="canInsert" id="JCF-ey-YUL"/>
                     </connections>
                 </button>
+                <button toolTip="Add new line separator" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kn9-pd-A47">
+                    <rect key="frame" x="88" y="-1" width="25" height="23"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <buttonCell key="cell" type="smallSquare" title="---" alternateTitle="Add separator" bezelStyle="smallSquare" image="NSPathTemplate" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="r9B-nl-XkX">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="addSeparator:" target="-2" id="dVQ-ge-moI"/>
+                        <binding destination="JPf-gH-wxm" name="enabled" keyPath="canInsert" id="2aK-XU-RUD"/>
+                    </connections>
+                </button>
                 <button toolTip="Import or Export data" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6ul-3K-fOy">
-                    <rect key="frame" x="295" y="-1" width="25" height="23"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                    <rect key="frame" x="128" y="-1" width="25" height="23"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <buttonCell key="cell" type="smallSquare" alternateTitle="Export" bezelStyle="smallSquare" image="NSShareTemplate" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="nrA-7c-1sL">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
@@ -219,6 +221,19 @@ CA
                         <action selector="shareMenu:" target="-2" id="JJq-7D-Bti"/>
                     </connections>
                 </button>
+                <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="fos-vP-s2s">
+                    <rect key="frame" x="168" y="3" width="16" height="16"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                </progressIndicator>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="44U-lx-hnq">
+                    <rect key="frame" x="190" y="4" width="112" height="14"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="&lt;string&gt;" id="yyA-K6-M3v">
+                        <font key="font" metaFont="smallSystem"/>
+                        <color key="textColor" name="systemGrayColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
             </subviews>
             <point key="canvasLocation" x="27" y="882.5"/>
         </customView>

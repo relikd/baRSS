@@ -29,7 +29,7 @@
 + (instancetype)newFeedAndMetaInContext:(NSManagedObjectContext*)context;
 + (instancetype)appendToRootWithDefaultIntervalInContext:(NSManagedObjectContext*)moc;
 - (void)calculateAndSetIndexPathString;
-- (void)resetArticleCountAndIndexPathString;
+- (void)calculateAndSetUnreadCount;
 - (void)updateWithRSS:(RSParsedFeed*)obj postUnreadCountChange:(BOOL)flag;
 // Article properties
 - (NSArray<FeedArticle*>*)sortedArticles;
@@ -37,5 +37,5 @@
 - (int)markAllItemsUnread;
 // Icon
 - (NSImage*)iconImage16;
-- (BOOL)setIcon:(NSImage*)img replaceExisting:(BOOL)overwrite;
+- (BOOL)setIconImage:(NSImage*)img;
 @end

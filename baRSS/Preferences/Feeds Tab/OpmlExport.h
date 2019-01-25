@@ -26,6 +26,6 @@
 @class Feed;
 
 @interface OpmlExport : NSObject
-+ (void)showImportDialog:(NSWindow*)window withTreeController:(NSTreeController*)tree;
++ (void)showImportDialog:(NSWindow*)window withContext:(NSManagedObjectContext*)moc;
 + (void)showExportDialog:(NSWindow*)window withContext:(NSManagedObjectContext*)moc;
 @end

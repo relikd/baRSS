@@ -37,8 +37,9 @@
 + (NSInteger)numberRootItemsInContext:(NSManagedObjectContext*)moc;
 + (NSArray<FeedGroup*>*)sortedListOfRootObjectsInContext:(NSManagedObjectContext*)moc;
 // Restore sound state
-+ (void)deleteUnreferencedFeeds;
-+ (void)restoreFeedCountsAndIndexPaths:(NSArray<NSManagedObjectID*>*)list;
++ (NSUInteger)deleteAllGroups;
++ (NSUInteger)deleteUnreferenced;
++ (void)restoreFeedCountsAndIndexPaths;
 + (NSArray<Feed*>*)listOfFeedsMissingArticlesInContext:(NSManagedObjectContext*)moc;
 + (NSArray<Feed*>*)listOfFeedsMissingIconsInContext:(NSManagedObjectContext*)moc;
 @end

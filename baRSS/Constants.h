@@ -29,11 +29,42 @@
 // TODO: List of hidden preferences for readme
 // TODO: Do we need to search for favicon in places other than '../favicon.ico'?
 
+/**
+ @c notification.object is @c NSNumber of type @c NSUInteger.
+ Represents number of feeds that are proccessed in background update. Sends @c 0 when all downloads are finished.
+ */
+static NSString *kNotificationBackgroundUpdateInProgress = @"baRSS-notification-background-update-in-progress";
+/**
+ @c notification.object is @c NSManagedObjectID of type @c Feed.
+ Called whenever download of a feed finished and object was modified (not if statusCode 304).
+ */
 static NSString *kNotificationFeedUpdated = @"baRSS-notification-feed-updated";
+/**
+ @c notification.object is @c NSManagedObjectID of type @c Feed.
+ Called whenever the icon attribute of an item was updated.
+ */
+static NSString *kNotificationFeedIconUpdated = @"baRSS-notification-feed-icon-updated";
+/**
+ @c notification.object is @c NSNumber of type @c BOOL.
+ @c YES if network became reachable. @c NO on connection lost.
+ */
 static NSString *kNotificationNetworkStatusChanged = @"baRSS-notification-network-status-changed";
+/**
+ @c notification.object is @c NSNumber of type @c NSInteger.
+ Represents a relative change (e.g., negative if items were marked read)
+ */
 static NSString *kNotificationTotalUnreadCountChanged = @"baRSS-notification-total-unread-count-changed";
+/**
+ @c notification.object is either @c nil or @c NSNumber of type @c NSInteger.
+ If new count is known an absoulte number is passed.
+ Else @c nil if count has to be fetched from core data.
+ */
 static NSString *kNotificationTotalUnreadCountReset = @"baRSS-notification-total-unread-count-reset";
 
+
+/**
+ Internal developer method for benchmarking purposes.
+ */
 extern uint64_t dispatch_benchmark(size_t count, void (^block)(void));
 //void benchmark(char *desc, dispatch_block_t b){printf("%s: %llu ns\n", desc, dispatch_benchmark(1, b));}
 #define benchmark(desc,block) printf(desc": %llu ns\n", dispatch_benchmark(1, block));
