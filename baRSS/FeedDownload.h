@@ -26,6 +26,7 @@
 @class Feed;
 
 @interface FeedDownload : NSObject
+@property (class, readonly) NSDate *dateScheduled;
 @property (class, readonly) BOOL allowNetworkConnection;
 @property (class, readonly) BOOL isUpdating;
 @property (class, setter=setPaused:) BOOL isPaused;

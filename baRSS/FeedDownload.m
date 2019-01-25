@@ -29,6 +29,7 @@
 
 #import <SystemConfiguration/SystemConfiguration.h>
 
+static NSTimer *_timer;
 static SCNetworkReachabilityRef _reachability = NULL;
 static BOOL _isReachable = NO;
 static BOOL _isUpdating = NO;
@@ -40,6 +41,9 @@ static BOOL _nextUpdateIsForced = NO;
 
 
 #pragma mark - User Interaction -
+
+/// @return Date when background update will fire. If updates are paused, date is @c distantFuture.
++ (NSDate *)dateScheduled { return _timer.fireDate; }
 
 /// @return @c YES if current network state is reachable and updates are not paused by user.
 + (BOOL)allowNetworkConnection { return (_isReachable && !_updatePaused); }
@@ -80,9 +84,8 @@ static BOOL _nextUpdateIsForced = NO;
 + (void)scheduleUpdateForUpcomingFeeds {
 	if (![self allowNetworkConnection]) // timer will restart once connection exists
 		return;
-	NSDate *nextTime = [StoreCoordinator nextScheduledUpdate];
-	if (!nextTime) return; // no timer means no feeds to update
-	if ([nextTime timeIntervalSinceNow] < 1) { // mostly, if app was closed for a long time
+	NSDate *nextTime = [StoreCoordinator nextScheduledUpdate]; // if nextTime = nil, then no feeds to update
+	if (nextTime && [nextTime timeIntervalSinceNow] < 1) { // mostly, if app was closed for a long time
 		nextTime = [NSDate dateWithTimeIntervalSinceNow:1];
 	}
 	[self scheduleTimer:nextTime];
@@ -104,16 +107,16 @@ static BOOL _nextUpdateIsForced = NO;
  @param nextTime If @c nil timer will be disabled with a @c .fireDate very far in the future.
  */
 + (void)scheduleTimer:(NSDate*)nextTime {
-	static NSTimer *timer;
-	if (!timer) {
-		timer = [NSTimer timerWithTimeInterval:NSTimeIntervalSince1970 target:[self class] selector:@selector(updateTimerCallback) userInfo:nil repeats:YES];
-		[[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
-	}
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		_timer = [NSTimer timerWithTimeInterval:NSTimeIntervalSince1970 target:[self class] selector:@selector(updateTimerCallback) userInfo:nil repeats:YES];
+		[[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSRunLoopCommonModes];
+	});
 	if (!nextTime)
-		nextTime = [NSDate dateWithTimeIntervalSinceNow:NSTimeIntervalSince1970];
+		nextTime = [NSDate distantFuture];
 	NSTimeInterval tolerance = [nextTime timeIntervalSinceNow] * 0.15;
-	timer.tolerance = (tolerance < 1 ? 1 : tolerance); // at least 1 sec
-	timer.fireDate = nextTime;
+	_timer.tolerance = (tolerance < 1 ? 1 : tolerance); // at least 1 sec
+	_timer.fireDate = nextTime;
 }
 
 /**
