@@ -25,6 +25,7 @@
 #import "BarMenu.h"
 #import "UserPrefs.h"
 #import "StoreCoordinator.h"
+#import "Constants.h"
 
 #import <ServiceManagement/ServiceManagement.h>
 
@@ -60,8 +61,10 @@
 }
 
 - (IBAction)fixCache:(NSButton *)sender {
-	[StoreCoordinator deleteUnreferencedFeeds];
-	[StoreCoordinator restoreFeedCountsAndIndexPaths:nil];
+	NSUInteger deleted = [StoreCoordinator deleteUnreferenced];
+	[StoreCoordinator restoreFeedCountsAndIndexPaths];
+	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
+	NSLog(@"Removed %lu unreferenced core data entries.", deleted);
 }
 
 - (IBAction)changeMenuBarIconSetting:(NSButton*)sender {

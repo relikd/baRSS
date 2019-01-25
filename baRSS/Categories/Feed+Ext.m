@@ -57,15 +57,11 @@
 		self.indexPath = pthStr;
 }
 
-/// Reset attributes @c articleCount, @c unreadCount, and @c indexPath.
-- (void)resetArticleCountAndIndexPathString {
-	int16_t totalCount = (int16_t)self.articles.count;
-	int16_t unreadCount = (int16_t)[[self.articles valueForKeyPath:@"@sum.unread"] integerValue];
-	if (self.articleCount != totalCount)
-		self.articleCount = totalCount;
+/// Reset attributes @c unreadCount by counting number of articles. @note Remember to update global unread count.
+- (void)calculateAndSetUnreadCount {
+	int32_t unreadCount = (int32_t)[[self.articles valueForKeyPath:@"@sum.unread"] integerValue];
 	if (self.unreadCount != unreadCount)
-		self.unreadCount = unreadCount; // remember to update global total unread count
-	[self calculateAndSetIndexPathString];
+		self.unreadCount = unreadCount;
 }
 
 
@@ -89,12 +85,10 @@
 	[self addMissingArticles:obj updateLinks:urls]; // will remove links in 'urls' that should be kept
 	[self deleteArticlesWithLink:urls]; // remove old, outdated articles
 	// Get new total article count and post unread-count-change notification
-	int32_t totalCount = (int32_t)self.articles.count;
-	if (self.articleCount != totalCount)
-		self.articleCount = totalCount;
 	if (flag) {
-		NSNumber *cDiff = [NSNumber numberWithInteger:self.unreadCount - unreadBefore];
-		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:cDiff];
+		int32_t cDiff = self.unreadCount - unreadBefore;
+		if (cDiff != 0)
+			[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:@(cDiff)];
 	}
 }
 
@@ -237,7 +231,7 @@
 			fa.unread = !readFlag;
 	}
 	int32_t oldCount = self.unreadCount;
-	int32_t newCount = (readFlag ? 0 : self.articleCount);
+	int32_t newCount = (readFlag ? 0 : (int32_t)self.articles.count);
 	if (self.unreadCount != newCount)
 		self.unreadCount = newCount;
 	return newCount - oldCount;
@@ -258,7 +252,7 @@
 		[img setSize:NSMakeSize(16, 16)];
 		return img;
 	}
-	else if (self.articleCount == 0)
+	else if (self.articles.count == 0)
 	{
 		static NSImage *warningIcon;
 		if (!warningIcon) {
@@ -277,22 +271,20 @@
 }
 
 /**
- Set (or overwrite) favicon icon or delete relationship if icon is @c nil.
+ Set favicon icon or delete relationship if @c img is not a valid image.
  
- @param overwrite If @c NO write image only if non is set already. Use @c YES if you want to @c nil.
+ @return @c YES if icon was updated (core data did change).
 */
-- (BOOL)setIcon:(NSImage*)img replaceExisting:(BOOL)overwrite {
-	if (overwrite || !self.icon) { // write if forced or image empty
-		if (img && [img isValid]) {
-			if (!self.icon)
-				self.icon = [[FeedIcon alloc] initWithEntity:FeedIcon.entity insertIntoManagedObjectContext:self.managedObjectContext];
-			self.icon.icon = [img TIFFRepresentation];
-			return YES;
-		} else if (self.icon) {
-			[self.managedObjectContext deleteObject:self.icon];
-			self.icon = nil;
-			return YES;
-		}
+- (BOOL)setIconImage:(NSImage*)img {
+	if (img && [img isValid]) {
+		if (!self.icon)
+			self.icon = [[FeedIcon alloc] initWithEntity:FeedIcon.entity insertIntoManagedObjectContext:self.managedObjectContext];
+		self.icon.icon = [img TIFFRepresentation];
+		return YES;
+	} else if (self.icon) {
+		[self.managedObjectContext deleteObject:self.icon];
+		self.icon = nil;
+		return YES;
 	}
 	return NO;
 }

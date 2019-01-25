@@ -35,14 +35,9 @@ All in all, the software is in a usable state. The remaining features will be ad
 ToDo
 ----
 
-- [ ] Preferences
-	- [ ] ~~Choose status bar icon?~~
-	- [ ] Display license info (e.g., RSXML)
-
-
 - [ ] Edit feed
 	- [ ] Show statistics
-		- [ ] How often gets the feed updated (min, max, avg)
+		- [x] How often gets the feed updated (min, max, avg)
 		- [ ] Automatically choose best interval?
 		- [ ] Show time of next update
 	- [ ] Feeds with authentication

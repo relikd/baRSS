@@ -26,6 +26,10 @@
 @class Feed;
 
 @interface FeedDownload : NSObject
+@property (class, readonly) BOOL allowNetworkConnection;
+@property (class, readonly) BOOL isUpdating;
+@property (class, setter=setPaused:) BOOL isPaused;
+
 // Register for network change notifications
 + (void)registerNetworkChangeNotification;
 + (void)unregisterNetworkChangeNotification;
@@ -35,12 +39,8 @@
 // Downloading
 + (void)newFeed:(NSString *)urlStr askUser:(nonnull NSString*(^)(NSArray<RSHTMLMetadataFeedLink*> *list))askUser block:(nonnull void(^)(RSParsedFeed *parsed, NSError *error, NSHTTPURLResponse *response))block;
 + (void)autoDownloadAndParseURL:(NSString*)urlStr;
-+ (void)batchDownloadRSSAndFavicons:(NSArray<Feed*> *)list showErrorAlert:(BOOL)flag rssFinished:(void(^)(NSArray<Feed*> *successful, BOOL *cancelFavicons))blockXml finally:(void(^)(BOOL successful))blockFavicon;
-+ (void)downloadFavicon:(NSString*)urlStr finished:(void(^)(NSImage * _Nullable img))block ;
-// User interaction
-+ (BOOL)allowNetworkConnection;
-+ (BOOL)isPaused;
-+ (void)setPaused:(BOOL)flag;
++ (void)downloadFavicon:(NSString*)urlStr finished:(void(^)(NSImage * _Nullable img))block;
++ (void)batchDownloadFeeds:(NSArray<Feed*> *)list favicons:(BOOL)fav showErrorAlert:(BOOL)alert finally:(nullable os_block_t)block;
 @end
 
 

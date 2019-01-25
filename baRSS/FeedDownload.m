@@ -31,23 +31,24 @@
 
 static SCNetworkReachabilityRef _reachability = NULL;
 static BOOL _isReachable = NO;
+static BOOL _isUpdating = NO;
 static BOOL _updatePaused = NO;
 static BOOL _nextUpdateIsForced = NO;
 
 
 @implementation FeedDownload
 
+
 #pragma mark - User Interaction -
 
 /// @return @c YES if current network state is reachable and updates are not paused by user.
-+ (BOOL)allowNetworkConnection {
-	return (_isReachable && !_updatePaused);
-}
++ (BOOL)allowNetworkConnection { return (_isReachable && !_updatePaused); }
+
+/// @return @c YES if batch update is running
++ (BOOL)isUpdating { return _isUpdating; }
 
 /// @return @c YES if update is paused by user.
-+ (BOOL)isPaused {
-	return _updatePaused;
-}
++ (BOOL)isPaused { return _updatePaused; }
 
 /// Set paused flag and cancel timer regardless of network connectivity.
 + (void)setPaused:(BOOL)flag {
@@ -94,7 +95,7 @@ static BOOL _nextUpdateIsForced = NO;
 	if (![self allowNetworkConnection]) // timer will restart once connection exists
 		return;
 	_nextUpdateIsForced = YES;
-	[self scheduleTimer:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+	[self scheduleTimer:[NSDate dateWithTimeIntervalSinceNow:0.05]];
 }
 
 /**
@@ -130,29 +131,11 @@ static BOOL _nextUpdateIsForced = NO;
 	NSArray<Feed*> *list = [StoreCoordinator getListOfFeedsThatNeedUpdate:updateAll inContext:moc];
 	//NSAssert(list.count > 0, @"ERROR: Something went wrong, timer fired too early.");
 	
-	[FeedDownload batchUpdateFeeds:list showErrorAlert:NO finally:^(NSArray<Feed*> *successful, NSArray<Feed*> *failed) {
-		[self saveContext:moc andPostChanges:successful];
+	[self batchDownloadFeeds:list favicons:updateAll showErrorAlert:NO finally:^{
+		[StoreCoordinator saveContext:moc andParent:YES]; // save parents too ...
 		[moc reset];
-		if (updateAll) { // forced update will also download missing feed icons
-			NSArray<Feed*> *missingIcons = [StoreCoordinator listOfFeedsMissingIconsInContext:moc];
-			[self batchDownloadFavicons:missingIcons replaceExisting:NO finally:^{
-				[self saveContext:moc andPostChanges:successful];
-				[moc reset];
-			}];
-		}
 		[self resumeUpdates]; // always reset the timer
 	}];
-}
-
-/**
- Perform save on context and all parents. Then post @c FeedUpdated notification.
- */
-+ (void)saveContext:(NSManagedObjectContext*)moc andPostChanges:(NSArray<Feed*>*)changedFeeds {
-	[StoreCoordinator saveContext:moc andParent:YES];
-	if (changedFeeds && changedFeeds.count > 0) {
-		NSArray<NSManagedObjectID*> *list = [changedFeeds valueForKeyPath:@"objectID"];
-		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedUpdated object:list];
-	}
 }
 
 
@@ -179,20 +162,20 @@ static BOOL _nextUpdateIsForced = NO;
 	req.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
 	req.HTTPShouldHandleCookies = NO;
 //	req.timeoutInterval = 30;
-//	[req setValue:@"Mon, 10 Sep 2018 10:32:19 GMT" forHTTPHeaderField:@"If-Modified-Since"];
-//	[req setValue:@"wII2pETT9EGmlqyCHBFJpm25/7w" forHTTPHeaderField:@"If-None-Match"]; // ETag
 	return req;
 }
 
-/// @return New request with etag and modified headers set.
-+ (NSURLRequest*)newRequest:(FeedMeta*)meta {
+/// @return New request with etag and modified headers set (or not, if @c flag @c == @c YES ).
++ (NSURLRequest*)newRequest:(FeedMeta*)meta ignoreCache:(BOOL)flag {
 	NSMutableURLRequest *req = [self newRequestURL:meta.url];
-	NSString* etag = [meta.etag stringByReplacingOccurrencesOfString:@"-gzip" withString:@""];
-	if (meta.modified.length > 0)
-		[req setValue:meta.modified forHTTPHeaderField:@"If-Modified-Since"];
-	if (etag.length > 0)
-		[req setValue:etag forHTTPHeaderField:@"If-None-Match"]; // ETag
-	if (!_nextUpdateIsForced) // any FeedMeta-request that is not forced, is a background update
+	if (!flag) {
+		NSString* etag = [meta.etag stringByReplacingOccurrencesOfString:@"-gzip" withString:@""];
+		if (meta.modified.length > 0)
+			[req setValue:meta.modified forHTTPHeaderField:@"If-Modified-Since"];
+		if (etag.length > 0)
+			[req setValue:etag forHTTPHeaderField:@"If-None-Match"]; // ETag
+	}
+	if (!_nextUpdateIsForced) // any request that is not forced, is a background update
 		req.networkServiceType = NSURLNetworkServiceTypeBackground;
 	return req;
 }
@@ -246,7 +229,7 @@ static BOOL _nextUpdateIsForced = NO;
  @note @c askUser will not be called if url is XML already.
  
  @param urlStr XML URL or HTTP URL that will be parsed to find feed URLs.
- @param askUser Use @c list to present user a list of detected feed URLs. Always before @c block.
+ @param askUser Use @c list to present user a list of detected feed URLs.
  @param block Called after webpage has been fully parsed (including html autodetect).
  */
 + (void)newFeed:(NSString *)urlStr askUser:(nonnull NSString*(^)(NSArray<RSHTMLMetadataFeedLink*> *list))askUser block:(nonnull void(^)(RSParsedFeed *parsed, NSError *error, NSHTTPURLResponse *response))block {
@@ -273,41 +256,46 @@ static BOOL _nextUpdateIsForced = NO;
 }
 
 /**
- Start download request with existing @c Feed object. Reuses etag and modified headers.
-
- @param feed @c Feed on which the update is executed.
- @param group Mutex to count completion of all downloads.
+ Start download request with existing @c Feed object. Reuses etag and modified headers (unless articles count is 0).
+ 
+ @note Will post a @c kNotificationFeedUpdated notification if download was successful and @b not status code 304.
+ 
  @param alert If @c YES display Error Popup to user.
- @param successful Empty, mutable list that will be returned in @c batchUpdateFeeds:finally:showErrorAlert: finally block
- @param failed Empty, mutable list that will be returned in @c batchUpdateFeeds:finally:showErrorAlert: finally block
+ @param block Parameter @c success is only @c YES if download was successful or if status code is 304 (not modified).
  */
-+ (void)downloadFeed:(Feed*)feed group:(dispatch_group_t)group
-		  errorAlert:(BOOL)alert
-		  successful:(nonnull NSMutableArray<Feed*>*)successful
-			  failed:(nonnull NSMutableArray<Feed*>*)failed
-{
++ (void)backgroundUpdateFeed:(Feed*)feed showErrorAlert:(BOOL)alert finally:(nullable void(^)(BOOL success))block {
 	if (![self allowNetworkConnection]) {
-		[failed addObject:feed];
+		if (block) block(NO);
 		return;
 	}
-	dispatch_group_enter(group);
-	[self parseFeedRequest:[self newRequest:feed.meta] xmlBlock:nil feedBlock:^(RSParsedFeed *rss, NSError *error, NSHTTPURLResponse *response) {
-		if (!feed.isDeleted) {
-			if (error) {
-				if (alert) {
-					NSAlert *alertPopup = [NSAlert alertWithError:error];
-					alertPopup.informativeText = [NSString stringWithFormat:@"Error loading source: %@", response.URL.absoluteString];
-					[alertPopup runModal];
-				}
-				[feed.meta setErrorAndPostponeSchedule];
-				[failed addObject:feed];
-			} else {
-				[feed.meta setSucessfulWithResponse:response];
-				if (rss) [feed updateWithRSS:rss postUnreadCountChange:YES];
-				[successful addObject:feed]; // will be added even if statusCode == 304 (rss == nil)
+	NSManagedObjectID *oid = feed.objectID;
+	NSManagedObjectContext *moc = feed.managedObjectContext;
+	NSURLRequest *req = [self newRequest:feed.meta ignoreCache:(feed.articles.count == 0)];
+	NSString *reqURL = req.URL.absoluteString;
+	[self parseFeedRequest:req xmlBlock:nil feedBlock:^(RSParsedFeed *rss, NSError *error, NSHTTPURLResponse *response) {
+		Feed *f = [moc objectWithID:oid];
+		BOOL success = NO;
+		BOOL needsNotification = NO;
+		if (error) {
+			if (alert) {
+				NSAlert *alertPopup = [NSAlert alertWithError:error];
+				alertPopup.informativeText = [NSString stringWithFormat:@"Error loading source: %@", reqURL];
+				[alertPopup runModal];
+			}
+			// TODO: don't increase error count on forced update
+			[f.meta setErrorAndPostponeSchedule];
+		} else {
+			success = YES;
+			[f.meta setSucessfulWithResponse:response];
+			if (rss) {
+				[f updateWithRSS:rss postUnreadCountChange:YES];
+				needsNotification = YES;
 			}
 		}
-		dispatch_group_leave(group);
+		[StoreCoordinator saveContext:moc andParent:NO];
+		if (needsNotification)
+			[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedUpdated object:oid];
+		if (block) block(success);
 	}];
 }
 
@@ -322,111 +310,86 @@ static BOOL _nextUpdateIsForced = NO;
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	Feed *f = [Feed appendToRootWithDefaultIntervalInContext:moc];
 	f.meta.url = url;
-	[self batchDownloadRSSAndFavicons:@[f] showErrorAlert:YES rssFinished:^(NSArray<Feed *> *successful, BOOL *cancelFavicons) {
-		if (successful.count == 0) {
-			*cancelFavicons = YES;
-		} else {
-			[self saveContext:moc andPostChanges:successful];
+	[self backgroundUpdateBoth:f favicon:YES alert:YES finally:^(BOOL successful){
+		if (!successful) {
+			[moc deleteObject:f.group];
 		}
-	} finally:^(BOOL successful) {
-		if (successful) {
-			[StoreCoordinator saveContext:moc andParent:YES];
-		} else {
-			[moc rollback];
-		}
+		[StoreCoordinator saveContext:moc andParent:YES];
 		[moc reset];
 	}];
 }
 
 /**
- Perform a download /update request for the feed data and download missing favicons.
- If neither block is set, favicons will be downloaded and stored automatically.
- However, you should handle the case
-
- @param list List of feeds that need update. Its sufficient if @c feed.meta.url is set.
- @param flag If @c YES display Error Popup to user.
- @param blockXml Called after XML is downloaded and parsed.
-                 Parameter @c successful is list of feeds that were downloaded.
-                 Set @c cancelFavicons to @c YES to call @c finally block without downloading favicons. Default: @c NO.
- @param blockFavicon Called after all downloads are finished.
-                     @c successful is set to @c NO if favicon download was prohibited in @c blockXml or list is empty.
+ Start download of feed xml, then continue with favicon download (optional).
+ 
+ @param fav If @c YES continue with favicon download after xml download finished.
+ @param alert If @c YES display Error Popup to user.
+ @param block Parameter @c success is @c YES if xml download succeeded (regardless of favicon result).
  */
-+ (void)batchDownloadRSSAndFavicons:(NSArray<Feed*> *)list
-					 showErrorAlert:(BOOL)flag
-						rssFinished:(void(^)(NSArray<Feed*> *successful, BOOL * cancelFavicons))blockXml
-							finally:(void(^)(BOOL successful))blockFavicon
-{
-	[self batchUpdateFeeds:list showErrorAlert:flag finally:^(NSArray<Feed*> *successful, NSArray<Feed*> *failed) {
-		BOOL cancelFaviconsDownload = NO;
-		if (blockXml) {
-			blockXml(successful, &cancelFaviconsDownload);
-		}
-		if (cancelFaviconsDownload || successful.count == 0) {
-			if (blockFavicon) blockFavicon(NO);
-		} else {
-			[self batchDownloadFavicons:successful replaceExisting:NO finally:^{
-				if (blockFavicon) blockFavicon(YES);
++ (void)backgroundUpdateBoth:(Feed*)feed favicon:(BOOL)fav alert:(BOOL)alert finally:(nullable void(^)(BOOL success))block {
+	[self backgroundUpdateFeed:feed showErrorAlert:alert finally:^(BOOL success) {
+		if (fav && success) {
+			[self backgroundUpdateFavicon:feed replaceExisting:NO finally:^{
+				if (block) block(YES);
 			}];
+		} else {
+			if (block) block(success);
 		}
 	}];
 }
 
 /**
- Create download list of feed URLs and download them all at once. Finally, notify when all finished.
- 
+ Start download of all feeds in list. Either with or without favicons.
+
  @param list Download list using @c feed.meta.url as download url. (while reusing etag and modified headers)
- @param flag If @c YES display Error Popup to user.
- @param block Called after all downloads finished @b OR if list is empty (in that case both parameters are @c nil ).
- */
-+ (void)batchUpdateFeeds:(NSArray<Feed*> *)list showErrorAlert:(BOOL)flag finally:(void(^)(NSArray<Feed*> *successful, NSArray<Feed*> *failed))block {
-	if (!list || list.count == 0) {
-		if (block) block(nil, nil);
-		return;
-	}
-	// else, process all feed items in a batch
-	NSMutableArray<Feed*> *successful = [NSMutableArray arrayWithCapacity:list.count];
-	NSMutableArray<Feed*> *failed = [NSMutableArray arrayWithCapacity:list.count];
-	
-	dispatch_group_t group = dispatch_group_create();
-	for (Feed *feed in list) {
-		[self downloadFeed:feed group:group errorAlert:flag successful:successful failed:failed];
-	}
-	dispatch_group_notify(group, dispatch_get_main_queue(), ^{
-		if (block) block(successful, failed);
-	});
-}
-
-
-#pragma mark - Favicon -
-
-
-/**
- Create download list of @c favicon.ico URLs and save downloaded images to persistent store.
- 
- @param list Download list using @c feed.link as download url. If empty fall back to @c feed.meta.url
- @param flag If @c YES display Error Popup to user.
+ @param fav If @c YES continue with favicon download after xml download finished.
+ @param alert If @c YES display Error Popup to user.
  @param block Called after all downloads finished.
  */
-+ (void)batchDownloadFavicons:(NSArray<Feed*> *)list replaceExisting:(BOOL)flag finally:(os_block_t)block {
++ (void)batchDownloadFeeds:(NSArray<Feed*> *)list favicons:(BOOL)fav showErrorAlert:(BOOL)alert finally:(nullable os_block_t)block {
+	_isUpdating = YES;
+	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationBackgroundUpdateInProgress object:@(list.count)];
 	dispatch_group_t group = dispatch_group_create();
 	for (Feed *f in list) {
-		if (!flag && f.icon != nil) {
-			continue; // skip existing icons if replace == NO
-		}
-		NSManagedObjectID *oid = f.objectID;
-		NSManagedObjectContext *moc = f.managedObjectContext;
-		NSString *faviconURL = (f.link.length > 0 ? f.link : f.meta.url);
-		
 		dispatch_group_enter(group);
-		[self downloadFavicon:faviconURL finished:^(NSImage *img) {
-			Feed *feed = [moc objectWithID:oid]; // should also work if context was reset
-			[feed setIcon:img replaceExisting:flag];
+		[self backgroundUpdateBoth:f favicon:fav alert:alert finally:^(BOOL success){
 			dispatch_group_leave(group);
 		}];
 	}
 	dispatch_group_notify(group, dispatch_get_main_queue(), ^{
 		if (block) block();
+		_isUpdating = NO;
+		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationBackgroundUpdateInProgress object:@(0)];
 	});
+}
+
+
+#pragma mark - Download Favicon -
+
+
+/**
+ Start favicon download request on existing @c Feed object.
+ 
+ @note Will post a @c kNotificationFeedIconUpdated notification if icon was updated.
+ 
+ @param overwrite If @c YES and icon is present already, @c block will return immediatelly.
+ */
++ (void)backgroundUpdateFavicon:(Feed*)feed replaceExisting:(BOOL)overwrite finally:(nullable os_block_t)block {
+	if (!overwrite && feed.icon != nil) {
+		if (block) block();
+		return; // skip existing icons if replace == NO
+	}
+	NSManagedObjectID *oid = feed.objectID;
+	NSManagedObjectContext *moc = feed.managedObjectContext;
+	NSString *faviconURL = (feed.link.length > 0 ? feed.link : feed.meta.url);
+	[self downloadFavicon:faviconURL finished:^(NSImage *img) {
+		Feed *f = [moc objectWithID:oid];
+		if (f && [f setIconImage:img]) {
+			[StoreCoordinator saveContext:moc andParent:NO];
+			[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedIconUpdated object:oid];
+		}
+		if (block) block();
+	}];
 }
 
 /// Download favicon located at http://.../ @c favicon.ico. Callback @c block will be called on main thread.

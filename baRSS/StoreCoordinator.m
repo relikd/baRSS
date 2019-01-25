@@ -24,8 +24,6 @@
 #import "AppHook.h"
 #import "Feed+Ext.h"
 
-#import <RSXML/RSXML.h>
-
 @implementation StoreCoordinator
 
 #pragma mark - Managing contexts
@@ -40,7 +38,7 @@
 	NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
 	[context setParentContext:[self getMainContext]];
 	context.undoManager = nil;
-	context.automaticallyMergesChangesFromParent = YES;
+	//context.automaticallyMergesChangesFromParent = YES;
 	return context;
 }
 
@@ -178,46 +176,64 @@
 #pragma mark - Restore Sound State
 
 /**
- Delete all @c Feed items where @c group @c = @c NULL.
+ Perform batch delete on entities of type @c entity where @c column @c IS @c NULL. If @c column is @c nil, delete all rows.
  */
-+ (void)deleteUnreferencedFeeds {
-	NSManagedObjectContext *moc = [self getMainContext];
-	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: Feed.entity.name];
-	fr.predicate = [NSPredicate predicateWithFormat:@"group = NULL"];
++ (NSUInteger)batchDelete:(NSEntityDescription*)entity nullAttribute:(NSString*)column inContext:(NSManagedObjectContext*)moc {
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: entity.name];
+	if (column && column.length > 0) {
+		// double nested string, otherwise column is not interpreted as such.
+		// using @count here to also find items where foreign key is set but referencing a non-existing object.
+		fr.predicate = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"count(%@) == 0", column]];
+	}
 	NSBatchDeleteRequest *bdr = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fr];
+	bdr.resultType = NSBatchDeleteResultTypeCount;
 	NSError *err;
-	[moc executeRequest:bdr error:&err];
+	NSBatchDeleteResult *lol = [moc executeRequest:bdr error:&err];
 	if (err) NSLog(@"%@", err);
+	return [lol.result unsignedIntegerValue];
 }
 
 /**
- Iterate over all @c Feed and re-calculate @c unreadCount, @c articleCount and @c indexPath.
- Restore will happend on the main context.
- 
- @param list A list of @c Feed objectIDs. Acts like a filter, if @c nil performs a fetch on all feed items.
+ Delete all @c FeedGroup items.
  */
-+ (void)restoreFeedCountsAndIndexPaths:(NSArray<NSManagedObjectID*>*)list {
++ (NSUInteger)deleteAllGroups {
 	NSManagedObjectContext *moc = [self getMainContext];
-	if (!list) {
-		NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: Feed.entity.name];
-		[fr setResultType:NSManagedObjectIDResultType];
-		list = [self fetchAllRows:fr inContext:moc];
+	NSUInteger deleted = [self batchDelete:FeedGroup.entity nullAttribute:nil inContext:moc];
+	[self saveContext:moc andParent:YES];
+	return deleted;
+}
+
+/**
+ Delete all @c Feed items where @c group @c = @c NULL and all @c FeedMeta, @c FeedIcon, @c FeedArticle where @c feed @c = @c NULL.
+ */
++ (NSUInteger)deleteUnreferenced {
+	NSUInteger deleted = 0;
+	NSManagedObjectContext *moc = [self getMainContext];
+	deleted += [self batchDelete:Feed.entity nullAttribute:@"group" inContext:moc];
+	deleted += [self batchDelete:FeedMeta.entity nullAttribute:@"feed" inContext:moc];
+	deleted += [self batchDelete:FeedIcon.entity nullAttribute:@"feed" inContext:moc];
+	deleted += [self batchDelete:FeedArticle.entity nullAttribute:@"feed" inContext:moc];
+	[self saveContext:moc andParent:YES];
+	return deleted;
+}
+
+/**
+ Iterate over all @c Feed and re-calculate @c unreadCount and @c indexPath.
+ */
++ (void)restoreFeedCountsAndIndexPaths {
+	NSManagedObjectContext *moc = [self getMainContext];
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: Feed.entity.name];
+	for (Feed *f in [self fetchAllRows:fr inContext:moc]) {
+		[f calculateAndSetUnreadCount];
+		[f calculateAndSetIndexPathString];
 	}
-	[moc performBlock:^{
-		for (NSManagedObjectID *moi in list) {
-			Feed *f = [moc objectWithID:moi];
-			if ([f isKindOfClass:[Feed class]])
-				[f resetArticleCountAndIndexPathString];
-		}
-		[self saveContext:moc andParent:YES];
-	}];
+	[self saveContext:moc andParent:YES];
 }
 
 /// @return All @c Feed items where @c articles.count @c == @c 0
 + (NSArray<Feed*>*)listOfFeedsMissingArticlesInContext:(NSManagedObjectContext*)moc {
 	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: Feed.entity.name];
-	// More accurate but with subquery on FeedArticle: "count(articles) == 0"
-	fr.predicate = [NSPredicate predicateWithFormat:@"articleCount == 0"];
+	fr.predicate = [NSPredicate predicateWithFormat:@"articles.@count == 0"];
 	return [self fetchAllRows:fr inContext:moc];
 }
 

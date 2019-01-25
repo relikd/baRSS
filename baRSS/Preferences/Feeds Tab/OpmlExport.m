@@ -31,13 +31,22 @@
 
 #pragma mark - Open & Save Panel
 
-/// Display Open File Panel to select @c .opml file.
-+ (void)showImportDialog:(NSWindow*)window withContext:(NSManagedObjectContext*)moc success:(nullable void(^)(NSArray<Feed*> *added))block {
+/// Display Open File Panel to select @c .opml file. Perform web requests (feed data & icon) within a single undo group.
++ (void)showImportDialog:(NSWindow*)window withContext:(NSManagedObjectContext*)moc {
 	NSOpenPanel *op = [NSOpenPanel openPanel];
 	op.allowedFileTypes = @[@"opml"];
 	[op beginSheetModalForWindow:window completionHandler:^(NSModalResponse result) {
 		if (result == NSModalResponseOK) {
-			[self importFeedData:op.URL inContext:moc success:block];
+			NSData *data = [NSData dataWithContentsOfURL:op.URL];
+			RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:@"opml-file-import"];
+			RSOPMLParser *parser = [RSOPMLParser parserWithXMLData:xml];
+			[parser parseAsync:^(RSOPMLItem * _Nullable doc, NSError * _Nullable error) {
+				if (error) {
+					[NSApp presentError:error];
+				} else {
+					[self importOPMLDocument:doc inContext:moc];
+				}
+			}];
 		}
 	}];
 }
@@ -67,28 +76,6 @@
 	}];
 }
 
-/// Handle import dialog and perform web requests (feed data & icon). Creates a single undo group.
-+ (void)showImportDialog:(NSWindow*)window withTreeController:(NSTreeController*)tree {
-	NSManagedObjectContext *moc = tree.managedObjectContext;
-	//[moc refreshAllObjects];
-	[moc.undoManager beginUndoGrouping];
-	[self showImportDialog:window withContext:moc success:^(NSArray<Feed *> *added) {
-		[StoreCoordinator saveContext:moc andParent:YES];
-		[FeedDownload batchDownloadRSSAndFavicons:added showErrorAlert:YES rssFinished:^(NSArray<Feed *> *successful, BOOL *cancelFavicons) {
-			if (successful.count > 0)
-				[StoreCoordinator saveContext:moc andParent:YES];
-			// we need to post a reset, since after deletion total unread count is wrong
-			[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
-		} finally:^(BOOL successful) {
-			[moc.undoManager endUndoGrouping];
-			if (successful) {
-				[StoreCoordinator saveContext:moc andParent:YES];
-				[tree rearrangeObjects]; // rearrange, because no new items appread instead only icon attrib changed
-			}
-		}];
-	}];
-}
-
 
 #pragma mark - Import
 
@@ -98,9 +85,9 @@
  If user chooses to replace existing items, perform core data request to delete all feeds.
 
  @param document Used to count feed items that will be imported
- @return @c NO if user clicks 'Cancel' button. @c YES otherwise.
+ @return @c -1: User clicked 'Cancel' button. @c 0: Append items. @c 1: Overwrite items.
  */
-+ (BOOL)askToAppendOrOverwriteAlert:(RSOPMLItem*)document inContext:(NSManagedObjectContext*)moc {
++ (NSInteger)askToAppendOrOverwriteAlert:(RSOPMLItem*)document inContext:(NSManagedObjectContext*)moc {
 	NSUInteger count = [self recursiveNumberOfFeeds:document];
 	NSAlert *alert = [[NSAlert alloc] init];
 	alert.messageText = [NSString stringWithFormat:NSLocalizedString(@"Import of %lu feed items", nil), count];
@@ -109,42 +96,43 @@
 	[alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
 	alert.accessoryView = [self radioGroupCreate:@[NSLocalizedString(@"Append", nil),
 												   NSLocalizedString(@"Overwrite", nil)]];
-	NSModalResponse code = [alert runModal];
-	if (code == NSAlertSecondButtonReturn) { // cancel button
-		return NO;
+	
+	if ([alert runModal] == NSAlertFirstButtonReturn) {
+		return [self radioGroupSelection:alert.accessoryView];
 	}
-	if ([self radioGroupSelection:alert.accessoryView] == 1) { // overwrite selected
-		for (FeedGroup *g in [StoreCoordinator sortedListOfRootObjectsInContext:moc]) {
-			[moc deleteObject:g];
-		}
-	}
-	return YES;
+	return -1; // cancel button
 }
 
 /**
  Perform import of @c FeedGroup items.
-
- @param block Called after import finished. Parameter @c added is the list of inserted @c Feed items.
  */
-+ (void)importFeedData:(NSURL*)fileURL inContext:(NSManagedObjectContext*)moc success:(nullable void(^)(NSArray<Feed*> *added))block {
-	NSData *data = [NSData dataWithContentsOfURL:fileURL];
-	RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:@"opml-file-import"];
-	RSOPMLParser *parser = [RSOPMLParser parserWithXMLData:xml];
-	[parser parseAsync:^(RSOPMLItem * _Nullable doc, NSError * _Nullable error) {
-		if (error) {
-			[NSApp presentError:error];
-		} else if ([self askToAppendOrOverwriteAlert:doc inContext:moc]) {
-			NSMutableArray<Feed*> *list = [NSMutableArray array];
-			int32_t idx = 0;
-			if (moc.deletedObjects.count == 0) // if there are deleted objects, user choose to overwrite all items
-				idx = (int32_t)[StoreCoordinator numberRootItemsInContext:moc];
-			
-			for (RSOPMLItem *item in doc.children) {
-				[self importFeed:item parent:nil index:idx inContext:moc appendToList:list];
-				idx += 1;
-			}
-			if (block) block(list);
++ (void)importOPMLDocument:(RSOPMLItem*)doc inContext:(NSManagedObjectContext*)moc {
+	NSInteger select = [self askToAppendOrOverwriteAlert:doc inContext:moc];
+	if (select < 0 || select > 1) // not a valid selection (or cancel button)
+		return;
+	
+	[moc.undoManager beginUndoGrouping];
+	
+	int32_t idx = 0;
+	if (select == 1) { // overwrite selected
+		for (FeedGroup *fg in [StoreCoordinator sortedListOfRootObjectsInContext:moc]) {
+			[moc deleteObject:fg]; // Not a batch delete request to support undo
 		}
+		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:@(0)];
+	} else {
+		idx = (int32_t)[StoreCoordinator numberRootItemsInContext:moc];
+	}
+	
+	NSMutableArray<Feed*> *list = [NSMutableArray array];
+	for (RSOPMLItem *item in doc.children) {
+		[self importFeed:item parent:nil index:idx inContext:moc appendToList:list];
+		idx += 1;
+	}
+	// Persist state, because on crash we have at least inserted items (without articles & icons)
+	[StoreCoordinator saveContext:moc andParent:YES];
+	[FeedDownload batchDownloadFeeds:list favicons:YES showErrorAlert:YES finally:^{
+		[StoreCoordinator saveContext:moc andParent:YES];
+		[moc.undoManager endUndoGrouping];
 	}];
 }
 
@@ -206,9 +194,9 @@
  */
 + (NSXMLDocument*)xmlDocumentForFeeds:(NSArray<FeedGroup*>*)list hierarchical:(BOOL)flag {
 	NSXMLElement *head = [NSXMLElement elementWithName:@"head"];
-	[head addChild:[NSXMLElement elementWithName:@"title" stringValue:@"baRSS feeds"]];
-	[head addChild:[NSXMLElement elementWithName:@"ownerName" stringValue:@"baRSS"]];
-	[head addChild:[NSXMLElement elementWithName:@"dateCreated" stringValue:[self currentDayAsStringISO8601:YES]]];
+	head.children = @[[NSXMLElement elementWithName:@"title" stringValue:@"baRSS feeds"],
+					  [NSXMLElement elementWithName:@"ownerName" stringValue:@"baRSS"],
+					  [NSXMLElement elementWithName:@"dateCreated" stringValue:[self currentDayAsStringISO8601:YES]] ];
 	
 	NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
 	for (FeedGroup *item in list) {
@@ -216,9 +204,8 @@
 	}
 	
 	NSXMLElement *opml = [NSXMLElement elementWithName:@"opml"];
-	[opml addAttribute:[NSXMLNode attributeWithName:@"version" stringValue:@"1.0"]];
-	[opml addChild:head];
-	[opml addChild:body];
+	opml.attributes = @[[NSXMLNode attributeWithName:@"version" stringValue:@"1.0"]];
+	opml.children = @[head, body];
 	
 	NSXMLDocument *xml = [NSXMLDocument documentWithRootElement:opml];
 	xml.version = @"1.0";

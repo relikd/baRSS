@@ -27,10 +27,13 @@
 #import "Feed+Ext.h"
 #import "FeedGroup+Ext.h"
 #import "OpmlExport.h"
+#import "FeedDownload.h"
 
 @interface SettingsFeeds ()
 @property (weak) IBOutlet NSOutlineView *outlineView;
 @property (weak) IBOutlet NSTreeController *dataStore;
+@property (weak) IBOutlet NSProgressIndicator *spinner;
+@property (weak) IBOutlet NSTextField *spinnerLabel;
 
 @property (strong) NSArray<NSTreeNode*> *currentlyDraggedNodes;
 @property (strong) NSUndoManager *undoManager;
@@ -44,6 +47,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+	[self activateSpinner:([FeedDownload isUpdating] ? -1 : 0)]; // start spinner if update is in progress when preferences open
 	[self.outlineView registerForDraggedTypes:[NSArray arrayWithObject:dragNodeType]];
 	[self.dataStore setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];
 	
@@ -53,8 +57,60 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	
 	self.dataStore.managedObjectContext = [StoreCoordinator createChildContext];
 	self.dataStore.managedObjectContext.undoManager = self.undoManager;
-	self.dataStore.managedObjectContext.automaticallyMergesChangesFromParent = NO;
+	
+	// Register for notifications
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateIcon:) name:kNotificationFeedUpdated object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateIcon:) name:kNotificationFeedIconUpdated object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateInProgress:) name:kNotificationBackgroundUpdateInProgress object:nil];
 }
+
+- (void)dealloc {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+
+#pragma mark - Notification callback methods
+
+
+/// Callback method fired when feeds have been updated in the background.
+- (void)updateIcon:(NSNotification*)notify {
+	NSManagedObjectID *oid = notify.object;
+	NSManagedObjectContext *moc = self.dataStore.managedObjectContext;
+	Feed *feed = [moc objectRegisteredForID:oid];
+	if (feed) {
+		if (self.undoManager.groupingLevel == 0) // don't mess around if user is editing something
+			[moc refreshObject:feed mergeChanges:YES];
+		[self.dataStore rearrangeObjects];
+	}
+}
+
+/// Callback method fired when background feed update begins and ends.
+- (void)updateInProgress:(NSNotification*)notify {
+	[self activateSpinner:[notify.object integerValue]];
+}
+
+/// Start or stop activity spinner (will run on main thread). If @c c @c == @c 0 stop spinner.
+- (void)activateSpinner:(NSInteger)c {
+	dispatch_async(dispatch_get_main_queue(), ^{
+		if (c == 0) {
+			[self.spinner stopAnimation:nil];
+			self.spinnerLabel.stringValue = @"";
+		} else {
+			[self.spinner startAnimation:nil];
+			if (c < 0) { // unknown number of feeds
+				self.spinnerLabel.stringValue = NSLocalizedString(@"Updating feeds …", nil);
+			} else if (c == 1) {
+				self.spinnerLabel.stringValue = NSLocalizedString(@"Updating 1 feed …", nil);
+			} else {
+				self.spinnerLabel.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Updating %lu feeds …", nil), c];
+			}
+		}
+	});
+}
+
+
+#pragma mark - Persist state
+
 
 /**
  Refresh current context from parent context and start new undo grouping.
@@ -89,10 +145,13 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
  After the user did undo or redo we can't ensure integrity without doing some additional work.
  */
 - (void)saveWithUnpredictableChange {
-	NSSet<Feed*> *arr = [self.dataStore.managedObjectContext.insertedObjects
-						 filteredSetUsingPredicate:[NSPredicate predicateWithFormat:@"class == %@", [Feed class]]];
+	// dont use unless you merge changes from main
+//	NSManagedObjectContext *moc = self.dataStore.managedObjectContext;
+//	NSPredicate *pred = [NSPredicate predicateWithFormat:@"class == %@", [FeedArticle class]];
+//	NSInteger del = [[[moc.deletedObjects filteredSetUsingPredicate:pred] valueForKeyPath:@"@sum.unread"] integerValue];
+//	NSInteger ins = [[[moc.insertedObjects filteredSetUsingPredicate:pred] valueForKeyPath:@"@sum.unread"] integerValue];
+//	NSLog(@"%ld, %ld", del, ins);
 	[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
-	[StoreCoordinator restoreFeedCountsAndIndexPaths:[arr valueForKeyPath:@"objectID"]]; // main context will not create undo group
 	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
 	[self.dataStore rearrangeObjects]; // update ordering
 }
@@ -150,7 +209,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	if ([sender.menu popUpMenuPositioningItem:nil atLocation:NSMakePoint(0,sender.frame.size.height) inView:sender]) {
 		NSInteger tag = sender.menu.highlightedItem.tag;
 		if (tag == 101) {
-			[OpmlExport showImportDialog:self.view.window withTreeController:self.dataStore];
+			[OpmlExport showImportDialog:self.view.window withContext:self.dataStore.managedObjectContext];
 		} else if (tag == 102) {
 			[OpmlExport showExportDialog:self.view.window withContext:self.dataStore.managedObjectContext];
 		}
@@ -323,8 +382,10 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 /// Returning @c NO will result in a Action-Not-Available-Buzzer sound
 - (BOOL)respondsToSelector:(SEL)aSelector {
-	if (aSelector == @selector(undo:)) return [self.undoManager canUndo] && self.undoManager.groupingLevel == 0;
-	if (aSelector == @selector(redo:)) return [self.undoManager canRedo] && self.undoManager.groupingLevel == 0;
+	if (aSelector == @selector(undo:))
+		return [self.undoManager canUndo] && self.undoManager.groupingLevel == 0 && ![FeedDownload isUpdating];
+	if (aSelector == @selector(redo:))
+		return [self.undoManager canRedo] && self.undoManager.groupingLevel == 0 && ![FeedDownload isUpdating];
 	if (aSelector == @selector(copy:) || aSelector == @selector(enterPressed:)) {
 		BOOL outlineHasFocus = [[self.view.window firstResponder] isKindOfClass:[NSOutlineView class]];
 		BOOL hasSelection = (self.dataStore.selectedNodes.count > 0);
