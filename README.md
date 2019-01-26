@@ -46,7 +46,7 @@ ToDo
 - [ ] Other
 	- [ ] App Icon
 	- [ ] Translate text to different languages
-	- [ ] Download with ephemeral url session?
+	- [x] Download with ephemeral url session?
 	- [ ] Add Sandboxing
 		- [ ] Disable Startup checkbox (or other workaround)
 

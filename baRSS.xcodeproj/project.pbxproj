@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		540CD14921C094A2004AB594 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 540CD14821C094A2004AB594 /* README.md */; };
 		540F704521B6C16C0022E69D /* FeedMeta+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 540F704421B6C16C0022E69D /* FeedMeta+Ext.m */; };
 		54195883218A061100581B79 /* Feed+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54195882218A061100581B79 /* Feed+Ext.m */; };
 		54195886218E1BDB00581B79 /* NSMenu+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54195885218E1BDB00581B79 /* NSMenu+Ext.m */; };
@@ -385,7 +384,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				540CD14921C094A2004AB594 /* README.md in Resources */,
 				546FC4472118A8E6007CC3A3 /* Preferences.xib in Resources */,
 				54E88321211B509D00064188 /* ModalFeedEdit.xib in Resources */,
 				54ACC28621061B3C0020715F /* Assets.xcassets in Resources */,
