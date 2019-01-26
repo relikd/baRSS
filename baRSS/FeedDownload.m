@@ -161,31 +161,43 @@ static BOOL _nextUpdateIsForced = NO;
 
 /// @return New request with no caching policy and timeout interval of 30 seconds.
 + (NSMutableURLRequest*)newRequestURL:(NSString*)urlStr {
-	NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[self fixURL:urlStr]];
-	req.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
-	req.HTTPShouldHandleCookies = NO;
-//	req.timeoutInterval = 30;
-	return req;
+	return [NSMutableURLRequest requestWithURL:[self fixURL:urlStr]];
 }
 
 /// @return New request with etag and modified headers set (or not, if @c flag @c == @c YES ).
 + (NSURLRequest*)newRequest:(FeedMeta*)meta ignoreCache:(BOOL)flag {
 	NSMutableURLRequest *req = [self newRequestURL:meta.url];
 	if (!flag) {
-		NSString* etag = [meta.etag stringByReplacingOccurrencesOfString:@"-gzip" withString:@""];
-		if (meta.modified.length > 0)
+		if (meta.etag.length > 0)
+			[req setValue:meta.etag forHTTPHeaderField:@"If-None-Match"]; // ETag
+		else if (meta.modified.length > 0)
 			[req setValue:meta.modified forHTTPHeaderField:@"If-Modified-Since"];
-		if (etag.length > 0)
-			[req setValue:etag forHTTPHeaderField:@"If-None-Match"]; // ETag
 	}
 	if (!_nextUpdateIsForced) // any request that is not forced, is a background update
 		req.networkServiceType = NSURLNetworkServiceTypeBackground;
 	return req;
 }
 
++ (NSURLSession*)nonCachingSession {
+	static NSURLSession *session = nil;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		NSURLSessionConfiguration *conf = [NSURLSessionConfiguration defaultSessionConfiguration];
+		conf.HTTPCookieAcceptPolicy = NSHTTPCookieAcceptPolicyNever;
+		conf.HTTPShouldSetCookies = NO;
+		conf.HTTPCookieStorage = nil; // disables '~/Library/Cookies/'
+		conf.requestCachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+		conf.URLCache = nil; // disables '~/Library/Caches/de.relikd.baRSS/'
+		conf.HTTPAdditionalHeaders = @{ @"User-Agent": @"baRSS (macOS)",
+										@"Accept-Encoding": @"gzip" };
+		session = [NSURLSession sessionWithConfiguration:conf];
+	});
+	return session; // [NSURLSession sharedSession];
+}
+
 /// Helper method to start new @c NSURLSession. If @c (http.statusCode==304) then set @c data @c = @c nil.
 + (void)asyncRequest:(NSURLRequest*)request block:(nonnull void(^)(NSData * _Nullable data, NSError * _Nullable error, NSHTTPURLResponse *response))block {
-	[[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+	[[[self nonCachingSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
 		NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
 		if (error || [httpResponse statusCode] == 304)
 			data = nil;
@@ -285,7 +297,6 @@ static BOOL _nextUpdateIsForced = NO;
 				alertPopup.informativeText = [NSString stringWithFormat:@"Error loading source: %@", reqURL];
 				[alertPopup runModal];
 			}
-			// TODO: don't increase error count on forced update
 			[f.meta setErrorAndPostponeSchedule];
 		} else {
 			success = YES;
@@ -397,12 +408,67 @@ static BOOL _nextUpdateIsForced = NO;
 
 /// Download favicon located at http://.../ @c favicon.ico. Callback @c block will be called on main thread.
 + (void)downloadFavicon:(NSString*)urlStr finished:(void(^)(NSImage * _Nullable img))block {
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		NSURL *favURL = [[self hostURL:urlStr] URLByAppendingPathComponent:@"favicon.ico"];
-		// TODO: fix anonymous session. initWithContentsOfURL: will set cookie in ~/Library/Cookies/
-		// TODO: check ~/Library/Caches/de.relikd.baRSS/fsCachedData/
-		// TODO: fix missing favicon by parsing html
-		NSImage *img = [[NSImage alloc] initWithContentsOfURL:favURL];
+	NSURL *host = [self hostURL:urlStr];
+	NSString *hostURL = host.absoluteString;
+	NSString *favURL = [host URLByAppendingPathComponent:@"favicon.ico"].absoluteString;
+	[self downloadImage:favURL finished:^(NSImage * _Nullable img) {
+		if (img) {
+			block(img); // is on main already (from downloadImage:)
+		} else {
+			[self downloadFaviconByParsingHTML:hostURL finished:block];
+		}
+	}];
+}
+
+/// Download html page and parse all icon urls. Starting a successive request on the url of the smallest icon.
++ (void)downloadFaviconByParsingHTML:(NSString*)hostURL finished:(void(^)(NSImage * _Nullable img))block {
+	[self asyncRequest:[self newRequestURL:hostURL] block:^(NSData * _Nullable htmlData, NSError * _Nullable error, NSHTTPURLResponse *response) {
+		if (htmlData) {
+			// TODO: use session delegate to stop downloading after <head>
+			RSXMLData *xml = [[RSXMLData alloc] initWithData:htmlData urlString:hostURL];
+			RSHTMLMetadataParser *parser = [RSHTMLMetadataParser parserWithXMLData:xml];
+			RSHTMLMetadata *meta = [parser parseSync:&error];
+			if (error) meta = nil;
+			NSString *iconURL = [self faviconUrlForMetadata:meta];
+			if (iconURL) {
+				// if everything went well we can finally start a request on the url we found.
+				[self downloadImage:iconURL finished:block];
+				return;
+			}
+		}
+		dispatch_async(dispatch_get_main_queue(), ^{ block(nil); }); // on failure
+	}];
+}
+
+/// Extract favicon URL from parsed HTML metadata.
++ (NSString*)faviconUrlForMetadata:(RSHTMLMetadata*)meta {
+	if (meta) {
+		if (meta.faviconLink.length > 0) {
+			return meta.faviconLink;
+		}
+		else if (meta.iconLinks.count > 0) {
+			// at least any url (even if all items in list have size 0)
+			NSString *iconURL = meta.iconLinks.firstObject.link;
+			// we dont need much, lets find the smallest icon ...
+			int smallest = 9001;
+			for (RSHTMLMetadataIconLink *icon in meta.iconLinks) {
+				int size = (int)[icon getSize].width;
+				if (size > 0 && size < smallest) {
+					smallest = size;
+					iconURL = icon.link;
+				}
+			}
+			if (iconURL && iconURL.length > 0)
+				return iconURL;
+		}
+	}
+	return nil;
+}
+
+/// Download image in a background thread and notify once finished.
++ (void)downloadImage:(NSString*)url finished:(void(^)(NSImage * _Nullable img))block {
+	[self asyncRequest:[self newRequestURL:url] block:^(NSData * _Nullable data, NSError * _Nullable e, NSHTTPURLResponse *r) {
+		NSImage *img = [[NSImage alloc] initWithData:data];
 		if (!img || ![img isValid])
 			img = nil;
 //		if (img.size.width > 16 || img.size.height > 16) {
@@ -413,10 +479,8 @@ static BOOL _nextUpdateIsForced = NO;
 //			if (img.TIFFRepresentation.length > smallImage.TIFFRepresentation.length)
 //				img = smallImage;
 //		}
-		dispatch_async(dispatch_get_main_queue(), ^{
-			block(img);
-		});
-	});
+		dispatch_async(dispatch_get_main_queue(), ^{ block(img); });
+	}];
 }
 
 
