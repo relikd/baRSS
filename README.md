@@ -26,10 +26,22 @@ All basic functionality is there. What's missing?
 
 - Authenticated feeds
 - Online sync with other services
-- Automatic feed detection (e.g., YouTube)
 - Text / UI localisation
+- App icon & UI icons
 
 All in all, the software is in a usable state. The remaining features will be added in the coming weeks.
+
+
+Hidden options
+--------------
+
+1) When holding down the option key, the menu will show an item to open only a few unread items at a time. This number can be changed with the following Terminal command (default: 10):
+
+    defaults write de.relikd.baRSS openFewLinksLimit -int 10
+
+2) In preferences you can choose to show 'Short article names'. This will limit the number of displayed characters to 60 (default). With this Terminal command you can customize this number:
+
+    defaults write de.relikd.baRSS shortArticleNamesLimit -int 50
 
 
 ToDo

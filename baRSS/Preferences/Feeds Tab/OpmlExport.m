@@ -170,9 +170,9 @@
 				meta.url = [item attributeForKey:OPMLXMLURLKey];
 				id refresh = [item attributeForKey:@"refreshInterval"]; // baRSS specific
 				if (refresh) {
-					[meta setRefreshAndUnitFromInterval:(int32_t)[refresh integerValue]];
+					[meta setRefreshAndSchedule:(int32_t)[refresh integerValue]];
 				} else {
-					[meta setRefresh:30 unit:RefreshUnitMinutes];
+					[meta setRefreshAndSchedule:kDefaultFeedRefreshInterval]; // TODO: set -1, then auto
 				}
 			}
 			[list addObject:newFeed.feed];
@@ -232,7 +232,7 @@
 			[outline addAttribute:[NSXMLNode attributeWithName:OPMLHMTLURLKey stringValue:item.feed.link]];
 			[outline addAttribute:[NSXMLNode attributeWithName:OPMLXMLURLKey stringValue:item.feed.meta.url]];
 			[outline addAttribute:[NSXMLNode attributeWithName:OPMLTypeKey stringValue:@"rss"]];
-			NSString *intervalStr = [NSString stringWithFormat:@"%d", item.feed.meta.refreshInterval];
+			NSString *intervalStr = [NSString stringWithFormat:@"%d", item.feed.meta.refresh];
 			[outline addAttribute:[NSXMLNode attributeWithName:@"refreshInterval" stringValue:intervalStr]]; // baRSS specific
 			// TODO: option to export unread state?
 		}

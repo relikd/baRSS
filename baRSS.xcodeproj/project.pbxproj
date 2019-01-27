@@ -29,6 +29,7 @@
 		54ACC28C21061B3C0020715F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28B21061B3C0020715F /* main.m */; };
 		54ACC29521061E270020715F /* FeedDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29421061E270020715F /* FeedDownload.m */; };
 		54ACC29821061FBA0020715F /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29721061FBA0020715F /* Preferences.m */; };
+		54BB048921FD2AB500C303A5 /* NSDate+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54BB048821FD2AB500C303A5 /* NSDate+Ext.m */; };
 		54CC04382162532A00A48795 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 54CC04372162532A00A48795 /* main.m */; };
 		54CC043E2162566900A48795 /* baRSS-Helper.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54CC042C2162532800A48795 /* baRSS-Helper.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E8831E211B509D00064188 /* ModalFeedEdit.m */; };
@@ -115,6 +116,8 @@
 		54ACC29421061E270020715F /* FeedDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FeedDownload.m; sourceTree = "<group>"; };
 		54ACC29621061FBA0020715F /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		54ACC29721061FBA0020715F /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
+		54BB048721FD2AB500C303A5 /* NSDate+Ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Ext.h"; sourceTree = "<group>"; };
+		54BB048821FD2AB500C303A5 /* NSDate+Ext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Ext.m"; sourceTree = "<group>"; };
 		54CC042C2162532800A48795 /* baRSS-Helper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "baRSS-Helper.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		54CC04362162532A00A48795 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		54CC04372162532A00A48795 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -183,6 +186,8 @@
 				54209E932117325100F3B5EF /* DrawImage.m */,
 				544936F921F1E66100DEE9AA /* Statistics.h */,
 				544936FA21F1E66100DEE9AA /* Statistics.m */,
+				54BB048721FD2AB500C303A5 /* NSDate+Ext.h */,
+				54BB048821FD2AB500C303A5 /* NSDate+Ext.m */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -411,6 +416,7 @@
 				544B011D2114EE9100386E5C /* AppHook.m in Sources */,
 				546FC44321189975007CC3A3 /* SettingsGeneral.m in Sources */,
 				54ACC29521061E270020715F /* FeedDownload.m in Sources */,
+				54BB048921FD2AB500C303A5 /* NSDate+Ext.m in Sources */,
 				5477D34E21233C62002BA27F /* FeedGroup+Ext.m in Sources */,
 				544936FB21F1E66100DEE9AA /* Statistics.m in Sources */,
 				540F704521B6C16C0022E69D /* FeedMeta+Ext.m in Sources */,

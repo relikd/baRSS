@@ -29,7 +29,6 @@
 #import "FeedArticle+CoreDataClass.h"
 #import "StoreCoordinator.h"
 
-#import <Cocoa/Cocoa.h>
 #import <RSXML/RSXML.h>
 
 @implementation Feed (Ext)
@@ -46,7 +45,7 @@
 	NSInteger lastIndex = [StoreCoordinator numberRootItemsInContext:moc];
 	FeedGroup *fg = [FeedGroup newGroup:FEED inContext:moc];
 	[fg setParent:nil andSortIndex:(int32_t)lastIndex];
-	[fg.feed.meta setRefresh:30 unit:RefreshUnitMinutes];
+	[fg.feed.meta setRefreshAndSchedule:kDefaultFeedRefreshInterval];
 	return fg.feed;
 }
 
