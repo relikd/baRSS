@@ -27,6 +27,8 @@
 #import "FeedMeta+Ext.h"
 #import "FeedGroup+Ext.h"
 #import "Statistics.h"
+#import "NSDate+Ext.h"
+
 #import <QuartzCore/QuartzCore.h>
 
 
@@ -89,6 +91,7 @@
 	[super viewDidLoad];
 	self.previousURL = @"";
 	self.refreshNum.intValue = 30;
+	[NSDate populateUnitsMenu:self.refreshUnit selected:TimeUnitMinutes];
 	self.warningIndicator.image = nil;
 	[self.warningIndicator.cell setHighlightsBy:NSNoCellMask];
 	[self populateTextFields:self.feedGroup];
@@ -102,12 +105,8 @@
 	self.name.objectValue = fg.name;
 	self.url.objectValue = fg.feed.meta.url;
 	self.previousURL = self.url.stringValue;
-	self.refreshNum.intValue = fg.feed.meta.refreshNum;
-	NSInteger unit = (NSInteger)fg.feed.meta.refreshUnit;
-	if (unit < 0 || unit > self.refreshUnit.numberOfItems - 1)
-		unit = self.refreshUnit.numberOfItems - 1;
-	[self.refreshUnit selectItemAtIndex:unit];
 	self.warningIndicator.image = [fg.feed iconImage16];
+	[NSDate setInterval:fg.feed.meta.refresh forPopup:self.refreshUnit andField:self.refreshNum];
 	[self statsForCoreDataObject];
 }
 
@@ -122,7 +121,8 @@
 	[self.feedGroup setNameIfChanged:self.name.stringValue];
 	FeedMeta *meta = feed.meta;
 	[meta setUrlIfChanged:self.previousURL];
-	[meta setRefresh:self.refreshNum.intValue unit:(int16_t)self.refreshUnit.indexOfSelectedItem]; // updateTimer will be scheduled once preferences is closed
+	[meta setRefreshAndSchedule:[NSDate intervalForPopup:self.refreshUnit andField:self.refreshNum]];
+	// updateTimer will be scheduled once preferences is closed
 	if (self.didDownloadFeed) {
 		[meta setEtag:self.httpEtag modified:self.httpDate];
 		[feed updateWithRSS:self.feedResult postUnreadCountChange:YES];

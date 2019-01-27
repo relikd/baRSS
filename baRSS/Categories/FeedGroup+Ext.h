@@ -44,4 +44,5 @@ typedef NS_ENUM(int16_t, FeedGroupType) {
 - (BOOL)iterateSorted:(BOOL)ordered overDescendantFeeds:(void(^)(Feed *feed, BOOL* cancel))block;
 // Printing
 - (NSString*)readableDescription;
+- (nonnull NSString*)refreshString;
 @end

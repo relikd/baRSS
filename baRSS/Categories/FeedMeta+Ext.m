@@ -24,29 +24,7 @@
 #import "Feed+Ext.h"
 #import "FeedGroup+Ext.h"
 
-/// smhdw: [1, 60, 3600, 86400, 604800]
-static const int32_t RefreshUnitValues[] = {1, 60, 3600, 86400, 604800}; // smhdw
-
 @implementation FeedMeta (Ext)
-
-#pragma mark - Getter
-
-/// Check whether update interval is disabled by user (refresh interval is 0).
-- (BOOL)refreshIntervalDisabled {
-	return (self.refreshNum <= 0);
-}
-
-/// @return Time interval respecting the selected unit. E.g., returns @c 180 for @c '3m'
-- (int32_t)refreshInterval {
-	return self.refreshNum * RefreshUnitValues[self.refreshUnit % 5];
-}
-
-/// @return Formatted string for update interval ( e.g., @c 30m or @c 12h )
-- (NSString*)readableRefreshString {
-	if (self.refreshIntervalDisabled)
-		return @"∞"; // ∞ ƒ Ø
-	return [NSString stringWithFormat:@"%d%c", self.refreshNum, [@"smhdw" characterAtIndex:self.refreshUnit % 5]];
-}
 
 #pragma mark - HTTP response
 
@@ -68,7 +46,7 @@ static const int32_t RefreshUnitValues[] = {1, 60, 3600, 86400, 604800}; // smhd
 	self.errorCount = 0; // reset counter
 	NSDictionary *header = [response allHeaderFields];
 	[self setEtag:header[@"Etag"] modified:header[@"Date"]]; // @"Expires", @"Last-Modified"
-	[self scheduleNow:[self refreshInterval]];
+	[self scheduleNow:self.refresh];
 }
 
 #pragma mark - Setter
@@ -85,44 +63,22 @@ static const int32_t RefreshUnitValues[] = {1, 60, 3600, 86400, 604800}; // smhd
 }
 
 /**
- Set @c refresh and @c unit from popup button selection. Only values that differ will be updated.
- Also, calculate and set new @c scheduled date and update FeedGroup @c refreshStr (if changed).
+ Set @c refresh and calculate new @c scheduled date.
 
  @return @c YES if refresh interval has changed
  */
-- (BOOL)setRefresh:(int32_t)refresh unit:(RefreshUnitType)unit {
-	BOOL intervalChanged = (self.refreshNum != refresh || self.refreshUnit != unit);
-	if (self.refreshNum != refresh) self.refreshNum = refresh;
-	if (self.refreshUnit != unit)   self.refreshUnit = unit;
-	
-	if (intervalChanged) {
-		[self scheduleNow:[self refreshInterval]];
-		NSString *str = [self readableRefreshString];
-		if (![self.feed.group.refreshStr isEqualToString:str])
-			self.feed.group.refreshStr = str;
+- (BOOL)setRefreshAndSchedule:(int32_t)refresh {
+	if (self.refresh != refresh) {
+		self.refresh = refresh;
+		[self scheduleNow:self.refresh];
+		return YES;
 	}
-	return intervalChanged;
+	return NO;
 }
 
-/**
- Set properties @c refreshNum and @c refreshUnit to highest possible (integer-dividable-)unit.
- Only values that differ will be updated.
- Also, calculate and set new @c scheduled date and update FeedGroup @c refreshStr (if changed).
- 
- @return @c YES if refresh interval has changed
- */
-- (BOOL)setRefreshAndUnitFromInterval:(int32_t)interval {
-	for (RefreshUnitType i = 4; i >= 0; i--) { // start with weeks
-		if (interval % RefreshUnitValues[i] == 0) { // find first unit that is dividable
-			return [self setRefresh:abs(interval) / RefreshUnitValues[i] unit:i];
-		}
-	}
-	return NO; // since loop didn't return, no value was changed
-}
-
-/// Calculate date from @c refreshNum and @c refreshUnit and set as next scheduled feed update.
+/// Set next scheduled feed update or @c nil if @c refresh @c <= @c 0.
 - (void)scheduleNow:(NSTimeInterval)future {
-	if (self.refreshIntervalDisabled) { // update deactivated; manually update with force update all
+	if (self.refresh <= 0) { // update deactivated; manually update with force update all
 		if (self.scheduled != nil) // already nil? Avoid unnecessary core data edits
 			self.scheduled = nil;
 	} else {

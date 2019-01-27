@@ -86,24 +86,12 @@
                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TUi-VS-ge4">
                     <rect key="frame" x="198" y="-3" width="125" height="26"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <popUpButtonCell key="cell" type="push" title="Minutes" bezelStyle="rounded" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" autoenablesItems="NO" altersStateOfSelectedItem="NO" selectedItem="CsM-KR-zzs" id="O0p-Tc-KQ1">
+                    <popUpButtonCell key="cell" type="push" title="-- list --" bezelStyle="rounded" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" autoenablesItems="NO" altersStateOfSelectedItem="NO" selectedItem="lQ1-ai-wYn" id="O0p-Tc-KQ1">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="menu"/>
                         <menu key="menu" showsStateColumn="NO" autoenablesItems="NO" id="7hX-7Y-rtT">
                             <items>
-                                <menuItem title="Seconds" keyEquivalent="s" id="VD1-1h-Hdh">
-                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                </menuItem>
-                                <menuItem title="Minutes" state="on" keyEquivalent="m" id="CsM-KR-zzs">
-                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                </menuItem>
-                                <menuItem title="Hours" keyEquivalent="h" id="Nqd-L9-4V8">
-                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                </menuItem>
-                                <menuItem title="Days" keyEquivalent="d" id="5c2-Mb-3aw">
-                                    <modifierMask key="keyEquivalentModifierMask"/>
-                                </menuItem>
-                                <menuItem title="Weeks" keyEquivalent="w" id="mJE-8n-iKF">
+                                <menuItem title="-- list --" id="lQ1-ai-wYn">
                                     <modifierMask key="keyEquivalentModifierMask"/>
                                 </menuItem>
                             </items>

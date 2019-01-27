@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14315.18" systemVersion="17G4015" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="v1">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14315.18" systemVersion="17G5019" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="v1">
     <entity name="Feed" representedClassName="Feed" syncable="YES" codeGenerationType="class">
         <attribute name="indexPath" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="link" optional="YES" attributeType="String" syncable="YES"/>
@@ -25,7 +25,6 @@
     </entity>
     <entity name="FeedGroup" representedClassName="FeedGroup" syncable="YES" codeGenerationType="class">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="refreshStr" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="sortIndex" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="children" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FeedGroup" inverseName="parent" inverseEntity="FeedGroup" syncable="YES"/>
@@ -40,8 +39,7 @@
         <attribute name="errorCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="etag" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="modified" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="refreshNum" optional="YES" attributeType="Integer 32" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="refreshUnit" optional="YES" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES" customClassName="NSUInteger" syncable="YES"/>
+        <attribute name="refresh" optional="YES" attributeType="Integer 32" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="scheduled" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="meta" inverseEntity="Feed" syncable="YES"/>
@@ -49,8 +47,8 @@
     <elements>
         <element name="Feed" positionX="-278.84765625" positionY="-112.953125" width="128" height="180"/>
         <element name="FeedArticle" positionX="-96.77734375" positionY="-113.83984375" width="128" height="195"/>
-        <element name="FeedGroup" positionX="-460.37890625" positionY="-111.62890625" width="130.52734375" height="150"/>
+        <element name="FeedGroup" positionX="-460.37890625" positionY="-111.62890625" width="130.52734375" height="135"/>
         <element name="FeedIcon" positionX="-202.79296875" positionY="137.71875" width="128" height="75"/>
-        <element name="FeedMeta" positionX="-348.02734375" positionY="136.89453125" width="128" height="165"/>
+        <element name="FeedMeta" positionX="-348.02734375" positionY="136.89453125" width="128" height="150"/>
     </elements>
 </model>

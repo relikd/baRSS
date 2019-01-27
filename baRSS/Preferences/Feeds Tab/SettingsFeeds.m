@@ -408,8 +408,9 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	NSTableCellView *cellView = [self.outlineView makeViewWithIdentifier:cellIdent owner:nil];
 	
 	if (isRefreshColumn) {
-		cellView.textField.objectValue = fg.refreshStr;
-		cellView.textField.textColor = (fg.refreshStr.length > 1 ? [NSColor controlTextColor] : [NSColor disabledControlTextColor]);
+		NSString *str = [fg refreshString];
+		cellView.textField.stringValue = str;
+		cellView.textField.textColor = (str.length > 1 ? [NSColor controlTextColor] : [NSColor disabledControlTextColor]);
 	} else if (isSeperator) {
 		return cellView; // refresh cell already skipped with the above if condition
 	} else {
