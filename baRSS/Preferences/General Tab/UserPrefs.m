@@ -21,6 +21,7 @@
 //  SOFTWARE.
 
 #import "UserPrefs.h"
+#import <Cocoa/Cocoa.h>
 
 @implementation UserPrefs
 
@@ -52,6 +53,16 @@
 /// Store custom browser bundle id to user defaults.
 + (void)setHttpApplication:(NSString*)bundleID {
 	[[NSUserDefaults standardUserDefaults] setObject:bundleID forKey:@"defaultHttpApplication"];
+}
+
+/**
+ Open web links in default browser or a browser the user selected in the preferences.
+ 
+ @param urls A list of @c NSURL objects that will be opened immediatelly in bulk.
+ */
++ (void)openURLsWithPreferredBrowser:(NSArray<NSURL*>*)urls {
+	if (urls.count == 0) return;
+	[[NSWorkspace sharedWorkspace] openURLs:urls withAppBundleIdentifier:[self getHttpApplication] options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
 }
 
 #pragma mark - Hidden Plist Properties -

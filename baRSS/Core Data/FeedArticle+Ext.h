@@ -20,26 +20,12 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+#import "FeedArticle+CoreDataClass.h"
 #import <Cocoa/Cocoa.h>
 
-typedef int32_t Interval;
-typedef NS_ENUM(int32_t, TimeUnitType) {
-	TimeUnitSeconds = 1,
-	TimeUnitMinutes = 60,
-	TimeUnitHours = 60 * 60,
-	TimeUnitDays = 24 * 60 * 60,
-	TimeUnitWeeks = 7 * 24 * 60 * 60,
-	TimeUnitYears = 365 * 24 * 60 * 60
-};
+@class RSParsedArticle;
 
-@interface NSDate (Ext)
-+ (nonnull NSString*)stringForInterval:(Interval)intv rounded:(BOOL)flag;
-+ (TimeUnitType)unitForInterval:(Interval)intv rounded:(BOOL)flag;
-@end
-
-
-@interface NSDate (RefreshControlsUI)
-+ (Interval)intervalForPopup:(NSPopUpButton*)unit andField:(NSTextField*)value;
-+ (void)setInterval:(Interval)intv forPopup:(NSPopUpButton*)popup andField:(NSTextField*)field animate:(BOOL)flag;
-+ (void)populateUnitsMenu:(NSPopUpButton*)popup selected:(TimeUnitType)unit;
+@interface FeedArticle (Ext)
++ (instancetype)newArticle:(RSParsedArticle*)entry inContext:(NSManagedObjectContext*)moc;
+- (NSMenuItem*)newMenuItem;
 @end

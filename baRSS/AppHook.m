@@ -21,8 +21,13 @@
 //  SOFTWARE.
 
 #import "AppHook.h"
-#import "BarMenu.h"
+#import "BarStatusItem.h"
 #import "FeedDownload.h"
+#import "Preferences.h"
+
+@interface AppHook()
+@property (strong) Preferences *prefWindow;
+@end
 
 @implementation AppHook
 
@@ -33,7 +38,7 @@
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
-	_barMenu = [BarMenu new];
+	_statusItem = [BarStatusItem new];
 	NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
 	[appleEventManager setEventHandler:self andSelector:@selector(handleGetURLEvent:withReplyEvent:)
 						 forEventClass:kInternetEventClass andEventID:kAEGetURL];
@@ -57,6 +62,29 @@
 			url = [url substringFromIndex:2];
 		[FeedDownload autoDownloadAndParseURL:url];
 	}
+}
+
+
+#pragma mark - Handle Menu Interaction
+
+
+/// Called whenever the user activates the preferences (either through menu click or hotkey).
+- (void)openPreferences {
+	if (!self.prefWindow) {
+		self.prefWindow = [[Preferences alloc] initWithWindowNibName:@"Preferences"];
+		self.prefWindow.window.title = [NSString stringWithFormat:@"%@ %@", NSProcessInfo.processInfo.processName,
+										NSLocalizedString(@"Preferences", nil)];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preferencesClosed:) name:NSWindowWillCloseNotification object:self.prefWindow.window];
+	}
+	[NSApp activateIgnoringOtherApps:YES];
+	[self.prefWindow showWindow:nil];
+}
+
+/// Callback method after user closes the preferences window.
+- (void)preferencesClosed:(id)sender {
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:self.prefWindow.window];
+	self.prefWindow = nil;
+	[FeedDownload scheduleUpdateForUpcomingFeeds];
 }
 
 

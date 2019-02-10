@@ -20,22 +20,32 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import "Feed+CoreDataClass.h"
+#import "FeedGroup+CoreDataClass.h"
+#import <Cocoa/Cocoa.h>
 
-@class RSParsedFeed;
+/// Enum type to distinguish different @c FeedGroup types: @c GROUP, @c FEED, @c SEPARATOR
+typedef NS_ENUM(int16_t, FeedGroupType) {
+	/// Other types: @c GROUP, @c FEED, @c SEPARATOR
+	GROUP = 0, FEED = 1, SEPARATOR = 2
+};
 
-@interface Feed (Ext)
-// Generator methods / Feed update
-+ (instancetype)newFeedAndMetaInContext:(NSManagedObjectContext*)context;
-+ (instancetype)appendToRootWithDefaultIntervalInContext:(NSManagedObjectContext*)moc;
-- (void)calculateAndSetIndexPathString;
-- (void)calculateAndSetUnreadCount;
-- (void)updateWithRSS:(RSParsedFeed*)obj postUnreadCountChange:(BOOL)flag;
-// Article properties
-- (NSArray<FeedArticle*>*)sortedArticles;
-- (int)markAllItemsRead;
-- (int)markAllItemsUnread;
-// Icon
-- (NSImage*)iconImage16;
-- (BOOL)setIconImage:(NSImage*)img;
+
+@interface FeedGroup (Ext)
+/// Overwrites @c type attribute with enum. Use one of: @c GROUP, @c FEED, @c SEPARATOR.
+@property (nonatomic) FeedGroupType type;
+@property (nonnull, readonly) NSString *nameOrError;
+
++ (instancetype)newGroup:(FeedGroupType)type inContext:(NSManagedObjectContext*)context;
+- (void)setParent:(FeedGroup *)parent andSortIndex:(int32_t)sortIndex;
+- (void)setNameIfChanged:(NSString*)name;
+- (NSImage*)groupIconImage16;
+- (NSMenuItem*)newMenuItem;
+// Handle children and parents
+- (NSString*)indexPathString;
+- (NSArray<FeedGroup*>*)sortedChildren;
+- (NSMutableArray<FeedGroup*>*)allParents;
+- (BOOL)iterateSorted:(BOOL)ordered overDescendantFeeds:(void(^)(Feed *feed, BOOL* cancel))block;
+// Printing
+- (NSString*)readableDescription;
+- (nonnull NSString*)refreshString;
 @end

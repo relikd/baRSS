@@ -5,7 +5,6 @@
         <attribute name="link" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="subtitle" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="unreadCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="articles" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FeedArticle" inverseName="feed" inverseEntity="FeedArticle" syncable="YES"/>
         <relationship name="group" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedGroup" inverseName="feed" inverseEntity="FeedGroup" syncable="YES"/>
         <relationship name="icon" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FeedIcon" inverseName="feed" inverseEntity="FeedIcon" syncable="YES"/>
@@ -45,7 +44,7 @@
         <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="meta" inverseEntity="Feed" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Feed" positionX="-278.84765625" positionY="-112.953125" width="128" height="180"/>
+        <element name="Feed" positionX="-278.84765625" positionY="-112.953125" width="128" height="165"/>
         <element name="FeedArticle" positionX="-96.77734375" positionY="-113.83984375" width="128" height="195"/>
         <element name="FeedGroup" positionX="-460.37890625" positionY="-111.62890625" width="130.52734375" height="135"/>
         <element name="FeedIcon" positionX="-202.79296875" positionY="137.71875" width="128" height="75"/>

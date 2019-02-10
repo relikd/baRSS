@@ -20,26 +20,19 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
+#import <CoreData/CoreData.h>
 
-typedef int32_t Interval;
-typedef NS_ENUM(int32_t, TimeUnitType) {
-	TimeUnitSeconds = 1,
-	TimeUnitMinutes = 60,
-	TimeUnitHours = 60 * 60,
-	TimeUnitDays = 24 * 60 * 60,
-	TimeUnitWeeks = 7 * 24 * 60 * 60,
-	TimeUnitYears = 365 * 24 * 60 * 60
-};
+@interface NSFetchRequest<ResultType> (Ext)
+// Perform core data request and fetch data
+- (NSArray<ResultType>*)fetchAllRows:(NSManagedObjectContext*)moc;
+- (NSArray<NSManagedObjectID*>*)fetchIDs:(NSManagedObjectContext*)moc;
+- (NSUInteger)fetchCount:(NSManagedObjectContext*)moc;
+- (id)fetchFirst:(NSManagedObjectContext*)moc; // limit 1
 
-@interface NSDate (Ext)
-+ (nonnull NSString*)stringForInterval:(Interval)intv rounded:(BOOL)flag;
-+ (TimeUnitType)unitForInterval:(Interval)intv rounded:(BOOL)flag;
-@end
-
-
-@interface NSDate (RefreshControlsUI)
-+ (Interval)intervalForPopup:(NSPopUpButton*)unit andField:(NSTextField*)value;
-+ (void)setInterval:(Interval)intv forPopup:(NSPopUpButton*)popup andField:(NSTextField*)field animate:(BOOL)flag;
-+ (void)populateUnitsMenu:(NSPopUpButton*)popup selected:(TimeUnitType)unit;
+// Selecting, filtering, sorting results
+- (instancetype)select:(NSArray<NSString*>*)cols; // sets .propertiesToFetch
+- (instancetype)where:(NSString*)format, ...; // sets .predicate
+- (instancetype)sortASC:(NSString*)key; // add .sortDescriptors -> ascending:YES
+- (instancetype)sortDESC:(NSString*)key; // add .sortDescriptors -> ascending:NO
+- (instancetype)addFunctionExpression:(NSString*)fn onKeyPath:(NSString*)keyPath name:(NSString*)name type:(NSAttributeType)type; // add .propertiesToFetch -> (expressionForFunction:@[expressionForKeyPath:])
 @end

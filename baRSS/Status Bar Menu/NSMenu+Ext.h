@@ -21,20 +21,26 @@
 //  SOFTWARE.
 
 #import <Cocoa/Cocoa.h>
-#import "NSMenuItem+Ext.h"
+
+@class FeedGroup;
 
 @interface NSMenu (Ext)
+@property (nonnull, copy, readonly) NSString *titleIndexPath;
+@property (nullable, readonly) NSMenuItem* parentItem;
+@property (readonly) BOOL isMainMenu;
+@property (readonly) BOOL isFeedMenu;
+
 // Generator
-+ (instancetype)menuWithDelegate:(id<NSMenuDelegate>)target;
-- (instancetype)submenuWithIndex:(int)index isFeed:(BOOL)flag;
-- (instancetype)cleanInstanceCopy;
-// Properties
-- (BOOL)isMainMenu;
-- (BOOL)isFeedMenu;
-- (MenuItemTag)scope;
-- (NSInteger)feedDataOffset;
-- (NSInteger)coreDataUnreadCount;
-// Modify menu
-- (void)replaceSeparatorStringsWithActualSeparator;
-- (void)autoEnableMenuHeader:(BOOL)hasUnread;
+- (NSMenuItem*)insertFeedGroupItem:(FeedGroup*)fg;
+- (void)insertDefaultHeader;
+// Update menu
+- (void)cleanup;
+- (void)setHeaderHasUnread:(BOOL)hasUnread hasRead:(BOOL)hasRead;
+- (NSMenuItem*)deepestItemWithPath:(nonnull NSString*)path;
+@end
+
+
+@interface NSMenuItem (Ext)
+- (instancetype)alternateWithTitle:(NSString*)title;
+- (void)setTitleCount:(NSUInteger)count;
 @end

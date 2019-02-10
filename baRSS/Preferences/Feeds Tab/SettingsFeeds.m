@@ -61,8 +61,8 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	self.dataStore.managedObjectContext.undoManager = self.undoManager;
 	
 	// Register for notifications
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateIcon:) name:kNotificationFeedUpdated object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateIcon:) name:kNotificationFeedIconUpdated object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedUpdated:) name:kNotificationFeedUpdated object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedUpdated:) name:kNotificationFeedIconUpdated object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateInProgress:) name:kNotificationBackgroundUpdateInProgress object:nil];
 }
 
@@ -132,8 +132,8 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 #pragma mark - Notification callback methods
 
 
-/// Callback method fired when feeds have been updated in the background.
-- (void)updateIcon:(NSNotification*)notify {
+/// Callback method fired when feed (or icon) has been updated in the background.
+- (void)feedUpdated:(NSNotification*)notify {
 	NSManagedObjectID *oid = notify.object;
 	NSManagedObjectContext *moc = self.dataStore.managedObjectContext;
 	Feed *feed = [moc objectRegisteredForID:oid];

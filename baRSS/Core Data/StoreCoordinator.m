@@ -1,0 +1,253 @@
+//
+//  The MIT License (MIT)
+//  Copyright (c) 2018 Oleg Geier
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy of
+//  this software and associated documentation files (the "Software"), to deal in
+//  the Software without restriction, including without limitation the rights to
+//  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+//  of the Software, and to permit persons to whom the Software is furnished to do
+//  so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in all
+//  copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//  SOFTWARE.
+
+#import "StoreCoordinator.h"
+#import "NSFetchRequest+Ext.h"
+#import "AppHook.h"
+#import "Feed+Ext.h"
+
+@implementation StoreCoordinator
+
+#pragma mark - Managing contexts
+
+/// @return The application main persistent context.
++ (NSManagedObjectContext*)getMainContext {
+	return [(AppHook*)NSApp persistentContainer].viewContext;
+}
+
+/// New child context with @c NSMainQueueConcurrencyType and without undo manager.
++ (NSManagedObjectContext*)createChildContext {
+	NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+	[context setParentContext:[self getMainContext]];
+	context.undoManager = nil;
+	//context.automaticallyMergesChangesFromParent = YES;
+	return context;
+}
+
+/**
+ Commit changes and perform save operation on @c context.
+
+ @param flag If @c YES save any parent context as well (recursive).
+ */
++ (void)saveContext:(NSManagedObjectContext*)context andParent:(BOOL)flag {
+	// Performs the save action for the application, which is to send the save: message to the application's managed object context. Any encountered errors are presented to the user.
+	if (![context commitEditing]) {
+		NSLog(@"%@:%@ unable to commit editing before saving", [self class], NSStringFromSelector(_cmd));
+	}
+	NSError *error = nil;
+	if (context.hasChanges && ![context save:&error]) {
+		// Customize this code block to include application-specific recovery steps.
+		[[NSApplication sharedApplication] presentError:error];
+	}
+	if (flag && context.parentContext) {
+		[self saveContext:context.parentContext andParent:flag];
+	}
+}
+
+
+#pragma mark - Feed Update
+
+/// @return @c NSDate of next (earliest) feed update. May be @c nil.
++ (NSDate*)nextScheduledUpdate {
+	NSFetchRequest *fr = [FeedMeta fetchRequest];
+	[fr addFunctionExpression:@"min:" onKeyPath:@"scheduled" name:@"minDate" type:NSDateAttributeType];
+	return [fr fetchAllRows: [self getMainContext]].firstObject[@"minDate"];
+}
+
+/**
+ List of @c Feed items that need to be updated. Scheduled time is now (or in past).
+
+ @param forceAll If @c YES get a list of all @c Feed regardless of schedules time.
+ */
++ (NSArray<Feed*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc {
+	NSFetchRequest *fr = [Feed fetchRequest];
+	if (!forceAll) {
+		// when fetching also get those feeds that would need update soon (now + 10s)
+		[fr where:@"meta.scheduled <= %@", [NSDate dateWithTimeIntervalSinceNow:+10]];
+	}
+	return [fr fetchAllRows:moc];
+}
+
+
+#pragma mark - Count Elements
+
+/// @return Sum of all unread @c FeedArticle items.
++ (NSUInteger)countTotalUnread {
+	return [[[FeedArticle fetchRequest] where:@"unread = YES"] fetchCount: [self getMainContext]];
+}
+
+/// @return Count of objects at root level. Aka @c sortIndex for the next @c FeedGroup item.
++ (NSUInteger)countRootItemsInContext:(NSManagedObjectContext*)moc {
+	return [[[FeedGroup fetchRequest] where:@"parent = NULL"] fetchCount:moc];
+}
+
+/// @return Unread and total count grouped by @c Feed item.
++ (NSArray<NSDictionary*>*)countAggregatedUnread {
+	NSFetchRequest *fr = [Feed fetchRequest];
+	fr.propertiesToGroupBy = @[ @"indexPath" ];
+	fr.propertiesToFetch = @[ @"indexPath" ];
+	[fr addFunctionExpression:@"sum:" onKeyPath:@"articles.unread" name:@"unread" type:NSInteger32AttributeType];
+	[fr addFunctionExpression:@"count:" onKeyPath:@"articles.unread" name:@"total" type:NSInteger32AttributeType];
+	return [fr fetchAllRows: [self getMainContext]];
+}
+
+
+#pragma mark - Get List Of Elements
+
+/// @return Sorted list of @c FeedGroup items where @c FeedGroup.parent @c = @c parent.
++ (NSArray<FeedGroup*>*)sortedFeedGroupsWithParent:(id)parent inContext:(NSManagedObjectContext*)moc {
+	return [[[[FeedGroup fetchRequest] where:@"parent = %@", parent] sortASC:@"sortIndex"] fetchAllRows:moc];
+}
+
+/// @return Sorted list of @c FeedArticle items where @c FeedArticle.feed @c = @c parent.
++ (NSArray<FeedArticle*>*)sortedArticlesWithParent:(id)parent inContext:(NSManagedObjectContext*)moc {
+	return [[[[FeedArticle fetchRequest] where:@"feed = %@", parent] sortDESC:@"sortIndex"] fetchAllRows:moc];
+}
+
+/// @return Unsorted list of @c Feed items where @c articles.count @c == @c 0.
++ (NSArray<Feed*>*)listOfFeedsMissingArticlesInContext:(NSManagedObjectContext*)moc {
+	return [[[Feed fetchRequest] where:@"articles.@count == 0"] fetchAllRows:moc];
+}
+
+/// @return Unsorted list of @c Feed items where @c icon is @c nil.
++ (NSArray<Feed*>*)listOfFeedsMissingIconsInContext:(NSManagedObjectContext*)moc {
+	return [[[Feed fetchRequest] where:@"icon = NULL"] fetchAllRows:moc];
+}
+
+/// @return Single @c Feed item where @c Feed.indexPath @c = @c path.
++ (Feed*)feedWithIndexPath:(nonnull NSString*)path inContext:(NSManagedObjectContext*)moc {
+	return [[[Feed fetchRequest] where:@"indexPath = %@", path] fetchFirst:moc];
+}
+
+/// @return URL of @c Feed item where @c Feed.indexPath @c = @c path.
++ (NSString*)urlForFeedWithIndexPath:(nonnull NSString*)path {
+	return [[[[Feed fetchRequest] where:@"indexPath = %@", path] select:@[@"link"]] fetchFirst: [self getMainContext]][@"link"];
+}
+
+/// @return Unsorted list of object IDs where @c Feed.indexPath begins with @c path @c + @c "."
++ (NSArray<NSManagedObjectID*>*)feedIDsForIndexPath:(nonnull NSString*)path inContext:(NSManagedObjectContext*)moc {
+	return [[[Feed fetchRequest] where:@"indexPath BEGINSWITH %@", [path stringByAppendingString:@"."]] fetchIDs:moc];
+}
+
+
+#pragma mark - Unread Articles List & Mark Read
+
+/// @return Return predicate that will match either exactly one, @b or a list of, @b or all @c Feed items.
++ (nullable NSPredicate*)predicateWithPath:(nullable NSString*)path isFeed:(BOOL)flag inContext:(NSManagedObjectContext*)moc {
+	if (!path) return nil; // match all
+	if (flag) {
+		Feed *obj = [self feedWithIndexPath:path inContext:moc];
+		return [NSPredicate predicateWithFormat:@"feed = %@", obj.objectID];
+	}
+	NSArray *list = [self feedIDsForIndexPath:path inContext:moc];
+	if (list && list.count > 0) {
+		return [NSPredicate predicateWithFormat:@"feed IN %@", list];
+	}
+	return [NSPredicate predicateWithValue:NO]; // match none
+}
+
+/**
+ Return object list with @c FeedArticle where @c unread @c = @c YES. In the same order the user provided.
+
+ @param path Match @c Feed items where @c indexPath string matches @c path.
+ @param feedFlag If @c YES path must match exactly. If @c NO match items that begin with @c path + @c "."
+ @param sortFlag Whether articles should be returned in sorted order (e.g., for 'open all unread').
+ @param readFlag Match @c FeedArticle where @c unread @c = @c readFlag.
+ @param limit Only return first @c X articles that match the criteria.
+ @return Sorted list of @c FeedArticle with @c unread @c = @c YES.
+ */
++ (NSArray<FeedArticle*>*)articlesAtPath:(nullable NSString*)path isFeed:(BOOL)feedFlag sorted:(BOOL)sortFlag unread:(BOOL)readFlag inContext:(NSManagedObjectContext*)moc limit:(NSUInteger)limit {
+	NSFetchRequest<FeedArticle*> *fr = [[FeedArticle fetchRequest] where:@"unread = %d", readFlag];
+	fr.fetchLimit = limit;
+	if (sortFlag) {
+		if (!path || !feedFlag)
+			[fr sortASC:@"feed.indexPath"];
+		[fr sortDESC:@"sortIndex"];
+	}
+	/* UNUSED. Batch updates will break NSUndoManager in preferences. Fix that before usage.
+	 NSBatchUpdateRequest *bur = [NSBatchUpdateRequest batchUpdateRequestWithEntityName: FeedArticle.entity.name];
+	 bur.propertiesToUpdate = @{ @"unread": @(!readFlag) };
+	 bur.resultType = NSUpdatedObjectIDsResultType;
+	 bur.predicate = [NSPredicate predicateWithFormat:@"unread = %d", readFlag];*/
+	NSPredicate *feedFilter = [self predicateWithPath:path isFeed:feedFlag inContext:moc];
+	if (feedFilter)
+		fr.predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[fr.predicate, feedFilter]];
+	return [fr fetchAllRows:moc];
+}
+
+
+#pragma mark - Restore Sound State
+
+/// Iterate over all @c Feed and re-calculate @c indexPath.
++ (void)restoreFeedIndexPaths {
+	NSManagedObjectContext *moc = [self getMainContext];
+	for (Feed *f in [[Feed fetchRequest] fetchAllRows:moc]) {
+		[f calculateAndSetIndexPathString];
+	}
+	[self saveContext:moc andParent:YES];
+	[moc reset];
+}
+
+/**
+ Delete all @c Feed items where @c group @c = @c NULL and all @c FeedMeta, @c FeedIcon, @c FeedArticle where @c feed @c = @c NULL.
+ */
++ (NSUInteger)deleteUnreferenced {
+	NSUInteger deleted = 0;
+	NSManagedObjectContext *moc = [self getMainContext];
+	deleted += [self batchDelete:Feed.entity nullAttribute:@"group" inContext:moc];
+	deleted += [self batchDelete:FeedMeta.entity nullAttribute:@"feed" inContext:moc];
+	deleted += [self batchDelete:FeedIcon.entity nullAttribute:@"feed" inContext:moc];
+	deleted += [self batchDelete:FeedArticle.entity nullAttribute:@"feed" inContext:moc];
+	if (deleted > 0) {
+		[self saveContext:moc andParent:YES];
+		[moc reset];
+	}
+	return deleted;
+}
+
+/// Delete all @c FeedGroup items.
++ (NSUInteger)deleteAllGroups {
+	NSManagedObjectContext *moc = [self getMainContext];
+	NSUInteger deleted = [self batchDelete:FeedGroup.entity nullAttribute:nil inContext:moc];
+	[self saveContext:moc andParent:YES];
+	[moc reset];
+	return deleted;
+}
+
+/**
+ Perform batch delete on entities of type @c entity where @c column @c IS @c NULL. If @c column is @c nil, delete all rows.
+ */
++ (NSUInteger)batchDelete:(NSEntityDescription*)entity nullAttribute:(NSString*)column inContext:(NSManagedObjectContext*)moc {
+	NSFetchRequest *fr = [NSFetchRequest fetchRequestWithEntityName: entity.name];
+	if (column && column.length > 0) {
+		// using @count here to also find items where foreign key is set but referencing a non-existing object.
+		fr.predicate = [NSPredicate predicateWithFormat:@"count(%K) == 0", column];
+	}
+	NSBatchDeleteRequest *bdr = [[NSBatchDeleteRequest alloc] initWithFetchRequest:fr];
+	bdr.resultType = NSBatchDeleteResultTypeCount;
+	NSError *err;
+	NSBatchDeleteResult *res = [moc executeRequest:bdr error:&err];
+	if (err) NSLog(@"%@", err);
+	return [res.result unsignedIntegerValue];
+}
+
+@end
