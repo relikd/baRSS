@@ -4,7 +4,7 @@
 
 For nearly a decade I've been using the then free version of [RSS Menu](https://itunes.apple.com/us/app/rss-menu/id423069534). However, with the release of macOS Mojave, 32bit applications are no longer supported. Furthermore, the currently available version in the Mac App Store was last updated in 2014 (as of writing).
 
-*baRSS* was build from scratch with a minimal footprint in mind. It will be available on the AppStore eventually. If you want a feature to be added, drop me an email or create an issue. Look at the other issues, in case somebody else already filed one similar. If you like this project and want to say thank you drop me a line (or other stuff like money). Regardless, I'll continue development as long as I'm using it on my own. Admittedly, I've invested way too much time in this project already (1200h+) …
+*baRSS* was build from scratch with a minimal footprint in mind. It will be available on the AppStore eventually. If you want a feature to be added, drop me an email or create an issue. Look at the other issues, in case somebody else already filed one similar. If you like this project and want to say thank you drop me a line (or other stuff like money). Regardless, I'll continue development as long as I'm using it on my own. Admittedly, I've invested way too much time in this project already (1400h+) …
 
 
 Why is this project not written in Swift?

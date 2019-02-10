@@ -76,6 +76,7 @@
 @property (copy) NSString *previousURL; // check if changed and avoid multiple download
 @property (copy) NSString *httpDate;
 @property (copy) NSString *httpEtag;
+@property (copy) NSString *faviconURL;
 @property (strong) NSImage *favicon;
 @property (strong) NSError *feedError; // download error or xml parser error
 @property (strong) RSParsedFeed *feedResult; // parsed result
@@ -148,6 +149,7 @@
 	self.httpEtag = nil;
 	self.httpDate = nil;
 	self.favicon = nil;
+	self.faviconURL = nil;
 }
 
 /**
@@ -159,8 +161,9 @@
 	if (self.modalSheet.didCloseAndCancel)
 		return;
 	[self preDownload];
-	[FeedDownload newFeed:self.previousURL askUser:^NSString *(NSArray<RSHTMLMetadataFeedLink *> *list) {
-		return [self letUserChooseXmlUrlFromList:list];
+	[FeedDownload newFeed:self.previousURL askUser:^NSString *(RSHTMLMetadata *meta) {
+		self.faviconURL = [FeedDownload faviconUrlForMetadata:meta]; // we can re-use favicon url if we find one
+		return [self letUserChooseXmlUrlFromList:meta.feedLinks];
 	} block:^(RSParsedFeed *result, NSError *error, NSHTTPURLResponse* response) {
 		if (self.modalSheet.didCloseAndCancel)
 			return;
@@ -222,10 +225,11 @@
 	if (self.feedError) {
 		[self finishDownloadWithFavicon:[NSImage imageNamed:NSImageNameCaution]];
 	} else {
-		NSString *faviconURL = self.feedResult.link;
-		if (faviconURL.length == 0)
-			faviconURL = responseURL;
-		[FeedDownload downloadFavicon:faviconURL finished:^(NSImage * _Nullable img) {
+		if (!self.faviconURL)
+			self.faviconURL = self.feedResult.link;
+		if (self.faviconURL.length == 0)
+			self.faviconURL = responseURL;
+		[FeedDownload downloadFavicon:self.faviconURL finished:^(NSImage * _Nullable img) {
 			if (self.modalSheet.didCloseAndCancel)
 				return;
 			self.favicon = img;
