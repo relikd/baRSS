@@ -301,7 +301,7 @@ static BOOL _nextUpdateIsForced = NO;
 		} else {
 			success = YES;
 			[f.meta setSucessfulWithResponse:response];
-			if (rss) {
+			if (rss && rss.articles.count > 0) {
 				[f updateWithRSS:rss postUnreadCountChange:YES];
 				needsNotification = YES;
 			}

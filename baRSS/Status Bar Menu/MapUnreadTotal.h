@@ -1,6 +1,6 @@
 //
 //  The MIT License (MIT)
-//  Copyright (c) 2018 Oleg Geier
+//  Copyright (c) 2019 Oleg Geier
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -20,29 +20,22 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import "FeedGroup+CoreDataClass.h"
+#import <Foundation/Foundation.h>
 
-/// Enum type to distinguish different @c FeedGroup types: @c GROUP, @c FEED, @c SEPARATOR
-typedef NS_ENUM(int16_t, FeedGroupType) {
-	/// Other types: @c GROUP, @c FEED, @c SEPARATOR
-	GROUP = 0, FEED = 1, SEPARATOR = 2
-};
+@interface UnreadTotal : NSObject
+@property (nonatomic, assign) NSUInteger unread;
+@property (nonatomic, assign) NSUInteger total;
+@end
 
 
-@interface FeedGroup (Ext)
-/// Overwrites @c type attribute with enum. Use one of: @c GROUP, @c FEED, @c SEPARATOR.
-@property (nonatomic) FeedGroupType type;
+@interface MapUnreadTotal : NSObject
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithCoreData:(NSArray<NSDictionary*>*)data NS_DESIGNATED_INITIALIZER;
 
-+ (instancetype)newGroup:(FeedGroupType)type inContext:(NSManagedObjectContext*)context;
-- (void)setParent:(FeedGroup *)parent andSortIndex:(int32_t)sortIndex;
-- (void)setNameIfChanged:(NSString*)name;
-- (NSImage*)groupIconImage16;
-// Handle children and parents
-- (NSString*)indexPathString;
-- (NSArray<FeedGroup*>*)sortedChildren;
-- (NSMutableArray<FeedGroup*>*)allParents;
-- (BOOL)iterateSorted:(BOOL)ordered overDescendantFeeds:(void(^)(Feed *feed, BOOL* cancel))block;
-// Printing
-- (NSString*)readableDescription;
-- (nonnull NSString*)refreshString;
+- (NSArray<UnreadTotal*>*)itemsForPath:(NSString*)path create:(BOOL)flag;
+- (void)updateAllCounts:(UnreadTotal*)updated forPath:(NSString*)path;
+
+// Keyed subscription
+- (UnreadTotal*)objectForKeyedSubscript:(NSString*)key;
+- (void)setObject:(UnreadTotal*)obj forKeyedSubscript:(NSString*)key;
 @end

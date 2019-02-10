@@ -1,6 +1,6 @@
 //
 //  The MIT License (MIT)
-//  Copyright (c) 2018 Oleg Geier
+//  Copyright (c) 2019 Oleg Geier
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -20,26 +20,14 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Foundation/Foundation.h>
-#import "DBv1+CoreDataModel.h"
+#import <Cocoa/Cocoa.h>
 
-@interface StoreCoordinator : NSObject
-// Managing contexts
-+ (NSManagedObjectContext*)createChildContext;
-+ (void)saveContext:(NSManagedObjectContext*)context andParent:(BOOL)flag;
-// Feed update
-+ (NSArray<Feed*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc;
-+ (NSDate*)nextScheduledUpdate;
-// Main menu display
-+ (NSInteger)unreadCountForIndexPathString:(NSString*)str;
-+ (NSArray*)sortedObjectIDsForParent:(id)parent isFeed:(BOOL)flag inContext:(NSManagedObjectContext*)moc;
-// OPML import & export
-+ (NSInteger)numberRootItemsInContext:(NSManagedObjectContext*)moc;
-+ (NSArray<FeedGroup*>*)sortedListOfRootObjectsInContext:(NSManagedObjectContext*)moc;
-// Restore sound state
-+ (NSUInteger)deleteAllGroups;
-+ (NSUInteger)deleteUnreferenced;
-+ (void)restoreFeedCountsAndIndexPaths;
-+ (NSArray<Feed*>*)listOfFeedsMissingArticlesInContext:(NSManagedObjectContext*)moc;
-+ (NSArray<Feed*>*)listOfFeedsMissingIconsInContext:(NSManagedObjectContext*)moc;
+@interface BarStatusItem : NSObject
+@property (weak, readonly) NSMenu *mainMenu;
+
+- (void)setUnreadCountAbsolute:(NSUInteger)count;
+- (void)setUnreadCountRelative:(NSInteger)count;
+- (void)asyncReloadUnreadCount;
+- (void)updateBarIcon;
 @end
+

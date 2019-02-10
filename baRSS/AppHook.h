@@ -23,9 +23,11 @@
 #import <Cocoa/Cocoa.h>
 #import <CoreData/CoreData.h>
 
-@class BarMenu;
+@class BarStatusItem;
 
 @interface AppHook : NSApplication <NSApplicationDelegate>
-@property (readonly, strong) BarMenu *barMenu;
+@property (readonly, strong) BarStatusItem *statusItem;
 @property (readonly, strong) NSPersistentContainer *persistentContainer;
+
+- (void)openPreferences;
 @end

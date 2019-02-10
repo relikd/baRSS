@@ -21,6 +21,7 @@
 //  SOFTWARE.
 
 #import "Statistics.h"
+#import "NSDate+Ext.h"
 
 @implementation Statistics
 
@@ -51,55 +52,23 @@
 	if (differences.count == 0)
 		return nil;
 	
-	[differences sortUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"intValue" ascending:YES]]];
+	[differences sortUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"integerValue" ascending:YES]]];
 	
-	NSUInteger i = differences.count;
-	NSUInteger mid = (i/2);
-	unsigned int med = differences[mid].unsignedIntValue;
-	if (i > 1 && (i % 1) == 0) { // even feed count, use median of two values
-		med = (med + differences[mid+1].unsignedIntValue) / 2;
+	NSUInteger i = (differences.count/2);
+	NSNumber *median = differences[i];
+	if ((differences.count % 2) == 0) { // even feed count, use median of two values
+		median = [NSNumber numberWithInteger:(median.integerValue + differences[i-1].integerValue) / 2];
 	}
-	return @{@"min" : [self stringForInterval:differences.firstObject.unsignedIntValue],
-			 @"max" : [self stringForInterval:differences.lastObject.unsignedIntValue],
-			 @"avg" : [self stringForInterval:[(NSNumber*)[differences valueForKeyPath:@"@avg.self"] unsignedIntValue]],
-			 @"median" : [self stringForInterval:med],
+	return @{@"min" : differences.firstObject,
+			 @"max" : differences.lastObject,
+			 @"avg" : [differences valueForKeyPath:@"@avg.self"],
+			 @"median" : median,
 			 @"earliest" : earliest,
 			 @"latest" : latest };
 }
 
-/// Print @c 1.1f float string with single char unit: e.g., 3.3m, 1.7h
-+ (NSString*)stringForInterval:(unsigned int)val {
-	float i;
-	NSUInteger u = [self findAppropriateTimeUnit:val interval:&i];
-	return [NSString stringWithFormat:@"%1.1f%c", i, [@"smhdw" characterAtIndex:u]];
-}
-
-/// @return Unit as int @c (0-4) (0: seconds - 4: weeks). Sets division result @c intv.
-+ (NSUInteger)findAppropriateTimeUnit:(unsigned int)val interval:(float*)intv {
-	if (val > 604800) {*intv = (val / 604800.f); return 4;} // weeks
-	if (val > 86400) {*intv = (val / 86400.f); return 3;} // days
-	if (val > 3600) {*intv = (val / 3600.f); return 2;} // hours
-	if (val > 60) {*intv = (val / 60.f); return 1;} // minutes
-	*intv = (val / 1.f);
-	return 0;
-}
-
-/// @return Single integer value that combines refresh interval and refresh unit. To be used as @c NSButton.tag
-+ (NSInteger)buttonTagFromRefreshString:(NSString*)str {
-	NSInteger refresh = (NSInteger)roundf([str floatValue]) << 3;
-	switch ([str characterAtIndex:(str.length - 1)]) {
-		case 's': return 0 | refresh;
-		case 'm': return 1 | refresh;
-		case 'h': return 2 | refresh;
-		case 'd': return 3 | refresh;
-		case 'w': return 4 | refresh;
-	}
-	return 0; // error, should never happen though
-}
-
 
 #pragma mark - Feed Statistics UI
-
 
 /**
  Generate UI with buttons for min, max, avg and median. Also show number of articles and latest article date.
@@ -120,8 +89,7 @@
 	NSPoint origin = NSZeroPoint;
 	for (NSString *str in @[@"min", @"max", @"avg", @"median"]) {
 		NSString *title = [str stringByAppendingString:@":"];
-		NSString *value = [info valueForKey:str];
-		NSView *v = [self viewWithLabel:title andRefreshButton:value callback:callback];
+		NSView *v = [self viewWithLabel:title andInterval:info[str] callback:callback];
 		[v setFrameOrigin:origin];
 		[buttonsView addSubview:v];
 		origin.x += NSWidth(v.frame);
@@ -161,11 +129,8 @@
 /**
  Create view with duration button, e.g., '3.4h' and label infornt of it.
  */
-+ (NSView*)viewWithLabel:(NSString*)title andRefreshButton:(NSString*)value callback:(nullable id<RefreshIntervalButtonDelegate>)callback {
++ (NSView*)viewWithLabel:(NSString*)title andInterval:(NSNumber*)value callback:(nullable id<RefreshIntervalButtonDelegate>)callback {
 	static const int buttonPadding = 5;
-	if (!value  || value.length == 0)
-		return nil;
-	
 	NSButton *button = [self grayInlineButton:value];
 	if (callback) {
 		button.target = callback;
@@ -194,12 +159,13 @@
 /**
  @return Rounded, gray inline button with tag equal to refresh interval.
  */
-+ (NSButton*)grayInlineButton:(NSString*)text {
-	NSButton *button = [NSButton buttonWithTitle:text target:nil action:nil];
++ (NSButton*)grayInlineButton:(NSNumber*)num {
+	NSButton *button = [NSButton buttonWithTitle:[NSDate stringForInterval:num.intValue rounded:YES] target:nil action:nil];
 	button.font = [NSFont monospacedDigitSystemFontOfSize: NSFont.labelFontSize weight:NSFontWeightBold];
 	button.bezelStyle = NSBezelStyleInline;
 	button.controlSize = NSControlSizeSmall;
-	button.tag = [self buttonTagFromRefreshString:text];
+	TimeUnitType unit = [NSDate unitForInterval:num.intValue rounded:YES];
+	button.tag = (NSInteger)(roundf(num.floatValue / unit) * unit); // rounded inteval
 	[button sizeToFit];
 	return button;
 }

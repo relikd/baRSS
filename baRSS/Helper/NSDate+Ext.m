@@ -1,5 +1,28 @@
+//
+//  The MIT License (MIT)
+//  Copyright (c) 2019 Oleg Geier
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy of
+//  this software and associated documentation files (the "Software"), to deal in
+//  the Software without restriction, including without limitation the rights to
+//  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+//  of the Software, and to permit persons to whom the Software is furnished to do
+//  so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in all
+//  copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//  SOFTWARE.
 
 #import "NSDate+Ext.h"
+
+#import <QuartzCore/QuartzCore.h>
 
 static const char _shortnames[] = {'y','w','d','h','m','s'};
 static const char *_names[] = {"Years", "Weeks", "Days", "Hours", "Minutes", "Seconds"};
@@ -15,6 +38,7 @@ static const TimeUnitType _values[] = {
 
 @implementation NSDate (Ext)
 
+/// If @c flag @c = @c YES, print @c 1.1f float string with single char unit: e.g., 3.3m, 1.7h.
 + (nonnull NSString*)stringForInterval:(Interval)intv rounded:(BOOL)flag {
 	if (flag) {
 		unsigned short i = [self floatUnitIndexForInterval:abs(intv)];
@@ -80,10 +104,13 @@ static const TimeUnitType _values[] = {
 }
 
 /// Configure both @c NSControl elements based on the provided interval @c intv.
-+ (void)setInterval:(Interval)intv forPopup:(NSPopUpButton*)popup andField:(NSTextField*)field {
++ (void)setInterval:(Interval)intv forPopup:(NSPopUpButton*)popup andField:(NSTextField*)field animate:(BOOL)flag {
 	TimeUnitType unit = [self unitForInterval:intv rounded:NO];
+	int num = (int)(intv / unit);
+	if (flag && popup.selectedTag != unit) [self animateControlSize:popup];
+	if (flag && field.intValue != num)     [self animateControlSize:field];
 	[popup selectItemWithTag:unit];
-	field.intValue = (int)(intv / unit);
+	field.intValue = num;
 }
 
 /// Insert all @c TimeUnitType items into popup button. Save unit value into @c tag attribute.
@@ -96,6 +123,19 @@ static const TimeUnitType _values[] = {
 		item.tag = _values[i];
 	}
 	[popup selectItemWithTag:unit];
+}
+
+/// Helper method to animate @c NSControl to draw user attention. View will be scalled up in a fraction of a second.
++ (void)animateControlSize:(NSView*)control {
+	CABasicAnimation *scale = [CABasicAnimation animationWithKeyPath:@"transform"];
+	CATransform3D tr = CATransform3DIdentity;
+	tr = CATransform3DTranslate(tr, NSMidX(control.bounds), NSMidY(control.bounds), 0);
+	tr = CATransform3DScale(tr, 1.1, 1.1, 1);
+	tr = CATransform3DTranslate(tr, -NSMidX(control.bounds), -NSMidY(control.bounds), 0);
+	scale.toValue = [NSValue valueWithCATransform3D:tr];
+	scale.duration = 0.15f;
+	scale.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+	[control.layer addAnimation:scale forKey:scale.keyPath];
 }
 
 @end

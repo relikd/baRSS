@@ -22,7 +22,7 @@
 
 #import "SettingsGeneral.h"
 #import "AppHook.h"
-#import "BarMenu.h"
+#import "BarStatusItem.h"
 #import "UserPrefs.h"
 #import "StoreCoordinator.h"
 #import "Constants.h"
@@ -62,13 +62,13 @@
 
 - (IBAction)fixCache:(NSButton *)sender {
 	NSUInteger deleted = [StoreCoordinator deleteUnreferenced];
-	[StoreCoordinator restoreFeedCountsAndIndexPaths];
+	[StoreCoordinator restoreFeedIndexPaths];
 	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
 	NSLog(@"Removed %lu unreferenced core data entries.", deleted);
 }
 
 - (IBAction)changeMenuBarIconSetting:(NSButton*)sender {
-	[[(AppHook*)NSApp barMenu] updateBarIcon];
+	[[(AppHook*)NSApp statusItem] updateBarIcon];
 }
 
 - (IBAction)changeHttpApplication:(NSPopUpButton *)sender {

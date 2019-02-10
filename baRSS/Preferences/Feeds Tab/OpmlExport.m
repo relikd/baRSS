@@ -64,7 +64,7 @@
 	[sp beginSheetModalForWindow:window completionHandler:^(NSModalResponse result) {
 		if (result == NSModalResponseOK) {
 			BOOL flattened = ([self radioGroupSelection:radioView] == 1);
-			NSArray<FeedGroup*> *list = [StoreCoordinator sortedListOfRootObjectsInContext:moc];
+			NSArray<FeedGroup*> *list = [StoreCoordinator sortedFeedGroupsWithParent:nil inContext:moc];
 			NSXMLDocument *doc = [self xmlDocumentForFeeds:list hierarchical:!flattened];
 			NSData *xml = [doc XMLDataWithOptions:NSXMLNodePreserveAttributeOrder | NSXMLNodePrettyPrint];
 			NSError *error;
@@ -115,12 +115,12 @@
 	
 	int32_t idx = 0;
 	if (select == 1) { // overwrite selected
-		for (FeedGroup *fg in [StoreCoordinator sortedListOfRootObjectsInContext:moc]) {
+		for (FeedGroup *fg in [StoreCoordinator sortedFeedGroupsWithParent:nil inContext:moc]) {
 			[moc deleteObject:fg]; // Not a batch delete request to support undo
 		}
-		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:@(0)];
+		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:@0];
 	} else {
-		idx = (int32_t)[StoreCoordinator numberRootItemsInContext:moc];
+		idx = (int32_t)[StoreCoordinator countRootItemsInContext:moc];
 	}
 	
 	NSMutableArray<Feed*> *list = [NSMutableArray array];

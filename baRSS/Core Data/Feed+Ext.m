@@ -22,11 +22,11 @@
 
 #import "Feed+Ext.h"
 #import "Constants.h"
+#import "UserPrefs.h"
 #import "DrawImage.h"
 #import "FeedMeta+Ext.h"
 #import "FeedGroup+Ext.h"
-#import "FeedIcon+CoreDataClass.h"
-#import "FeedArticle+CoreDataClass.h"
+#import "FeedArticle+Ext.h"
 #import "StoreCoordinator.h"
 
 #import <RSXML/RSXML.h>
@@ -42,7 +42,7 @@
 
 /// Instantiates new @c FeedGroup with @c FEED type, set the update interval to @c 30min and @c sortIndex to last root index.
 + (instancetype)appendToRootWithDefaultIntervalInContext:(NSManagedObjectContext*)moc {
-	NSInteger lastIndex = [StoreCoordinator numberRootItemsInContext:moc];
+	NSUInteger lastIndex = [StoreCoordinator countRootItemsInContext:moc];
 	FeedGroup *fg = [FeedGroup newGroup:FEED inContext:moc];
 	[fg setParent:nil andSortIndex:(int32_t)lastIndex];
 	[fg.feed.meta setRefreshAndSchedule:kDefaultFeedRefreshInterval];
@@ -56,11 +56,24 @@
 		self.indexPath = pthStr;
 }
 
-/// Reset attributes @c unreadCount by counting number of articles. @note Remember to update global unread count.
-- (void)calculateAndSetUnreadCount {
-	int32_t unreadCount = (int32_t)[[self.articles valueForKeyPath:@"@sum.unread"] integerValue];
-	if (self.unreadCount != unreadCount)
-		self.unreadCount = unreadCount;
+/// @return Fully initialized @c NSMenuItem with @c title, @c tooltip, @c image, and @c action.
+- (NSMenuItem*)newMenuItem {
+	NSMenuItem *item = [NSMenuItem new];
+	item.title = self.group.nameOrError;
+	item.toolTip = self.subtitle;
+	item.enabled = (self.articles.count > 0);
+	item.image = [self iconImage16];
+	item.representedObject = self.indexPath;
+	item.target = [self class];
+	item.action = @selector(didClickOnMenuItem:);
+	return item;
+}
+
+/// Callback method for @c NSMenuItem. Will open url associated with @c Feed.
++ (void)didClickOnMenuItem:(NSMenuItem*)sender {
+	NSString *url = [StoreCoordinator urlForFeedWithIndexPath:sender.representedObject];
+	if (url && url.length > 0)
+		[UserPrefs openURLsWithPreferredBrowser:@[[NSURL URLWithString:url]]];
 }
 
 
@@ -78,16 +91,13 @@
 	if (self.group.name.length == 0) // in case a blank group was initialized
 		self.group.name = obj.title;
 	
-	int32_t unreadBefore = self.unreadCount;
 	// Add and remove articles
 	NSMutableSet<NSString*> *urls = [[self.articles valueForKeyPath:@"link"] mutableCopy];
-	[self addMissingArticles:obj updateLinks:urls]; // will remove links in 'urls' that should be kept
-	[self deleteArticlesWithLink:urls]; // remove old, outdated articles
+	NSInteger diff = [self addMissingArticles:obj updateLinks:urls]; // will remove links in 'urls' that should be kept
+	diff -= [self deleteArticlesWithLink:urls]; // remove old, outdated articles
 	// Get new total article count and post unread-count-change notification
-	if (flag) {
-		int32_t cDiff = self.unreadCount - unreadBefore;
-		if (cDiff != 0)
-			[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:@(cDiff)];
+	if (flag && diff != 0) {
+		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:@(diff)];
 	}
 }
 
@@ -100,8 +110,8 @@
  
  @param urls Input will be used to identify new articles. Output will contain URLs that aren't present in the feed anymore.
  */
-- (void)addMissingArticles:(RSParsedFeed*)obj updateLinks:(NSMutableSet<NSString*>*)urls {
-	int32_t newOnes = 0;
+- (NSInteger)addMissingArticles:(RSParsedFeed*)obj updateLinks:(NSMutableSet<NSString*>*)urls {
+	NSInteger newOnes = 0;
 	int32_t currentIndex = [[self.articles valueForKeyPath:@"@min.sortIndex"] intValue];
 	FeedArticle *lastInserted = nil;
 	BOOL hasGapBetweenNewArticles = NO;
@@ -122,7 +132,9 @@
 				newOnes -= 1;
 			}
 			hasGapBetweenNewArticles = NO;
-			lastInserted = [self insertArticle:article atIndex:currentIndex];
+			lastInserted = [FeedArticle newArticle:article inContext:self.managedObjectContext];
+			lastInserted.sortIndex = currentIndex;
+			[self addArticlesObject:lastInserted];
 		}
 		currentIndex += 1;
 	}
@@ -130,41 +142,20 @@
 		lastInserted.unread = NO;
 		newOnes -= 1;
 	}
-	if (newOnes > 0)
-		self.unreadCount += newOnes; // new articles are by definition unread
-}
-
-/**
- Create article based on input and insert into core data storage.
- */
-- (FeedArticle*)insertArticle:(RSParsedArticle*)entry atIndex:(int32_t)idx {
-	FeedArticle *fa = [[FeedArticle alloc] initWithEntity:FeedArticle.entity insertIntoManagedObjectContext:self.managedObjectContext];
-	fa.sortIndex = idx;
-	fa.unread = YES;
-	fa.guid = entry.guid;
-	fa.title = entry.title;
-	fa.abstract = entry.abstract;
-	fa.body = entry.body;
-	fa.author = entry.author;
-	fa.link = entry.link;
-	fa.published = entry.datePublished;
-	if (!fa.published)
-		fa.published = entry.dateModified;
-	[self addArticlesObject:fa];
-	return fa;
+	return newOnes;
 }
 
 /**
  Delete all items where @c link matches one of the URLs in the @c NSSet.
  */
-- (void)deleteArticlesWithLink:(NSMutableSet<NSString*>*)urls {
+- (NSUInteger)deleteArticlesWithLink:(NSMutableSet<NSString*>*)urls {
 	if (!urls || urls.count == 0)
-		return;
+		return 0;
+	NSUInteger c = 0;
 	for (FeedArticle *fa in self.articles) {
 		if ([urls containsObject:fa.link]) {
 			[urls removeObject:fa.link];
-			if (fa.unread)
-				self.unreadCount -= 1;
+			if (fa.unread) ++c;
 			// TODO: keep unread articles?
 			[self.managedObjectContext deleteObject:fa];
 			if (urls.count == 0)
@@ -175,6 +166,7 @@
 	if (delArticles.count > 0) {
 		[self removeArticles:delArticles];
 	}
+	return c;
 }
 
 
@@ -199,41 +191,6 @@
 			return a;
 	}
 	return nil;
-}
-
-/**
- For all articles set @c unread @c = @c NO
-
- @return Change in unread count. (0 or negative number)
- */
-- (int)markAllItemsRead {
-	return [self markAllArticlesRead:YES];
-}
-
-/**
- For all articles set @c unread @c = @c YES
-
- @return Change in unread count. (0 or positive number)
- */
-- (int)markAllItemsUnread {
-	return [self markAllArticlesRead:NO];
-}
-
-/**
- Mark all articles read or unread and update @c unreadCount
-
- @param readFlag @c YES: mark items read; @c NO: mark items unread
- */
-- (int)markAllArticlesRead:(BOOL)readFlag {
-	for (FeedArticle *fa in self.articles) {
-		if (fa.unread == readFlag)
-			fa.unread = !readFlag;
-	}
-	int32_t oldCount = self.unreadCount;
-	int32_t newCount = (readFlag ? 0 : (int32_t)self.articles.count);
-	if (self.unreadCount != newCount)
-		self.unreadCount = newCount;
-	return newCount - oldCount;
 }
 
 
@@ -262,7 +219,7 @@
 	}
 	else
 	{
-		static NSImage *defaultRSSIcon;
+		static NSImage *defaultRSSIcon; // TODO: setup imageNamed: for default rss icon
 		if (!defaultRSSIcon)
 			defaultRSSIcon = [RSSIcon iconWithSize:16];
 		return defaultRSSIcon;

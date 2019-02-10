@@ -1,6 +1,6 @@
 //
 //  The MIT License (MIT)
-//  Copyright (c) 2019 Oleg Geier
+//  Copyright (c) 2018 Oleg Geier
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -20,26 +20,21 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+#import "Feed+CoreDataClass.h"
 #import <Cocoa/Cocoa.h>
 
-typedef int32_t Interval;
-typedef NS_ENUM(int32_t, TimeUnitType) {
-	TimeUnitSeconds = 1,
-	TimeUnitMinutes = 60,
-	TimeUnitHours = 60 * 60,
-	TimeUnitDays = 24 * 60 * 60,
-	TimeUnitWeeks = 7 * 24 * 60 * 60,
-	TimeUnitYears = 365 * 24 * 60 * 60
-};
+@class RSParsedFeed;
 
-@interface NSDate (Ext)
-+ (nonnull NSString*)stringForInterval:(Interval)intv rounded:(BOOL)flag;
-+ (TimeUnitType)unitForInterval:(Interval)intv rounded:(BOOL)flag;
-@end
-
-
-@interface NSDate (RefreshControlsUI)
-+ (Interval)intervalForPopup:(NSPopUpButton*)unit andField:(NSTextField*)value;
-+ (void)setInterval:(Interval)intv forPopup:(NSPopUpButton*)popup andField:(NSTextField*)field animate:(BOOL)flag;
-+ (void)populateUnitsMenu:(NSPopUpButton*)popup selected:(TimeUnitType)unit;
+@interface Feed (Ext)
+// Generator methods / Feed update
++ (instancetype)newFeedAndMetaInContext:(NSManagedObjectContext*)context;
++ (instancetype)appendToRootWithDefaultIntervalInContext:(NSManagedObjectContext*)moc;
+- (void)updateWithRSS:(RSParsedFeed*)obj postUnreadCountChange:(BOOL)flag;
+- (void)calculateAndSetIndexPathString;
+- (NSMenuItem*)newMenuItem;
+// Article properties
+- (NSArray<FeedArticle*>*)sortedArticles;
+// Icon
+- (NSImage*)iconImage16;
+- (BOOL)setIconImage:(NSImage*)img;
 @end

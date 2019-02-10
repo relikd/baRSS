@@ -59,6 +59,21 @@
 	return groupIcon;
 }
 
+/// @return Returns "(error)" if @c self.name is @c nil.
+- (nonnull NSString*)nameOrError {
+	return (self.name ? self.name : NSLocalizedString(@"(error)", nil));
+}
+
+/// @return Fully initialized @c NSMenuItem with @c title and @c image.
+- (NSMenuItem*)newMenuItem {
+	NSMenuItem *item = [NSMenuItem new];
+	item.title = self.nameOrError;
+	item.enabled = (self.children.count > 0);
+	item.image = [self groupIconImage16];
+	item.representedObject = self.objectID;
+	return item;
+}
+
 
 #pragma mark - Handle Children And Parents -
 

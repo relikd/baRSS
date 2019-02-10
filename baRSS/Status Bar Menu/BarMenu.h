@@ -22,6 +22,9 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class BarStatusItem;
+
 @interface BarMenu : NSObject <NSMenuDelegate>
-- (void)updateBarIcon;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithStatusItem:(BarStatusItem*)statusItem NS_DESIGNATED_INITIALIZER;
 @end

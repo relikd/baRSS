@@ -29,8 +29,6 @@
 #import "Statistics.h"
 #import "NSDate+Ext.h"
 
-#import <QuartzCore/QuartzCore.h>
-
 
 #pragma mark - ModalEditDialog -
 
@@ -106,7 +104,7 @@
 	self.url.objectValue = fg.feed.meta.url;
 	self.previousURL = self.url.stringValue;
 	self.warningIndicator.image = [fg.feed iconImage16];
-	[NSDate setInterval:fg.feed.meta.refresh forPopup:self.refreshUnit andField:self.refreshNum];
+	[NSDate setInterval:fg.feed.meta.refresh forPopup:self.refreshUnit andField:self.refreshNum animate:NO];
 	[self statsForCoreDataObject];
 }
 
@@ -288,29 +286,7 @@
 
 /// Callback method for @c Statistics @c +viewForRefreshInterval:articleCount:callback:
 - (void)refreshIntervalButtonClicked:(NSButton *)sender {
-	NSInteger num = (sender.tag >> 3);
-	NSInteger unit = (sender.tag & 0x7);
-	if (self.refreshNum.integerValue != num) {
-		[self animateControlAttention:self.refreshNum];
-		self.refreshNum.integerValue = num;
-	}
-	if (self.refreshUnit.indexOfSelectedItem != unit) {
-		[self animateControlAttention:self.refreshUnit];
-		[self.refreshUnit selectItemAtIndex:unit];
-	}
-}
-
-/// Helper method to animate @c NSControl to draw user attention. View will be scalled up in a fraction of a second.
-- (void)animateControlAttention:(NSView*)control {
-	CABasicAnimation *scale = [CABasicAnimation animationWithKeyPath:@"transform"];
-	CATransform3D tr = CATransform3DIdentity;
-	tr = CATransform3DTranslate(tr, NSMidX(control.bounds), NSMidY(control.bounds), 0);
-	tr = CATransform3DScale(tr, 1.1, 1.1, 1);
-	tr = CATransform3DTranslate(tr, -NSMidX(control.bounds), -NSMidY(control.bounds), 0);
-	scale.toValue = [NSValue valueWithCATransform3D:tr];
-	scale.duration = 0.15f;
-	scale.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
-	[control.layer addAnimation:scale forKey:scale.keyPath];
+	[NSDate setInterval:(Interval)sender.tag forPopup:self.refreshUnit andField:self.refreshNum animate:YES];
 }
 
 
