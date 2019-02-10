@@ -247,7 +247,7 @@ static BOOL _nextUpdateIsForced = NO;
  @param askUser Use @c list to present user a list of detected feed URLs.
  @param block Called after webpage has been fully parsed (including html autodetect).
  */
-+ (void)newFeed:(NSString *)urlStr askUser:(nonnull NSString*(^)(NSArray<RSHTMLMetadataFeedLink*> *list))askUser block:(nonnull void(^)(RSParsedFeed *parsed, NSError *error, NSHTTPURLResponse *response))block {
++ (void)newFeed:(NSString *)urlStr askUser:(nonnull NSString*(^)(RSHTMLMetadata *meta))askUser block:(nonnull void(^)(RSParsedFeed *parsed, NSError *error, NSHTTPURLResponse *response))block {
 	[self parseFeedRequest:[self newRequestURL:urlStr] xmlBlock:^BOOL(RSXMLData *xml, NSError **err) {
 		if (![xml.parserClass isHTMLParser])
 			return NO;
@@ -261,7 +261,7 @@ static BOOL _nextUpdateIsForced = NO;
 		}
 		__block NSString *chosenURL = nil;
 		dispatch_sync(dispatch_get_main_queue(), ^{ // sync! (thread is already in background)
-			chosenURL = askUser(parsedMeta.feedLinks);
+			chosenURL = askUser(parsedMeta);
 		});
 		if (!chosenURL || chosenURL.length == 0)
 			return NO;
@@ -441,7 +441,7 @@ static BOOL _nextUpdateIsForced = NO;
 }
 
 /// Extract favicon URL from parsed HTML metadata.
-+ (NSString*)faviconUrlForMetadata:(RSHTMLMetadata*)meta {
++ (nullable NSString*)faviconUrlForMetadata:(RSHTMLMetadata*)meta {
 	if (meta) {
 		if (meta.faviconLink.length > 0) {
 			return meta.faviconLink;

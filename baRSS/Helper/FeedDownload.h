@@ -38,10 +38,13 @@
 + (void)scheduleUpdateForUpcomingFeeds;
 + (void)forceUpdateAllFeeds;
 // Downloading
-+ (void)newFeed:(NSString *)urlStr askUser:(nonnull NSString*(^)(NSArray<RSHTMLMetadataFeedLink*> *list))askUser block:(nonnull void(^)(RSParsedFeed *parsed, NSError *error, NSHTTPURLResponse *response))block;
++ (void)newFeed:(NSString *)urlStr askUser:(nonnull NSString*(^)(RSHTMLMetadata *meta))askUser block:(nonnull void(^)(RSParsedFeed *parsed, NSError *error, NSHTTPURLResponse *response))block;
 + (void)autoDownloadAndParseURL:(NSString*)urlStr;
-+ (void)downloadFavicon:(NSString*)urlStr finished:(void(^)(NSImage * _Nullable img))block;
 + (void)batchDownloadFeeds:(NSArray<Feed*> *)list favicons:(BOOL)fav showErrorAlert:(BOOL)alert finally:(nullable os_block_t)block;
+// Favicon image download
++ (void)downloadFavicon:(NSString*)urlStr finished:(void(^)(NSImage * _Nullable img))block;
++ (void)downloadImage:(NSString*)url finished:(void(^)(NSImage * _Nullable img))block;
++ (nullable NSString*)faviconUrlForMetadata:(RSHTMLMetadata*)meta;
 @end
 
 
