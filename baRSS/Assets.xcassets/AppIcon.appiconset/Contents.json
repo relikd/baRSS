@@ -3,51 +3,61 @@
     {
       "idiom" : "mac",
       "size" : "16x16",
+      "filename" : "barss-icon-16.png",
       "scale" : "1x"
     },
     {
       "idiom" : "mac",
       "size" : "16x16",
+      "filename" : "barss-icon-32.png",
       "scale" : "2x"
     },
     {
       "idiom" : "mac",
       "size" : "32x32",
+      "filename" : "barss-icon-32.png",
       "scale" : "1x"
     },
     {
       "idiom" : "mac",
       "size" : "32x32",
+      "filename" : "barss-icon-64.png",
       "scale" : "2x"
     },
     {
       "idiom" : "mac",
       "size" : "128x128",
+      "filename" : "barss-icon-128.png",
       "scale" : "1x"
     },
     {
       "idiom" : "mac",
       "size" : "128x128",
+      "filename" : "barss-icon-256.png",
       "scale" : "2x"
     },
     {
       "idiom" : "mac",
       "size" : "256x256",
+      "filename" : "barss-icon-256.png",
       "scale" : "1x"
     },
     {
       "idiom" : "mac",
       "size" : "256x256",
+      "filename" : "barss-icon-512.png",
       "scale" : "2x"
     },
     {
       "idiom" : "mac",
       "size" : "512x512",
+      "filename" : "barss-icon-512.png",
       "scale" : "1x"
     },
     {
       "idiom" : "mac",
       "size" : "512x512",
+      "filename" : "barss-icon-1024.png",
       "scale" : "2x"
     }
   ],
