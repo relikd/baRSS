@@ -60,12 +60,14 @@
 		url = [url substringFromIndex:5];
 		if ([url hasPrefix:@"//"])
 			url = [url substringFromIndex:2];
-		[FeedDownload autoDownloadAndParseURL:url];
+		[FeedDownload autoDownloadAndParseURL:url successBlock:^{
+			[self reopenPreferencesIfOpen];
+		}];
 	}
 }
 
 
-#pragma mark - Handle Menu Interaction
+#pragma mark - App Preferences
 
 
 /// Called whenever the user activates the preferences (either through menu click or hotkey).
@@ -85,6 +87,16 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:self.prefWindow.window];
 	self.prefWindow = nil;
 	[FeedDownload scheduleUpdateForUpcomingFeeds];
+}
+
+/// Close previous preferences window and re-open at the same position (will drop undo manager stack!)
+- (void)reopenPreferencesIfOpen {
+	if (self.prefWindow) {
+		CGPoint screenPoint = self.prefWindow.window.frame.origin;
+		[self.prefWindow close];
+		[self openPreferences];
+		[self.prefWindow.window setFrameOrigin:screenPoint];
+	}
 }
 
 
@@ -108,10 +120,6 @@
 	}
 	return _persistentContainer;
 }
-
-
-#pragma mark - Core Data Saving and Undo support
-
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
 	// Save changes in the application's managed object context before the application terminates.

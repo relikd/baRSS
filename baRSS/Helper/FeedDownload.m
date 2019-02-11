@@ -123,17 +123,17 @@ static BOOL _nextUpdateIsForced = NO;
  Called when schedule timer runs out (earliest @c .schedule date). Or if forced by user request.
  */
 + (void)updateTimerCallback {
-	if (![self allowNetworkConnection])
-		return;
 	NSLog(@"fired");
-	
 	BOOL updateAll = _nextUpdateIsForced;
 	_nextUpdateIsForced = NO;
 	
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	NSArray<Feed*> *list = [StoreCoordinator getListOfFeedsThatNeedUpdate:updateAll inContext:moc];
 	//NSAssert(list.count > 0, @"ERROR: Something went wrong, timer fired too early.");
-	
+	if (![self allowNetworkConnection]) {
+		[moc reset];
+		return;
+	}
 	[self batchDownloadFeeds:list favicons:updateAll showErrorAlert:NO finally:^{
 		[StoreCoordinator saveContext:moc andParent:YES]; // save parents too ...
 		[moc reset];
@@ -279,10 +279,6 @@ static BOOL _nextUpdateIsForced = NO;
  @param block Parameter @c success is only @c YES if download was successful or if status code is 304 (not modified).
  */
 + (void)backgroundUpdateFeed:(Feed*)feed showErrorAlert:(BOOL)alert finally:(nullable void(^)(BOOL success))block {
-	if (![self allowNetworkConnection]) {
-		if (block) block(NO);
-		return;
-	}
 	NSManagedObjectID *oid = feed.objectID;
 	NSManagedObjectContext *moc = feed.managedObjectContext;
 	NSURLRequest *req = [self newRequest:feed.meta ignoreCache:(feed.articles.count == 0)];
@@ -320,7 +316,7 @@ static BOOL _nextUpdateIsForced = NO;
  Creates new @c FeedGroup, @c Feed, @c FeedMeta and @c FeedArticle instances and saves them to the persistent store.
  Update duration is set to the default of 30 minutes.
  */
-+ (void)autoDownloadAndParseURL:(NSString*)url {
++ (void)autoDownloadAndParseURL:(NSString*)url successBlock:(nullable os_block_t)block {
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	Feed *f = [Feed appendToRootWithDefaultIntervalInContext:moc];
 	f.meta.url = url;
@@ -330,6 +326,10 @@ static BOOL _nextUpdateIsForced = NO;
 		}
 		[StoreCoordinator saveContext:moc andParent:YES];
 		[moc reset];
+		if (successful) {
+			[self scheduleUpdateForUpcomingFeeds];
+			if (block) block();
+		}
 	}];
 }
 
