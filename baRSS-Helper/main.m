@@ -25,7 +25,10 @@
 int main(int argc, const char * argv[]) {
 	@autoreleasepool {
 		// see: http://martiancraft.com/blog/2015/01/login-items/
-		NSArray<NSRunningApplication*> *arr = [NSRunningApplication runningApplicationsWithBundleIdentifier:@"de.relikd.baRSS"];
+		NSURL *mainURL = [NSURL fileURLWithPath:@"../../../../" isDirectory:YES relativeToURL:NSBundle.mainBundle.bundleURL];
+		NSString *mainIdent = [[NSBundle bundleWithURL:mainURL] bundleIdentifier]; // de.relikd.baRSS
+		
+		NSArray<NSRunningApplication*> *arr = [NSRunningApplication runningApplicationsWithBundleIdentifier:mainIdent];
 		if (arr.count == 0) { // if not already running
 			NSArray *pathComponents = [[[NSBundle mainBundle] bundlePath] pathComponents];
 			pathComponents = [pathComponents subarrayWithRange:NSMakeRange(0, [pathComponents count] - 4)];
