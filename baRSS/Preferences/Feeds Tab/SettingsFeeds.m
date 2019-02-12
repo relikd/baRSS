@@ -98,6 +98,10 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	NSDate *date = [FeedDownload dateScheduled];
 	if (date) {
 		double nextFire = fabs(date.timeIntervalSinceNow);
+		if (nextFire > 1e9) { // distance future, over 31 years
+			self.spinnerLabel.stringValue = @"";
+			return;
+		}
 		if (nextFire > 60) { // update 1/min
 			nextFire = fmod(nextFire, 60); // next update will align with minute
 		} else {
