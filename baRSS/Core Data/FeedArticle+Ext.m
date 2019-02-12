@@ -35,13 +35,16 @@
 	fa.unread = YES;
 	fa.guid = entry.guid;
 	fa.title = entry.title;
-	fa.abstract = entry.abstract;
+	if (entry.abstract.length > 0) { // remove html tags and save plain text to db
+		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<[^>]*>" options:kNilOptions error:nil];
+		fa.abstract = [regex stringByReplacingMatchesInString:entry.abstract options:kNilOptions range:NSMakeRange(0, entry.abstract.length) withTemplate:@""];
+	}
 	fa.body = entry.body;
 	fa.author = entry.author;
 	fa.link = entry.link;
 	fa.published = entry.datePublished;
-	if (!fa.published)
-		fa.published = entry.dateModified;
+	if (!fa.link)      fa.link = entry.guid;  // may be wrong, but better than returning nothing.
+	if (!fa.published) fa.published = entry.dateModified;
 	return fa;
 }
 
@@ -64,12 +67,7 @@
 	item.title = [self shortArticleName];
 	item.enabled = (self.link.length > 0);
 	item.state = (self.unread && [UserPrefs defaultYES:@"feedTickMark"] ? NSControlStateValueOn : NSControlStateValueOff);
-	//mi.toolTip = item.abstract;
-	// TODO: Do regex during save, not during display. Its here for testing purposes ...
-	if (self.abstract.length > 0) {
-		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<[^>]*>" options:kNilOptions error:nil];
-		item.toolTip = [regex stringByReplacingMatchesInString:self.abstract options:kNilOptions range:NSMakeRange(0, self.abstract.length) withTemplate:@""];
-	}
+	item.toolTip = self.abstract;
 	item.representedObject = self.objectID;
 	item.target = [self class];
 	item.action = @selector(didClickOnMenuItem:);

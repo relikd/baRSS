@@ -380,7 +380,7 @@
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Tec-F3-9cE">
                     <rect key="frame" x="18" y="271" width="284" height="18"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="Tint menu bar icon" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="19k-mc-RLe">
+                    <buttonCell key="cell" type="check" title="Tint menu bar icon on unread" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="19k-mc-RLe">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
