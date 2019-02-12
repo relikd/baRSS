@@ -64,7 +64,11 @@
 	NSUInteger deleted = [StoreCoordinator deleteUnreferenced];
 	[StoreCoordinator restoreFeedIndexPaths];
 	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
-	NSLog(@"Removed %lu unreferenced core data entries.", deleted);
+	// show only if >0, but hey, this button will vanish anyway ...
+	NSAlert *alert = [[NSAlert alloc] init];
+	alert.messageText = [NSString stringWithFormat:@"Removed %lu unreferenced core data entries.", deleted];
+	alert.alertStyle = NSAlertStyleInformational;
+	[alert runModal];
 }
 
 - (IBAction)changeMenuBarIconSetting:(NSButton*)sender {
