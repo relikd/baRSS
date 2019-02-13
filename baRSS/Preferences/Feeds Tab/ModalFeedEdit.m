@@ -33,7 +33,7 @@
 #pragma mark - ModalEditDialog -
 
 
-@interface ModalEditDialog()
+@interface ModalEditDialog() <NSWindowDelegate>
 @property (strong) FeedGroup *feedGroup;
 @property (strong) ModalSheet *modalSheet;
 @end
@@ -47,8 +47,10 @@
 }
 /// @return New @c ModalSheet with its subclass @c .view property as dialog content.
 - (ModalSheet *)getModalSheet {
-	if (!self.modalSheet)
+	if (!self.modalSheet) {
 		self.modalSheet = [[ModalSheet alloc] initWithView:self.view];
+		self.modalSheet.delegate = self;
+	}
 	return self.modalSheet;
 }
 /// This method should be overridden by subclasses. Used to save changes to persistent store.
@@ -296,6 +298,15 @@
 
 #pragma mark - NSTextField Delegate
 
+
+/// Window delegate will be only called on button 'Done'.
+- (BOOL)windowShouldClose:(NSWindow *)sender {
+	if (![self.previousURL isEqualToString:self.url.stringValue]) {
+		[[NSNotificationCenter defaultCenter] postNotificationName:NSControlTextDidEndEditingNotification object:self.url];
+		return NO;
+	}
+	return YES;
+}
 
 /// Whenever the user finished entering the url (return key or focus change) perform a download request.
 - (void)controlTextDidEndEditing:(NSNotification *)obj {
