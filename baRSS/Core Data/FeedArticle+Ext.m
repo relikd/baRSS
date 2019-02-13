@@ -76,16 +76,18 @@
 
 /// Callback method for @c NSMenuItem. Will open url associated with @c FeedArticle and mark it read.
 + (void)didClickOnMenuItem:(NSMenuItem*)sender {
+	BOOL flipUnread = (([NSEvent modifierFlags] & NSEventModifierFlagOption) != 0);
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	FeedArticle *fa = [moc objectWithID:sender.representedObject];
 	NSString *url = fa.link;
-	if (fa.unread) {
-		fa.unread = NO;
+	if (flipUnread || fa.unread) {
+		fa.unread = !fa.unread;
+		NSNumber *num = (fa.unread ? @+1 : @-1);
 		[StoreCoordinator saveContext:moc andParent:YES];
-		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:@-1];
+		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:num];
 	}
 	[moc reset];
-	if (url && url.length > 0)
+	if (url && url.length > 0 && !flipUnread) // flipUnread == change unread state
 		[UserPrefs openURLsWithPreferredBrowser:@[[NSURL URLWithString:url]]];
 }
 
