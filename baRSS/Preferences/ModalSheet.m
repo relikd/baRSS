@@ -24,6 +24,7 @@
 
 @interface ModalSheet()
 @property (weak) NSButton *btnDone;
+@property (assign) BOOL respondToShouldClose;
 @end
 
 @implementation ModalSheet
@@ -36,12 +37,20 @@
 /// Manually disable 'Done' button if a task is still running.
 - (void)setDoneEnabled:(BOOL)accept { self.btnDone.enabled = accept; }
 
+- (void)setDelegate:(id<NSWindowDelegate>)delegate {
+	[super setDelegate:delegate];
+	self.respondToShouldClose = [delegate respondsToSelector:@selector(windowShouldClose:)];
+}
+
 /**
  Called after user has clicked the 'Done' (Return) or 'Cancel' (Esc) button.
  Flags controller as being closed @c .closeInitiated @c = @c YES.
  And removes all subviews (clean up).
  */
 - (void)closeWithResponse:(NSModalResponse)response {
+	if (response == NSModalResponseOK && self.respondToShouldClose && ![self.delegate windowShouldClose:self]) {
+		return;
+	}
 	_didCloseAndSave = (response == NSModalResponseOK);
 	_didCloseAndCancel = (response != NSModalResponseOK);
 	// store modal view width and remove subviews to avoid _NSKeyboardFocusClipView issues
