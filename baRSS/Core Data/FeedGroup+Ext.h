@@ -34,11 +34,12 @@ typedef NS_ENUM(int16_t, FeedGroupType) {
 /// Overwrites @c type attribute with enum. Use one of: @c GROUP, @c FEED, @c SEPARATOR.
 @property (nonatomic) FeedGroupType type;
 @property (nonnull, readonly) NSString *nameOrError;
+@property (nonnull, readonly) NSImage* groupIconImage16;
+@property (nonnull, readonly) NSImage* iconImage16;
 
 + (instancetype)newGroup:(FeedGroupType)type inContext:(NSManagedObjectContext*)context;
 - (void)setParent:(FeedGroup *)parent andSortIndex:(int32_t)sortIndex;
 - (void)setNameIfChanged:(NSString*)name;
-- (NSImage*)groupIconImage16;
 - (NSMenuItem*)newMenuItem;
 // Handle children and parents
 - (NSString*)indexPathString;

@@ -419,7 +419,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		return cellView; // refresh cell already skipped with the above if condition
 	} else {
 		cellView.textField.objectValue = fg.name;
-		cellView.imageView.image = (fg.type == GROUP ? [NSImage imageNamed:NSImageNameFolder] : [fg.feed iconImage16]);
+		cellView.imageView.image = fg.iconImage16;
 	}
 	return cellView;
 }

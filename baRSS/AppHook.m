@@ -55,15 +55,18 @@
 
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
 	NSString *url = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
-	if ([url hasPrefix:@"feed:"]) {
-		// TODO: handle other app schemes like configuration export / import
-		url = [url substringFromIndex:5];
-		if ([url hasPrefix:@"//"])
-			url = [url substringFromIndex:2];
+	NSString *scheme = [[[NSURL URLWithString:url] scheme] lowercaseString];
+	url = [url substringFromIndex:scheme.length + 1]; // + ':'
+	if (url.length >= 2 && [[url substringToIndex:2] isEqualToString:@"//"]) {
+		url = [url substringFromIndex:2];
+	}
+	if ([scheme isEqualToString:@"feed"]) {
 		[FeedDownload autoDownloadAndParseURL:url successBlock:^{
 			[self reopenPreferencesIfOpen];
 		}];
 	}
+	// TODO: handle other app schemes like configuration export / import
+	// NSURLComponents *comp = [NSURLComponents componentsWithString:url];
 }
 
 

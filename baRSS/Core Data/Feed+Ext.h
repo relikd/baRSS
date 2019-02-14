@@ -26,6 +26,8 @@
 @class RSParsedFeed;
 
 @interface Feed (Ext)
+@property (nonnull, readonly) NSImage* iconImage16;
+
 // Generator methods / Feed update
 + (instancetype)newFeedAndMetaInContext:(NSManagedObjectContext*)context;
 + (instancetype)appendToRootWithDefaultIntervalInContext:(NSManagedObjectContext*)moc;
@@ -35,6 +37,5 @@
 // Article properties
 - (NSArray<FeedArticle*>*)sortedArticles;
 // Icon
-- (NSImage*)iconImage16;
 - (BOOL)setIconImage:(NSImage*)img;
 @end
