@@ -112,7 +112,7 @@
 		54A07A7E220E04CF00082C51 /* NSFetchRequest+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSFetchRequest+Ext.m"; sourceTree = "<group>"; };
 		54A07A80220E723D00082C51 /* MapUnreadTotal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapUnreadTotal.h; sourceTree = "<group>"; };
 		54A07A81220E723D00082C51 /* MapUnreadTotal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapUnreadTotal.m; sourceTree = "<group>"; };
-		54ACC27C21061B3B0020715F /* baRSS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = baRSS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		54ACC27C21061B3B0020715F /* baRSS Beta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "baRSS Beta.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		54ACC28321061B3B0020715F /* DBv1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DBv1.xcdatamodel; sourceTree = "<group>"; };
 		54ACC28521061B3C0020715F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		54ACC28A21061B3C0020715F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -261,7 +261,7 @@
 		54ACC27D21061B3B0020715F /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				54ACC27C21061B3B0020715F /* baRSS.app */,
+				54ACC27C21061B3B0020715F /* baRSS Beta.app */,
 				54CC042C2162532800A48795 /* baRSS-Helper.app */,
 			);
 			name = Products;
@@ -322,6 +322,7 @@
 				544DCCBB212A2B4D002DBC46 /* Embed Frameworks */,
 				544DCCBC212A2B5A002DBC46 /* CopyFiles */,
 				54CC043D2162565F00A48795 /* CopyFiles */,
+				543964EE2215C27B0016AAA3 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -329,7 +330,7 @@
 			);
 			name = baRSS;
 			productName = baRRS;
-			productReference = 54ACC27C21061B3B0020715F /* baRSS.app */;
+			productReference = 54ACC27C21061B3B0020715F /* baRSS Beta.app */;
 			productType = "com.apple.product-type.application";
 		};
 		54CC042B2162532800A48795 /* baRSS-Helper */ = {
@@ -420,6 +421,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		543964EE2215C27B0016AAA3 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# https://crunchybagel.com/auto-incrementing-build-numbers-in-xcode/\nbuildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		54ACC27821061B3B0020715F /* Sources */ = {
@@ -617,7 +638,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = de.relikd.baRSS.beta;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "$(TARGET_NAME) Beta";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -666,7 +687,7 @@
 					"$(FRAMEWORK_SEARCH_PATHS)",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				PRODUCT_BUNDLE_IDENTIFIER = de.relikd.baRSS.beta;
+				PRODUCT_BUNDLE_IDENTIFIER = de.relikd.baRSS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};

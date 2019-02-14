@@ -62,7 +62,7 @@
 	item.title = self.group.nameOrError;
 	item.toolTip = self.subtitle;
 	item.enabled = (self.articles.count > 0);
-	item.image = [self iconImage16];
+	item.image = self.iconImage16;
 	item.representedObject = self.indexPath;
 	item.target = [self class];
 	item.action = @selector(didClickOnMenuItem:);
@@ -200,30 +200,17 @@
 /**
  @return Return @c 16x16px image. Either from core data storage or generated default RSS icon.
  */
-- (NSImage*)iconImage16 {
-	NSData *imgData = self.icon.icon;
-	if (imgData)
-	{
-		NSImage *img = [[NSImage alloc] initWithData:imgData];
-		[img setSize:NSMakeSize(16, 16)];
-		return img;
+- (nonnull NSImage*)iconImage16 {
+	NSImage *img = nil;
+	if (self.articles.count == 0) {
+		img = [NSImage imageNamed:NSImageNameCaution];
+	} else if (self.icon.icon) {
+		img = [[NSImage alloc] initWithData:self.icon.icon];
+	} else {
+		return [RSSIcon iconWithSize:16]; // TODO: setup imageNamed: for default rss icon?
 	}
-	else if (self.articles.count == 0)
-	{
-		static NSImage *warningIcon;
-		if (!warningIcon) {
-			warningIcon = [NSImage imageNamed:NSImageNameCaution];
-			[warningIcon setSize:NSMakeSize(16, 16)];
-		}
-		return warningIcon;
-	}
-	else
-	{
-		static NSImage *defaultRSSIcon; // TODO: setup imageNamed: for default rss icon
-		if (!defaultRSSIcon)
-			defaultRSSIcon = [RSSIcon iconWithSize:16];
-		return defaultRSSIcon;
-	}
+	[img setSize:NSMakeSize(16, 16)];
+	return img;
 }
 
 /**

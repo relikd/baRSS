@@ -27,6 +27,33 @@
 
 @implementation FeedGroup (Ext)
 
+#pragma mark - Properties
+
+/// @return Returns "(error)" if @c self.name is @c nil.
+- (nonnull NSString*)nameOrError {
+	return (self.name ? self.name : NSLocalizedString(@"(error)", nil));
+}
+
+/// @return Return @c 16x16px NSImageNameFolder image.
+- (nonnull NSImage*)groupIconImage16 {
+	NSImage *groupIcon = [NSImage imageNamed:NSImageNameFolder];
+	groupIcon.size = NSMakeSize(16, 16);
+	return groupIcon;
+}
+
+/**
+ @return Return @c 16x16px image.
+ Either feed icon ( @c type @c == @c FEED ) or @c NSImageNameFolder ( @c type @c == @c GROUP ).
+ */
+- (nonnull NSImage*)iconImage16 {
+	if (self.type == FEED)
+		return self.feed.iconImage16;
+	return self.groupIconImage16;
+}
+
+
+#pragma mark - Generator
+
 /// Create new instance and set @c Feed and @c FeedMeta if group type is @c FEED
 + (instancetype)newGroup:(FeedGroupType)type inContext:(NSManagedObjectContext*)moc {
 	FeedGroup *fg = [[FeedGroup alloc] initWithEntity: FeedGroup.entity insertIntoManagedObjectContext:moc];
@@ -49,27 +76,12 @@
 		self.name = name;
 }
 
-/// @return Return static @c 16x16px NSImageNameFolder image.
-- (NSImage*)groupIconImage16 {
-	static NSImage *groupIcon;
-	if (!groupIcon) {
-		groupIcon = [NSImage imageNamed:NSImageNameFolder];
-		groupIcon.size = NSMakeSize(16, 16);
-	}
-	return groupIcon;
-}
-
-/// @return Returns "(error)" if @c self.name is @c nil.
-- (nonnull NSString*)nameOrError {
-	return (self.name ? self.name : NSLocalizedString(@"(error)", nil));
-}
-
 /// @return Fully initialized @c NSMenuItem with @c title and @c image.
 - (NSMenuItem*)newMenuItem {
 	NSMenuItem *item = [NSMenuItem new];
 	item.title = self.nameOrError;
 	item.enabled = (self.children.count > 0);
-	item.image = [self groupIconImage16];
+	item.image = self.groupIconImage16;
 	item.representedObject = self.objectID;
 	return item;
 }
