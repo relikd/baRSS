@@ -56,6 +56,11 @@ With this Terminal command you can customize this number:
 
 3) If you hold down the option key and click on an article item, you can mark a single item (un-)read.
 
+4) Limit number of displayed articles in feed menu.
+**Note:** unread count for feed and group may be different than the unread items inside (if unread articles are omitted).
+
+```defaults write de.relikd.baRSS articlesInMenuLimit -int 40```
+
 
 
 ToDo

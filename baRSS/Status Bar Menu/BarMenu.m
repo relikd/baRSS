@@ -22,6 +22,7 @@
 
 #import "BarMenu.h"
 #import "Constants.h"
+#import "UserPrefs.h"
 #import "NSMenu+Ext.h"
 #import "BarStatusItem.h"
 #import "MapUnreadTotal.h"
@@ -105,8 +106,11 @@
 /// Generate items for @c FeedArticles menu.
 - (void)setArticles:(NSArray<FeedArticle*>*)sortedList forMenu:(NSMenu*)menu {
 	[menu insertDefaultHeader];
+	NSUInteger mc = [UserPrefs articlesInMenuLimit];
 	for (FeedArticle *fa in sortedList) {
 		[menu addItem:[fa newMenuItem]];
+		if (--mc == 0) // if mc==0 then unsigned int will underflow and turn into INT_MAX
+			break;
 	}
 	UnreadTotal *uct = self.unreadMap[menu.titleIndexPath];
 	[menu setHeaderHasUnread:(uct.unread > 0) hasRead:(uct.unread < uct.total)];
