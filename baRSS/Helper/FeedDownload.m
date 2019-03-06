@@ -229,6 +229,7 @@ static BOOL _nextUpdateIsForced = NO;
 			}
 			if (!error) { // metaBlock may set error
 				RSFeedParser *parser = [RSFeedParser parserWithXMLData:xml];
+				parser.dontStopOnLowerAsciiBytes = YES;
 				result = [parser parseSync:&error];
 			}
 		}
