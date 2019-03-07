@@ -38,6 +38,11 @@
                             <action selector="tabClicked:" target="-2" id="MVF-hq-6H4"/>
                         </connections>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="BC213BA1-C1C5-4EBA-8282-769344192482" explicitItemIdentifier="tabAppearance" label="Appearance" paletteLabel="Appearance" tag="-1" image="NSFontPanel" selectable="YES" id="5gP-ck-qVK">
+                        <connections>
+                            <action selector="tabClicked:" target="-2" id="BXs-NU-zQM"/>
+                        </connections>
+                    </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="kda-e8-akS"/>
                     <toolbarItem implicitItemIdentifier="7A0CF54C-C0BA-4E1D-9CD7-39FD39A6BA5A" explicitItemIdentifier="tabAbout" label="About" paletteLabel="About" tag="-1" image="NSInfo" selectable="YES" id="kob-4t-J64">
                         <connections>
@@ -48,6 +53,7 @@
                 <defaultToolbarItems>
                     <toolbarItem reference="WDq-RJ-C3X"/>
                     <toolbarItem reference="atT-AS-vmR"/>
+                    <toolbarItem reference="5gP-ck-qVK"/>
                     <toolbarItem reference="kda-e8-akS"/>
                     <toolbarItem reference="kob-4t-J64"/>
                 </defaultToolbarItems>
@@ -769,6 +775,7 @@ Cg
     </objects>
     <resources>
         <image name="NSApplicationIcon" width="128" height="128"/>
+        <image name="NSFontPanel" width="32" height="32"/>
         <image name="NSInfo" width="32" height="32"/>
         <image name="NSPreferencesGeneral" width="32" height="32"/>
         <image name="NSUserAccounts" width="32" height="32"/>
