@@ -51,6 +51,13 @@
 		self.window.contentView = self.settingsGeneral.view;
 	} else if ([sender.itemIdentifier isEqualToString:@"tabFeeds"]) {
 		self.window.contentView = self.settingsFeeds.view;
+	} else if ([sender.itemIdentifier isEqualToString:@"tabAppearance"]) {
+		if (self.settingsGeneral.view.frame.size.width > 0) {
+			// using side effect when reading settingsGeneral.view -> will load appearanceView too.
+			// TODO: generate view programmatically
+			self.window.contentView = nil;
+		}
+		self.window.contentView = self.settingsGeneral.appearanceView;
 	} else if ([sender.itemIdentifier isEqualToString:@"tabAbout"]) {
 		NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
 		self.lblAppName.objectValue = infoDict[@"CFBundleName"];

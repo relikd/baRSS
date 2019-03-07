@@ -23,5 +23,5 @@
 #import <Cocoa/Cocoa.h>
 
 @interface SettingsGeneral : NSViewController
-
+@property (assign) IBOutlet NSView *appearanceView;
 @end

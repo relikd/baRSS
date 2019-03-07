@@ -106,7 +106,10 @@
 /// Generate items for @c FeedArticles menu.
 - (void)setArticles:(NSArray<FeedArticle*>*)sortedList forMenu:(NSMenu*)menu {
 	[menu insertDefaultHeader];
-	NSUInteger mc = [UserPrefs articlesInMenuLimit];
+	NSUInteger mc = 0;
+	if ([UserPrefs defaultNO:@"feedLimitArticles"]) {
+		mc = [UserPrefs articlesInMenuLimit];
+	}
 	for (FeedArticle *fa in sortedList) {
 		[menu addItem:[fa newMenuItem]];
 		if (--mc == 0) // if mc==0 then unsigned int will underflow and turn into INT_MAX

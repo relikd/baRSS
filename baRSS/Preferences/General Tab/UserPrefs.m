@@ -67,19 +67,22 @@
 
 #pragma mark - Hidden Plist Properties -
 
-/// @return The limit on how many links should be opened at the same time, if user holds the option key. Default: @c 10
+/// @return The limit on how many links should be opened at the same time, if user holds the option key.
+/// Default: @c 10
 + (NSUInteger)openFewLinksLimit {
 	return (NSUInteger)[self defaultInt:10 forKey:@"openFewLinksLimit"];
 }
 
-/// @return The limit on when to truncate article titles (Short names setting must be active). Default: @c 60
+/// @return The limit on when to truncate article titles (Short names setting must be active).
+/// Default: @c 60
 + (NSUInteger)shortArticleNamesLimit {
 	return (NSUInteger)[self defaultInt:60 forKey:@"shortArticleNamesLimit"];
 }
 
-/// @return The maximum number of articles displayed per feed. Default: @c 0 (no limitation)
+/// @return The maximum number of articles displayed per feed (Limit articles setting must be active).
+/// Default: @c 40
 + (NSUInteger)articlesInMenuLimit {
-	return (NSUInteger)[self defaultInt:0 forKey:@"articlesInMenuLimit"];
+	return (NSUInteger)[self defaultInt:40 forKey:@"articlesInMenuLimit"];
 }
 
 @end
