@@ -106,6 +106,7 @@
 		546FC4462118A8E6007CC3A3 /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
 		5477D34C21233C62002BA27F /* FeedGroup+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FeedGroup+Ext.h"; sourceTree = "<group>"; };
 		5477D34D21233C62002BA27F /* FeedGroup+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "FeedGroup+Ext.m"; sourceTree = "<group>"; };
+		54892F1D2235285700271CBA /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		5496B50F214D6275003ED4ED /* UserPrefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserPrefs.h; sourceTree = "<group>"; };
 		5496B510214D6275003ED4ED /* UserPrefs.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserPrefs.m; sourceTree = "<group>"; };
 		54A07A7D220E04CF00082C51 /* NSFetchRequest+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSFetchRequest+Ext.h"; sourceTree = "<group>"; };
@@ -251,6 +252,7 @@
 			isa = PBXGroup;
 			children = (
 				540CD14821C094A2004AB594 /* README.md */,
+				54892F1D2235285700271CBA /* CHANGELOG.md */,
 				54ACC27E21061B3B0020715F /* baRSS */,
 				54CC042D2162532800A48795 /* baRSS-Helper */,
 				54ACC27D21061B3B0020715F /* Products */,

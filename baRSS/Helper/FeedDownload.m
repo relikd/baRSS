@@ -303,7 +303,7 @@ static BOOL _nextUpdateIsForced = NO;
 				needsNotification = YES;
 			}
 		}
-		[StoreCoordinator saveContext:moc andParent:NO];
+		[StoreCoordinator saveContext:moc andParent:YES];
 		if (needsNotification)
 			[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedUpdated object:oid];
 		if (block) block(success);
@@ -400,7 +400,7 @@ static BOOL _nextUpdateIsForced = NO;
 	[self downloadFavicon:faviconURL finished:^(NSImage *img) {
 		Feed *f = [moc objectWithID:oid];
 		if (f && [f setIconImage:img]) {
-			[StoreCoordinator saveContext:moc andParent:NO];
+			[StoreCoordinator saveContext:moc andParent:YES];
 			[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedIconUpdated object:oid];
 		}
 		if (block) block();

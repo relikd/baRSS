@@ -9,6 +9,9 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 ### Added
 - Changelog
 
+### Fixed
+- 'Update all feeds' will shows unread items count properly during update
+
 
 ## [0.9.2] - 2019-03-07
 ### Added
