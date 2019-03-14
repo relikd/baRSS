@@ -34,7 +34,9 @@
 		self.errorCount = 0;
 	int16_t n = self.errorCount + 1; // always increment errorCount (can be used to indicate bad feeds)
 	// TODO: remove logging
+#ifdef DEBUG
 	NSLog(@"ERROR: Feed download failed: %@ (errorCount: %d)", self.url, n);
+#endif
 	if ([self.scheduled timeIntervalSinceNow] > 30) // forced, early update. Scheduled is still in the futute.
 		return; // Keep error counter low. Not enough time has passed (e.g., temporary server outage)
 	NSTimeInterval retryWaitTime = pow(2, (n > 13 ? 13 : n)) * 60; // 2^N (between: 2 minutes and 5.7 days)

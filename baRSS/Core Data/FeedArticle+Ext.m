@@ -67,7 +67,7 @@
 	item.title = [self shortArticleName];
 	item.enabled = (self.link.length > 0);
 	item.state = (self.unread && [UserPrefs defaultYES:@"feedTickMark"] ? NSControlStateValueOn : NSControlStateValueOff);
-	item.toolTip = self.abstract;
+	item.toolTip = (self.abstract ? self.abstract : self.body); // fall back to body (html)
 	item.representedObject = self.objectID;
 	item.target = [self class];
 	item.action = @selector(didClickOnMenuItem:);
