@@ -123,7 +123,9 @@ static BOOL _nextUpdateIsForced = NO;
  Called when schedule timer runs out (earliest @c .schedule date). Or if forced by user request.
  */
 + (void)updateTimerCallback {
+#ifdef DEBUG
 	NSLog(@"fired");
+#endif
 	BOOL updateAll = _nextUpdateIsForced;
 	_nextUpdateIsForced = NO;
 	
