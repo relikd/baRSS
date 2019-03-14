@@ -6,16 +6,21 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 
 
 ## [Unreleased]
+
+
+## [0.9.3] - 2019-03-14
 ### Added
 - Changelog
+- UI: Show body tag in article tooltip if abstract tag is empty
 
 ### Fixed
 - 'Update all feeds' will shows unread items count properly during update
+- Fixed update for feeds where all article URLs point to the same resource (issue: #3)
 
 
 ## [0.9.2] - 2019-03-07
 ### Added
-- Limit number of articles that are displayed in feed menu
+- Limit number of articles that are displayed in feed menu (issue: #2)
 
 ### Fixed
 - Cmd+Q in preferences will close the window instead of quitting the application
@@ -46,6 +51,7 @@ Initial release
 
 
 [Unreleased]: https://github.com/relikd/baRSS/compare/v0.9.2...HEAD
+[0.9.3]: https://github.com/relikd/baRSS/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/relikd/baRSS/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/relikd/baRSS/compare/v0.9...v0.9.1
 [0.9]: https://github.com/relikd/baRSS/compare/e1f36514a8aa2d5fb9a575b6eb19adc2ce4a04d9...v0.9
