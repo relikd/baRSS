@@ -92,9 +92,9 @@
 		self.group.name = obj.title;
 	
 	// Add and remove articles
-	NSMutableSet<NSString*> *urls = [[self.articles valueForKeyPath:@"link"] mutableCopy];
-	NSInteger diff = [self addMissingArticles:obj updateLinks:urls]; // will remove links in 'urls' that should be kept
-	diff -= [self deleteArticlesWithLink:urls]; // remove old, outdated articles
+	NSMutableSet<FeedArticle*> *oldSet = [self.articles mutableCopy];
+	NSInteger diff = [self addMissingArticles:obj withOldSet:oldSet]; // will remove items that should be kept
+	diff -= [self deleteArticlesWithOldSet:oldSet]; // remove old, outdated articles
 	// Get new total article count and post unread-count-change notification
 	if (flag && diff != 0) {
 		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:@(diff)];
@@ -108,9 +108,10 @@
  New articles should be in ascending order without any gaps in between.
  If new article is disjunct from the article before, assume a deleted article re-appeared and mark it as read.
  
- @param urls Input will be used to identify new articles. Output will contain URLs that aren't present in the feed anymore.
+ @param oldSet Input will be used to identify new articles.
+               Output contains articles that aren't present in the feed anymore and should be deleted.
  */
-- (NSInteger)addMissingArticles:(RSParsedFeed*)obj updateLinks:(NSMutableSet<NSString*>*)urls {
+- (NSInteger)addMissingArticles:(RSParsedFeed*)obj withOldSet:(NSMutableSet<FeedArticle*>*)oldSet {
 	NSInteger newOnes = 0;
 	int32_t currentIndex = [[self.articles valueForKeyPath:@"@min.sortIndex"] intValue];
 	FeedArticle *lastInserted = nil;
@@ -118,10 +119,10 @@
 	
 	for (RSParsedArticle *article in [obj.articles reverseObjectEnumerator]) {
 		// reverse enumeration ensures correct article order
-		if ([urls containsObject:article.link]) {
-			[urls removeObject:article.link];
-			FeedArticle *storedArticle = [self findArticleWithLink:article.link]; // TODO: use two synced arrays?
-			if (storedArticle && storedArticle.sortIndex != currentIndex) {
+		FeedArticle *storedArticle = [self findArticle:article inSet:oldSet];
+		if (storedArticle) {
+			[oldSet removeObject:storedArticle];
+			if (storedArticle.sortIndex != currentIndex) {
 				storedArticle.sortIndex = currentIndex;
 			}
 			hasGapBetweenNewArticles = YES;
@@ -146,26 +147,19 @@
 }
 
 /**
- Delete all items where @c link matches one of the URLs in the @c NSSet.
+ Delete all articles from core data, that are still in the oldSet.
  */
-- (NSUInteger)deleteArticlesWithLink:(NSMutableSet<NSString*>*)urls {
-	if (!urls || urls.count == 0)
+- (NSUInteger)deleteArticlesWithOldSet:(NSMutableSet<FeedArticle*>*)oldSet {
+	if (!oldSet || oldSet.count == 0)
 		return 0;
 	NSUInteger c = 0;
-	for (FeedArticle *fa in self.articles) {
-		if ([urls containsObject:fa.link]) {
-			[urls removeObject:fa.link];
-			if (fa.unread) ++c;
-			// TODO: keep unread articles?
-			[self.managedObjectContext deleteObject:fa];
-			if (urls.count == 0)
-				break;
-		}
+	for (FeedArticle *fa in oldSet) {
+		if (fa.unread) ++c;
+		// TODO: keep unread articles?
+		[self.managedObjectContext deleteObject:fa];
 	}
-	NSSet<FeedArticle*> *delArticles = [self.managedObjectContext deletedObjects];
-	if (delArticles.count > 0) {
-		[self removeArticles:delArticles];
-	}
+	if (oldSet.count > 0)
+		[self removeArticles:oldSet];
 	return c;
 }
 
@@ -183,12 +177,18 @@
 }
 
 /**
- Iterate over all Articles and return the one where @c .link matches. Or @c nil if no matching article found.
+ Iterate over oldSet and return the one where @c link and @c guid matches. Or @c nil if no matching article found.
  */
-- (FeedArticle*)findArticleWithLink:(NSString*)url {
-	for (FeedArticle *a in self.articles) {
-		if ([a.link isEqualToString:url])
-			return a;
+- (FeedArticle*)findArticle:(RSParsedArticle*)article inSet:(NSSet<FeedArticle*>*)oldSet {
+	NSString *searchLink = article.link;
+	NSString *searchGuid = article.guid;
+	BOOL linkIsNil = (searchLink == nil);
+	BOOL guidIsNil = (searchGuid == nil);
+	for (FeedArticle *old in oldSet) {
+		if ((linkIsNil && old.link == nil) || [old.link isEqualToString:searchLink]) {
+			if ((guidIsNil && old.guid == nil) || [old.guid isEqualToString:searchGuid])
+				return old;
+		}
 	}
 	return nil;
 }
