@@ -6,6 +6,8 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 
 
 ## [Unreleased]
+### Fixed
+- Article order got mixed up for some feeds (issue: #4)
 
 
 ## [0.9.3] - 2019-03-14
@@ -50,7 +52,7 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 Initial release
 
 
-[Unreleased]: https://github.com/relikd/baRSS/compare/v0.9.2...HEAD
+[Unreleased]: https://github.com/relikd/baRSS/compare/v0.9.3...HEAD
 [0.9.3]: https://github.com/relikd/baRSS/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/relikd/baRSS/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/relikd/baRSS/compare/v0.9...v0.9.1

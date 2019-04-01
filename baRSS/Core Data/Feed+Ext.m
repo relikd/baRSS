@@ -92,9 +92,10 @@
 		self.group.name = obj.title;
 	
 	// Add and remove articles
-	NSMutableSet<FeedArticle*> *oldSet = [self.articles mutableCopy];
-	NSInteger diff = [self addMissingArticles:obj withOldSet:oldSet]; // will remove items that should be kept
-	diff -= [self deleteArticlesWithOldSet:oldSet]; // remove old, outdated articles
+	NSMutableSet<FeedArticle*> *localSet = [self.articles mutableCopy];
+	NSInteger diff = 0;
+	diff -= [self deleteArticles:localSet withRemoteSet:obj.articles]; // remove old, outdated articles
+	diff += [self insertArticles:localSet withRemoteSet:obj.articles]; // insert new in correct order
 	// Get new total article count and post unread-count-change notification
 	if (flag && diff != 0) {
 		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:@(diff)];
@@ -108,20 +109,20 @@
  New articles should be in ascending order without any gaps in between.
  If new article is disjunct from the article before, assume a deleted article re-appeared and mark it as read.
  
- @param oldSet Input will be used to identify new articles.
-               Output contains articles that aren't present in the feed anymore and should be deleted.
+ @param localSet Use result set @c localSet of method call @c deleteArticles:withRemoteSet:.
+ @param remoteSet Readonly copy of @c RSParsedFeed.articles.
  */
-- (NSInteger)addMissingArticles:(RSParsedFeed*)obj withOldSet:(NSMutableSet<FeedArticle*>*)oldSet {
-	NSInteger newOnes = 0;
-	int32_t currentIndex = [[self.articles valueForKeyPath:@"@min.sortIndex"] intValue];
+- (NSUInteger)insertArticles:(NSMutableSet<FeedArticle*>*)localSet withRemoteSet:(NSArray<RSParsedArticle*>*)remoteSet {
+	NSUInteger newOnes = 0;
+	int32_t currentIndex = [[localSet valueForKeyPath:@"@min.sortIndex"] intValue];
 	FeedArticle *lastInserted = nil;
 	BOOL hasGapBetweenNewArticles = NO;
 	
-	for (RSParsedArticle *article in [obj.articles reverseObjectEnumerator]) {
+	for (RSParsedArticle *article in [remoteSet reverseObjectEnumerator]) {
 		// reverse enumeration ensures correct article order
-		FeedArticle *storedArticle = [self findArticle:article inSet:oldSet];
+		FeedArticle *storedArticle = [self findRemoteArticle:article inLocalSet:localSet];
 		if (storedArticle) {
-			[oldSet removeObject:storedArticle];
+			[localSet removeObject:storedArticle];
 			if (storedArticle.sortIndex != currentIndex) {
 				storedArticle.sortIndex = currentIndex;
 			}
@@ -147,19 +148,26 @@
 }
 
 /**
- Delete all articles from core data, that are still in the oldSet.
+ Delete all articles from core data, that aren't present anymore.
+ 
+ @param localSet Input a copy of @c self.articles. Output the same set minus deleted articles.
+ @param remoteSet Readonly copy of @c RSParsedFeed.articles.
  */
-- (NSUInteger)deleteArticlesWithOldSet:(NSMutableSet<FeedArticle*>*)oldSet {
-	if (!oldSet || oldSet.count == 0)
-		return 0;
+- (NSUInteger)deleteArticles:(NSMutableSet<FeedArticle*>*)localSet withRemoteSet:(NSArray<RSParsedArticle*>*)remoteSet {
 	NSUInteger c = 0;
-	for (FeedArticle *fa in oldSet) {
-		if (fa.unread) ++c;
-		// TODO: keep unread articles?
-		[self.managedObjectContext deleteObject:fa];
+	NSMutableSet<FeedArticle*> *deletingSet = [NSMutableSet setWithCapacity:localSet.count];
+	for (FeedArticle *fa in localSet) {
+		if (![self findLocalArticle:fa inRemoteSet:remoteSet]) {
+			if (fa.unread) ++c;
+			// TODO: keep unread articles?
+			[self.managedObjectContext deleteObject:fa];
+			[deletingSet addObject:fa];
+		}
 	}
-	if (oldSet.count > 0)
-		[self removeArticles:oldSet];
+	if (deletingSet.count > 0) {
+		[localSet minusSet:deletingSet];
+		[self removeArticles:deletingSet];
+	}
 	return c;
 }
 
@@ -177,17 +185,34 @@
 }
 
 /**
- Iterate over oldSet and return the one where @c link and @c guid matches. Or @c nil if no matching article found.
+ Iterate over localSet and return the one where @c link and @c guid matches. Or @c nil if no matching article found.
  */
-- (FeedArticle*)findArticle:(RSParsedArticle*)article inSet:(NSSet<FeedArticle*>*)oldSet {
-	NSString *searchLink = article.link;
-	NSString *searchGuid = article.guid;
+- (FeedArticle*)findRemoteArticle:(RSParsedArticle*)remote inLocalSet:(NSSet<FeedArticle*>*)localSet {
+	NSString *searchLink = remote.link;
+	NSString *searchGuid = remote.guid;
 	BOOL linkIsNil = (searchLink == nil);
 	BOOL guidIsNil = (searchGuid == nil);
-	for (FeedArticle *old in oldSet) {
-		if ((linkIsNil && old.link == nil) || [old.link isEqualToString:searchLink]) {
-			if ((guidIsNil && old.guid == nil) || [old.guid isEqualToString:searchGuid])
-				return old;
+	for (FeedArticle *art in localSet) {
+		if ((linkIsNil && art.link == nil) || [art.link isEqualToString:searchLink]) {
+			if ((guidIsNil && art.guid == nil) || [art.guid isEqualToString:searchGuid])
+				return art;
+		}
+	}
+	return nil;
+}
+
+/**
+ Iterate over remoteSet and return the one where @c link and @c guid matches. Or @c nil if no matching article found.
+ */
+- (RSParsedArticle*)findLocalArticle:(FeedArticle*)local inRemoteSet:(NSArray<RSParsedArticle*>*)remoteSet {
+	NSString *searchLink = local.link;
+	NSString *searchGuid = local.guid;
+	BOOL linkIsNil = (searchLink == nil);
+	BOOL guidIsNil = (searchGuid == nil);
+	for (RSParsedArticle *art in remoteSet) {
+		if ((linkIsNil && art.link == nil) || [art.link isEqualToString:searchLink]) {
+			if ((guidIsNil && art.guid == nil) || [art.guid isEqualToString:searchGuid])
+				return art;
 		}
 	}
 	return nil;
