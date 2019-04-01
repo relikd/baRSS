@@ -9,6 +9,9 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 ### Fixed
 - Article order got mixed up for some feeds (issue: #4)
 
+### Changed
+- Removed 'Start on login'. Use Preferences > Users > Login Items instead.
+
 
 ## [0.9.3] - 2019-03-14
 ### Added

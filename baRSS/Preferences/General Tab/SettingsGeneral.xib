@@ -21,25 +21,19 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="327"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XF4-m8-sya">
-                    <rect key="frame" x="18" y="291" width="284" height="18"/>
-                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="Start on login" bezelStyle="regularSquare" imagePosition="left" inset="2" id="WwD-9B-kMx">
-                        <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QwE-M7-q2R">
+                    <rect key="frame" x="151" y="13" width="155" height="32"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                    <buttonCell key="cell" type="push" title="Fix Cache" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ady-2s-Ggm">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="changeStartOnLogin:" target="-2" id="e05-eb-6ni"/>
-                        <binding destination="iU7-KA-nY5" name="value" keyPath="values.startOnLogin" id="LnI-lN-nUf">
-                            <dictionary key="options">
-                                <bool key="NSAllowsEditingMultipleValuesSelection" value="NO"/>
-                                <integer key="NSNullPlaceholder" value="0"/>
-                            </dictionary>
-                        </binding>
+                        <action selector="fixCache:" target="-2" id="gbM-hA-UVF"/>
                     </connections>
                 </button>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2sG-NO-OJz">
-                    <rect key="frame" x="18" y="254" width="133" height="17"/>
+                    <rect key="frame" x="18" y="288" width="133" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Open URLs with:" id="vNb-i3-dvE">
                         <font key="font" metaFont="system"/>
@@ -48,7 +42,7 @@
                     </textFieldCell>
                 </textField>
                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BcN-gW-jBg">
-                    <rect key="frame" x="155" y="249" width="148" height="26"/>
+                    <rect key="frame" x="155" y="283" width="148" height="26"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <popUpButtonCell key="cell" type="push" title="-- list --" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="qW6-vv-pdE" id="R91-En-pHg">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -64,7 +58,7 @@
                     </connections>
                 </popUpButton>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TC5-cu-zUi">
-                    <rect key="frame" x="18" y="227" width="133" height="17"/>
+                    <rect key="frame" x="18" y="261" width="133" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Default RSS Reader:" id="wvK-Oz-Kk3">
                         <font key="font" metaFont="system"/>
@@ -73,7 +67,7 @@
                     </textFieldCell>
                 </textField>
                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tJe-jL-nUu">
-                    <rect key="frame" x="155" y="222" width="148" height="26"/>
+                    <rect key="frame" x="155" y="256" width="148" height="26"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <popUpButtonCell key="cell" type="push" title="-- list --" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="4Gg-hZ-mh4" id="saR-9h-TWE">
                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -88,17 +82,6 @@
                         <action selector="changeDefaultRSSReader:" target="-2" id="ul1-1K-oJb"/>
                     </connections>
                 </popUpButton>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QwE-M7-q2R">
-                    <rect key="frame" x="151" y="13" width="155" height="32"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
-                    <buttonCell key="cell" type="push" title="Fix Cache" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ady-2s-Ggm">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="fixCache:" target="-2" id="gbM-hA-UVF"/>
-                    </connections>
-                </button>
             </subviews>
             <point key="canvasLocation" x="33" y="-153.5"/>
         </customView>
