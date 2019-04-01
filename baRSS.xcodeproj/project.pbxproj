@@ -33,12 +33,9 @@
 		54B749DA2204A85C0022CC6D /* BarStatusItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B749D92204A85C0022CC6D /* BarStatusItem.m */; };
 		54B749E0220636200022CC6D /* FeedArticle+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B749DF220635CD0022CC6D /* FeedArticle+Ext.m */; };
 		54BB048921FD2AB500C303A5 /* NSDate+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54BB048821FD2AB500C303A5 /* NSDate+Ext.m */; };
-		54CC04382162532A00A48795 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 54CC04372162532A00A48795 /* main.m */; };
-		54CC043E2162566900A48795 /* baRSS-Helper.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54CC042C2162532800A48795 /* baRSS-Helper.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E8831E211B509D00064188 /* ModalFeedEdit.m */; };
 		54E88321211B509D00064188 /* ModalFeedEdit.xib in Resources */ = {isa = PBXBuildFile; fileRef = 54E8831F211B509D00064188 /* ModalFeedEdit.xib */; };
 		54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */; };
-		54F518782162CA4F00EE856C /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54F518772162CA4F00EE856C /* ServiceManagement.framework */; };
 		54F6025D21C1D4170006D338 /* OpmlExport.m in Sources */ = {isa = PBXBuildFile; fileRef = 54F6025C21C1D4170006D338 /* OpmlExport.m */; };
 		54FE73D021220DEC003EAC65 /* StoreCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 54FE73CF21220DEC003EAC65 /* StoreCoordinator.m */; };
 		54FE73D3212316CD003EAC65 /* BarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 54FE73D2212316CD003EAC65 /* BarMenu.m */; };
@@ -63,16 +60,6 @@
 			dstSubfolderSpec = 16;
 			files = (
 				544DCCBE212A2B6F002DBC46 /* RSXML.framework.dSYM in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		54CC043D2162565F00A48795 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = Contents/Library/LoginItems;
-			dstSubfolderSpec = 1;
-			files = (
-				54CC043E2162566900A48795 /* baRSS-Helper.app in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,9 +115,6 @@
 		54B749DF220635CD0022CC6D /* FeedArticle+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "FeedArticle+Ext.m"; sourceTree = "<group>"; };
 		54BB048721FD2AB500C303A5 /* NSDate+Ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Ext.h"; sourceTree = "<group>"; };
 		54BB048821FD2AB500C303A5 /* NSDate+Ext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Ext.m"; sourceTree = "<group>"; };
-		54CC042C2162532800A48795 /* baRSS-Helper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "baRSS-Helper.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		54CC04362162532A00A48795 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		54CC04372162532A00A48795 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		54E8831D211B509D00064188 /* ModalFeedEdit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalFeedEdit.h; sourceTree = "<group>"; };
 		54E8831E211B509D00064188 /* ModalFeedEdit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalFeedEdit.m; sourceTree = "<group>"; };
 		54E8831F211B509D00064188 /* ModalFeedEdit.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ModalFeedEdit.xib; sourceTree = "<group>"; };
@@ -148,15 +132,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				54F518782162CA4F00EE856C /* ServiceManagement.framework in Frameworks */,
 				544DCCB9212A2B4D002DBC46 /* RSXML.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		54CC04292162532800A48795 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,7 +230,6 @@
 				540CD14821C094A2004AB594 /* README.md */,
 				54892F1D2235285700271CBA /* CHANGELOG.md */,
 				54ACC27E21061B3B0020715F /* baRSS */,
-				54CC042D2162532800A48795 /* baRSS-Helper */,
 				54ACC27D21061B3B0020715F /* Products */,
 				544FBD4321064AEB008A260C /* Frameworks */,
 			);
@@ -264,7 +239,6 @@
 			isa = PBXGroup;
 			children = (
 				54ACC27C21061B3B0020715F /* baRSS Beta.app */,
-				54CC042C2162532800A48795 /* baRSS-Helper.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -285,15 +259,6 @@
 				54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */,
 			);
 			path = baRSS;
-			sourceTree = "<group>";
-		};
-		54CC042D2162532800A48795 /* baRSS-Helper */ = {
-			isa = PBXGroup;
-			children = (
-				54CC04362162532A00A48795 /* Info.plist */,
-				54CC04372162532A00A48795 /* main.m */,
-			);
-			path = "baRSS-Helper";
 			sourceTree = "<group>";
 		};
 		54E88323211B542E00064188 /* Feeds Tab */ = {
@@ -323,7 +288,6 @@
 				54ACC27A21061B3B0020715F /* Resources */,
 				544DCCBB212A2B4D002DBC46 /* Embed Frameworks */,
 				544DCCBC212A2B5A002DBC46 /* CopyFiles */,
-				54CC043D2162565F00A48795 /* CopyFiles */,
 				543964EE2215C27B0016AAA3 /* ShellScript */,
 			);
 			buildRules = (
@@ -333,23 +297,6 @@
 			name = baRSS;
 			productName = baRRS;
 			productReference = 54ACC27C21061B3B0020715F /* baRSS Beta.app */;
-			productType = "com.apple.product-type.application";
-		};
-		54CC042B2162532800A48795 /* baRSS-Helper */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 54CC043C2162532A00A48795 /* Build configuration list for PBXNativeTarget "baRSS-Helper" */;
-			buildPhases = (
-				54CC04282162532800A48795 /* Sources */,
-				54CC04292162532800A48795 /* Frameworks */,
-				54CC042A2162532800A48795 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "baRSS-Helper";
-			productName = "baRSS-Helper";
-			productReference = 54CC042C2162532800A48795 /* baRSS-Helper.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -373,14 +320,6 @@
 							};
 						};
 					};
-					54CC042B2162532800A48795 = {
-						CreatedOnToolsVersion = 9.4.1;
-						SystemCapabilities = {
-							com.apple.Sandbox = {
-								enabled = 0;
-							};
-						};
-					};
 				};
 			};
 			buildConfigurationList = 54ACC27721061B3B0020715F /* Build configuration list for PBXProject "baRSS" */;
@@ -397,7 +336,6 @@
 			projectRoot = "";
 			targets = (
 				54ACC27B21061B3B0020715F /* baRSS */,
-				54CC042B2162532800A48795 /* baRSS-Helper */,
 			);
 		};
 /* End PBXProject section */
@@ -412,13 +350,6 @@
 				54ACC28621061B3C0020715F /* Assets.xcassets in Resources */,
 				546FC44421189975007CC3A3 /* SettingsGeneral.xib in Resources */,
 				546FC43F21188C78007CC3A3 /* SettingsFeeds.xib in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		54CC042A2162532800A48795 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -473,14 +404,6 @@
 				54209E942117325100F3B5EF /* DrawImage.m in Sources */,
 				54FE73D021220DEC003EAC65 /* StoreCoordinator.m in Sources */,
 				54A07A7F220E04CF00082C51 /* NSFetchRequest+Ext.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		54CC04282162532800A48795 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				54CC04382162532A00A48795 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -695,44 +618,6 @@
 			};
 			name = Release;
 		};
-		54CC043A2162532A00A48795 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Manual;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = "baRSS-Helper/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.relikd.baRSS-Helper";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SKIP_INSTALL = YES;
-			};
-			name = Debug;
-		};
-		54CC043B2162532A00A48795 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Manual;
-				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = "baRSS-Helper/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				PRODUCT_BUNDLE_IDENTIFIER = "de.relikd.baRSS-Helper";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -750,15 +635,6 @@
 			buildConfigurations = (
 				54ACC29121061B3C0020715F /* Debug */,
 				54ACC29221061B3C0020715F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		54CC043C2162532A00A48795 /* Build configuration list for PBXNativeTarget "baRSS-Helper" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				54CC043A2162532A00A48795 /* Debug */,
-				54CC043B2162532A00A48795 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

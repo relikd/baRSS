@@ -27,8 +27,6 @@
 #import "StoreCoordinator.h"
 #import "Constants.h"
 
-#import <ServiceManagement/ServiceManagement.h>
-
 @interface SettingsGeneral()
 @property (weak) IBOutlet NSPopUpButton *popupHttpApplication;
 @property (weak) IBOutlet NSPopUpButton *popupDefaultRSSReader;
@@ -48,17 +46,6 @@
 }
 
 #pragma mark - UI interaction with IBAction
-
-/// Run helper application to add thyself to startup items.
-- (IBAction)changeStartOnLogin:(NSButton *)sender {
-	// launchctl list | grep de.relikd
-	CFStringRef helperIdentifier = CFBridgingRetain(@"de.relikd.baRSS-Helper");
-	Boolean setOnLogin = (sender.state == NSControlStateValueOn);
-	if (!helperIdentifier || !SMLoginItemSetEnabled(helperIdentifier, setOnLogin))
-		sender.state = (setOnLogin ? NSControlStateValueOff : NSControlStateValueOn); // restore prev state
-	if (helperIdentifier)
-		CFRelease(helperIdentifier);
-}
 
 - (IBAction)fixCache:(NSButton *)sender {
 	NSUInteger deleted = [StoreCoordinator deleteUnreferenced];
