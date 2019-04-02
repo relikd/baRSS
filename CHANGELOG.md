@@ -6,8 +6,12 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 
 
 ## [Unreleased]
+
+
+## [0.9.4] - 2019-04-02
 ### Fixed
 - Article order got mixed up for some feeds (issue: #4)
+- If multiple consecutive items reappear in the middle of the feed mark them read
 
 ### Changed
 - Removed 'Start on login'. Use Preferences > Users > Login Items instead.
@@ -55,7 +59,8 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 Initial release
 
 
-[Unreleased]: https://github.com/relikd/baRSS/compare/v0.9.3...HEAD
+[Unreleased]: https://github.com/relikd/baRSS/compare/v0.9.4...HEAD
+[0.9.4]: https://github.com/relikd/baRSS/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/relikd/baRSS/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/relikd/baRSS/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/relikd/baRSS/compare/v0.9...v0.9.1
