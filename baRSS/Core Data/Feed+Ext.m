@@ -113,38 +113,34 @@
  @param remoteSet Readonly copy of @c RSParsedFeed.articles.
  */
 - (NSUInteger)insertArticles:(NSMutableSet<FeedArticle*>*)localSet withRemoteSet:(NSArray<RSParsedArticle*>*)remoteSet {
-	NSUInteger newOnes = 0;
 	int32_t currentIndex = [[localSet valueForKeyPath:@"@min.sortIndex"] intValue];
-	FeedArticle *lastInserted = nil;
-	BOOL hasGapBetweenNewArticles = NO;
+	NSMutableArray<FeedArticle*>* newlyInserted = [NSMutableArray arrayWithCapacity:remoteSet.count];
 	
 	for (RSParsedArticle *article in [remoteSet reverseObjectEnumerator]) {
 		// reverse enumeration ensures correct article order
 		FeedArticle *storedArticle = [self findRemoteArticle:article inLocalSet:localSet];
 		if (storedArticle) {
 			[localSet removeObject:storedArticle];
+			// If we encounter an already existing item, assume newly inserted are "ghost" items and mark read.
+			if (newlyInserted.count > 0) {
+				for (FeedArticle *ghostItem in newlyInserted) {
+					ghostItem.unread = NO;
+				}
+				[newlyInserted removeAllObjects];
+			}
+			// Ensures consecutive block of incrementing numbers on sortIndex
 			if (storedArticle.sortIndex != currentIndex) {
 				storedArticle.sortIndex = currentIndex;
 			}
-			hasGapBetweenNewArticles = YES;
 		} else {
-			newOnes += 1;
-			if (hasGapBetweenNewArticles && lastInserted) { // gap with at least one article inbetween
-				lastInserted.unread = NO;
-				newOnes -= 1;
-			}
-			hasGapBetweenNewArticles = NO;
-			lastInserted = [FeedArticle newArticle:article inContext:self.managedObjectContext];
-			lastInserted.sortIndex = currentIndex;
-			[self addArticlesObject:lastInserted];
+			FeedArticle *newArticle = [FeedArticle newArticle:article inContext:self.managedObjectContext];
+			newArticle.sortIndex = currentIndex;
+			[self addArticlesObject:newArticle];
+			[newlyInserted addObject:newArticle];
 		}
 		currentIndex += 1;
 	}
-	if (hasGapBetweenNewArticles && lastInserted) {
-		lastInserted.unread = NO;
-		newOnes -= 1;
-	}
-	return newOnes;
+	return newlyInserted.count; // all ghost items are removed already
 }
 
 /**
