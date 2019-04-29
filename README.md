@@ -31,6 +31,8 @@ RSXML is licensed under a MIT license (same as this project).
 Install
 -------
 
+Requires macOS Sierra (10.12) or higher.
+
 Easy way: go to [releases](https://github.com/relikd/baRSS/releases) and downloaded the latest version.
 
 ### Build from source
