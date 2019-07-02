@@ -23,5 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 @interface SettingsGeneral : NSViewController
-@property (assign) IBOutlet NSView *appearanceView;
+- (void)fixCache:(NSButton *)sender;
+- (void)changeHttpApplication:(NSPopUpButton *)sender;
+- (void)changeDefaultRSSReader:(NSPopUpButton *)sender;
 @end

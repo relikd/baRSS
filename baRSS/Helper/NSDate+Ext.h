@@ -33,6 +33,12 @@ typedef NS_ENUM(int32_t, TimeUnitType) {
 };
 
 @interface NSDate (Ext)
++ (NSString*)dayStringISO8601;
++ (NSString*)dayStringLocalized;
+@end
+
+
+@interface NSDate (Interval)
 + (nonnull NSString*)stringForInterval:(Interval)intv rounded:(BOOL)flag;
 + (TimeUnitType)unitForInterval:(Interval)intv rounded:(BOOL)flag;
 @end
@@ -42,4 +48,9 @@ typedef NS_ENUM(int32_t, TimeUnitType) {
 + (Interval)intervalForPopup:(NSPopUpButton*)unit andField:(NSTextField*)value;
 + (void)setInterval:(Interval)intv forPopup:(NSPopUpButton*)popup andField:(NSTextField*)field animate:(BOOL)flag;
 + (void)populateUnitsMenu:(NSPopUpButton*)popup selected:(TimeUnitType)unit;
+@end
+
+
+@interface NSDate (Statistics)
++ (NSDictionary*)refreshIntervalStatistics:(NSArray<NSDate*> *)list;
 @end

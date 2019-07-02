@@ -10,19 +10,20 @@
 		540F704521B6C16C0022E69D /* FeedMeta+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 540F704421B6C16C0022E69D /* FeedMeta+Ext.m */; };
 		54195883218A061100581B79 /* Feed+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54195882218A061100581B79 /* Feed+Ext.m */; };
 		54195886218E1BDB00581B79 /* NSMenu+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54195885218E1BDB00581B79 /* NSMenu+Ext.m */; };
+		541C67C32255470B004D2CE6 /* SettingsAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = 541C67C22255470B004D2CE6 /* SettingsAppearance.m */; };
 		54209E942117325100F3B5EF /* DrawImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 54209E932117325100F3B5EF /* DrawImage.m */; };
-		544936FB21F1E66100DEE9AA /* Statistics.m in Sources */ = {isa = PBXBuildFile; fileRef = 544936FA21F1E66100DEE9AA /* Statistics.m */; };
 		544B011A2114B41200386E5C /* ModalSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* ModalSheet.m */; };
 		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
 		544DCCB9212A2B4D002DBC46 /* RSXML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML.framework */; };
 		544DCCBA212A2B4D002DBC46 /* RSXML.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		544DCCBE212A2B6F002DBC46 /* RSXML.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 544DCCBD212A2B6F002DBC46 /* RSXML.framework.dSYM */; };
+		546A6A2922C583390034E806 /* SettingsGeneralView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D857D122802309001BA1C8 /* SettingsGeneralView.m */; };
+		546A6A2C22C584AF0034E806 /* SettingsAppearanceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 546A6A2A22C584AF0034E806 /* SettingsAppearanceView.m */; };
+		546A6A2F22C585580034E806 /* SettingsAboutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 546A6A2D22C585580034E806 /* SettingsAboutView.m */; };
 		546FC43D21188AD5007CC3A3 /* SettingsFeeds.m in Sources */ = {isa = PBXBuildFile; fileRef = 546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */; };
-		546FC43F21188C78007CC3A3 /* SettingsFeeds.xib in Resources */ = {isa = PBXBuildFile; fileRef = 546FC43E21188C78007CC3A3 /* SettingsFeeds.xib */; };
 		546FC44321189975007CC3A3 /* SettingsGeneral.m in Sources */ = {isa = PBXBuildFile; fileRef = 546FC44121189975007CC3A3 /* SettingsGeneral.m */; };
-		546FC44421189975007CC3A3 /* SettingsGeneral.xib in Resources */ = {isa = PBXBuildFile; fileRef = 546FC44221189975007CC3A3 /* SettingsGeneral.xib */; };
-		546FC4472118A8E6007CC3A3 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 546FC4462118A8E6007CC3A3 /* Preferences.xib */; };
 		5477D34E21233C62002BA27F /* FeedGroup+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 5477D34D21233C62002BA27F /* FeedGroup+Ext.m */; };
+		5478DF04225A7AE200D30C64 /* SettingsFeedsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5478DF03225A7AE200D30C64 /* SettingsFeedsView.m */; };
 		5496B511214D6275003ED4ED /* UserPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5496B510214D6275003ED4ED /* UserPrefs.m */; };
 		54A07A7F220E04CF00082C51 /* NSFetchRequest+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A07A7E220E04CF00082C51 /* NSFetchRequest+Ext.m */; };
 		54A07A82220E723D00082C51 /* MapUnreadTotal.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A07A81220E723D00082C51 /* MapUnreadTotal.m */; };
@@ -30,11 +31,14 @@
 		54ACC28C21061B3C0020715F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28B21061B3C0020715F /* main.m */; };
 		54ACC29521061E270020715F /* FeedDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29421061E270020715F /* FeedDownload.m */; };
 		54ACC29821061FBA0020715F /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29721061FBA0020715F /* Preferences.m */; };
+		54B51704226DC339006C1B29 /* ModalFeedEditView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B51703226DC339006C1B29 /* ModalFeedEditView.m */; };
+		54B517072270E990006C1B29 /* NSView+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B517062270E92A006C1B29 /* NSView+Ext.m */; };
 		54B749DA2204A85C0022CC6D /* BarStatusItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B749D92204A85C0022CC6D /* BarStatusItem.m */; };
 		54B749E0220636200022CC6D /* FeedArticle+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B749DF220635CD0022CC6D /* FeedArticle+Ext.m */; };
 		54BB048921FD2AB500C303A5 /* NSDate+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54BB048821FD2AB500C303A5 /* NSDate+Ext.m */; };
+		54D857CE227C5785001BA1C8 /* RefreshStatisticsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D857CD227C5785001BA1C8 /* RefreshStatisticsView.m */; };
 		54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E8831E211B509D00064188 /* ModalFeedEdit.m */; };
-		54E88321211B509D00064188 /* ModalFeedEdit.xib in Resources */ = {isa = PBXBuildFile; fileRef = 54E8831F211B509D00064188 /* ModalFeedEdit.xib */; };
+		54E9CF32225914300023696F /* SettingsAbout.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E9CF31225914300023696F /* SettingsAbout.m */; };
 		54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */; };
 		54F6025D21C1D4170006D338 /* OpmlExport.m in Sources */ = {isa = PBXBuildFile; fileRef = 54F6025C21C1D4170006D338 /* OpmlExport.m */; };
 		54FE73D021220DEC003EAC65 /* StoreCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 54FE73CF21220DEC003EAC65 /* StoreCoordinator.m */; };
@@ -74,25 +78,28 @@
 		54195884218E1BDB00581B79 /* NSMenu+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMenu+Ext.h"; sourceTree = "<group>"; };
 		54195885218E1BDB00581B79 /* NSMenu+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMenu+Ext.m"; sourceTree = "<group>"; };
 		541958872190FF1200581B79 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		541C67C12255470B004D2CE6 /* SettingsAppearance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsAppearance.h; sourceTree = "<group>"; };
+		541C67C22255470B004D2CE6 /* SettingsAppearance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsAppearance.m; sourceTree = "<group>"; };
 		54209E922117325100F3B5EF /* DrawImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawImage.h; sourceTree = "<group>"; };
 		54209E932117325100F3B5EF /* DrawImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawImage.m; sourceTree = "<group>"; };
-		544936F921F1E66100DEE9AA /* Statistics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Statistics.h; sourceTree = "<group>"; };
-		544936FA21F1E66100DEE9AA /* Statistics.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Statistics.m; sourceTree = "<group>"; };
 		544B01182114B41200386E5C /* ModalSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSheet.h; sourceTree = "<group>"; };
 		544B01192114B41200386E5C /* ModalSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalSheet.m; sourceTree = "<group>"; };
 		544B011B2114EE9100386E5C /* AppHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppHook.h; sourceTree = "<group>"; };
 		544B011C2114EE9100386E5C /* AppHook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppHook.m; sourceTree = "<group>"; };
 		544DCCB8212A2B4D002DBC46 /* RSXML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSXML.framework; path = Carthage/Build/Mac/RSXML.framework; sourceTree = "<group>"; };
 		544DCCBD212A2B6F002DBC46 /* RSXML.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = RSXML.framework.dSYM; path = Carthage/Build/Mac/RSXML.framework.dSYM; sourceTree = "<group>"; };
+		546A6A2A22C584AF0034E806 /* SettingsAppearanceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsAppearanceView.m; sourceTree = "<group>"; };
+		546A6A2B22C584AF0034E806 /* SettingsAppearanceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsAppearanceView.h; sourceTree = "<group>"; };
+		546A6A2D22C585580034E806 /* SettingsAboutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsAboutView.m; sourceTree = "<group>"; };
+		546A6A2E22C585580034E806 /* SettingsAboutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsAboutView.h; sourceTree = "<group>"; };
 		546FC43B21188AD5007CC3A3 /* SettingsFeeds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsFeeds.h; sourceTree = "<group>"; };
 		546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsFeeds.m; sourceTree = "<group>"; };
-		546FC43E21188C78007CC3A3 /* SettingsFeeds.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsFeeds.xib; sourceTree = "<group>"; };
 		546FC44021189975007CC3A3 /* SettingsGeneral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsGeneral.h; sourceTree = "<group>"; };
 		546FC44121189975007CC3A3 /* SettingsGeneral.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsGeneral.m; sourceTree = "<group>"; };
-		546FC44221189975007CC3A3 /* SettingsGeneral.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsGeneral.xib; sourceTree = "<group>"; };
-		546FC4462118A8E6007CC3A3 /* Preferences.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
 		5477D34C21233C62002BA27F /* FeedGroup+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FeedGroup+Ext.h"; sourceTree = "<group>"; };
 		5477D34D21233C62002BA27F /* FeedGroup+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "FeedGroup+Ext.m"; sourceTree = "<group>"; };
+		5478DF02225A7AE200D30C64 /* SettingsFeedsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsFeedsView.h; sourceTree = "<group>"; };
+		5478DF03225A7AE200D30C64 /* SettingsFeedsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsFeedsView.m; sourceTree = "<group>"; };
 		54892F1D2235285700271CBA /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		5496B50F214D6275003ED4ED /* UserPrefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserPrefs.h; sourceTree = "<group>"; };
 		5496B510214D6275003ED4ED /* UserPrefs.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserPrefs.m; sourceTree = "<group>"; };
@@ -109,15 +116,24 @@
 		54ACC29421061E270020715F /* FeedDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FeedDownload.m; sourceTree = "<group>"; };
 		54ACC29621061FBA0020715F /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		54ACC29721061FBA0020715F /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
+		54B51702226DC339006C1B29 /* ModalFeedEditView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModalFeedEditView.h; sourceTree = "<group>"; };
+		54B51703226DC339006C1B29 /* ModalFeedEditView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ModalFeedEditView.m; sourceTree = "<group>"; };
+		54B517052270E8C6006C1B29 /* NSView+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSView+Ext.h"; sourceTree = "<group>"; };
+		54B517062270E92A006C1B29 /* NSView+Ext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSView+Ext.m"; sourceTree = "<group>"; };
 		54B749D82204A85C0022CC6D /* BarStatusItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BarStatusItem.h; sourceTree = "<group>"; };
 		54B749D92204A85C0022CC6D /* BarStatusItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BarStatusItem.m; sourceTree = "<group>"; };
 		54B749DE220635BE0022CC6D /* FeedArticle+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FeedArticle+Ext.h"; sourceTree = "<group>"; };
 		54B749DF220635CD0022CC6D /* FeedArticle+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "FeedArticle+Ext.m"; sourceTree = "<group>"; };
 		54BB048721FD2AB500C303A5 /* NSDate+Ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Ext.h"; sourceTree = "<group>"; };
 		54BB048821FD2AB500C303A5 /* NSDate+Ext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Ext.m"; sourceTree = "<group>"; };
+		54D857CC227C5785001BA1C8 /* RefreshStatisticsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RefreshStatisticsView.h; sourceTree = "<group>"; };
+		54D857CD227C5785001BA1C8 /* RefreshStatisticsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RefreshStatisticsView.m; sourceTree = "<group>"; };
+		54D857D022802309001BA1C8 /* SettingsGeneralView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsGeneralView.h; sourceTree = "<group>"; };
+		54D857D122802309001BA1C8 /* SettingsGeneralView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsGeneralView.m; sourceTree = "<group>"; };
 		54E8831D211B509D00064188 /* ModalFeedEdit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalFeedEdit.h; sourceTree = "<group>"; };
 		54E8831E211B509D00064188 /* ModalFeedEdit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalFeedEdit.m; sourceTree = "<group>"; };
-		54E8831F211B509D00064188 /* ModalFeedEdit.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ModalFeedEdit.xib; sourceTree = "<group>"; };
+		54E9CF30225914300023696F /* SettingsAbout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsAbout.h; sourceTree = "<group>"; };
+		54E9CF31225914300023696F /* SettingsAbout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsAbout.m; sourceTree = "<group>"; };
 		54F6025B21C1D4170006D338 /* OpmlExport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpmlExport.h; sourceTree = "<group>"; };
 		54F6025C21C1D4170006D338 /* OpmlExport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OpmlExport.m; sourceTree = "<group>"; };
 		54FE73CE21220DEC003EAC65 /* StoreCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StoreCoordinator.h; sourceTree = "<group>"; };
@@ -160,10 +176,10 @@
 				54209E932117325100F3B5EF /* DrawImage.m */,
 				54ACC29321061E270020715F /* FeedDownload.h */,
 				54ACC29421061E270020715F /* FeedDownload.m */,
-				544936F921F1E66100DEE9AA /* Statistics.h */,
-				544936FA21F1E66100DEE9AA /* Statistics.m */,
 				54BB048721FD2AB500C303A5 /* NSDate+Ext.h */,
 				54BB048821FD2AB500C303A5 /* NSDate+Ext.m */,
+				54B517052270E8C6006C1B29 /* NSView+Ext.h */,
+				54B517062270E92A006C1B29 /* NSView+Ext.m */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -177,28 +193,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		546FC44521189ADC007CC3A3 /* General Tab */ = {
-			isa = PBXGroup;
-			children = (
-				5496B50F214D6275003ED4ED /* UserPrefs.h */,
-				5496B510214D6275003ED4ED /* UserPrefs.m */,
-				546FC44021189975007CC3A3 /* SettingsGeneral.h */,
-				546FC44121189975007CC3A3 /* SettingsGeneral.m */,
-				546FC44221189975007CC3A3 /* SettingsGeneral.xib */,
-			);
-			path = "General Tab";
-			sourceTree = "<group>";
-		};
 		546FC44D2118B357007CC3A3 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
+				54E9CF2F225913850023696F /* Helper */,
 				54ACC29621061FBA0020715F /* Preferences.h */,
 				54ACC29721061FBA0020715F /* Preferences.m */,
-				546FC4462118A8E6007CC3A3 /* Preferences.xib */,
-				544B01182114B41200386E5C /* ModalSheet.h */,
-				544B01192114B41200386E5C /* ModalSheet.m */,
-				546FC44521189ADC007CC3A3 /* General Tab */,
+				54D857CF228022AB001BA1C8 /* General Tab */,
 				54E88323211B542E00064188 /* Feeds Tab */,
+				54D857D3228035D4001BA1C8 /* Appearance Tab */,
+				54D857D72280C367001BA1C8 /* About Tab */,
 			);
 			path = Preferences;
 			sourceTree = "<group>";
@@ -259,19 +263,67 @@
 			path = baRSS;
 			sourceTree = "<group>";
 		};
+		54D857CF228022AB001BA1C8 /* General Tab */ = {
+			isa = PBXGroup;
+			children = (
+				546FC44021189975007CC3A3 /* SettingsGeneral.h */,
+				546FC44121189975007CC3A3 /* SettingsGeneral.m */,
+				54D857D022802309001BA1C8 /* SettingsGeneralView.h */,
+				54D857D122802309001BA1C8 /* SettingsGeneralView.m */,
+			);
+			path = "General Tab";
+			sourceTree = "<group>";
+		};
+		54D857D3228035D4001BA1C8 /* Appearance Tab */ = {
+			isa = PBXGroup;
+			children = (
+				541C67C12255470B004D2CE6 /* SettingsAppearance.h */,
+				541C67C22255470B004D2CE6 /* SettingsAppearance.m */,
+				546A6A2B22C584AF0034E806 /* SettingsAppearanceView.h */,
+				546A6A2A22C584AF0034E806 /* SettingsAppearanceView.m */,
+			);
+			path = "Appearance Tab";
+			sourceTree = "<group>";
+		};
+		54D857D72280C367001BA1C8 /* About Tab */ = {
+			isa = PBXGroup;
+			children = (
+				54E9CF30225914300023696F /* SettingsAbout.h */,
+				54E9CF31225914300023696F /* SettingsAbout.m */,
+				546A6A2E22C585580034E806 /* SettingsAboutView.h */,
+				546A6A2D22C585580034E806 /* SettingsAboutView.m */,
+			);
+			path = "About Tab";
+			sourceTree = "<group>";
+		};
 		54E88323211B542E00064188 /* Feeds Tab */ = {
 			isa = PBXGroup;
 			children = (
 				546FC43B21188AD5007CC3A3 /* SettingsFeeds.h */,
 				546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */,
-				546FC43E21188C78007CC3A3 /* SettingsFeeds.xib */,
+				5478DF02225A7AE200D30C64 /* SettingsFeedsView.h */,
+				5478DF03225A7AE200D30C64 /* SettingsFeedsView.m */,
 				54E8831D211B509D00064188 /* ModalFeedEdit.h */,
 				54E8831E211B509D00064188 /* ModalFeedEdit.m */,
-				54E8831F211B509D00064188 /* ModalFeedEdit.xib */,
+				54B51702226DC339006C1B29 /* ModalFeedEditView.h */,
+				54B51703226DC339006C1B29 /* ModalFeedEditView.m */,
+				54D857CC227C5785001BA1C8 /* RefreshStatisticsView.h */,
+				54D857CD227C5785001BA1C8 /* RefreshStatisticsView.m */,
 				54F6025B21C1D4170006D338 /* OpmlExport.h */,
 				54F6025C21C1D4170006D338 /* OpmlExport.m */,
 			);
 			path = "Feeds Tab";
+			sourceTree = "<group>";
+		};
+		54E9CF2F225913850023696F /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				5496B50F214D6275003ED4ED /* UserPrefs.h */,
+				5496B510214D6275003ED4ED /* UserPrefs.m */,
+				544B01182114B41200386E5C /* ModalSheet.h */,
+				544B01192114B41200386E5C /* ModalSheet.m */,
+			);
+			path = Helper;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -343,11 +395,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				546FC4472118A8E6007CC3A3 /* Preferences.xib in Resources */,
-				54E88321211B509D00064188 /* ModalFeedEdit.xib in Resources */,
 				54ACC28621061B3C0020715F /* Assets.xcassets in Resources */,
-				546FC44421189975007CC3A3 /* SettingsGeneral.xib in Resources */,
-				546FC43F21188C78007CC3A3 /* SettingsFeeds.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -378,14 +426,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				54B51704226DC339006C1B29 /* ModalFeedEditView.m in Sources */,
+				546A6A2C22C584AF0034E806 /* SettingsAppearanceView.m in Sources */,
+				54E9CF32225914300023696F /* SettingsAbout.m in Sources */,
 				54B749E0220636200022CC6D /* FeedArticle+Ext.m in Sources */,
 				54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */,
 				544B011D2114EE9100386E5C /* AppHook.m in Sources */,
 				546FC44321189975007CC3A3 /* SettingsGeneral.m in Sources */,
+				546A6A2922C583390034E806 /* SettingsGeneralView.m in Sources */,
 				54ACC29521061E270020715F /* FeedDownload.m in Sources */,
 				54BB048921FD2AB500C303A5 /* NSDate+Ext.m in Sources */,
 				5477D34E21233C62002BA27F /* FeedGroup+Ext.m in Sources */,
-				544936FB21F1E66100DEE9AA /* Statistics.m in Sources */,
+				5478DF04225A7AE200D30C64 /* SettingsFeedsView.m in Sources */,
 				540F704521B6C16C0022E69D /* FeedMeta+Ext.m in Sources */,
 				54ACC28C21061B3C0020715F /* main.m in Sources */,
 				54FE73D3212316CD003EAC65 /* BarMenu.m in Sources */,
@@ -395,6 +447,10 @@
 				54195886218E1BDB00581B79 /* NSMenu+Ext.m in Sources */,
 				54F6025D21C1D4170006D338 /* OpmlExport.m in Sources */,
 				5496B511214D6275003ED4ED /* UserPrefs.m in Sources */,
+				546A6A2F22C585580034E806 /* SettingsAboutView.m in Sources */,
+				54B517072270E990006C1B29 /* NSView+Ext.m in Sources */,
+				54D857CE227C5785001BA1C8 /* RefreshStatisticsView.m in Sources */,
+				541C67C32255470B004D2CE6 /* SettingsAppearance.m in Sources */,
 				54B749DA2204A85C0022CC6D /* BarStatusItem.m in Sources */,
 				546FC43D21188AD5007CC3A3 /* SettingsFeeds.m in Sources */,
 				54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */,

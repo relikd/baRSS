@@ -123,7 +123,7 @@
 			self.statusItem.title = @"";
 		}
 		BOOL hasNet = [FeedDownload allowNetworkConnection];
-		if (self.unreadCountTotal > 0 && hasNet && [UserPrefs defaultYES:@"tintMenuBarIcon"]) {
+		if (self.unreadCountTotal > 0 && hasNet && [UserPrefs defaultYES:@"globalTintMenuBarIcon"]) {
 			self.statusItem.image = [RSSIcon systemBarIcon:16 tint:[NSColor rssOrange] noConnection:!hasNet];
 		} else {
 			self.statusItem.image = [RSSIcon systemBarIcon:16 tint:nil noConnection:!hasNet];

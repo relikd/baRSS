@@ -6,6 +6,12 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 
 
 ## [Unreleased]
+### Fixed
+- Changed error message text when user cancels creation of new feed item
+- Comparing existing articles with nonexistent guid and link
+
+### Changed
+- Interface builder files replaced with code equivalent
 
 
 ## [0.9.4] - 2019-04-02

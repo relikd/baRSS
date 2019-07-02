@@ -21,33 +21,32 @@
 //  SOFTWARE.
 
 #import "SettingsGeneral.h"
-#import "AppHook.h"
-#import "BarStatusItem.h"
 #import "UserPrefs.h"
 #import "StoreCoordinator.h"
 #import "Constants.h"
+#import "SettingsGeneralView.h"
 
 @interface SettingsGeneral()
-@property (weak) IBOutlet NSPopUpButton *popupHttpApplication;
-@property (weak) IBOutlet NSPopUpButton *popupDefaultRSSReader;
+@property (strong) IBOutlet SettingsGeneralView *view; // override
 @end
 
 @implementation SettingsGeneral
+@dynamic view;
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
+- (void)loadView {
+	self.view = [[SettingsGeneralView alloc] initWithController:self];
 	// Default http application for opening the feed urls
-	[self generateMenuForPopup:self.popupHttpApplication withScheme:@"https"];
-	[self.popupHttpApplication insertItemWithTitle:NSLocalizedString(@"System Default", @"Default web browser application") atIndex:0];
-	[self selectBundleID:[UserPrefs getHttpApplication] inPopup:self.popupHttpApplication];
+	[self generateMenuForPopup:self.view.popupHttpApplication withScheme:@"https"];
+	[self.view.popupHttpApplication insertItemWithTitle:NSLocalizedString(@"System Default", @"Default web browser application") atIndex:0];
+	[self selectBundleID:[UserPrefs getHttpApplication] inPopup:self.view.popupHttpApplication];
 	// Default RSS Reader application
-	[self generateMenuForPopup:self.popupDefaultRSSReader withScheme:@"feed"];
-	[self selectBundleID:[self defaultBundleIdForScheme:@"feed"] inPopup:self.popupDefaultRSSReader];
+	[self generateMenuForPopup:self.view.popupDefaultRSSReader withScheme:@"feed"];
+	[self selectBundleID:[self defaultBundleIdForScheme:@"feed"] inPopup:self.view.popupDefaultRSSReader];
 }
 
 #pragma mark - UI interaction with IBAction
 
-- (IBAction)fixCache:(NSButton *)sender {
+- (void)fixCache:(NSButton *)sender {
 	NSUInteger deleted = [StoreCoordinator deleteUnreferenced];
 	[StoreCoordinator restoreFeedIndexPaths];
 	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
@@ -58,15 +57,11 @@
 	[alert runModal];
 }
 
-- (IBAction)changeMenuBarIconSetting:(NSButton*)sender {
-	[[(AppHook*)NSApp statusItem] updateBarIcon];
-}
-
-- (IBAction)changeHttpApplication:(NSPopUpButton *)sender {
+- (void)changeHttpApplication:(NSPopUpButton *)sender {
 	[UserPrefs setHttpApplication:sender.selectedItem.representedObject];
 }
 
-- (IBAction)changeDefaultRSSReader:(NSPopUpButton *)sender {
+- (void)changeDefaultRSSReader:(NSPopUpButton *)sender {
 	if ([self setDefaultRSSApplication:sender.selectedItem.representedObject] == NO) {
 		// in case anything went wrong, restore previous selection
 		[self selectBundleID:[self defaultBundleIdForScheme:@"feed"] inPopup:sender];

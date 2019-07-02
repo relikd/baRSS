@@ -189,8 +189,8 @@
 	BOOL linkIsNil = (searchLink == nil);
 	BOOL guidIsNil = (searchGuid == nil);
 	for (FeedArticle *art in localSet) {
-		if ((linkIsNil && art.link == nil) || [art.link isEqualToString:searchLink]) {
-			if ((guidIsNil && art.guid == nil) || [art.guid isEqualToString:searchGuid])
+		if ((linkIsNil && art.link == nil) || (!linkIsNil && [art.link isEqualToString:searchLink])) {
+			if ((guidIsNil && art.guid == nil) || (!guidIsNil && [art.guid isEqualToString:searchGuid]))
 				return art;
 		}
 	}
@@ -206,8 +206,8 @@
 	BOOL linkIsNil = (searchLink == nil);
 	BOOL guidIsNil = (searchGuid == nil);
 	for (RSParsedArticle *art in remoteSet) {
-		if ((linkIsNil && art.link == nil) || [art.link isEqualToString:searchLink]) {
-			if ((guidIsNil && art.guid == nil) || [art.guid isEqualToString:searchGuid])
+		if ((linkIsNil && art.link == nil) || (!linkIsNil && [art.link isEqualToString:searchLink])) {
+			if ((guidIsNil && art.guid == nil) || (!guidIsNil && [art.guid isEqualToString:searchGuid]))
 				return art;
 		}
 	}

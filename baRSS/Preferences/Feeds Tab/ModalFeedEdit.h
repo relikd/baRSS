@@ -33,6 +33,7 @@
 
 
 @interface ModalFeedEdit : ModalEditDialog <NSTextFieldDelegate>
+- (void)didClickWarningButton:(NSButton*)sender;
 @end
 
 @interface ModalGroupEdit : ModalEditDialog

@@ -38,6 +38,23 @@ static const TimeUnitType _values[] = {
 
 @implementation NSDate (Ext)
 
+/// @return Day as string in iso format: @c YYYY-MM-DD'T'hh:mm:ss'Z'
++ (NSString*)dayStringISO8601 {
+	return [[[NSISO8601DateFormatter alloc] init] stringFromDate:[NSDate date]];
+//	NSDateComponents *now = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear fromDate:[NSDate date]];
+//	return [NSString stringWithFormat:@"%04ld-%02ld-%02ld", now.year, now.month, now.day];
+}
+
+/// @return Day as string in localized short format, e.g., @c DD.MM.YY
++ (NSString*)dayStringLocalized {
+	return [NSDateFormatter localizedStringFromDate:[NSDate date] dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle];
+}
+
+@end
+
+
+@implementation NSDate (Interval)
+
 /// If @c flag @c = @c YES, print @c 1.1f float string with single char unit: e.g., 3.3m, 1.7h.
 + (nonnull NSString*)stringForInterval:(Interval)intv rounded:(BOOL)flag {
 	if (flag) {
@@ -136,6 +153,51 @@ static const TimeUnitType _values[] = {
 	scale.duration = 0.15f;
 	scale.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
 	[control.layer addAnimation:scale forKey:scale.keyPath];
+}
+
+@end
+
+
+@implementation NSDate (Statistics)
+
+/**
+ @return @c nil if list contains less than 2 entries. Otherwise: @{min, max, avg, median, earliest, latest}
+ */
++ (NSDictionary*)refreshIntervalStatistics:(NSArray<NSDate*> *)list {
+	if (!list || list.count == 0)
+		return nil;
+	
+	NSDate *earliest = [NSDate distantFuture];
+	NSDate *latest = [NSDate distantPast];
+	NSDate *prev = nil;
+	NSMutableArray<NSNumber*> *differences = [NSMutableArray array];
+	for (NSDate *d in list) {
+		if (![d isKindOfClass:[NSDate class]]) // because valueForKeyPath: can return NSNull
+			continue;
+		earliest = [d earlierDate:earliest];
+		latest = [d laterDate:latest];
+		if (prev) {
+			int dif = abs((int)[d timeIntervalSinceDate:prev]);
+			[differences addObject:[NSNumber numberWithInt:dif]];
+		}
+		prev = d;
+	}
+	if (differences.count == 0)
+		return nil;
+	
+	[differences sortUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"integerValue" ascending:YES]]];
+	
+	NSUInteger i = (differences.count/2);
+	NSNumber *median = differences[i];
+	if ((differences.count % 2) == 0) { // even feed count, use median of two values
+		median = [NSNumber numberWithInteger:(median.integerValue + differences[i-1].integerValue) / 2];
+	}
+	return @{@"min" : differences.firstObject,
+			 @"max" : differences.lastObject,
+			 @"avg" : [differences valueForKeyPath:@"@avg.self"],
+			 @"median" : median,
+			 @"earliest" : earliest,
+			 @"latest" : latest };
 }
 
 @end

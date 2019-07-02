@@ -1,6 +1,6 @@
 //
 //  The MIT License (MIT)
-//  Copyright (c) 2018 Oleg Geier
+//  Copyright (c) 2019 Oleg Geier
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -20,18 +20,13 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
+#import "SettingsAbout.h"
+#import "SettingsAboutView.h"
 
-/** Manages the NSOutlineView and Feed creation and editing */
-@interface SettingsFeeds : NSViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
-@property (strong) NSTreeController *dataStore;
+@implementation SettingsAbout
 
-- (void)editSelectedItem;
-- (void)doubleClickOutlineView:(NSOutlineView*)sender;
-- (void)addFeed;
-- (void)addGroup;
-- (void)addSeparator;
-- (void)remove:(id)sender;
-- (void)openImportDialog;
-- (void)openExportDialog;
+- (void)loadView {
+	self.view = [SettingsAboutView new];
+}
+
 @end

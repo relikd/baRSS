@@ -26,7 +26,7 @@
 #import "Preferences.h"
 
 @interface AppHook()
-@property (strong) Preferences *prefWindow;
+@property (strong) NSWindowController *prefWindow;
 @end
 
 @implementation AppHook
@@ -76,9 +76,7 @@
 /// Called whenever the user activates the preferences (either through menu click or hotkey).
 - (void)openPreferences {
 	if (!self.prefWindow) {
-		self.prefWindow = [[Preferences alloc] initWithWindowNibName:@"Preferences"];
-		self.prefWindow.window.title = [NSString stringWithFormat:@"%@ %@", NSProcessInfo.processInfo.processName,
-										NSLocalizedString(@"Preferences", nil)];
+		self.prefWindow = [[NSWindowController alloc] initWithWindow:[Preferences window]];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preferencesClosed:) name:NSWindowWillCloseNotification object:self.prefWindow.window];
 	}
 	[NSApp activateIgnoringOtherApps:YES];
@@ -196,12 +194,13 @@ static NSEventModifierFlags fnKeyFlags = NSEventModifierFlagShift | NSEventModif
 				if ([self sendAction:@selector(redo:) to:nil from:self])
 					return;
 			}
-		} else {
-			if (key == NSEnterCharacter || key == NSCarriageReturnCharacter) {
-				if ([self sendAction:@selector(enterPressed:) to:nil from:self])
-					return;
-			}
 		}
+//		else {
+//			if (key == NSEnterCharacter || key == NSCarriageReturnCharacter) {
+//				if ([self sendAction:@selector(enterPressed:) to:nil from:self])
+//					return;
+//			}
+//		}
 #pragma clang diagnostic pop
 	}
 	[super sendEvent:event];
