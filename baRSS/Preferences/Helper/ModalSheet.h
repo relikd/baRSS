@@ -22,16 +22,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-/** Manages the NSOutlineView and Feed creation and editing */
-@interface SettingsFeeds : NSViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
-@property (strong) NSTreeController *dataStore;
+@interface ModalSheet : NSPanel
+@property (readonly) BOOL didCloseAndCancel;
 
-- (void)editSelectedItem;
-- (void)doubleClickOutlineView:(NSOutlineView*)sender;
-- (void)addFeed;
-- (void)addGroup;
-- (void)addSeparator;
-- (void)remove:(id)sender;
-- (void)openImportDialog;
-- (void)openExportDialog;
+- (instancetype)initWithContentRect:(NSRect)contentRect styleMask:(NSWindowStyleMask)style backing:(NSBackingStoreType)backingStoreType defer:(BOOL)flag NS_UNAVAILABLE;
+- (instancetype)initWithView:(NSView*)content NS_DESIGNATED_INITIALIZER;
+
+- (void)setDoneEnabled:(BOOL)accept;
+- (void)extendContentViewBy:(CGFloat)dy;
 @end

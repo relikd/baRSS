@@ -26,6 +26,8 @@
 #import "StoreCoordinator.h"
 #import "FeedDownload.h"
 #import "Constants.h"
+#import "NSDate+Ext.h"
+#import "NSView+Ext.h"
 
 @implementation OpmlExport
 
@@ -54,12 +56,12 @@
 /// Display Save File Panel to select export destination. All feeds from core data will be exported.
 + (void)showExportDialog:(NSWindow*)window withContext:(NSManagedObjectContext*)moc {
 	NSSavePanel *sp = [NSSavePanel savePanel];
-	sp.nameFieldStringValue = [NSString stringWithFormat:@"baRSS feeds %@", [self currentDayAsStringISO8601:NO]];
+	sp.nameFieldStringValue = [NSString stringWithFormat:@"baRSS feeds %@", [NSDate dayStringLocalized]];
 	sp.allowedFileTypes = @[@"opml"];
 	sp.allowsOtherFileTypes = YES;
-	NSView *radioView = [self radioGroupCreate:@[NSLocalizedString(@"Hierarchical", nil),
-												 NSLocalizedString(@"Flattened", nil)]];
-	sp.accessoryView = [self viewByPrependingLabel:NSLocalizedString(@"Export format:", nil) toView:radioView];
+	NSView *radioView = [NSView radioGroup:@[NSLocalizedString(@"Hierarchical", nil),
+											 NSLocalizedString(@"Flattened", nil)]];
+	sp.accessoryView = [NSView wrapView:radioView withLabel:NSLocalizedString(@"Export format:", nil) padding:PAD_M];
 	
 	[sp beginSheetModalForWindow:window completionHandler:^(NSModalResponse result) {
 		if (result == NSModalResponseOK) {
@@ -94,8 +96,8 @@
 	alert.informativeText = NSLocalizedString(@"Do you want to append or replace existing items?", nil);
 	[alert addButtonWithTitle:NSLocalizedString(@"Import", nil)];
 	[alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
-	alert.accessoryView = [self radioGroupCreate:@[NSLocalizedString(@"Append", nil),
-												   NSLocalizedString(@"Overwrite", nil)]];
+	alert.accessoryView = [NSView radioGroup:@[NSLocalizedString(@"Append", nil),
+											   NSLocalizedString(@"Overwrite", nil)]];
 	
 	if ([alert runModal] == NSAlertFirstButtonReturn) {
 		return [self radioGroupSelection:alert.accessoryView];
@@ -196,7 +198,7 @@
 	NSXMLElement *head = [NSXMLElement elementWithName:@"head"];
 	head.children = @[[NSXMLElement elementWithName:@"title" stringValue:@"baRSS feeds"],
 					  [NSXMLElement elementWithName:@"ownerName" stringValue:@"baRSS"],
-					  [NSXMLElement elementWithName:@"dateCreated" stringValue:[self currentDayAsStringISO8601:YES]] ];
+					  [NSXMLElement elementWithName:@"dateCreated" stringValue:[NSDate dayStringISO8601]] ];
 	
 	NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
 	for (FeedGroup *item in list) {
@@ -247,15 +249,6 @@
 #pragma mark - Helper
 
 
-/// @param flag If @c YES use long internet format for opml file. If @c NO use short format as filename.
-+ (NSString*)currentDayAsStringISO8601:(BOOL)flag {
-	if (flag)
-		return [[[NSISO8601DateFormatter alloc] init] stringFromDate:[NSDate date]];
-//	NSDateComponents *now = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear fromDate:[NSDate date]];
-//	return [NSString stringWithFormat:@"%04ld-%02ld-%02ld", now.year, now.month, now.day];
-	return [NSDateFormatter localizedStringFromDate:[NSDate date] dateStyle:NSDateFormatterShortStyle timeStyle:NSDateFormatterNoStyle];
-}
-
 /// Count items where @c xmlURL key is set.
 + (NSUInteger)recursiveNumberOfFeeds:(RSOPMLItem*)document {
 	if ([document attributeForKey:OPMLXMLURLKey]) {
@@ -269,34 +262,6 @@
 	}
 }
 
-/// Solely used to group radio buttons
-+ (void)donothing {}
-
-/// Create a new view with as many @c NSRadioButton items as there are strings. Buttons @c tag is equal to the array index.
-+ (NSView*)radioGroupCreate:(NSArray<NSString*>*)titles {
-	if (titles.count == 0)
-		return nil;
-	
-	NSRect viewRect = NSMakeRect(0, 0, 0, 8);
-	NSInteger idx = (NSInteger)titles.count;
-	NSView *v = [[NSView alloc] init];
-	for (NSString *title in titles.reverseObjectEnumerator) {
-		idx -= 1;
-		NSButton *btn = [NSButton radioButtonWithTitle:title target:self action:@selector(donothing)];
-		btn.tag = idx;
-		btn.frame = NSOffsetRect(btn.frame, 0, viewRect.size.height);
-		viewRect.size.height += btn.frame.size.height + 2; // 2px padding
-		if (viewRect.size.width < btn.frame.size.width)
-			viewRect.size.width = btn.frame.size.width;
-		[v addSubview:btn];
-		if (idx == 0)
-			btn.state = NSControlStateValueOn;
-	}
-	viewRect.size.height += 6; // 8 - 2px padding
-	v.frame = viewRect;
-	return v;
-}
-
 /// Loop over all subviews and find the @c NSButton that is selected.
 + (NSInteger)radioGroupSelection:(NSView*)view {
 	for (NSButton *btn in view.subviews) {
@@ -305,27 +270,6 @@
 		}
 	}
 	return -1;
-}
-
-/// @return New view with @c NSTextField label in the top left corner and @c radioView on the right side.
-+ (NSView*)viewByPrependingLabel:(NSString*)str toView:(NSView*)radioView {
-	NSTextField *label = [NSTextField textFieldWithString:str];
-	label.editable = NO;
-	label.selectable = NO;
-	label.bezeled = NO;
-	label.drawsBackground = NO;
-	
-	NSRect fL = label.frame;
-	NSRect fR = radioView.frame;
-	fL.origin.y += fR.size.height - fL.size.height - 8;
-	fR.origin.x += fL.size.width;
-	label.frame = fL;
-	radioView.frame = fR;
-	
-	NSView *view = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, NSMaxX(fR), NSMaxY(fR))];
-	[view addSubview:label];
-	[view addSubview:radioView];
-	return view;
 }
 
 @end

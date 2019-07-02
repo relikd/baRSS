@@ -21,74 +21,95 @@
 //  SOFTWARE.
 
 #import "Preferences.h"
-#import "SettingsFeeds.h"
 #import "SettingsGeneral.h"
+#import "SettingsFeeds.h"
+#import "SettingsAppearance.h"
+#import "SettingsAbout.h"
 
-
-@interface Preferences ()
-@property (weak) IBOutlet SettingsGeneral *settingsGeneral;
-@property (weak) IBOutlet SettingsFeeds *settingsFeeds;
-@property (weak) IBOutlet NSView *aboutView;
-@property (weak) IBOutlet NSTextField *lblAppName;
-@property (weak) IBOutlet NSTextField *lblAppVersion;
+/// Managing individual tabs in application preferences
+@interface PrefTabs : NSTabViewController
 @end
+
+@implementation PrefTabs
+
+- (instancetype)init {
+	self = [super init];
+	if (self) {
+		self.tabStyle = NSTabViewControllerTabStyleToolbar;
+		self.transitionOptions = NSViewControllerTransitionNone;
+		
+		NSTabViewItem *flexibleWidth = [[NSTabViewItem alloc] initWithIdentifier:NSToolbarFlexibleSpaceItemIdentifier];
+		flexibleWidth.viewController = [NSViewController new];
+		
+		self.tabViewItems = @[
+			TabItem(NSImageNamePreferencesGeneral, NSLocalizedString(@"General", nil), [SettingsGeneral class]),
+			TabItem(NSImageNameUserAccounts, NSLocalizedString(@"Feeds", nil), [SettingsFeeds class]),
+			TabItem(NSImageNameFontPanel, NSLocalizedString(@"Appearance", nil), [SettingsAppearance class]),
+			flexibleWidth,
+			TabItem(NSImageNameInfo, NSLocalizedString(@"About", nil), [SettingsAbout class]),
+		];
+		
+		NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey:@"preferencesTab"];
+		if (index > 0 || (NSUInteger)index < self.tabViewItems.count)
+			self.selectedTabViewItemIndex = index;
+	}
+	return self;
+}
+
+/// Helper method to generate tab item with image, label, and controller.
+NS_INLINE NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Class class) {
+	NSTabViewItem *item = [NSTabViewItem tabViewItemWithViewController: [class new]];
+	item.image = [NSImage imageNamed:imageName];
+	item.label = text;
+	return item;
+}
+
+/// Delegate method, store last selected tab to user preferences
+- (void)tabView:(NSTabView*)tabView didSelectTabViewItem:(nullable NSTabViewItem*)tabViewItem {
+	[super tabView:tabView didSelectTabViewItem:tabViewItem];
+	NSInteger prevIndex = [[NSUserDefaults standardUserDefaults] integerForKey:@"preferencesTab"];
+	NSInteger newIndex = self.selectedTabViewItemIndex;
+	if (prevIndex != newIndex)
+		[[NSUserDefaults standardUserDefaults] setInteger:newIndex forKey:@"preferencesTab"];
+}
+
+@end
+
 
 @implementation Preferences
 
-/// Restore tab selection from previous session
-- (void)windowDidLoad {
-	[super windowDidLoad];
-	NSUInteger idx = (NSUInteger)[[NSUserDefaults standardUserDefaults] integerForKey:@"preferencesTab"];
-	if (idx >= self.window.toolbar.items.count)
-		idx = 0;
-	[self tabClicked:self.window.toolbar.items[idx]];
-}
-
-/// Replace content view according to selected tab
-- (IBAction)tabClicked:(NSToolbarItem *)sender {
-	self.window.contentView = nil;
-	if ([sender.itemIdentifier isEqualToString:@"tabGeneral"]) {
-		self.window.contentView = self.settingsGeneral.view;
-	} else if ([sender.itemIdentifier isEqualToString:@"tabFeeds"]) {
-		self.window.contentView = self.settingsFeeds.view;
-	} else if ([sender.itemIdentifier isEqualToString:@"tabAppearance"]) {
-		if (self.settingsGeneral.view.frame.size.width > 0) {
-			// using side effect when reading settingsGeneral.view -> will load appearanceView too.
-			// TODO: generate view programmatically
-			self.window.contentView = nil;
-		}
-		self.window.contentView = self.settingsGeneral.appearanceView;
-	} else if ([sender.itemIdentifier isEqualToString:@"tabAbout"]) {
-		NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
-		self.lblAppName.objectValue = infoDict[@"CFBundleName"];
-		self.lblAppVersion.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Version %@", nil), infoDict[@"CFBundleShortVersionString"]];
-		self.window.contentView = self.aboutView;
++ (instancetype)window {
+	NSWindowStyleMask style = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable | NSWindowStyleMaskUnifiedTitleAndToolbar;
+	Preferences *w = [[Preferences alloc] initWithContentRect:NSMakeRect(0, 0, 320, 327) styleMask:style backing:NSBackingStoreBuffered defer:YES];
+	w.contentMinSize = NSMakeSize(320, 327);
+	w.windowController.shouldCascadeWindows = YES;
+	w.title = [NSString stringWithFormat:NSLocalizedString(@"%@ Preferences", nil), NSProcessInfo.processInfo.processName];
+	w.contentViewController = [PrefTabs new];
+	w.delegate = w;
+	NSWindowPersistableFrameDescriptor prevFrame = [[NSUserDefaults standardUserDefaults] stringForKey:@"prefWindow"];
+	if (!prevFrame) {
+		[w setContentSize:NSMakeSize(320, 327)];
+		[w center];
+	} else {
+		[w setFrameFromString:prevFrame];
 	}
-	
-	self.window.toolbar.selectedItemIdentifier = sender.itemIdentifier;
-	[self.window recalculateKeyViewLoop];
-	[self.window setInitialFirstResponder:self.window.contentView];
-	
-	NSInteger selectedIndex = (NSInteger)[self.window.toolbar.items indexOfObject:sender];
-	[[NSUserDefaults standardUserDefaults] setInteger:selectedIndex forKey:@"preferencesTab"];
+	return w;
 }
 
-@end
+- (void)windowWillClose:(NSNotification *)notification {
+	[[NSUserDefaults standardUserDefaults] setObject:self.stringWithSavedFrame forKey:@"prefWindow"];
+}
 
-
-/// A window that does not respond to Cmd-C, Cmd-Z, Cmd-Shift-Z and Enter-pressed events.
-@interface NonRespondingWindow : NSWindow
-@end
-
-@implementation NonRespondingWindow
+/// Do not respond to Cmd-Z and Cmd-Shift-Z. Will be handled in subview controllers.
 - (BOOL)respondsToSelector:(SEL)aSelector {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
-	if (aSelector == @selector(enterPressed:) || aSelector == @selector(copy:)
-		|| aSelector == @selector(undo:) || aSelector == @selector(redo:)) {
+	if (aSelector == @selector(undo:) || aSelector == @selector(redo:)) {
 #pragma clang diagnostic pop
 		return NO;
 	}
 	return [super respondsToSelector:aSelector];
 }
+
 @end
+

@@ -22,17 +22,5 @@
 
 #import <Cocoa/Cocoa.h>
 
-@protocol RefreshIntervalButtonDelegate <NSObject>
-@required
-/**
- The interval-unit combination is stored as follows:
- :: @c sender.tag @c >> @c 3 (Refresh Interval)
- :: @c sender.tag @c & @c 0x7 (Refresh Unit, where 0: seconds and 4: weeks)
- */
-- (void)refreshIntervalButtonClicked:(NSButton*)sender;
-@end
-
-@interface Statistics : NSObject
-+ (NSDictionary*)refreshInterval:(NSArray<NSDate*> *)list;
-+ (NSView*)viewForRefreshInterval:(NSDictionary*)info articleCount:(NSUInteger)count callback:(nullable id<RefreshIntervalButtonDelegate>)callback;
+@interface SettingsAbout : NSViewController
 @end

@@ -107,7 +107,7 @@
 	fr.propertiesToFetch = @[ @"indexPath" ];
 	[fr addFunctionExpression:@"sum:" onKeyPath:@"articles.unread" name:@"unread" type:NSInteger32AttributeType];
 	[fr addFunctionExpression:@"count:" onKeyPath:@"articles.unread" name:@"total" type:NSInteger32AttributeType];
-	return [fr fetchAllRows: [self getMainContext]];
+	return (NSArray<NSDictionary*>*)[fr fetchAllRows: [self getMainContext]];
 }
 
 

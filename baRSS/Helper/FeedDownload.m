@@ -266,8 +266,11 @@ static BOOL _nextUpdateIsForced = NO;
 		dispatch_sync(dispatch_get_main_queue(), ^{ // sync! (thread is already in background)
 			chosenURL = askUser(parsedMeta);
 		});
-		if (!chosenURL || chosenURL.length == 0)
+		if (!chosenURL || chosenURL.length == 0) {
+			// User canceled operation, show appropriate error message
+			*err = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"Operation canceled.", nil)}];
 			return NO;
+		}
 		[self parseFeedRequest:[self newRequestURL:chosenURL] xmlBlock:nil feedBlock:block];
 		return YES;
 	} feedBlock:block];

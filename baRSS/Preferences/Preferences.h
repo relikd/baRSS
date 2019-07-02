@@ -22,5 +22,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface Preferences : NSWindowController <NSWindowDelegate>
+@interface Preferences : NSWindow <NSWindowDelegate>
++ (instancetype)window;
 @end

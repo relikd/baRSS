@@ -28,12 +28,10 @@
 #import "FeedGroup+Ext.h"
 #import "OpmlExport.h"
 #import "FeedDownload.h"
+#import "SettingsFeedsView.h"
 
 @interface SettingsFeeds ()
-@property (weak) IBOutlet NSOutlineView *outlineView;
-@property (weak) IBOutlet NSTreeController *dataStore;
-@property (weak) IBOutlet NSProgressIndicator *spinner;
-@property (weak) IBOutlet NSTextField *spinnerLabel;
+@property (strong) SettingsFeedsView *view; // override super
 
 @property (strong) NSArray<NSTreeNode*> *currentlyDraggedNodes;
 @property (strong) NSUndoManager *undoManager;
@@ -43,23 +41,20 @@
 @end
 
 @implementation SettingsFeeds
+@dynamic view;
 
 // TODO: drag-n-drop feeds to opml file?
 // Declare a string constant for the drag type - to be used when writing and retrieving pasteboard data...
 static NSString *dragNodeType = @"baRSS-feed-drag";
 
+- (void)loadView {
+	[self initCoreDataStore];
+	self.view = [[SettingsFeedsView alloc] initWithController:self];
+	[self.view.outline registerForDraggedTypes:[NSArray arrayWithObject:dragNodeType]];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-	[self.outlineView registerForDraggedTypes:[NSArray arrayWithObject:dragNodeType]];
-	[self.dataStore setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];
-	
-	self.undoManager = [[NSUndoManager alloc] init];
-	self.undoManager.groupsByEvent = NO;
-	self.undoManager.levelsOfUndo = 30;
-	
-	self.dataStore.managedObjectContext = [StoreCoordinator createChildContext];
-	self.dataStore.managedObjectContext.undoManager = self.undoManager;
-	
 	// Register for notifications
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedUpdated:) name:kNotificationFeedUpdated object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedUpdated:) name:kNotificationFeedIconUpdated object:nil];
@@ -70,12 +65,35 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+- (void)initCoreDataStore {
+	self.undoManager = [[NSUndoManager alloc] init];
+	self.undoManager.groupsByEvent = NO;
+	self.undoManager.levelsOfUndo = 30;
+	
+	self.dataStore = [[NSTreeController alloc] init];
+	self.dataStore.managedObjectContext = [StoreCoordinator createChildContext];
+	self.dataStore.managedObjectContext.undoManager = self.undoManager;
+	self.dataStore.childrenKeyPath = @"children";
+	self.dataStore.leafKeyPath = @"type";
+	self.dataStore.entityName = @"FeedGroup";
+	self.dataStore.objectClass = [FeedGroup class];
+	self.dataStore.fetchPredicate = [NSPredicate predicateWithFormat:@"parent == nil"];
+	self.dataStore.sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]];
+	
+	NSError *error;
+	BOOL ok = [self.dataStore fetchWithRequest:nil merge:NO error:&error];
+	if (!ok || error) {
+		[[NSApplication sharedApplication] presentError:error];
+	}
+}
+
 
 #pragma mark - Activity Spinner & Status Info
 
 
 /// Initialize status info timer
 - (void)viewWillAppear {
+	[self.dataStore rearrangeObjects]; // needed to scroll outline view to top (if prefs open on another tab)
 	self.intervalFormatter = [[NSDateComponentsFormatter alloc] init];
 	self.intervalFormatter.unitsStyle = NSDateComponentsFormatterUnitsStyleShort; // e.g., '30 min'
 	self.intervalFormatter.maximumUnitCount = 1;
@@ -99,7 +117,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	if (date) {
 		double nextFire = fabs(date.timeIntervalSinceNow);
 		if (nextFire > 1e9) { // distance future, over 31 years
-			self.spinnerLabel.stringValue = @"";
+			self.view.status.stringValue = @"";
 			return;
 		}
 		if (nextFire > 60) { // update 1/min
@@ -108,7 +126,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 			nextFire = 1; // update 1/sec
 		}
 		NSString *str = [self.intervalFormatter stringFromTimeInterval: date.timeIntervalSinceNow];
-		self.spinnerLabel.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Next update in %@", nil), str];
+		self.view.status.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Next update in %@", nil), str];
 		[self.timerStatusInfo setFireDate:[NSDate dateWithTimeIntervalSinceNow: nextFire]];
 	}
 }
@@ -116,18 +134,18 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 /// Start ( @c c @c > @c 0 ) or stop ( @c c @c = @c 0 ) activity spinner. Also, sets status info.
 - (void)activateSpinner:(NSInteger)c {
 	if (c == 0) {
-		[self.spinner stopAnimation:nil];
-		self.spinnerLabel.stringValue = @"";
+		[self.view.spinner stopAnimation:nil];
+		self.view.status.stringValue = @"";
 		[self.timerStatusInfo fire];
 	} else {
 		[self.timerStatusInfo setFireDate:[NSDate distantFuture]];
-		[self.spinner startAnimation:nil];
+		[self.view.spinner startAnimation:nil];
 		if (c == 1) { // exactly one feed
-			self.spinnerLabel.stringValue = NSLocalizedString(@"Updating 1 feed …", nil);
+			self.view.status.stringValue = NSLocalizedString(@"Updating 1 feed …", nil);
 		} else if (c < 0) { // unknown number of feeds
-			self.spinnerLabel.stringValue = NSLocalizedString(@"Updating feeds …", nil);
+			self.view.status.stringValue = NSLocalizedString(@"Updating feeds …", nil);
 		} else {
-			self.spinnerLabel.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Updating %lu feeds …", nil), c];
+			self.view.status.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Updating %lu feeds …", nil), c];
 		}
 	}
 }
@@ -207,25 +225,39 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 #pragma mark - UI Button Interaction
 
 
+/// Open clicked or selected item for editing.
+- (void)editSelectedItem {
+	FeedGroup *chosen = [self clickedItem];
+	if (!chosen) chosen = self.dataStore.selectedObjects.firstObject;
+	[self showModalForFeedGroup:chosen isGroupEdit:YES]; // yes will be overwritten anyway
+}
+
+/// Open clicked item for editing.
+- (void)doubleClickOutlineView:(NSOutlineView*)sender {
+	FeedGroup *fg = [self clickedItem];
+	if (!fg) return;
+	[self showModalForFeedGroup:fg isGroupEdit:YES]; // yes will be overwritten anyway
+}
+
 /// Add feed button.
-- (IBAction)addFeed:(id)sender {
+- (void)addFeed {
 	[self showModalForFeedGroup:nil isGroupEdit:NO];
 }
 
 /// Add group button.
-- (IBAction)addGroup:(id)sender {
+- (void)addGroup {
 	[self showModalForFeedGroup:nil isGroupEdit:YES];
 }
 
 /// Add separator button.
-- (IBAction)addSeparator:(id)sender {
+- (void)addSeparator {
 	[self beginCoreDataChange];
 	[self insertFeedGroupAtSelection:SEPARATOR].name = @"---";
 	[self endCoreDataChangeShouldUndo:NO];
 }
 
 /// Remove feed button. User has selected one or more item in outline view.
-- (IBAction)remove:(id)sender {
+- (void)remove:(id)sender {
 	[self beginCoreDataChange];
 	NSArray<NSTreeNode*> *parentNodes = [self.dataStore.selectedNodes valueForKeyPath:@"parentNode"];
 	[self.dataStore remove:sender];
@@ -236,31 +268,12 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
 }
 
-/// Open user selected item for editing.
-- (IBAction)doubleClickOutlineView:(NSOutlineView*)sender {
-	if (sender.clickedRow == -1)
-		return; // ignore clicks on column headers and where no row was selected
-	FeedGroup *fg = [(NSTreeNode*)[sender itemAtRow:sender.clickedRow] representedObject];
-	[self showModalForFeedGroup:fg isGroupEdit:YES]; // yes will be overwritten anyway
+- (void)openImportDialog {
+	[OpmlExport showImportDialog:self.view.window withContext:self.dataStore.managedObjectContext];
 }
 
-/// Share menu button. Currently only import & export feeds as OPML.
-- (IBAction)shareMenu:(NSButton*)sender {
-	if (!sender.menu) {
-		sender.menu = [[NSMenu alloc] initWithTitle:NSLocalizedString(@"Import / Export menu", nil)];
-		sender.menu.autoenablesItems = NO;
-		[sender.menu addItemWithTitle:NSLocalizedString(@"Import Feeds …", nil) action:nil keyEquivalent:@""].tag = 101;
-		[sender.menu addItemWithTitle:NSLocalizedString(@"Export Feeds …", nil) action:nil keyEquivalent:@""].tag = 102;
-		// TODO: Add menus for online sync? email export? etc.
-	}
-	if ([sender.menu popUpMenuPositioningItem:nil atLocation:NSMakePoint(0,sender.frame.size.height) inView:sender]) {
-		NSInteger tag = sender.menu.highlightedItem.tag;
-		if (tag == 101) {
-			[OpmlExport showImportDialog:self.view.window withContext:self.dataStore.managedObjectContext];
-		} else if (tag == 102) {
-			[OpmlExport showExportDialog:self.view.window withContext:self.dataStore.managedObjectContext];
-		}
-	}
+- (void)openExportDialog {
+	[OpmlExport showExportDialog:self.view.window withContext:self.dataStore.managedObjectContext];
 }
 
 
@@ -320,7 +333,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 - (NSIndexPath*)indexPathForInsertAtNode:(NSTreeNode*)node {
 	if (!node) { // append to root
 		return [NSIndexPath indexPathWithIndex:[self.dataStore arrangedObjects].childNodes.count]; // or 0 to append at front
-	} else if ([self.outlineView isItemExpanded:node]) { // append to group (if open)
+	} else if ([self.view.outline isItemExpanded:node]) { // append to group (if open)
 		return [node.indexPath indexPathByAddingIndex:0]; // or 'selection.childNodes.count' to append at end
 	} else { // append before / after selected item
 		NSIndexPath *pth = node.indexPath;
@@ -328,6 +341,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		NSUInteger lastIdx = [pth indexAtPosition:pth.length - 1];
 		return [[pth indexPathByRemovingLastIndex] indexPathByAddingIndex:lastIdx + 1];
 	}
+	// TODO: always append to end
 }
 
 /// Loop over all descendants and update @c sortIndex @c (FeedGroup) as well as all @c indexPath @c (Feed)
@@ -401,32 +415,44 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 #pragma mark - Data Source Delegate
 
 
+// Data source is handled by bindings anyway. These methods can be ignored
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item { return 0; }
+- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item { return YES; }
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item { return nil; }
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item { return nil; }
+
 /// Populate @c NSOutlineView data cells with core data object values.
-- (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(id)item {
-	FeedGroup *fg = [(NSTreeNode*)item representedObject];
-	BOOL isSeperator = (fg.type == SEPARATOR);
-	BOOL isRefreshColumn = [tableColumn.identifier isEqualToString:@"RefreshColumn"];
-	
-	NSString *cellIdent = (isRefreshColumn ? @"cellRefresh" : (isSeperator ? @"cellSeparator" : @"cellFeed"));
-	// owner is nil to prohibit repeated awakeFromNib calls
-	NSTableCellView *cellView = [self.outlineView makeViewWithIdentifier:cellIdent owner:nil];
-	
-	if (isRefreshColumn) {
-		NSString *str = [fg refreshString];
-		cellView.textField.stringValue = str;
-		cellView.textField.textColor = (str.length > 1 ? [NSColor controlTextColor] : [NSColor disabledControlTextColor]);
-	} else if (isSeperator) {
-		return cellView; // refresh cell already skipped with the above if condition
-	} else {
-		cellView.textField.objectValue = fg.name;
-		cellView.imageView.image = fg.iconImage16;
+- (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(NSTreeNode*)item {
+	NSUserInterfaceItemIdentifier ident = tableColumn.identifier;
+	if (ident == CustomCellName) {
+		FeedGroup *fg = [item representedObject];
+		if (fg.type == SEPARATOR)
+			ident = CustomCellSeparator;
 	}
-	return cellView;
+	NSTableCellView *v = [outlineView makeViewWithIdentifier:ident owner:self];
+	if (v) return v;
+	if (ident == CustomCellName)      return [NameColumnCell new];
+	if (ident == CustomCellRefresh)   return [RefreshColumnCell new];
+	if (ident == CustomCellSeparator) return [SeparatorColumnCell new];
+	return nil;
+}
+
+/// @return User clicked cell item or @c nil if user did not click on a cell.
+- (FeedGroup*)clickedItem {
+	NSOutlineView *ov = self.view.outline;
+	return [(NSTreeNode*)[ov itemAtRow:ov.clickedRow] representedObject];
 }
 
 
 #pragma mark - Keyboard Commands: undo, redo, copy, enter
 
+
+/// Also look for commands right click menu of outline view
+- (void)keyDown:(NSEvent *)event {
+	if (![self.view.outline.menu performKeyEquivalent:event]) {
+		[super keyDown:event];
+	}
+}
 
 /// Returning @c NO will result in a Action-Not-Available-Buzzer sound
 - (BOOL)respondsToSelector:(SEL)aSelector {
@@ -434,15 +460,14 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		return [self.undoManager canUndo] && self.undoManager.groupingLevel == 0 && ![FeedDownload isUpdating];
 	if (aSelector == @selector(redo:))
 		return [self.undoManager canRedo] && self.undoManager.groupingLevel == 0 && ![FeedDownload isUpdating];
-	if (aSelector == @selector(copy:) || aSelector == @selector(enterPressed:)) {
-		BOOL outlineHasFocus = [[self.view.window firstResponder] isKindOfClass:[NSOutlineView class]];
-		BOOL hasSelection = (self.dataStore.selectedNodes.count > 0);
-		if (!outlineHasFocus || !hasSelection)
-			return NO;
-		if (aSelector == @selector(copy:))
-			return YES;
-		// can edit only if selection is not a separator
-		return (((FeedGroup*)self.dataStore.selectedNodes.firstObject.representedObject).type != SEPARATOR);
+	if (aSelector == @selector(copy:) || aSelector == @selector(remove:))
+		return self.dataStore.selectedNodes.count > 0;
+	if (aSelector == @selector(editSelectedItem)) {
+		FeedGroup *chosen = [self clickedItem];
+		if (!chosen) chosen = self.dataStore.selectedObjects.firstObject;
+		if (chosen && chosen.type != SEPARATOR)
+			return YES; // can edit only if selection is not a separator
+		return NO;
 	}
 	return [super respondsToSelector:aSelector];
 }
@@ -457,11 +482,6 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 - (void)redo:(id)sender {
 	[self.undoManager redo];
 	[self saveWithUnpredictableChange];
-}
-
-/// User pressed enter; open edit dialog for selected item.
-- (void)enterPressed:(id)sender {
-	[self showModalForFeedGroup:self.dataStore.selectedObjects.firstObject isGroupEdit:YES]; // yes will be overwritten anyway
 }
 
 /// Copy human readable description of selected nodes to clipboard.
