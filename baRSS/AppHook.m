@@ -24,6 +24,7 @@
 #import "BarStatusItem.h"
 #import "FeedDownload.h"
 #import "Preferences.h"
+#import "DrawImage.h"
 
 @interface AppHook()
 @property (strong) NSWindowController *prefWindow;
@@ -45,6 +46,7 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+	RegisterImageViewNames();
 //	feed://https://feeds.feedburner.com/simpledesktops
 	[FeedDownload registerNetworkChangeNotification]; // will call update scheduler
 }

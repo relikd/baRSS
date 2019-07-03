@@ -199,7 +199,9 @@ NSUserInterfaceItemIdentifier const CustomCellName = @"NameColumnCell";
 	self = [super initWithFrame:frameRect];
 	self.identifier = CustomCellName;
 	self.imageView = [[NSView imageView:nil size:16] placeIn:self x:1 yTop:1];
+	self.imageView.accessibilityLabel = NSLocalizedString(@"Feed icon", nil);
 	self.textField = [[[NSView label:@""] placeIn:self x:25 yTop:0] sizeToRight:0];
+	self.textField.accessibilityLabel = NSLocalizedString(@"Feed title", nil);
 	return self;
 }
 
@@ -222,6 +224,7 @@ NSUserInterfaceItemIdentifier const CustomCellRefresh = @"RefreshColumnCell";
 	self = [super initWithFrame:frameRect];
 	self.identifier = CustomCellRefresh;
 	self.textField = [[[[NSView label:@""] textRight] placeIn:self x:0 yTop:0] sizeToRight:0];
+	self.textField.accessibilityLabel = NSLocalizedString(@"Refresh interval", nil);
 	return self;
 }
 

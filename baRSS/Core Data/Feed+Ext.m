@@ -228,7 +228,7 @@
 	} else if (self.icon.icon) {
 		img = [[NSImage alloc] initWithData:self.icon.icon];
 	} else {
-		return [RSSIcon iconWithSize:16]; // TODO: setup imageNamed: for default rss icon?
+		img = [NSImage imageNamed:RSSImageDefaultRSSIcon];
 	}
 	[img setSize:NSMakeSize(16, 16)];
 	return img;

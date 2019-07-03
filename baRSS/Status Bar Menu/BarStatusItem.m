@@ -117,18 +117,13 @@
 /// Update menu bar icon and text according to unread count and user preferences.
 - (void)updateBarIcon {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		if (self.unreadCountTotal > 0 && [UserPrefs defaultYES:@"globalUnreadCount"]) {
-			self.statusItem.title = [NSString stringWithFormat:@"%ld", self.unreadCountTotal];
-		} else {
-			self.statusItem.title = @"";
-		}
 		BOOL hasNet = [FeedDownload allowNetworkConnection];
-		if (self.unreadCountTotal > 0 && hasNet && [UserPrefs defaultYES:@"globalTintMenuBarIcon"]) {
-			self.statusItem.image = [RSSIcon systemBarIcon:16 tint:[NSColor rssOrange] noConnection:!hasNet];
-		} else {
-			self.statusItem.image = [RSSIcon systemBarIcon:16 tint:nil noConnection:!hasNet];
-			self.statusItem.image.template = YES;
-		}
+		BOOL tint = (self.unreadCountTotal > 0 && hasNet && [UserPrefs defaultYES:@"globalTintMenuBarIcon"]);
+		self.statusItem.image = [NSImage imageNamed:(hasNet ? RSSImageMenuBarIconActive : RSSImageMenuBarIconPaused)];
+		self.statusItem.image.template = !tint;
+		
+		BOOL showCount = (self.unreadCountTotal > 0 && [UserPrefs defaultYES:@"globalUnreadCount"]);
+		self.statusItem.title = (showCount ? [NSString stringWithFormat:@"%ld", self.unreadCountTotal] : @"");
 	});
 }
 

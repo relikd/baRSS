@@ -29,67 +29,18 @@
 + (NSColor*)rssOrange;
 @end
 
-//  ---------------------------------------------------------------
-// |
-// |  DrawImage
-// |
-//  ---------------------------------------------------------------
 
-IB_DESIGNABLE
-@interface DrawImage : NSView
-@property (strong) IBInspectable NSColor *color;
-@property (assign) IBInspectable BOOL showBackground;
-/** percentage value between 0 - 100 */
-@property (assign, nonatomic) IBInspectable CGFloat roundness;
-@property (assign, nonatomic) IBInspectable CGFloat contentScale;
-@property (strong, readonly) NSImageView *imageView;
-
-- (NSImage*)drawnImage;
-@end
-
-//  ---------------------------------------------------------------
-// |
-// |  RSSIcon
-// |
-//  ---------------------------------------------------------------
-
-IB_DESIGNABLE
-@interface RSSIcon : DrawImage
-@property (strong) IBInspectable NSColor *barsColor;
-@property (strong) IBInspectable NSColor *gradientColor;
-@property (assign) IBInspectable BOOL noConnection;
-
-+ (NSImage*)iconWithSize:(CGFloat)size;
-+ (NSImage*)systemBarIcon:(CGFloat)size tint:(NSColor*)color noConnection:(BOOL)conn;
-@end
-
-//  ---------------------------------------------------------------
-// |
-// |  SettingsIconGlobal
-// |
-//  ---------------------------------------------------------------
-
-IB_DESIGNABLE
-@interface SettingsIconGlobal : DrawImage
-@end
-
-//  ---------------------------------------------------------------
-// |
-// |  SettingsIconGroup
-// |
-//  ---------------------------------------------------------------
-
-IB_DESIGNABLE
-@interface SettingsIconGroup : DrawImage
-@end
-
-//  ---------------------------------------------------------------
-// |
-// |  DrawSeparator
-// |
-//  ---------------------------------------------------------------
-
+/// Draw separator line in @c NSOutlineView
 IB_DESIGNABLE
 @interface DrawSeparator : NSView
 @end
 
+
+static NSImageName const RSSImageSettingsGlobal    = @"RSSImageSettingsGlobal";
+static NSImageName const RSSImageSettingsGroup     = @"RSSImageSettingsGroup";
+static NSImageName const RSSImageSettingsFeed      = @"RSSImageSettingsFeed";
+static NSImageName const RSSImageDefaultRSSIcon    = @"RSSImageDefaultRSSIcon";
+static NSImageName const RSSImageMenuBarIconActive = @"RSSImageMenuBarIconActive";
+static NSImageName const RSSImageMenuBarIconPaused = @"RSSImageMenuBarIconPaused";
+
+void RegisterImageViewNames(void);

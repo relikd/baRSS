@@ -32,209 +32,169 @@
 }
 /// @return Orange color that is typically used for RSS
 + (NSColor*)rssOrange {
-	return [NSColor colorWithCalibratedRed:0.984 green:0.639 blue:0.227 alpha:1.0];
+	return [NSColor colorWithCalibratedRed:251/255.0 green:163/255.0 blue:58/255.0 alpha:1.0];
 }
 @end
 
 
-// ################################################################
-// #
-// #  DrawImage
-// #
-// ################################################################
-
-@implementation DrawImage
-@synthesize roundness = _roundness, contentScale = _contentScale;
-
--(id)init{self=[super init];if(self)[self initialize];return self;}
--(id)initWithFrame:(CGRect)f{self=[super initWithFrame:f];if(self)[self initialize];return self;}
--(id)initWithCoder:(NSCoder*)c{self=[super initWithCoder:c];if(self)[self initialize];return self;}
-
-//#if !TARGET_INTERFACE_BUILDER #endif
-/// Prepare view content to autoresize when rescaling
-- (void)initialize {
-	_contentScale = 1.0;
-	_imageView = [NSImageView imageViewWithImage:[self drawnImage]];
-	[_imageView setFrameSize:self.frame.size];
-	_imageView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-	[self addSubview:_imageView];
-}
-
-/**
- Designated initializer. Will add rounded corners and background color.
-
- @param w Square size of icon.
- @param s Scaling factor of the content image.
- */
-- (instancetype)initWithSize:(CGFloat)w scale:(CGFloat)s {
-	self = [super initWithFrame:NSMakeRect(0, 0, w, w)];
-	self.roundness = 40;
-	self.contentScale = s;
-	self.showBackground = YES;
-	return self;
-}
-
-/**
- @return New image with drawn content. Will call @c drawImageInRect:
- */
-- (NSImage*)drawnImage {
-	return [NSImage imageWithSize:self.frame.size flipped:NO drawingHandler:^BOOL(NSRect rect) {
-		[self drawImageInRect:rect];
-		return YES;
-	}];
-}
-
-/// Set roundness factor for rounded corners (background). This setter ensures a percent value between 0 and 1.
-- (void)setRoundness:(CGFloat)r {
-	_roundness = 0.5 * (r < 0 ? 0 : r > 100 ? 100 : r);
-}
-
-/// @return MIN( width, height )
-- (CGFloat)shorterSide {
-	if (self.frame.size.width < self.frame.size.height)
-		return self.frame.size.width;
-	return self.frame.size.height;
-}
-
-/**
- Draw background image, rounded corners and scaled image content
- */
-- (void)drawImageInRect:(NSRect)r {
-	const CGFloat s = [self shorterSide];
-	CGContextRef c = [[NSGraphicsContext currentContext] CGContext];
-	
-	if (_showBackground) {
-		CGMutablePathRef pth = CGPathCreateMutable();
-		const CGFloat corner = s * (_roundness / 100.0);
-		if (corner > 0) {
-			CGPathAddRoundedRect(pth, NULL, r, corner, corner);
-		} else {
-			CGPathAddRect(pth, NULL, r);
-		}
-		CGContextSetFillColorWithColor(c, [_color CGColor]);
-		CGContextAddPath(c, pth);
-		CGPathRelease(pth);
-		if ([self isMemberOfClass:[DrawImage class]])
-			CGContextFillPath(c); // fill only if not a subclass
-	}
-	if (_contentScale != 1.0) {
-		CGFloat offset = s * (1 - _contentScale) / 2;
-		CGContextTranslateCTM(c, offset, offset);
-		CGContextScaleCTM(c, _contentScale, _contentScale);
-	}
+@implementation DrawSeparator
+- (void)drawRect:(NSRect)r {
+	NSColor *color = [NSColor darkGrayColor];
+	NSGradient *grdnt = [[NSGradient alloc] initWithStartingColor:color endingColor:[color colorWithAlphaComponent:0.0]];
+	NSRect separatorRect = NSMakeRect(1, NSMidY(self.frame) - 1, NSWidth(self.frame) - 2, 2);
+	NSBezierPath *rounded = [NSBezierPath bezierPathWithRoundedRect:separatorRect xRadius:1 yRadius:1];
+	[grdnt drawInBezierPath:rounded angle:0];
 }
 @end
 
 
-// ################################################################
-// #
-// #  RSSIcon
-// #
-// ################################################################
+#pragma mark - Helper Methods
 
-@implementation RSSIcon // content scale 0.75 works fine
 
-/**
- @return Default RSS icon for feeds that are missing an icon. (Not used in system bar).
- */
-+ (NSImage*)iconWithSize:(CGFloat)s {
-	RSSIcon *icon = [[RSSIcon alloc] initWithSize:s scale:0.7];
-	icon.barsColor = [NSColor whiteColor];
-	icon.gradientColor = [NSColor rssOrange];
-	return [icon drawnImage];
+/// @return @c MIN(s.width,s.height)
+NS_INLINE const CGFloat ShorterSide(NSSize s) {
+	return (s.width < s.height ? s.width : s.height);
 }
 
-/**
- Returns new @c NSImage with background (tinted or not) and connection error (if set).
+/// Perform @c CGAffineTransform with custom rotation point
+// CGAffineTransform RotateAroundPoint(CGAffineTransform at, CGFloat angle, CGFloat x, CGFloat y) {
+//	at = CGAffineTransformTranslate(at, x, y);
+//	at = CGAffineTransformRotate(at, angle);
+//	return CGAffineTransformTranslate(at, -x, -y);
+//}
 
- @param s Square image size
- @param color Tint color of icon. Either untintend (white) or highlighted (rss orange).
- @param conn If @c YES show small pause icon in right upper corner.
- */
-+ (NSImage*)systemBarIcon:(CGFloat)s tint:(NSColor*)color noConnection:(BOOL)conn {
-	RSSIcon *icon = [[RSSIcon alloc] initWithSize:s scale:0.7];
-	icon.color = (color ? color : [NSColor blackColor]);
-	icon.noConnection = conn;
-//	icon.showBackground = !conn;
-//	icon.contentScale = (conn ? 0.9 : 0.7);
-	return [icon drawnImage];
+
+#pragma mark - CGPath Component Generators
+
+
+/// Add circle with @c radius
+NS_INLINE void PathAddCircle(CGMutablePathRef path, CGFloat radius) {
+	CGPathAddArc(path, NULL, radius, radius, radius, 0, M_PI * 2, YES);
 }
 
+/// Add a single RSS icon radio wave
+NS_INLINE void PathAddRSSArc(CGMutablePathRef path, CGFloat radius, CGFloat thickness) {
+	CGPathMoveToPoint(path, NULL, 0, radius + thickness);
+	CGPathAddArc(path, NULL, 0, 0, radius + thickness, M_PI_2, 0, YES);
+	CGPathAddLineToPoint(path, NULL, radius, 0);
+	CGPathAddArc(path, NULL, 0, 0, radius, 0, M_PI_2, NO);
+	CGPathCloseSubpath(path);
+}
+
+/// Add two vertical bars representing a pause icon
+NS_INLINE void PathAddPauseIcon(CGMutablePathRef path, CGAffineTransform at, CGFloat size, CGFloat thickness) {
+	const CGFloat off = (size - 2 * thickness) / 4;
+	CGPathAddRect(path, &at, CGRectMake(off, 0, thickness, size));
+	CGPathAddRect(path, &at, CGRectMake(size/2 + off, 0, thickness, size));
+}
+
+/// Add X icon by applying a rotational affine transform and drawing a plus sign
+// void PathAddXIcon(CGMutablePathRef path, CGAffineTransform at, CGFloat size, CGFloat thickness) {
+//	at = RotateAroundPoint(at, M_PI_4, size/2, size/2);
+//	const CGFloat p = size * 0.5 - thickness / 2;
+//	CGPathAddRect(path, &at, CGRectMake(0, p, size, thickness));
+//	CGPathAddRect(path, &at, CGRectMake(p, 0, thickness, p));
+//	CGPathAddRect(path, &at, CGRectMake(p, p + thickness, thickness, p));
+//}
+
+
+#pragma mark - Full Icon Path Generators
+
+
+/// Create @c CGPath for global icon; a menu bar and an open menu below
+NS_INLINE void AddGlobalIconPath(CGContextRef c, CGFloat size) {
+	CGMutablePathRef menu = CGPathCreateMutable();
+	CGPathAddRect(menu, NULL, CGRectMake(0, 0.8 * size, size, 0.2 * size));
+	CGPathAddRect(menu, NULL, CGRectMake(0.3 * size, 0, 0.55 * size, 0.75 * size));
+	CGPathAddRect(menu, NULL, CGRectMake(0.35 * size, 0.05 * size, 0.45 * size, 0.75 * size));
+	
+	CGFloat entryHeight = 0.1 * size; // 0.075
+	for (int i = 0; i < 3; i++) { // 4
+		//CGPathAddRect(menu, NULL, CGRectMake(0.37 * size, (2 * i + 1) * entryHeight, 0.42 * size, entryHeight)); // uncomment path above
+		CGPathAddRect(menu, NULL, CGRectMake(0.35 * size, (2 * i + 1.5) * entryHeight, 0.4 * size, entryHeight * 0.8));
+	}
+	CGContextAddPath(c, menu);
+	CGPathRelease(menu);
+}
+
+/// Create @c CGPath for group icon; a folder symbol
+NS_INLINE void AddGroupIconPath(CGContextRef c, CGFloat size, BOOL showBackground) {
+	const CGFloat r1 = size * 0.05; // corners
+	const CGFloat r2 = size * 0.08; // upper part, name tag
+	const CGFloat r3 = size * 0.15; // lower part, corners inside
+	const CGFloat posTop = 0.85 * size;
+	const CGFloat posMiddle = 0.6 * size - r3;
+	const CGFloat posBottom = 0.15 * size + r1;
+	const CGFloat posNameTag = 0.3 * size;
+	
+	CGMutablePathRef upper = CGPathCreateMutable();
+	CGPathMoveToPoint(upper, NULL, 0, 0.5 * size);
+	CGPathAddLineToPoint(upper, NULL, 0, posTop - r1);
+	CGPathAddArc(upper, NULL, r1, posTop - r1, r1, M_PI, M_PI_2, YES);
+	CGPathAddArc(upper, NULL, posNameTag, posTop - r2, r2, M_PI_2, M_PI_4, YES);
+	CGPathAddArc(upper, NULL, posNameTag + 1.85 * r2, posTop, r2, M_PI + M_PI_4, -M_PI_2, NO);
+	CGPathAddArc(upper, NULL, size - r1, posTop - r1 - r2, r1, M_PI_2, 0, YES);
+	CGPathAddArc(upper, NULL, size - r1, posBottom, r1, 0, -M_PI_2, YES);
+	CGPathAddArc(upper, NULL, r1, posBottom, r1, -M_PI_2, M_PI, YES);
+	CGPathCloseSubpath(upper);
+	
+	CGMutablePathRef lower = CGPathCreateMutable();
+	CGPathAddArc(lower, NULL, r3, posMiddle, r3, M_PI, M_PI_2, YES);
+	CGPathAddArc(lower, NULL, size - r3, posMiddle, r3, M_PI_2, 0, YES);
+	CGPathAddArc(lower, NULL, size - r1, posBottom, r1, 0, -M_PI_2, YES);
+	CGPathAddArc(lower, NULL, r1, posBottom, r1, -M_PI_2, M_PI, YES);
+	CGPathCloseSubpath(lower);
+	
+	CGContextAddPath(c, upper);
+	if (showBackground)
+		CGContextEOFillPath(c);
+	CGContextAddPath(c, lower);
+	CGPathRelease(upper);
+	CGPathRelease(lower);
+}
+
+
 /**
- Draw two rss bars (or paused icon) and tint color or gradient color.
- */
-- (void)drawImageInRect:(NSRect)r {
-	[super drawImageInRect:r];
-	
-	const CGFloat s = [self shorterSide];
-	CGContextRef c = [[NSGraphicsContext currentContext] CGContext];
-	CGContextSetFillColorWithColor(c, [self.color CGColor]);
-	
+NS_INLINE Create @c CGPath for RSS icon; a circle in the lower left bottom and two radio waves going outwards.
+NS_INLINE @param connection If @c NO, draw only one radio wave and a pause icon in the upper right
+NS_INLINE */
+NS_INLINE void AddRSSIconPath(CGContextRef c, CGFloat size, BOOL connection) {
 	CGMutablePathRef bars = CGPathCreateMutable(); // the rss bars
-	// circle
-	const CGFloat r1 = s * 0.125; // circle radius
-	CGPathAddArc(bars, NULL, r1, r1, r1, 0, M_PI * 2, YES);
-	// 1st bar
-	CGPathMoveToPoint(bars, NULL, 0, s * 0.65);
-	CGPathAddArc(bars, NULL, 0, 0, s * 0.65, M_PI_2, 0, YES);
-	CGPathAddLineToPoint(bars, NULL, s * 0.45, 0);
-	CGPathAddArc(bars, NULL, 0, 0, s * 0.45, 0, M_PI_2, NO);
-	CGPathCloseSubpath(bars);
-	// 2nd bar
-	if (_noConnection) {
-		CGAffineTransform at = CGAffineTransformMake(0.5, 0, 0, 0.5, s * 0.5, s * 0.5);
-		// X icon
-//		CGPathMoveToPoint(bars, &at, 0, s * 0.2);
-//		CGPathAddLineToPoint(bars, &at, s * 0.3, s * 0.5);
-//		CGPathAddLineToPoint(bars, &at, 0, s * 0.8);
-//		CGPathAddLineToPoint(bars, &at, s * 0.2, s);
-//		CGPathAddLineToPoint(bars, &at, s * 0.5, s * 0.7);
-//		CGPathAddLineToPoint(bars, &at, s * 0.8, s);
-//		CGPathAddLineToPoint(bars, &at, s, s * 0.8);
-//		CGPathAddLineToPoint(bars, &at, s * 0.7, s * 0.5);
-//		CGPathAddLineToPoint(bars, &at, s, s * 0.2);
-//		CGPathAddLineToPoint(bars, &at, s * 0.8, 0);
-//		CGPathAddLineToPoint(bars, &at, s * 0.5, s * 0.3);
-//		CGPathAddLineToPoint(bars, &at, s * 0.2, 0);
-//		CGPathCloseSubpath(bars);
-		// Pause icon
-//		CGPathMoveToPoint(bars, &at, s * 0.2, s * 0.2);
-		CGPathAddRect(bars, &at, CGRectMake(s*0.1, 0, s*0.3, s));
-		CGPathAddRect(bars, &at, CGRectMake(s*0.6, 0, s*0.3, s));
+	PathAddCircle(bars, size * 0.125);
+	PathAddRSSArc(bars, size * 0.45, size * 0.2);
+	if (connection) {
+		PathAddRSSArc(bars, size * 0.8, size * 0.2);
 	} else {
-		CGPathMoveToPoint(bars, NULL, 0, s);
-		CGPathAddArc(bars, NULL, 0, 0, s, M_PI_2, 0, YES);
-		CGPathAddLineToPoint(bars, NULL, s * 0.8, 0);
-		CGPathAddArc(bars, NULL, 0, 0, s * 0.8, 0, M_PI_2, NO);
-		CGPathCloseSubpath(bars);
+		CGAffineTransform at = CGAffineTransformMake(0.5, 0, 0, 0.5, size/2, size/2);
+		PathAddPauseIcon(bars, at, size, size * 0.3);
+		//PathAddXIcon(bars, at, size, size * 0.3);
 	}
-	
 	CGContextAddPath(c, bars);
-	
-	if (_gradientColor) {
-		CGContextSaveGState(c);
-		CGContextClip(c);
-		[self drawGradient:c side:s / self.contentScale];
-		CGContextRestoreGState(c);
-	} else {
-		CGContextEOFillPath(c);
-	}
-	
-	if (_barsColor) {
-		CGContextSetFillColorWithColor(c, [_barsColor CGColor]);
-		CGContextAddPath(c, bars);
-		CGContextEOFillPath(c);
-	}
 	CGPathRelease(bars);
 }
 
-/**
- Apply gradient to current context clipping.
- */
-- (void)drawGradient:(CGContextRef)c side:(CGFloat)w {
+
+#pragma mark - Icon Background Generators
+
+
+/// Create @c CGPath with rounded corners (optional). @param roundness Value between @c 0.0 and @c 1.0
+NS_INLINE void AddRoundedBackgroundPath(CGContextRef c, CGRect r, CGFloat roundness) {
+	const CGFloat corner = ShorterSide(r.size) * (roundness / 2.0);
+	if (corner > 0) {
+		CGMutablePathRef pth = CGPathCreateMutable();
+		CGPathAddRoundedRect(pth, NULL, r, corner, corner);
+		CGContextAddPath(c, pth);
+		CGPathRelease(pth);
+	} else {
+		CGContextAddRect(c, r);
+	}
+}
+
+/// Insert and draw linear gradient with @c color saturation @c ±0.3
+NS_INLINE void DrawGradient(CGContextRef c, CGFloat size, NSColor *color) {
 	CGFloat h = 0, s = 1, b = 1, a = 1;
 	@try {
-		NSColor *rgbColor = [_gradientColor colorUsingColorSpace:[NSColorSpace deviceRGBColorSpace]];
+		NSColor *rgbColor = [color colorUsingColorSpace:[NSColorSpace deviceRGBColorSpace]];
 		[rgbColor getHue:&h saturation:&s brightness:&b alpha:&a];
 	} @catch (NSException *e) {}
 	
@@ -249,128 +209,100 @@
 	CFArrayRef colors = CFArrayCreate(NULL, cgColors, 3, NULL);
 	CGGradientRef gradient = CGGradientCreateWithColors(NULL, colors, NULL);
 	
-	CGContextDrawLinearGradient(c, gradient, CGPointMake(0, w), CGPointMake(w, 0), kCGGradientDrawsBeforeStartLocation | kCGGradientDrawsAfterEndLocation);
+	CGContextDrawLinearGradient(c, gradient, CGPointMake(0, size), CGPointMake(size, 0), kCGGradientDrawsBeforeStartLocation | kCGGradientDrawsAfterEndLocation);
 	CGGradientRelease(gradient);
 	CFRelease(colors);
 }
-@end
 
 
-// ################################################################
-// #
-// #  SettingsIconGlobal
-// #
-// ################################################################
+#pragma mark - CGContext Drawing & Manipulation
 
-@implementation SettingsIconGlobal // content scale 0.7 works fine
-/**
- Draw icon for preferences; showing the status bar and an open menu. (single colors contour)
- */
-- (void)drawImageInRect:(NSRect)r {
-	[super drawImageInRect:r]; // add path of rounded rect
-	
-	const CGFloat w = r.size.width;
-	const CGFloat h = r.size.height;
-	
-	CGMutablePathRef menu = CGPathCreateMutable();
-	CGPathAddRect(menu, NULL, CGRectMake(0, 0.8 * h, w, 0.2 * h));
-	CGPathAddRect(menu, NULL, CGRectMake(0.3 * w, 0, 0.55 * w, 0.75 * h));
-	CGPathAddRect(menu, NULL, CGRectMake(0.35 * w, 0.05 * h, 0.45 * w, 0.75 * h));
-	
-	CGFloat entryHeight = 0.1 * h; // 0.075
-	for (int i = 0; i < 3; i++) { // 4
-		//CGPathAddRect(menu, NULL, CGRectMake(0.37 * w, (2 * i + 1) * entryHeight, 0.42 * w, entryHeight)); // uncomment path above
-		CGPathAddRect(menu, NULL, CGRectMake(0.35 * w, (2 * i + 1.5) * entryHeight, 0.4 * w, entryHeight * 0.8));
+
+/// Scale and translate context to the center with respect to the new scale. If @c width @c != @c length align top left.
+NS_INLINE void SetContentScale(CGContextRef c, CGSize size, CGFloat scale) {
+	const CGFloat s = ShorterSide(size);
+	CGFloat offset = s * (1 - scale) / 2;
+	CGContextTranslateCTM(c, offset, size.height - s + offset); // top left alignment
+	CGContextScaleCTM(c, scale, scale);
+}
+
+/// Helper method; set drawing color, add rounded background and prepare content scale
+NS_INLINE void DrawRoundedFrame(CGContextRef c, CGRect r, CGColorRef color, BOOL background, CGFloat corner, CGFloat defaultScale, CGFloat scaling) {
+	CGContextSetFillColorWithColor(c, color);
+	CGContextSetStrokeColorWithColor(c, color);
+	CGFloat contentScale = defaultScale;
+	if (background) {
+		AddRoundedBackgroundPath(c, r, corner);
+		if (scaling != 0.0)
+			contentScale *= scaling;
 	}
-	
-	CGContextRef c = [[NSGraphicsContext currentContext] CGContext];
-	CGContextSetFillColorWithColor(c, [self.color CGColor]);
-	
-	CGContextAddPath(c, menu);
+	SetContentScale(c, r.size, contentScale);
+}
+
+
+#pragma mark - Easy Icon Drawing Methods
+
+
+/// Draw global icon (menu bar)
+NS_INLINE void DrawGlobalIcon(CGRect r, CGColorRef color, BOOL background) {
+	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
+	DrawRoundedFrame(c, r, color, background, 0.4, 1.0, 0.7);
+	AddGlobalIconPath(c, ShorterSide(r.size));
 	CGContextEOFillPath(c);
-	CGPathRelease(menu);
 }
-@end
 
-
-// ################################################################
-// #
-// #  SettingsIconGroup
-// #
-// ################################################################
-
-@implementation SettingsIconGroup // content scale 0.8 works fine
-/**
- Draw icon for preferences; showing the mac typcial folder icon. (single colors contour)
- */
-- (void)drawImageInRect:(NSRect)r {
-	[super drawImageInRect:r];
-	
-	const CGFloat w = r.size.width;
-	const CGFloat h = r.size.height;
-	const CGFloat s = (w < h ? w : h); // shorter side
-	const CGFloat l = s * 0.04; // line width (half size)
-	const CGFloat r1 = s * 0.05; // corners
-	const CGFloat r2 = s * 0.08; // upper part, name tag
-	const CGFloat r3 = s * 0.15; // lower part, corners inside
-	const CGFloat posTop = 0.85 * h - l;
-	const CGFloat posMiddle = 0.6 * h - l - r3;
-	const CGFloat posBottom = 0.15 * h + l + r1;
-	const CGFloat posNameTag = 0.3 * w - l;
-	
-	CGMutablePathRef upper = CGPathCreateMutable();
-	CGPathMoveToPoint(upper, NULL, l, 0.5 * h);
-	CGPathAddLineToPoint(upper, NULL, l, posTop - r1);
-	CGPathAddArc(upper, NULL, l + r1, posTop - r1, r1, M_PI, M_PI_2, YES);
-	CGPathAddArc(upper, NULL, posNameTag, posTop - r2, r2, M_PI_2, M_PI_4, YES);
-	CGPathAddArc(upper, NULL, posNameTag + 2 * r2, posTop, r2, M_PI + M_PI_4, -M_PI_2, NO);
-	CGPathAddArc(upper, NULL, w - l - r1, posTop - r1 - r2, r1, M_PI_2, 0, YES);
-	CGPathAddArc(upper, NULL, w - l - r1, posBottom, r1, 0, -M_PI_2, YES);
-	CGPathAddArc(upper, NULL, l + r1, posBottom, r1, -M_PI_2, M_PI, YES);
-	CGPathCloseSubpath(upper);
-	
-	CGMutablePathRef lower = CGPathCreateMutable();
-	CGPathMoveToPoint(lower, NULL, l, 0.5 * h);
-	CGPathAddArc(lower, NULL, l + r3, posMiddle, r3, M_PI, M_PI_2, YES);
-	CGPathAddArc(lower, NULL, w - l - r3, posMiddle, r3, M_PI_2, 0, YES);
-	CGPathAddArc(lower, NULL, w - l - r1, posBottom, r1, 0, -M_PI_2, YES);
-	CGPathAddArc(lower, NULL, l + r1, posBottom, r1, -M_PI_2, M_PI, YES);
-	CGPathCloseSubpath(lower);
-	
-	CGContextRef c = [[NSGraphicsContext currentContext] CGContext];
-	CGContextSetFillColorWithColor(c, [self.color CGColor]);
-	CGContextSetStrokeColorWithColor(c, [self.color CGColor]);
-	CGContextSetLineWidth(c, l * 2);
-	
-	CGContextAddPath(c, upper);
-	CGContextAddPath(c, lower);
-	if (self.showBackground) {
-		CGContextAddPath(c, lower);
-		CGContextEOFillPath(c);
-		CGContextSetLineWidth(c, l); // thinner line
-		CGContextAddPath(c, lower);
-	}
+/// Draw group icon (folder)
+NS_INLINE void DrawGroupIcon(CGRect r, CGColorRef color, BOOL background) {
+	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
+	const CGFloat s = ShorterSide(r.size);
+	const CGFloat l = s * 0.08; // line width
+	DrawRoundedFrame(c, r, color, background, 0.4, 1.0 - (l / s), 0.85);
+	CGContextSetLineWidth(c, l * (background ? 0.5 : 1.0));
+	AddGroupIconPath(c, s, background);
 	CGContextStrokePath(c);
-	CGPathRelease(upper);
-	CGPathRelease(lower);
 }
-@end
 
-
-// ################################################################
-// #
-// #  DrawSeparator
-// #
-// ################################################################
-
-@implementation DrawSeparator
-/**
- Draw separator line in @c NSOutlineView
- */
-- (void)drawRect:(NSRect)dirtyRect {
-	NSGradient *grdnt = [[NSGradient alloc] initWithStartingColor:[NSColor darkGrayColor] endingColor:[[NSColor darkGrayColor] colorWithAlphaComponent:0.0]];
-	NSRect separatorRect = NSMakeRect(1, self.frame.size.height / 2.0 - 1, self.frame.size.width - 2, 2);
-	NSBezierPath *rounded = [NSBezierPath bezierPathWithRoundedRect:separatorRect xRadius:1 yRadius:1];
-	[grdnt drawInBezierPath:rounded angle:0];
+/// Draw RSS icon (flat without gradient)
+NS_INLINE void DrawRSSIcon(CGRect r, CGColorRef color, BOOL background, BOOL connection) {
+	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
+	DrawRoundedFrame(c, r, color, background, 0.4, 1.0, 0.7);
+	AddRSSIconPath(c, ShorterSide(r.size), connection);
+	CGContextEOFillPath(c);
 }
-@end
+
+/// Draw RSS icon (with orange gradient, corner @c 0.4, white radio waves)
+NS_INLINE void DrawRSSGradientIcon(CGRect r) {
+	const CGFloat size = ShorterSide(r.size);
+	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
+	DrawRoundedFrame(c, r, NSColor.whiteColor.CGColor, YES, 0.4, 1.0, 0.7);
+	// Gradient
+	CGContextSaveGState(c);
+	CGContextClip(c);
+	DrawGradient(c, size, [NSColor rssOrange]);
+	CGContextRestoreGState(c);
+	// Bars
+	AddRSSIconPath(c, size, YES);
+	CGContextEOFillPath(c);
+}
+
+
+#pragma mark - NSImage Name Registration
+
+
+/// Add single image to @c ImageNamed cache and set accessibility description
+NS_INLINE void Register(CGFloat size, NSImageName name, NSString *description, BOOL (^draw)(NSRect r)) {
+	NSImage *img = [NSImage imageWithSize: NSMakeSize(size, size) flipped:NO drawingHandler:draw];
+	img.accessibilityDescription = description;
+	img.name = name;
+}
+
+/// Register all icons that require custom drawing in @c ImageNamed cache
+void RegisterImageViewNames(void) {
+	const CGColorRef black = [NSColor controlTextColor].CGColor;
+	Register(16, RSSImageSettingsGlobal, NSLocalizedString(@"Global settings", nil), ^(NSRect r) { DrawGlobalIcon(r, black, NO); return YES; });
+	Register(16, RSSImageSettingsGroup, NSLocalizedString(@"Group settings", nil), ^(NSRect r) { DrawGroupIcon(r, black, NO); return YES; });
+	Register(16, RSSImageSettingsFeed, NSLocalizedString(@"Feed settings", nil), ^(NSRect r) { DrawRSSIcon(r, black, NO, YES); return YES; });
+	Register(16, RSSImageDefaultRSSIcon, NSLocalizedString(@"RSS icon", nil), ^(NSRect r) { DrawRSSGradientIcon(r); return YES; });
+	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"RSS menu bar icon", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor rssOrange].CGColor, YES, YES); return YES; });
+	Register(16, RSSImageMenuBarIconPaused, NSLocalizedString(@"RSS menu bar icon, paused", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor rssOrange].CGColor, YES, NO); return YES; });
+}
