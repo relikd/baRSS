@@ -40,9 +40,9 @@
 	self = [super initWithFrame: NSZeroRect];
 	self.row = 0;
 	// Insert matrix header (the three icons)
-	[self head:0 tooltip:NSLocalizedString(@"Show in menu bar", nil) class:[SettingsIconGlobal class]];
-	[self head:1 tooltip:NSLocalizedString(@"Show in group menu", nil) class:[SettingsIconGroup class]];
-	[self head:2 tooltip:NSLocalizedString(@"Show in feed menu", nil) class:[RSSIcon class]];
+	[self head:0 img:RSSImageSettingsGlobal tooltip:NSLocalizedString(@"Show in menu bar", nil)];
+	[self head:1 img:RSSImageSettingsGroup tooltip:NSLocalizedString(@"Show in group menu", nil)];
+	[self head:2 img:RSSImageSettingsFeed tooltip:NSLocalizedString(@"Show in feed menu", nil)];
 	// Generate checkbox matrix (checkbox state, X: default ON, O: default OFF, blank: hidden)
 	[self entry:"X  " label:NSLocalizedString(@"Tint menu bar icon on unread", nil)];
 	[self entry:"X  " label:NSLocalizedString(@"Update all feeds", nil)];
@@ -57,8 +57,8 @@
 }
 
 /// Helper method for matrix table header icons
-- (void)head:(int)x tooltip:(NSString*)ttip class:(Class)cls {
-	[[[[cls alloc] initWithFrame:NSMakeRect(0, 0, IconSize, IconSize)] tooltip:ttip] placeIn:self x:PAD_WIN + x * colWidth yTop:PAD_WIN];
+- (void)head:(int)x img:(NSImageName)img tooltip:(NSString*)ttip {
+	[[[NSView imageView:img size:IconSize] tooltip:ttip] placeIn:self x:PAD_WIN + x * colWidth yTop:PAD_WIN];
 }
 
 /// Create new entry with 1-3 checkboxes and a descriptive label
