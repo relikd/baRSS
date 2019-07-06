@@ -11,7 +11,7 @@ If you want a feature to be added, drop me an email or create an issue.
 Look at the other issues, in case somebody else already filed one similar. 
 If you like this project and want to say thank you drop me a line (or other stuff like money). 
 Regardless, I'll continue development as long as I'm using it on my own. 
-Admittedly, I've invested way too much time in this project already (1400h+) …
+Admittedly, I've invested way too much time in this project already (1595h+) …
 
 
 ### Why is this project not written in Swift?
@@ -20,6 +20,10 @@ Actually, I started this project with Swift. Even without adding much functional
 Compared to the nearly finished Alpha version with 500 Kb written in Objective-C. 
 The reason for that, Swift frameworks are always packed into the final application. 
 I decided that this level of encapsulation is a waste of space for such a small application.
+
+With Swift 5 and ABI stability this would not be any issue, but sadly Swift 5 was released after already half of the project was done.
+In retrospect it would be much nicer to have it written it like that from the beginning.
+But on the other hand, this project is macOS 10.12 compatible.
 
 
 ### 3rd Party Libraries
@@ -33,7 +37,8 @@ Install
 
 Requires macOS Sierra (10.12) or higher.
 
-Easy way: go to [releases](https://github.com/relikd/baRSS/releases) and downloaded the latest version.
+### Easy way
+go to [releases](https://github.com/relikd/baRSS/releases) and downloaded the latest version.
 
 ### Build from source
 
