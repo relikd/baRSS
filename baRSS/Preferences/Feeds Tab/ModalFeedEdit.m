@@ -146,6 +146,7 @@
 	self.httpEtag = nil;
 	self.httpDate = nil;
 	self.faviconURL = nil;
+	self.previousURL = self.view.url.stringValue;
 }
 
 /**
@@ -179,8 +180,11 @@
  @return Either URL string or @c nil if user canceled the selection.
  */
 - (NSString*)letUserChooseXmlUrlFromList:(NSArray<RSHTMLMetadataFeedLink*> *)list {
-	if (list.count == 1) // nothing to choose
+	if (list.count == 1) { // nothing to choose
+		// Feeds like https://news.ycombinator.com/ return 503 if URLs are requested too rapidly
+		//CFRunLoopRunInMode(kCFRunLoopDefaultMode, 1.0, false); // Non-blocking sleep (1s)
 		return list.firstObject.link;
+	}
 	NSMenu *menu = [[NSMenu alloc] initWithTitle:NSLocalizedString(@"Choose feed menu", nil)];
 	menu.autoenablesItems = NO;
 	for (RSHTMLMetadataFeedLink *fl in list) {
@@ -203,11 +207,19 @@
 - (void)postDownload:(NSString*)responseURL {
 	if (self.modalSheet.didCloseAndCancel)
 		return;
+	
+	BOOL hasError = (self.feedError != nil);
 	// 1. Stop spinner animation for name field. (keep spinner for URL running until favicon downloaded)
 	[self.view.spinnerName stopAnimation:nil];
 	// 2. If URL was redirected, replace original text field value with new one. (e.g., https redirect)
 	if (responseURL.length > 0 && ![responseURL isEqualToString:self.previousURL]) {
-		self.previousURL = responseURL;
+		if (!hasError) {
+			// If the url has changed and there is an error:
+			// This probably means the feed URL was resolved, but the successive download returned 5xx error.
+			// Presumably to prevent site crawlers accessing many pages in quick succession. (delay of 1s does help)
+			// By not setting previousURL, a second hit on the 'Done' button will retry the resolved URL again.
+			self.previousURL = responseURL;
+		}
 		self.view.url.stringValue = responseURL;
 	}
 	// 3. Copy parsed feed title to text field. (only if user hasn't set anything else yet)
@@ -218,7 +230,6 @@
 	// TODO: user preference to automatically select refresh interval (selection: None,min,max,avg,median)
 	[self statsForDownloadObject];
 	// 4. Continue with favicon download (or finish with error)
-	BOOL hasError = (self.feedError != nil);
 	self.view.favicon.hidden = hasError;
 	self.view.warningButton.hidden = !hasError;
 	if (hasError) {
@@ -305,7 +316,6 @@
 - (void)controlTextDidEndEditing:(NSNotification *)obj {
 	if (obj.object == self.view.url) {
 		if (![self.previousURL isEqualToString:self.view.url.stringValue]) {
-			self.previousURL = self.view.url.stringValue;
 			[self downloadRSS];
 		}
 	}
@@ -316,13 +326,24 @@
 	if (!self.feedError)
 		return;
 	
+	// show reload button if server is temporarily offline (any 5xx server error)
+	BOOL serverError = (self.feedError.domain == NSURLErrorDomain && self.feedError.code == NSURLErrorBadServerResponse);
+	self.view.warningReload.hidden = !serverError;
+	
+	// set error description as text
 	self.view.warningText.objectValue = self.feedError.localizedDescription;
 	NSSize newSize = self.view.warningText.fittingSize; // width is limited by the textfield's preferred width
 	newSize.width += 2 * self.view.warningText.frame.origin.x; // the padding
 	newSize.height += 2 * self.view.warningText.frame.origin.y;
 	
+	// apply fitting size and display
 	self.view.warningPopover.contentSize = newSize;
 	[self.view.warningPopover showRelativeToRect:sender.bounds ofView:sender preferredEdge:NSRectEdgeMinY];
+}
+
+/// Either hit by Cmd+R or reload button inside warning popover error description
+- (void)reloadData {
+	[self downloadRSS];
 }
 
 @end

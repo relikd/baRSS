@@ -87,11 +87,11 @@
 }
 
 /// Create pure image button with no border.
-+ (NSButton*)buttonIcon:(NSImage*)img size:(CGFloat)size {
++ (NSButton*)buttonIcon:(nonnull NSImageName)name size:(CGFloat)size {
 	NSButton *btn = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, size, size)];
 	btn.bezelStyle = NSBezelStyleRounded;
 	btn.bordered = NO;
-	btn.image = img;
+	btn.image = [NSImage imageNamed:name];
 	return btn;
 }
 
@@ -271,6 +271,8 @@
 	self.toolTip = tt;
 	if (self.accessibilityLabel.length == 0)
 		self.accessibilityLabel = tt;
+	else
+		self.accessibilityValueDescription = tt;
 	return self;
 }
 

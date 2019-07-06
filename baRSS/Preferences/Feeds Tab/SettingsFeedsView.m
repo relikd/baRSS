@@ -134,7 +134,7 @@
  */
 - (CGFloat)generateButtons {
 	NSButton *add = [[NSView buttonImageSquare:NSImageNameAddTemplate] tooltip:NSLocalizedString(@"Add new item", nil)];
-	NSButton *del = [[NSView buttonImageSquare:NSImageNameRemoveTemplate] tooltip:NSLocalizedString(@"Delete selected item(s)", nil)];
+	NSButton *del = [[NSView buttonImageSquare:NSImageNameRemoveTemplate] tooltip:NSLocalizedString(@"Delete selected items", nil)];
 	NSButton *share = [[NSView buttonImageSquare:NSImageNameShareTemplate] tooltip:NSLocalizedString(@"Import or export data", nil)];
 	
 	[self button:add copyActions:3 to:5];

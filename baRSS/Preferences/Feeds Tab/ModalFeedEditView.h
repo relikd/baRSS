@@ -38,6 +38,7 @@
 @property (weak) IBOutlet NSButton *warningButton;
 @property NSPopover *warningPopover;
 @property (weak) IBOutlet NSTextField *warningText;
+@property (weak) IBOutlet NSButton *warningReload;
 
 - (instancetype)initWithController:(ModalFeedEdit*)controller NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithFrame:(NSRect)frameRect NS_UNAVAILABLE;
