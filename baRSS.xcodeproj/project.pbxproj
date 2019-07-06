@@ -27,7 +27,6 @@
 		5496B511214D6275003ED4ED /* UserPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5496B510214D6275003ED4ED /* UserPrefs.m */; };
 		54A07A7F220E04CF00082C51 /* NSFetchRequest+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A07A7E220E04CF00082C51 /* NSFetchRequest+Ext.m */; };
 		54A07A82220E723D00082C51 /* MapUnreadTotal.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A07A81220E723D00082C51 /* MapUnreadTotal.m */; };
-		54ACC28621061B3C0020715F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54ACC28521061B3C0020715F /* Assets.xcassets */; };
 		54ACC28C21061B3C0020715F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28B21061B3C0020715F /* main.m */; };
 		54ACC29521061E270020715F /* FeedDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29421061E270020715F /* FeedDownload.m */; };
 		54ACC29821061FBA0020715F /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29721061FBA0020715F /* Preferences.m */; };
@@ -36,6 +35,7 @@
 		54B749DA2204A85C0022CC6D /* BarStatusItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B749D92204A85C0022CC6D /* BarStatusItem.m */; };
 		54B749E0220636200022CC6D /* FeedArticle+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B749DF220635CD0022CC6D /* FeedArticle+Ext.m */; };
 		54BB048921FD2AB500C303A5 /* NSDate+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54BB048821FD2AB500C303A5 /* NSDate+Ext.m */; };
+		54BF444A22D0F4F300660096 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 54BF444922D0F4F300660096 /* AppIcon.icns */; };
 		54D857CE227C5785001BA1C8 /* RefreshStatisticsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D857CD227C5785001BA1C8 /* RefreshStatisticsView.m */; };
 		54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E8831E211B509D00064188 /* ModalFeedEdit.m */; };
 		54E9CF32225914300023696F /* SettingsAbout.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E9CF31225914300023696F /* SettingsAbout.m */; };
@@ -109,7 +109,6 @@
 		54A07A81220E723D00082C51 /* MapUnreadTotal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapUnreadTotal.m; sourceTree = "<group>"; };
 		54ACC27C21061B3B0020715F /* baRSS Beta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "baRSS Beta.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		54ACC28321061B3B0020715F /* DBv1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DBv1.xcdatamodel; sourceTree = "<group>"; };
-		54ACC28521061B3C0020715F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		54ACC28A21061B3C0020715F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		54ACC28B21061B3C0020715F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		54ACC29321061E270020715F /* FeedDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FeedDownload.h; sourceTree = "<group>"; };
@@ -126,6 +125,7 @@
 		54B749DF220635CD0022CC6D /* FeedArticle+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "FeedArticle+Ext.m"; sourceTree = "<group>"; };
 		54BB048721FD2AB500C303A5 /* NSDate+Ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Ext.h"; sourceTree = "<group>"; };
 		54BB048821FD2AB500C303A5 /* NSDate+Ext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Ext.m"; sourceTree = "<group>"; };
+		54BF444922D0F4F300660096 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		54D857CC227C5785001BA1C8 /* RefreshStatisticsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RefreshStatisticsView.h; sourceTree = "<group>"; };
 		54D857CD227C5785001BA1C8 /* RefreshStatisticsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RefreshStatisticsView.m; sourceTree = "<group>"; };
 		54D857D022802309001BA1C8 /* SettingsGeneralView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsGeneralView.h; sourceTree = "<group>"; };
@@ -255,8 +255,8 @@
 				541A90EF21257D4F002680A6 /* Status Bar Menu */,
 				54A07A8322105E0800082C51 /* Core Data */,
 				546FC44D2118B357007CC3A3 /* Preferences */,
-				54ACC28521061B3C0020715F /* Assets.xcassets */,
 				54ACC28A21061B3C0020715F /* Info.plist */,
+				54BF444922D0F4F300660096 /* AppIcon.icns */,
 				54ACC28B21061B3C0020715F /* main.m */,
 				54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */,
 			);
@@ -395,7 +395,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				54ACC28621061B3C0020715F /* Assets.xcassets in Resources */,
+				54BF444A22D0F4F300660096 /* AppIcon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -576,7 +576,6 @@
 		54ACC29121061B3C0020715F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
@@ -615,7 +614,6 @@
 					"@executable_path/../Frameworks",
 					"$(FRAMEWORK_SEARCH_PATHS)",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = de.relikd.baRSS.beta;
 				PRODUCT_NAME = "$(TARGET_NAME) Beta";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -626,7 +624,6 @@
 		54ACC29221061B3C0020715F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES;
@@ -665,7 +662,6 @@
 					"@executable_path/../Frameworks",
 					"$(FRAMEWORK_SEARCH_PATHS)",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				PRODUCT_BUNDLE_IDENTIFIER = de.relikd.baRSS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
