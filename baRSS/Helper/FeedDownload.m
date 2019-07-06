@@ -201,10 +201,30 @@ static BOOL _nextUpdateIsForced = NO;
 + (void)asyncRequest:(NSURLRequest*)request block:(nonnull void(^)(NSData * _Nullable data, NSError * _Nullable error, NSHTTPURLResponse *response))block {
 	[[[self nonCachingSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
 		NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
-		if (error || [httpResponse statusCode] == 304)
+		NSInteger status = [httpResponse statusCode];
+		if (error || status == 304) { // 304 Not Modified
 			data = nil;
+		} else if (status >= 500 && status < 600) { // 5xx Server Error
+			NSString *reason = [NSString stringWithFormat:NSLocalizedString(@"Server HTTP error %ld.\n––––\n%@", nil),
+								status, [self extractReadableHTML:data]];
+			error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorBadServerResponse userInfo:@{NSLocalizedDescriptionKey: reason}];
+			data = nil;
+		}
 		block(data, error, httpResponse); // if status == 304, data & error nil
 	}] resume];
+}
+
+/// Helper method to extract readable text from HTML
++ (NSString*)extractReadableHTML:(NSData*)data {
+	NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+	// replace all <tags> with (presumably) non-used character
+	str = [[NSRegularExpression regularExpressionWithPattern:@"<[^>]*>\\s*" options:kNilOptions error:nil]
+		   stringByReplacingMatchesInString:str options:kNilOptions range:NSMakeRange(0, str.length) withTemplate:@"◊"];
+	// then replace multiple occurences of that character with a single new line
+	str = [[NSRegularExpression regularExpressionWithPattern:@"◊+" options:kNilOptions error:nil]
+		   stringByReplacingMatchesInString:str options:kNilOptions range:NSMakeRange(0, str.length) withTemplate:@"\n"];
+	// finally trim whitespace at start and end
+	return [str stringByTrimmingCharactersInSet: NSCharacterSet.whitespaceAndNewlineCharacterSet];
 }
 
 
@@ -266,9 +286,9 @@ static BOOL _nextUpdateIsForced = NO;
 		dispatch_sync(dispatch_get_main_queue(), ^{ // sync! (thread is already in background)
 			chosenURL = askUser(parsedMeta);
 		});
-		if (!chosenURL || chosenURL.length == 0) {
-			// User canceled operation, show appropriate error message
-			*err = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:@{NSLocalizedDescriptionKey: NSLocalizedString(@"Operation canceled.", nil)}];
+		if (!chosenURL || chosenURL.length == 0) { // User canceled operation, show appropriate error message
+			NSString *reason = NSLocalizedString(@"Operation canceled.", nil);
+			*err = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:@{NSLocalizedDescriptionKey: reason}];
 			return NO;
 		}
 		[self parseFeedRequest:[self newRequestURL:chosenURL] xmlBlock:nil feedBlock:block];

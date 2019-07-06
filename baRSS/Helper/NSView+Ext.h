@@ -56,7 +56,7 @@ NS_INLINE CGFloat YFromTop(NSView *view) { return NSHeight(view.superview.frame)
 // UI: Buttons
 + (NSButton*)button:(NSString*)text;
 + (NSButton*)buttonImageSquare:(nonnull NSImageName)name;
-+ (NSButton*)buttonIcon:(NSImage*)img size:(CGFloat)size;
++ (NSButton*)buttonIcon:(nonnull NSImageName)name size:(CGFloat)size;
 + (NSButton*)inlineButton:(NSString*)text;
 + (NSPopUpButton*)popupButton:(CGFloat)w;
 // UI: Others

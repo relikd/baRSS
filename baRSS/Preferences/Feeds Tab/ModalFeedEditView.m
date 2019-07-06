@@ -47,10 +47,7 @@
 	self.url = [[[NSView inputField:@"https://example.org/feed.rss" width:0] placeIn:self x:x yTop:0] sizeToRight:PAD_S + 18];
 	self.spinnerURL = [[NSView activitySpinner] placeIn:self xRight:1 yTop:2.5];
 	self.favicon = [[[NSView imageView:nil size:18] tooltip:NSLocalizedString(@"Favicon", nil)] placeIn:self xRight:0 yTop:1.5];
-	NSTextField *errorDesc = [self warningPopoverContentView];
-	self.warningPopover = [self warningPopoverControllerWith:errorDesc];
-	self.warningText = errorDesc; // after added to parent view, otherwise will be released immediatelly (weak ivar)
-	self.warningButton = [[[[NSView buttonIcon:[NSImage imageNamed:NSImageNameCaution] size:18] action:@selector(didClickWarningButton:) target:nil] // up the responder chain
+	self.warningButton = [[[[NSView buttonIcon:NSImageNameCaution size:18] action:@selector(didClickWarningButton:) target:nil] // up the responder chain
 						   tooltip:NSLocalizedString(@"Click here to show failure reason", nil)]
 						  placeIn:self xRight:0 yTop:1.5];
 	// 2. row
@@ -61,34 +58,39 @@
 	self.refreshUnit = [[NSView popupButton:120] placeIn:self x:NSMaxX(self.refreshNum.frame) + PAD_M yTop:2*rowHeight];
 	
 	// initial state
+	self.url.accessibilityLabel = lbls[0];
+	self.name.accessibilityLabel = lbls[1];
+	self.refreshNum.accessibilityLabel = NSLocalizedString(@"Refresh interval", nil);
 	self.url.delegate = controller;
 	self.warningButton.hidden = YES;
 	self.refreshNum.formatter = [StrictUIntFormatter new]; // see below ...
-	//[self.warningButton.cell setHighlightsBy:(error ? NSContentsCellMask : NSNoCellMask)];
+	[self prepareWarningPopover];
 	return self;
 }
 
-/// User visible error description text (after click on warning button)
-- (NSTextField*)warningPopoverContentView {
-	NSTextField *txt = [[[NSView label:@""] selectable] sizableWidthAndHeight];
-	[txt setFrameSize: NSMakeSize(300, 100)];
-	txt.lineBreakMode = NSLineBreakByWordWrapping;
-	txt.maximumNumberOfLines = 7;
-	return txt;
-}
-
-/// Prepare popover controller to display download errors
-- (NSPopover*)warningPopoverControllerWith:(NSTextField*)content {
+/// Prepare popover controller to display errors during download
+- (void)prepareWarningPopover {
 	NSPopover *pop = [[NSPopover alloc] init];
 	pop.behavior = NSPopoverBehaviorTransient;
 	pop.contentViewController = [[NSViewController alloc] init];
 	
-	pop.contentViewController.view = [[NSView alloc] initWithFrame:content.frame];
-	[pop.contentViewController.view addSubview:content];
+	NSView *content = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 300, 100)];
+	pop.contentViewController.view = content;
 	
-	content.frame = NSInsetRect(content.frame, 4, 2);
-	content.preferredMaxLayoutWidth = NSWidth(content.frame);
-	return pop;
+	// User visible error description text (after click on warning button)
+	NSTextField *txt = [[[NSView label:@""] selectable] sizableWidthAndHeight];
+	txt.frame = NSInsetRect(content.frame, 4, 2);
+	txt.preferredMaxLayoutWidth = NSWidth(txt.frame);
+	txt.lineBreakMode = NSLineBreakByWordWrapping;
+	txt.maximumNumberOfLines = 7;
+	[content addSubview:txt];
+	
+	self.warningPopover = pop;
+	self.warningText = txt;
+	// Reload button is only visible on 5xx server error (right of ––––)
+	self.warningReload = [[[[NSView buttonIcon:NSImageNameRefreshTemplate size:16] placeIn:content x:35 yTop:21]
+						   tooltip:NSLocalizedString(@"Retry download (Cmd+R)", nil)]
+						  action:@selector(reloadData) target:nil]; // up the responder chain
 }
 
 @end

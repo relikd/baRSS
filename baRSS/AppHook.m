@@ -187,6 +187,7 @@ static NSEventModifierFlags fnKeyFlags = NSEventModifierFlagShift | NSEventModif
 				case 'a': if ([self sendAction:@selector(selectAll:) to:nil from:self]) return; break;
 				case 'q': if ([self sendAction:@selector(performClose:) to:nil from:self]) return; break;
 				case 'w': if ([self sendAction:@selector(performClose:) to:nil from:self]) return; break;
+				case 'r': if ([self sendAction:@selector(reloadData) to:nil from:self]) return; break;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
 				case 'z': if ([self sendAction:@selector(undo:) to:nil from:self]) return; break;
