@@ -141,22 +141,10 @@
 /// @return Simplified description of the feed object.
 - (NSString*)readableDescription {
 	switch (self.type) {
+		case GROUP:     return [NSString stringWithFormat:@"%@:", self.name];
+		case FEED:      return [NSString stringWithFormat:@"%@ (%@)", self.name, self.feed.meta.url];
 		case SEPARATOR: return @"-------------";
-		case GROUP: return [NSString stringWithFormat:@"%@", self.name];
-		case FEED:
-			return [NSString stringWithFormat:@"%@ (%@) - %@", self.name, self.feed.meta.url, [self refreshString]];
 	}
-}
-
-/// @return Formatted string for update interval ( e.g., @c 30m or @c 12h )
-- (nonnull NSString*)refreshString {
-	if (self.type == FEED) {
-		int32_t refresh = self.feed.meta.refresh;
-		if (refresh <= 0)
-			return @"∞"; // ∞ ƒ Ø
-		return [NSDate stringForInterval:refresh rounded:NO];
-	}
-	return @"";
 }
 
 @end

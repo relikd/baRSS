@@ -87,10 +87,10 @@ NS_INLINE NSTextField* GrayLabel(NSString *text) {
 
 /// Inline button with tag equal to refresh interval. @c 16px height.
 - (NSButton*)createInlineButton:(NSNumber*)num callback:(nullable id<RefreshIntervalButtonDelegate>)callback {
-	NSButton *button = [NSView inlineButton:[NSDate stringForInterval:num.intValue rounded:YES]];
-	TimeUnitType unit = [NSDate unitForInterval:num.intValue rounded:YES];
-	button.tag = (NSInteger)(roundf(num.floatValue / unit) * unit); // rounded interval
-	// TODO: accessibility title: readable interval string
+	NSButton *button = [NSView inlineButton: [NSDate floatStringForInterval:num.intValue]];
+	Interval intv = [NSDate floatToIntInterval:num.intValue]; // rounded to highest unit
+	button.accessibilityTitle = [NSDate intStringForInterval:intv];
+	button.tag = (NSInteger)intv;
 	if (callback) {
 		[button action:@selector(refreshIntervalButtonClicked:) target:callback];
 	} else {

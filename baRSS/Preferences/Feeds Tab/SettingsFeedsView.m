@@ -93,7 +93,7 @@
 	
 	NSTableColumn *colRefresh = [[NSTableColumn alloc] initWithIdentifier:CustomCellRefresh];
 	colRefresh.title = NSLocalizedString(@"Refresh", nil);
-	colRefresh.width = 50;
+	colRefresh.width = 60;
 	colRefresh.resizingMask = NSTableColumnNoResizing;
 	[outline addTableColumn:colRefresh];
 	
@@ -224,15 +224,19 @@ NSUserInterfaceItemIdentifier const CustomCellRefresh = @"RefreshColumnCell";
 	self = [super initWithFrame:frameRect];
 	self.identifier = CustomCellRefresh;
 	self.textField = [[[[NSView label:@""] textRight] placeIn:self x:0 yTop:0] sizeToRight:0];
-	self.textField.accessibilityLabel = NSLocalizedString(@"Refresh interval", nil);
+	self.textField.accessibilityTitle = @" "; // otherwise groups and separators will say 'text'
 	return self;
 }
 
 - (void)setObjectValue:(FeedGroup*)fg {
-	NSString *str = [fg refreshString];
+	NSString *str = @"";
+	if (fg.type == FEED) {
+		int32_t refresh = fg.feed.meta.refresh;
+		str = (refresh <= 0 ? @"∞" : [NSDate intStringForInterval:refresh]); // ∞ ƒ Ø
+	}
 	self.textField.objectValue = str;
-	// TODO: accessibility title: readable interval string
 	self.textField.textColor = (str.length > 1 ? [NSColor controlTextColor] : [NSColor disabledControlTextColor]);
+	self.textField.accessibilityLabel = (str.length > 1 ? NSLocalizedString(@"Refresh interval", nil) : nil);
 }
 
 @end

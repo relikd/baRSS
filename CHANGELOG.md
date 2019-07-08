@@ -10,15 +10,18 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 - Show users any 5xx server error response and extracted failure reason
 - 5xx server errors have a reload button which will initiate a new download with the same URL
 - Adding feed: Cmd+R will reload the same URL
-- Settings, Feeds: Cmd+R will reload the data source 
+- Settings, Feeds: Cmd+R will reload the data source
+- Refresh interval string localizations
 
 ### Fixed
 - Changed error message text when user cancels creation of new feed item
 - Comparing existing articles with nonexistent guid and link
-- Adding feed: If URLs can't be resolved in the first run (5xx error), try a second time. E.g., 'Done' click (issue: #5)  
+- Adding feed: If URLs can't be resolved in the first run (5xx error), try a second time. E.g., 'Done' click (issue: #5)
 
 ### Changed
 - Interface builder files replaced with code equivalent
+- Settings, Feeds: Single add button for feeds, groups, and separators
+- Refresh interval hotkeys set to: Cmd+1 … Cmd+6
 
 
 ## [0.9.4] - 2019-04-02
