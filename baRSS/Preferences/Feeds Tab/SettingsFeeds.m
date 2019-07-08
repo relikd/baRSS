@@ -299,42 +299,23 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	}];
 }
 
-/// Insert @c FeedGroup item either after current selection or inside selected folder (if expanded)
+/// Insert @c FeedGroup item at the end of the current folder (or inside if expanded)
 - (FeedGroup*)insertFeedGroupAtSelection:(FeedGroupType)type {
+	FeedGroup *selObj = self.dataStore.selectedObjects.firstObject;
+	NSTreeNode *selNode = self.dataStore.selectedNodes.firstObject;
+	// If group selected and expanded, insert into group. Else: append at end of current folder
+	if (![self.view.outline isItemExpanded:selNode]) {
+		selObj = selObj.parent;
+		selNode = selNode.parentNode;
+	}
+	// If no selection, append to root folder
+	if (!selNode) selNode = [self.dataStore arrangedObjects];
+	// Insert new node
+	NSUInteger index = selNode.childNodes.count;
 	FeedGroup *fg = [FeedGroup newGroup:type inContext:self.dataStore.managedObjectContext];
-	NSIndexPath *pth = [self indexPathForInsertAtNode:[[self.dataStore selectedNodes] firstObject]];
-	[self.dataStore insertObject:fg atArrangedObjectIndexPath:pth];
-	
-	if (pth.length > 1) { // some subfolder and not root folder (has parent!)
-		NSTreeNode *parentNode = [[self.dataStore arrangedObjects] descendantNodeAtIndexPath:pth].parentNode;
-		fg.parent = parentNode.representedObject;
-		[self restoreOrderingAndIndexPathStr:parentNode];
-	} else {
-		[self restoreOrderingAndIndexPathStr:[self.dataStore arrangedObjects]]; // .parent = nil
-	}
+	[self.dataStore insertObject:fg atArrangedObjectIndexPath:[selNode.indexPath indexPathByAddingIndex:index]];
+	[fg setParent:selObj andSortIndex:(int32_t)index];
 	return fg;
-}
-
-/**
- Index path will be selected as follow:
- - @b root: append at end
- - @b folder (expanded): append at front
- - @b else: append after item.
-
- @return indexPath where item will be inserted.
- */
-- (NSIndexPath*)indexPathForInsertAtNode:(NSTreeNode*)node {
-	if (!node) { // append to root
-		return [NSIndexPath indexPathWithIndex:[self.dataStore arrangedObjects].childNodes.count]; // or 0 to append at front
-	} else if ([self.view.outline isItemExpanded:node]) { // append to group (if open)
-		return [node.indexPath indexPathByAddingIndex:0]; // or 'selection.childNodes.count' to append at end
-	} else { // append before / after selected item
-		NSIndexPath *pth = node.indexPath;
-		// remove the two lines below to insert infront of selection (instead of after selection)
-		NSUInteger lastIdx = [pth indexAtPosition:pth.length - 1];
-		return [[pth indexPathByRemovingLastIndex] indexPathByAddingIndex:lastIdx + 1];
-	}
-	// TODO: always append to end
 }
 
 /// Loop over all descendants and update @c sortIndex @c (FeedGroup) as well as all @c indexPath @c (Feed)

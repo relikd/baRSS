@@ -22,6 +22,7 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 - Interface builder files replaced with code equivalent
 - Settings, Feeds: Single add button for feeds, groups, and separators
 - Refresh interval hotkeys set to: Cmd+1 … Cmd+6
+- Always append new items at the end
 
 
 ## [0.9.4] - 2019-04-02
