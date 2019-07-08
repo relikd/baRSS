@@ -254,7 +254,7 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[self beginCoreDataChange];
 	NSArray<NSTreeNode*> *parentNodes = [self.dataStore.selectedNodes valueForKeyPath:@"parentNode"];
 	[self.dataStore remove:sender];
-	for (NSTreeNode *parent in parentNodes) {
+	for (NSTreeNode *parent in [self filterOutRedundant:parentNodes]) {
 		[self restoreOrderingAndIndexPathStr:parent];
 	}
 	[self endCoreDataChangeShouldUndo:NO];
@@ -356,15 +356,13 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	NSUInteger idx = (NSUInteger)index;
 	if (index == -1) // drag items on folder or root drop
 		idx = destParent.childNodes.count;
-	NSIndexPath *dest = [destParent indexPath];
 	
 	NSArray<NSTreeNode*> *previousParents = [self.currentlyDraggedNodes valueForKeyPath:@"parentNode"];
-	[self.dataStore moveNodes:self.currentlyDraggedNodes toIndexPath:[dest indexPathByAddingIndex:idx]];
+	[self.dataStore moveNodes:self.currentlyDraggedNodes toIndexPath:[destParent.indexPath indexPathByAddingIndex:idx]];
 	
-	for (NSTreeNode *node in previousParents) {
+	for (NSTreeNode *node in [self filterOutRedundant:[previousParents arrayByAddingObject:destParent]]) {
 		[self restoreOrderingAndIndexPathStr:node];
 	}
-	[self restoreOrderingAndIndexPathStr:destParent];
 
 	return YES;
 }
@@ -461,26 +459,8 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 /// Copy human readable description of selected nodes to clipboard.
 - (void)copy:(id)sender {
 	NSMutableString *str = [[NSMutableString alloc] init];
-	NSUInteger count = self.dataStore.selectedNodes.count;
-	NSMutableArray<NSTreeNode*> *groups = [NSMutableArray arrayWithCapacity:count];
-	
-	// filter out nodes that are already present in some selected parent node
-	for (NSTreeNode *node in self.dataStore.selectedNodes) {
-		BOOL skipItem = NO;
-		for (NSTreeNode *stored in groups) {
-			NSIndexPath *p = node.indexPath;
-			while (p.length > stored.indexPath.length)
-				p = [p indexPathByRemovingLastIndex];
-			if ([p isEqualTo:stored.indexPath]) {
-				skipItem = YES;
-				break;
-			}
-		}
-		if (!skipItem) {
-			[self traverseChildren:node appendString:str prefix:@""];
-			if (node.childNodes.count > 0)
-				[groups addObject:node];
-		}
+	for (NSTreeNode *node in [self filterOutRedundant:self.dataStore.selectedNodes]) {
+		[self traverseChildren:node appendString:str prefix:@""];
 	}
 	[[NSPasteboard generalPasteboard] clearContents];
 	[[NSPasteboard generalPasteboard] setString:str forType:NSPasteboardTypeString];
@@ -498,6 +478,24 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	for (NSTreeNode *child in obj.childNodes) {
 		[self traverseChildren:child appendString:str prefix:prefix];
 	}
+}
+
+/// Remove redundant nodes that are already present in some selected parent node
+- (NSArray<NSTreeNode*>*)filterOutRedundant:(NSArray<NSTreeNode*>*)nodes {
+	NSMutableArray<NSTreeNode*> *result = [NSMutableArray arrayWithCapacity:nodes.count];
+	for (NSTreeNode *current in nodes) {
+		BOOL skip = NO;
+		for (NSTreeNode *stored in result) {
+			NSIndexPath *p = current.indexPath;
+			while (p.length > stored.indexPath.length)
+				p = [p indexPathByRemovingLastIndex];
+			if ([p isEqualTo:stored.indexPath]) {
+				skip = YES; break;
+			}
+		}
+		if (skip == NO) [result addObject:current];
+	}
+	return result;
 }
 
 @end
