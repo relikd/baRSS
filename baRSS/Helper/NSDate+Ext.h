@@ -39,8 +39,10 @@ typedef NS_ENUM(int32_t, TimeUnitType) {
 
 
 @interface NSDate (Interval)
-+ (nonnull NSString*)stringForInterval:(Interval)intv rounded:(BOOL)flag;
-+ (TimeUnitType)unitForInterval:(Interval)intv rounded:(BOOL)flag;
++ (nullable NSString*)intStringForInterval:(Interval)intv;
++ (nonnull NSString*)floatStringForInterval:(Interval)intv;
++ (nullable NSString*)stringForRemainingTime:(NSDate*)other;
++ (Interval)floatToIntInterval:(Interval)intv;
 @end
 
 

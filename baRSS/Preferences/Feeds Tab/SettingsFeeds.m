@@ -29,6 +29,7 @@
 #import "OpmlExport.h"
 #import "FeedDownload.h"
 #import "SettingsFeedsView.h"
+#import "NSDate+Ext.h"
 
 @interface SettingsFeeds ()
 @property (strong) SettingsFeedsView *view; // override super
@@ -37,7 +38,6 @@
 @property (strong) NSUndoManager *undoManager;
 
 @property (strong) NSTimer *timerStatusInfo;
-@property (strong) NSDateComponentsFormatter *intervalFormatter;
 @end
 
 @implementation SettingsFeeds
@@ -94,9 +94,6 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 /// Initialize status info timer
 - (void)viewWillAppear {
 	[self.dataStore rearrangeObjects]; // needed to scroll outline view to top (if prefs open on another tab)
-	self.intervalFormatter = [[NSDateComponentsFormatter alloc] init];
-	self.intervalFormatter.unitsStyle = NSDateComponentsFormatterUnitsStyleShort; // e.g., '30 min'
-	self.intervalFormatter.maximumUnitCount = 1;
 	self.timerStatusInfo = [NSTimer timerWithTimeInterval:NSTimeIntervalSince1970 target:self selector:@selector(keepTimerRunning) userInfo:nil repeats:YES];
 	[[NSRunLoop mainRunLoop] addTimer:self.timerStatusInfo forMode:NSRunLoopCommonModes];
 	// start spinner if update is in progress when preferences open
@@ -108,7 +105,6 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	// in viewWillDisappear otherwise dealloc will not be called
 	[self.timerStatusInfo invalidate];
 	self.timerStatusInfo = nil;
-	self.intervalFormatter = nil;
 }
 
 /// Callback method to update status info. Will be called more often when interval is getting shorter.
@@ -120,14 +116,11 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 			self.view.status.stringValue = @"";
 			return;
 		}
-		if (nextFire > 60) { // update 1/min
-			nextFire = fmod(nextFire, 60); // next update will align with minute
-		} else {
-			nextFire = 1; // update 1/sec
-		}
-		NSString *str = [self.intervalFormatter stringFromTimeInterval: date.timeIntervalSinceNow];
-		self.view.status.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Next update in %@", nil), str];
-		[self.timerStatusInfo setFireDate:[NSDate dateWithTimeIntervalSinceNow: nextFire]];
+		self.view.status.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Next update in %@", nil),
+										[NSDate stringForRemainingTime:date]];
+		// Next update is aligned with minute (fmod) else update 1/sec
+		NSDate *nextUpdate = [NSDate dateWithTimeIntervalSinceNow: (nextFire > 60 ? fmod(nextFire, 60) : 1)];
+		[self.timerStatusInfo setFireDate:nextUpdate];
 	}
 }
 

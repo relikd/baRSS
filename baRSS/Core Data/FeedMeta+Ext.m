@@ -33,7 +33,6 @@
 	if (self.errorCount < 0)
 		self.errorCount = 0;
 	int16_t n = self.errorCount + 1; // always increment errorCount (can be used to indicate bad feeds)
-	// TODO: remove logging
 #ifdef DEBUG
 	NSLog(@"ERROR: Feed download failed: %@ (errorCount: %d)", self.url, n);
 #endif
