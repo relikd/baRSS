@@ -89,7 +89,7 @@
 	self.warningText = txt;
 	// Reload button is only visible on 5xx server error (right of ––––)
 	self.warningReload = [[[[NSView buttonIcon:NSImageNameRefreshTemplate size:16] placeIn:content x:35 yTop:21]
-						   tooltip:NSLocalizedString(@"Retry download (Cmd+R)", nil)]
+						   tooltip:NSLocalizedString(@"Retry download (⌘R)", nil)]
 						  action:@selector(reloadData) target:nil]; // up the responder chain
 }
 

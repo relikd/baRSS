@@ -80,15 +80,16 @@
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	FeedArticle *fa = [moc objectWithID:sender.representedObject];
 	NSString *url = fa.link;
-	if (flipUnread || fa.unread) {
+	BOOL success = NO;
+	if (url && url.length > 0 && !flipUnread) // flipUnread == change unread state
+		success = [UserPrefs openURLsWithPreferredBrowser:@[[NSURL URLWithString:url]]];
+	if (flipUnread || (success && fa.unread)) {
 		fa.unread = !fa.unread;
-		NSNumber *num = (fa.unread ? @+1 : @-1);
 		[StoreCoordinator saveContext:moc andParent:YES];
+		NSNumber *num = (fa.unread ? @+1 : @-1);
 		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:num];
 	}
 	[moc reset];
-	if (url && url.length > 0 && !flipUnread) // flipUnread == change unread state
-		[UserPrefs openURLsWithPreferredBrowser:@[[NSURL URLWithString:url]]];
 }
 
 @end

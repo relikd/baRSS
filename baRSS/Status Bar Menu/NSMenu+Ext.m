@@ -193,20 +193,25 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	NSArray<FeedArticle*> *list = [StoreCoordinator articlesAtPath:path isFeed:isFeedMenu sorted:openLinks unread:markRead inContext:moc limit:limit];
 	
-	NSNumber *countDiff = [NSNumber numberWithUnsignedInteger:list.count];
-	if (markRead) countDiff = [NSNumber numberWithInteger: -1 * countDiff.integerValue];
-	
-	NSMutableArray<NSURL*> *urls = [NSMutableArray arrayWithCapacity:list.count];
-	for (FeedArticle *fa in list) {
-		fa.unread = !markRead;
-		if (openLinks && fa.link.length > 0)
-			[urls addObject:[NSURL URLWithString:fa.link]];
+	BOOL success = NO;
+	if (openLinks) {
+		NSMutableArray<NSURL*> *urls = [NSMutableArray arrayWithCapacity:list.count];
+		for (FeedArticle *fa in list) {
+			if (fa.link.length > 0)
+				[urls addObject:[NSURL URLWithString:fa.link]];
+		}
+		success = [UserPrefs openURLsWithPreferredBrowser:urls];
 	}
-	[StoreCoordinator saveContext:moc andParent:YES];
-	[moc reset];
-	if (openLinks)
-		[UserPrefs openURLsWithPreferredBrowser:urls];
-	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:countDiff];
+	// if success == NO, do not modify unread state
+	if (!openLinks || success) {
+		for (FeedArticle *fa in list) {
+			fa.unread = !markRead;
+		}
+		[StoreCoordinator saveContext:moc andParent:YES];
+		[moc reset];
+		NSNumber *num = [NSNumber numberWithInteger: (markRead ? -1 : +1) * (NSInteger)list.count ];
+		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:num];
+	}
 }
 
 @end

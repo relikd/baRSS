@@ -17,6 +17,7 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 - Changed error message text when user cancels creation of new feed item
 - Comparing existing articles with nonexistent guid and link
 - Adding feed: If URLs can't be resolved in the first run (5xx error), try a second time. E.g., 'Done' click (issue: #5)
+- Don't mark articles read if opening URLs failed
 
 ### Changed
 - Interface builder files replaced with code equivalent
