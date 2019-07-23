@@ -59,10 +59,11 @@
  Open web links in default browser or a browser the user selected in the preferences.
  
  @param urls A list of @c NSURL objects that will be opened immediatelly in bulk.
+ @return @c YES if @c urls are opened successfully. @c NO on error.
  */
-+ (void)openURLsWithPreferredBrowser:(NSArray<NSURL*>*)urls {
-	if (urls.count == 0) return;
-	[[NSWorkspace sharedWorkspace] openURLs:urls withAppBundleIdentifier:[self getHttpApplication] options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
++ (BOOL)openURLsWithPreferredBrowser:(NSArray<NSURL*>*)urls {
+	if (urls.count == 0) return NO;
+	return [[NSWorkspace sharedWorkspace] openURLs:urls withAppBundleIdentifier:[self getHttpApplication] options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
 }
 
 #pragma mark - Hidden Plist Properties -
