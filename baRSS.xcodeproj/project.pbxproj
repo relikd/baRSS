@@ -41,7 +41,7 @@
 		54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E8831E211B509D00064188 /* ModalFeedEdit.m */; };
 		54E9CF32225914300023696F /* SettingsAbout.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E9CF31225914300023696F /* SettingsAbout.m */; };
 		54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */; };
-		54F6025D21C1D4170006D338 /* OpmlExport.m in Sources */ = {isa = PBXBuildFile; fileRef = 54F6025C21C1D4170006D338 /* OpmlExport.m */; };
+		54F6025D21C1D4170006D338 /* OpmlFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 54F6025C21C1D4170006D338 /* OpmlFile.m */; };
 		54FE73D021220DEC003EAC65 /* StoreCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 54FE73CF21220DEC003EAC65 /* StoreCoordinator.m */; };
 		54FE73D3212316CD003EAC65 /* BarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 54FE73D2212316CD003EAC65 /* BarMenu.m */; };
 /* End PBXBuildFile section */
@@ -137,8 +137,8 @@
 		54E8831E211B509D00064188 /* ModalFeedEdit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalFeedEdit.m; sourceTree = "<group>"; };
 		54E9CF30225914300023696F /* SettingsAbout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsAbout.h; sourceTree = "<group>"; };
 		54E9CF31225914300023696F /* SettingsAbout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsAbout.m; sourceTree = "<group>"; };
-		54F6025B21C1D4170006D338 /* OpmlExport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpmlExport.h; sourceTree = "<group>"; };
-		54F6025C21C1D4170006D338 /* OpmlExport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OpmlExport.m; sourceTree = "<group>"; };
+		54F6025B21C1D4170006D338 /* OpmlFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpmlFile.h; sourceTree = "<group>"; };
+		54F6025C21C1D4170006D338 /* OpmlFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OpmlFile.m; sourceTree = "<group>"; };
 		54FE73CE21220DEC003EAC65 /* StoreCoordinator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StoreCoordinator.h; sourceTree = "<group>"; };
 		54FE73CF21220DEC003EAC65 /* StoreCoordinator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StoreCoordinator.m; sourceTree = "<group>"; };
 		54FE73D1212316CD003EAC65 /* BarMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BarMenu.h; sourceTree = "<group>"; };
@@ -306,8 +306,8 @@
 				546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */,
 				54D55D7122E624CD00057B98 /* SettingsFeeds+DragDrop.h */,
 				54D55D7222E624CD00057B98 /* SettingsFeeds+DragDrop.m */,
-				54F6025B21C1D4170006D338 /* OpmlExport.h */,
-				54F6025C21C1D4170006D338 /* OpmlExport.m */,
+				54F6025B21C1D4170006D338 /* OpmlFile.h */,
+				54F6025C21C1D4170006D338 /* OpmlFile.m */,
 				5478DF02225A7AE200D30C64 /* SettingsFeedsView.h */,
 				5478DF03225A7AE200D30C64 /* SettingsFeedsView.m */,
 				54E8831D211B509D00064188 /* ModalFeedEdit.h */,
@@ -451,7 +451,7 @@
 				54A07A82220E723D00082C51 /* MapUnreadTotal.m in Sources */,
 				54ACC29821061FBA0020715F /* Preferences.m in Sources */,
 				54195886218E1BDB00581B79 /* NSMenu+Ext.m in Sources */,
-				54F6025D21C1D4170006D338 /* OpmlExport.m in Sources */,
+				54F6025D21C1D4170006D338 /* OpmlFile.m in Sources */,
 				5496B511214D6275003ED4ED /* UserPrefs.m in Sources */,
 				546A6A2F22C585580034E806 /* SettingsAboutView.m in Sources */,
 				54B517072270E990006C1B29 /* NSView+Ext.m in Sources */,
