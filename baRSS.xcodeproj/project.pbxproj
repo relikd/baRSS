@@ -36,6 +36,7 @@
 		54B749E0220636200022CC6D /* FeedArticle+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B749DF220635CD0022CC6D /* FeedArticle+Ext.m */; };
 		54BB048921FD2AB500C303A5 /* NSDate+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54BB048821FD2AB500C303A5 /* NSDate+Ext.m */; };
 		54BF444A22D0F4F300660096 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 54BF444922D0F4F300660096 /* AppIcon.icns */; };
+		54D55D7322E624CD00057B98 /* SettingsFeeds+DragDrop.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D55D7222E624CD00057B98 /* SettingsFeeds+DragDrop.m */; };
 		54D857CE227C5785001BA1C8 /* RefreshStatisticsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D857CD227C5785001BA1C8 /* RefreshStatisticsView.m */; };
 		54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E8831E211B509D00064188 /* ModalFeedEdit.m */; };
 		54E9CF32225914300023696F /* SettingsAbout.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E9CF31225914300023696F /* SettingsAbout.m */; };
@@ -126,6 +127,8 @@
 		54BB048721FD2AB500C303A5 /* NSDate+Ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Ext.h"; sourceTree = "<group>"; };
 		54BB048821FD2AB500C303A5 /* NSDate+Ext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Ext.m"; sourceTree = "<group>"; };
 		54BF444922D0F4F300660096 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+		54D55D7122E624CD00057B98 /* SettingsFeeds+DragDrop.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SettingsFeeds+DragDrop.h"; sourceTree = "<group>"; };
+		54D55D7222E624CD00057B98 /* SettingsFeeds+DragDrop.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SettingsFeeds+DragDrop.m"; sourceTree = "<group>"; };
 		54D857CC227C5785001BA1C8 /* RefreshStatisticsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RefreshStatisticsView.h; sourceTree = "<group>"; };
 		54D857CD227C5785001BA1C8 /* RefreshStatisticsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RefreshStatisticsView.m; sourceTree = "<group>"; };
 		54D857D022802309001BA1C8 /* SettingsGeneralView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsGeneralView.h; sourceTree = "<group>"; };
@@ -301,6 +304,10 @@
 			children = (
 				546FC43B21188AD5007CC3A3 /* SettingsFeeds.h */,
 				546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */,
+				54D55D7122E624CD00057B98 /* SettingsFeeds+DragDrop.h */,
+				54D55D7222E624CD00057B98 /* SettingsFeeds+DragDrop.m */,
+				54F6025B21C1D4170006D338 /* OpmlExport.h */,
+				54F6025C21C1D4170006D338 /* OpmlExport.m */,
 				5478DF02225A7AE200D30C64 /* SettingsFeedsView.h */,
 				5478DF03225A7AE200D30C64 /* SettingsFeedsView.m */,
 				54E8831D211B509D00064188 /* ModalFeedEdit.h */,
@@ -309,8 +316,6 @@
 				54B51703226DC339006C1B29 /* ModalFeedEditView.m */,
 				54D857CC227C5785001BA1C8 /* RefreshStatisticsView.h */,
 				54D857CD227C5785001BA1C8 /* RefreshStatisticsView.m */,
-				54F6025B21C1D4170006D338 /* OpmlExport.h */,
-				54F6025C21C1D4170006D338 /* OpmlExport.m */,
 			);
 			path = "Feeds Tab";
 			sourceTree = "<group>";
@@ -430,6 +435,7 @@
 				546A6A2C22C584AF0034E806 /* SettingsAppearanceView.m in Sources */,
 				54E9CF32225914300023696F /* SettingsAbout.m in Sources */,
 				54B749E0220636200022CC6D /* FeedArticle+Ext.m in Sources */,
+				54D55D7322E624CD00057B98 /* SettingsFeeds+DragDrop.m in Sources */,
 				54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */,
 				544B011D2114EE9100386E5C /* AppHook.m in Sources */,
 				546FC44321189975007CC3A3 /* SettingsGeneral.m in Sources */,

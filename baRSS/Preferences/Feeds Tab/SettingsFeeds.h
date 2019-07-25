@@ -23,8 +23,9 @@
 #import <Cocoa/Cocoa.h>
 
 /** Manages the NSOutlineView and Feed creation and editing */
-@interface SettingsFeeds : NSViewController <NSOutlineViewDataSource, NSOutlineViewDelegate>
+@interface SettingsFeeds : NSViewController <NSOutlineViewDelegate>
 @property (strong) NSTreeController *dataStore;
+@property (strong) NSArray<NSTreeNode*> *currentlyDraggedNodes;
 
 - (void)editSelectedItem;
 - (void)doubleClickOutlineView:(NSOutlineView*)sender;
@@ -34,4 +35,9 @@
 - (void)remove:(id)sender;
 - (void)openImportDialog;
 - (void)openExportDialog;
+
+- (void)beginCoreDataChange;
+- (BOOL)endCoreDataChangeUndoEmpty:(BOOL)undoEmpty forceUndo:(BOOL)force;
+- (void)someDatesChangedScheduleUpdateTimer;
+- (void)restoreOrderingAndIndexPathStr:(NSArray<NSTreeNode*>*)parentsList;
 @end

@@ -28,37 +28,40 @@
 // TODO: Disable 'update all' menu item during update?
 
 
+/// UTI type used for opml files
+static const NSPasteboardType UTI_OPML = @"org.opml";
+
 /**
  @c notification.object is @c NSNumber of type @c NSUInteger.
  Represents number of feeds that are proccessed in background update. Sends @c 0 when all downloads are finished.
  */
-static NSString *kNotificationBackgroundUpdateInProgress = @"baRSS-notification-background-update-in-progress";
+static const NSNotificationName kNotificationBackgroundUpdateInProgress = @"baRSS-notification-background-update-in-progress";
 /**
  @c notification.object is @c NSManagedObjectID of type @c Feed.
  Called whenever download of a feed finished and object was modified (not if statusCode 304).
  */
-static NSString *kNotificationFeedUpdated = @"baRSS-notification-feed-updated";
+static const NSNotificationName kNotificationFeedUpdated = @"baRSS-notification-feed-updated";
 /**
  @c notification.object is @c NSManagedObjectID of type @c Feed.
  Called whenever the icon attribute of an item was updated.
  */
-static NSString *kNotificationFeedIconUpdated = @"baRSS-notification-feed-icon-updated";
+static const NSNotificationName kNotificationFeedIconUpdated = @"baRSS-notification-feed-icon-updated";
 /**
  @c notification.object is @c NSNumber of type @c BOOL.
  @c YES if network became reachable. @c NO on connection lost.
  */
-static NSString *kNotificationNetworkStatusChanged = @"baRSS-notification-network-status-changed";
+static const NSNotificationName kNotificationNetworkStatusChanged = @"baRSS-notification-network-status-changed";
 /**
  @c notification.object is @c NSNumber of type @c NSInteger.
  Represents a relative change (e.g., negative if items were marked read)
  */
-static NSString *kNotificationTotalUnreadCountChanged = @"baRSS-notification-total-unread-count-changed";
+static const NSNotificationName kNotificationTotalUnreadCountChanged = @"baRSS-notification-total-unread-count-changed";
 /**
  @c notification.object is either @c nil or @c NSNumber of type @c NSInteger.
  If new count is known an absoulte number is passed.
  Else @c nil if count has to be fetched from core data.
  */
-static NSString *kNotificationTotalUnreadCountReset = @"baRSS-notification-total-unread-count-reset";
+static const NSNotificationName kNotificationTotalUnreadCountReset = @"baRSS-notification-total-unread-count-reset";
 
 
 /**

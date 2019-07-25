@@ -7,23 +7,28 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 
 ## [Unreleased]
 ### Added
-- Show users any 5xx server error response and extracted failure reason
-- 5xx server errors have a reload button which will initiate a new download with the same URL
+- Adding feed: 5xx server errors have a reload button which will initiate a new download with the same URL
 - Adding feed: Cmd+R will reload the same URL
 - Settings, Feeds: Cmd+R will reload the data source
-- Refresh interval string localizations
+- Settings, Feeds: Refresh interval string localizations
+- Settings, Feeds: Right click menu with edit actions
+- Settings, Feeds: Drag & Drop feeds from / to OPML file
+- Settings, Feeds: Drag & Drop feed titles and urls as text
+- Accessibility hints for most UI elements
 
 ### Fixed
-- Changed error message text when user cancels creation of new feed item
-- Comparing existing articles with nonexistent guid and link
+- Adding feed: Show users any 5xx server error response and extracted failure reason
 - Adding feed: If URLs can't be resolved in the first run (5xx error), try a second time. E.g., 'Done' click (issue: #5)
+- Settings, Feeds: Actions 'delete' and 'edit' use clicked items instead of selected items
+- Comparison of existing articles with nonexistent guid and link
 - Don't mark articles read if opening URLs failed
 
 ### Changed
 - Interface builder files replaced with code equivalent
 - Settings, Feeds: Single add button for feeds, groups, and separators
-- Refresh interval hotkeys set to: Cmd+1 … Cmd+6
-- Always append new items at the end
+- Settings, Feeds: Always append new items at the end
+- Adding feed: Display error reason if user cancels the creation of a new feed item
+- Adding feed: Refresh interval hotkeys set to: Cmd+1 … Cmd+6
 
 
 ## [0.9.4] - 2019-04-02

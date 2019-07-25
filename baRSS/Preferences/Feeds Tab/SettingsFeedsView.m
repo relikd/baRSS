@@ -72,8 +72,6 @@
 	
 	// Setup action and bindings
 	SettingsFeeds *sf = self.controller;
-	o.delegate = sf;
-	o.dataSource = sf;
 	o.target = sf;
 	o.doubleAction = @selector(doubleClickOutlineView:);
 	

@@ -20,37 +20,29 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import "SettingsFeeds.h"
+#import "SettingsFeeds+DragDrop.h"
 #import "Constants.h"
 #import "StoreCoordinator.h"
 #import "ModalFeedEdit.h"
-#import "Feed+Ext.h"
 #import "FeedGroup+Ext.h"
-#import "OpmlExport.h"
 #import "FeedDownload.h"
 #import "SettingsFeedsView.h"
 #import "NSDate+Ext.h"
 
 @interface SettingsFeeds ()
 @property (strong) SettingsFeedsView *view; // override super
-
-@property (strong) NSArray<NSTreeNode*> *currentlyDraggedNodes;
 @property (strong) NSUndoManager *undoManager;
-
 @property (strong) NSTimer *timerStatusInfo;
 @end
 
 @implementation SettingsFeeds
 @dynamic view;
 
-// TODO: drag-n-drop feeds to opml file?
-// Declare a string constant for the drag type - to be used when writing and retrieving pasteboard data...
-static NSString *dragNodeType = @"baRSS-feed-drag";
-
 - (void)loadView {
 	[self initCoreDataStore];
 	self.view = [[SettingsFeedsView alloc] initWithController:self];
-	[self.view.outline registerForDraggedTypes:[NSArray arrayWithObject:dragNodeType]];
+	self.view.outline.delegate = self; // viewForTableColumn
+	[self prepareOutlineViewForDragDrop:self.view.outline];
 }
 
 - (void)viewDidLoad {
@@ -65,6 +57,28 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+/// Initialize status info timer
+- (void)viewWillAppear {
+	// needed to scroll outline view to top (if prefs open on another tab)
+	[self.dataStore setSelectionIndexPath:[NSIndexPath indexPathWithIndex:0]];
+	self.timerStatusInfo = [NSTimer timerWithTimeInterval:NSTimeIntervalSince1970 target:self selector:@selector(keepTimerRunning) userInfo:nil repeats:YES];
+	[[NSRunLoop mainRunLoop] addTimer:self.timerStatusInfo forMode:NSRunLoopCommonModes];
+	// start spinner if update is in progress when preferences open
+	[self activateSpinner:([FeedDownload isUpdating] ? -1 : 0)];
+}
+
+/// Timer cleanup
+- (void)viewWillDisappear {
+	// in viewWillDisappear otherwise dealloc will not be called
+	[self.timerStatusInfo invalidate];
+	self.timerStatusInfo = nil;
+}
+
+
+#pragma mark - Persist state
+
+
+/// Prepare undo manager and tree controller
 - (void)initCoreDataStore {
 	self.undoManager = [[NSUndoManager alloc] init];
 	self.undoManager.groupsByEvent = NO;
@@ -87,25 +101,70 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	}
 }
 
+/**
+ Refresh current context from parent context and start new undo grouping.
+ @note Should be balanced with @c endCoreDataChangeUndoEmpty:forceUndo:
+ */
+- (void)beginCoreDataChange {
+	// Does seem to create problems with undo stack if refreshing from parent context
+	//[self.dataStore.managedObjectContext refreshAllObjects];
+	[self.undoManager beginUndoGrouping];
+}
+
+/**
+ End undo grouping and save changes to persistent store. Or undo group if no changes occured.
+ @note Should be balanced with @c beginCoreDataChange
+
+ @param undoEmpty If @c YES undo the last operation if no changes were made (unnecessary undo).
+ @param force If @c YES force @c NSUndoManager to undo the changes immediatelly.
+ @return Returns @c YES if context was saved.
+ */
+- (BOOL)endCoreDataChangeUndoEmpty:(BOOL)undoEmpty forceUndo:(BOOL)force {
+	[self.undoManager endUndoGrouping];
+	if (force || (undoEmpty && !self.dataStore.managedObjectContext.hasChanges)) {
+		[self.undoManager disableUndoRegistration];
+		[self.undoManager undoNestedGroup];
+		[self.undoManager enableUndoRegistration];
+		return NO;
+	}
+	[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
+	return YES;
+}
+
+/// After the user did undo or redo we can't ensure integrity without doing some additional work.
+- (void)saveWithUnpredictableChange {
+	// dont use unless you merge changes from main
+//	NSManagedObjectContext *moc = self.dataStore.managedObjectContext;
+//	NSPredicate *pred = [NSPredicate predicateWithFormat:@"class == %@", [FeedArticle class]];
+//	NSInteger del = [[[moc.deletedObjects filteredSetUsingPredicate:pred] valueForKeyPath:@"@sum.unread"] integerValue];
+//	NSInteger ins = [[[moc.insertedObjects filteredSetUsingPredicate:pred] valueForKeyPath:@"@sum.unread"] integerValue];
+//	NSLog(@"%ld, %ld", del, ins);
+	[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
+	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
+	[self.dataStore rearrangeObjects]; // update ordering
+}
+
+/// Query core data for next update date and set bottom status message
+- (void)someDatesChangedScheduleUpdateTimer {
+	[FeedDownload scheduleUpdateForUpcomingFeeds];
+	[self.timerStatusInfo fire];
+}
+
+/// Callback method fired when feed (or icon) has been updated in the background.
+- (void)feedUpdated:(NSNotification*)notify {
+	NSManagedObjectID *oid = notify.object;
+	NSManagedObjectContext *moc = self.dataStore.managedObjectContext;
+	Feed *feed = [moc objectRegisteredForID:oid];
+	if (feed) {
+		if (self.undoManager.groupingLevel == 0) // don't mess around if user is editing something
+			[moc refreshObject:feed mergeChanges:YES];
+		[self.dataStore rearrangeObjects]; // update display, show new icon
+	}
+}
+
 
 #pragma mark - Activity Spinner & Status Info
 
-
-/// Initialize status info timer
-- (void)viewWillAppear {
-	[self.dataStore rearrangeObjects]; // needed to scroll outline view to top (if prefs open on another tab)
-	self.timerStatusInfo = [NSTimer timerWithTimeInterval:NSTimeIntervalSince1970 target:self selector:@selector(keepTimerRunning) userInfo:nil repeats:YES];
-	[[NSRunLoop mainRunLoop] addTimer:self.timerStatusInfo forMode:NSRunLoopCommonModes];
-	// start spinner if update is in progress when preferences open
-	[self activateSpinner:([FeedDownload isUpdating] ? -1 : 0)];
-}
-
-/// Timer cleanup
-- (void)viewWillDisappear {
-	// in viewWillDisappear otherwise dealloc will not be called
-	[self.timerStatusInfo invalidate];
-	self.timerStatusInfo = nil;
-}
 
 /// Callback method to update status info. Will be called more often when interval is getting shorter.
 - (void)keepTimerRunning {
@@ -143,75 +202,9 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	}
 }
 
-
-#pragma mark - Notification callback methods
-
-
-/// Callback method fired when feed (or icon) has been updated in the background.
-- (void)feedUpdated:(NSNotification*)notify {
-	NSManagedObjectID *oid = notify.object;
-	NSManagedObjectContext *moc = self.dataStore.managedObjectContext;
-	Feed *feed = [moc objectRegisteredForID:oid];
-	if (feed) {
-		if (self.undoManager.groupingLevel == 0) // don't mess around if user is editing something
-			[moc refreshObject:feed mergeChanges:YES];
-		[self.dataStore rearrangeObjects];
-	}
-}
-
 /// Callback method fired when background feed update begins and ends.
 - (void)updateInProgress:(NSNotification*)notify {
 	[self activateSpinner:[notify.object integerValue]];
-}
-
-
-#pragma mark - Persist state
-
-
-/**
- Refresh current context from parent context and start new undo grouping.
- @note Should be balanced with @c endCoreDataChangeUndoChanges:
- */
-- (void)beginCoreDataChange {
-	// Does seem to create problems with undo stack if refreshing from parent context
-	//[self.dataStore.managedObjectContext refreshAllObjects];
-	[self.undoManager beginUndoGrouping];
-}
-
-/**
- End undo grouping and save changes to persistent store. Or undo group if no changes occured.
- @note Should be balanced with @c beginCoreDataChange
-
- @param flag If @c YES force @c NSUndoManager to undo the changes immediatelly.
- @return Returns @c YES if context was saved.
- */
-- (BOOL)endCoreDataChangeShouldUndo:(BOOL)flag {
-	[self.undoManager endUndoGrouping];
-	if (!flag && self.dataStore.managedObjectContext.hasChanges) {
-		[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
-		[FeedDownload scheduleUpdateForUpcomingFeeds];
-		[self.timerStatusInfo fire];
-		return YES;
-	}
-	[self.undoManager disableUndoRegistration];
-	[self.undoManager undoNestedGroup];
-	[self.undoManager enableUndoRegistration];
-	return NO;
-}
-
-/**
- After the user did undo or redo we can't ensure integrity without doing some additional work.
- */
-- (void)saveWithUnpredictableChange {
-	// dont use unless you merge changes from main
-//	NSManagedObjectContext *moc = self.dataStore.managedObjectContext;
-//	NSPredicate *pred = [NSPredicate predicateWithFormat:@"class == %@", [FeedArticle class]];
-//	NSInteger del = [[[moc.deletedObjects filteredSetUsingPredicate:pred] valueForKeyPath:@"@sum.unread"] integerValue];
-//	NSInteger ins = [[[moc.insertedObjects filteredSetUsingPredicate:pred] valueForKeyPath:@"@sum.unread"] integerValue];
-//	NSLog(@"%ld, %ld", del, ins);
-	[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
-	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
-	[self.dataStore rearrangeObjects]; // update ordering
 }
 
 
@@ -220,16 +213,14 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 
 /// Open clicked or selected item for editing.
 - (void)editSelectedItem {
-	FeedGroup *chosen = [self clickedItem];
-	if (!chosen) chosen = self.dataStore.selectedObjects.firstObject;
+	FeedGroup *chosen = [self userSelectionFirst].representedObject;
 	[self showModalForFeedGroup:chosen isGroupEdit:YES]; // yes will be overwritten anyway
 }
 
 /// Open clicked item for editing.
 - (void)doubleClickOutlineView:(NSOutlineView*)sender {
-	FeedGroup *fg = [self clickedItem];
-	if (!fg) return;
-	[self showModalForFeedGroup:fg isGroupEdit:YES]; // yes will be overwritten anyway
+	if (sender.clickedRow != -1) // only if there is a clicked item
+		[self editSelectedItem];
 }
 
 /// Add feed button.
@@ -245,28 +236,73 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 /// Add separator button.
 - (void)addSeparator {
 	[self beginCoreDataChange];
-	[self insertFeedGroupAtSelection:SEPARATOR].name = @"---";
-	[self endCoreDataChangeShouldUndo:NO];
+	[self insertFeedGroupAtSelection:SEPARATOR];
+	[self endCoreDataChangeUndoEmpty:NO forceUndo:NO];
 }
 
 /// Remove feed button. User has selected one or more item in outline view.
 - (void)remove:(id)sender {
+	NSArray<NSTreeNode*> *nodes = [self userSelectionAll];
+	NSArray<NSTreeNode*> *parentNodes = [nodes valueForKeyPath:@"parentNode"];
 	[self beginCoreDataChange];
-	NSArray<NSTreeNode*> *parentNodes = [self.dataStore.selectedNodes valueForKeyPath:@"parentNode"];
-	[self.dataStore remove:sender];
-	for (NSTreeNode *parent in [self filterOutRedundant:parentNodes]) {
-		[self restoreOrderingAndIndexPathStr:parent];
-	}
-	[self endCoreDataChangeShouldUndo:NO];
+	[self.dataStore removeObjectsAtArrangedObjectIndexPaths:[nodes valueForKeyPath:@"indexPath"]];
+	[self restoreOrderingAndIndexPathStr:parentNodes];
+	[self endCoreDataChangeUndoEmpty:NO forceUndo:NO];
+	[self someDatesChangedScheduleUpdateTimer];
 	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
 }
 
 - (void)openImportDialog {
-	[OpmlExport showImportDialog:self.view.window withContext:self.dataStore.managedObjectContext];
+	[[OpmlFileImport withDelegate:self] showImportDialog:self.view.window];
 }
 
 - (void)openExportDialog {
-	[OpmlExport showExportDialog:self.view.window withContext:self.dataStore.managedObjectContext];
+	[[OpmlFileExport withDelegate:self] showExportDialog:self.view.window];
+}
+
+
+#pragma mark - Keyboard Commands: undo, redo, copy, enter
+
+
+/// Also look for commands right click menu of outline view
+- (void)keyDown:(NSEvent *)event {
+	if (![self.view.outline.menu performKeyEquivalent:event]) {
+		[super keyDown:event];
+	}
+}
+
+/// Returning @c NO will result in a Action-Not-Available-Buzzer sound
+- (BOOL)respondsToSelector:(SEL)aSelector {
+	if (aSelector == @selector(undo:))
+		return [self.undoManager canUndo] && self.undoManager.groupingLevel == 0 && ![FeedDownload isUpdating];
+	if (aSelector == @selector(redo:))
+		return [self.undoManager canRedo] && self.undoManager.groupingLevel == 0 && ![FeedDownload isUpdating];
+	if (aSelector == @selector(copy:) || aSelector == @selector(remove:))
+		return ([self userSelectionFirst] != nil);
+	if (aSelector == @selector(editSelectedItem)) {
+		FeedGroup *chosen = [self userSelectionFirst].representedObject;
+		if (chosen && chosen.type != SEPARATOR)
+			return YES; // can edit only if selection is not a separator
+		return NO;
+	}
+	return [super respondsToSelector:aSelector];
+}
+
+/// Perform undo operation and redraw UI & menu bar unread count
+- (void)undo:(id)sender {
+	[self.undoManager undo];
+	[self saveWithUnpredictableChange];
+}
+
+/// Perform redo operation and redraw UI & menu bar unread count
+- (void)redo:(id)sender {
+	[self.undoManager redo];
+	[self saveWithUnpredictableChange];
+}
+
+/// Copy human readable description of selected nodes to clipboard.
+- (void)copy:(id)sender {
+	[[NSPasteboard generalPasteboard] declareTypes:@[NSPasteboardTypeString] owner:self]; // DragDrop handles callback
 }
 
 
@@ -293,19 +329,20 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 		if (returnCode == NSModalResponseOK) {
 			[editDialog applyChangesToCoreDataObject];
 		}
-		if ([self endCoreDataChangeShouldUndo:(returnCode != NSModalResponseOK)]) {
-			[self.dataStore rearrangeObjects];
+		if ([self endCoreDataChangeUndoEmpty:YES forceUndo:(returnCode != NSModalResponseOK)]) {
+			if (!flag) [self someDatesChangedScheduleUpdateTimer]; // only for feed edit
+			[self.dataStore rearrangeObjects]; // update display, edited title or icon
 		}
 	}];
 }
 
 /// Insert @c FeedGroup item at the end of the current folder (or inside if expanded)
 - (FeedGroup*)insertFeedGroupAtSelection:(FeedGroupType)type {
-	FeedGroup *selObj = self.dataStore.selectedObjects.firstObject;
-	NSTreeNode *selNode = self.dataStore.selectedNodes.firstObject;
+	NSTreeNode *selNode = [self userSelectionFirst];
+	FeedGroup *selObj = selNode.representedObject;
 	// If group selected and expanded, insert into group. Else: append at end of current folder
 	if (![self.view.outline isItemExpanded:selNode]) {
-		selObj = selObj.parent;
+		selObj = selObj.parent; // nullable
 		selNode = selNode.parentNode;
 	}
 	// If no selection, append to root folder
@@ -318,80 +355,9 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	return fg;
 }
 
-/// Loop over all descendants and update @c sortIndex @c (FeedGroup) as well as all @c indexPath @c (Feed)
-- (void)restoreOrderingAndIndexPathStr:(NSTreeNode*)parent {
-	NSArray<NSTreeNode*> *children = parent.childNodes;
-	for (NSUInteger i = 0; i < children.count; i++) {
-		FeedGroup *fg = [children objectAtIndex:i].representedObject;
-		if (fg.sortIndex != (int32_t)i)
-			fg.sortIndex = (int32_t)i;
-		[fg iterateSorted:NO overDescendantFeeds:^(Feed *feed, BOOL *cancel) {
-			[feed calculateAndSetIndexPathString];
-		}];
-	}
-}
-
-
-#pragma mark - Dragging Support, Data Source Delegate
-
-
-/// Begin drag-n-drop operation by copying selected nodes to memory
-- (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard {
-	[self beginCoreDataChange];
-	[pboard declareTypes:[NSArray arrayWithObject:dragNodeType] owner:self];
-	[pboard setString:@"dragging" forType:dragNodeType];
-	self.currentlyDraggedNodes = items;
-	return YES;
-}
-
-/// Finish drag-n-drop operation by saving changes to persistent store
-- (void)outlineView:(NSOutlineView *)outlineView draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation {
-	[self endCoreDataChangeShouldUndo:NO];
-	self.currentlyDraggedNodes = nil;
-}
-
-/// Perform drag-n-drop operation, move nodes to new destination and update all indices
-- (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index {
-	NSTreeNode *destParent = (item != nil ? item : [self.dataStore arrangedObjects]);
-	NSUInteger idx = (NSUInteger)index;
-	if (index == -1) // drag items on folder or root drop
-		idx = destParent.childNodes.count;
-	
-	NSArray<NSTreeNode*> *previousParents = [self.currentlyDraggedNodes valueForKeyPath:@"parentNode"];
-	[self.dataStore moveNodes:self.currentlyDraggedNodes toIndexPath:[destParent.indexPath indexPathByAddingIndex:idx]];
-	
-	for (NSTreeNode *node in [self filterOutRedundant:[previousParents arrayByAddingObject:destParent]]) {
-		[self restoreOrderingAndIndexPathStr:node];
-	}
-
-	return YES;
-}
-
-/// Validate method whether items can be dropped at destination
-- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index {
-	NSTreeNode *parent = item;
-	if (index == -1 && [parent isLeaf]) { // if drag is on specific item and that item isnt a group
-		return NSDragOperationNone;
-	}
-	while (parent != nil) {
-		for (NSTreeNode *node in self.currentlyDraggedNodes) {
-			if (parent == node)
-				return NSDragOperationNone; // cannot move items into a child of its own
-		}
-		parent = [parent parentNode];
-	}
-	return NSDragOperationGeneric;
-}
-
 
 #pragma mark - Data Source Delegate
 
-
-// Data source is handled by bindings anyway. These methods can be ignored
-- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item { return 0; }
-- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item { return YES; }
-- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item { return nil; }
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item { return nil; }
 
 /// Populate @c NSOutlineView data cells with core data object values.
 - (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(NSTreeNode*)item {
@@ -409,93 +375,38 @@ static NSString *dragNodeType = @"baRSS-feed-drag";
 	return nil;
 }
 
-/// @return User clicked cell item or @c nil if user did not click on a cell.
-- (FeedGroup*)clickedItem {
-	NSOutlineView *ov = self.view.outline;
-	return [(NSTreeNode*)[ov itemAtRow:ov.clickedRow] representedObject];
-}
 
+#pragma mark - Helper Methods
 
-#pragma mark - Keyboard Commands: undo, redo, copy, enter
-
-
-/// Also look for commands right click menu of outline view
-- (void)keyDown:(NSEvent *)event {
-	if (![self.view.outline.menu performKeyEquivalent:event]) {
-		[super keyDown:event];
-	}
-}
-
-/// Returning @c NO will result in a Action-Not-Available-Buzzer sound
-- (BOOL)respondsToSelector:(SEL)aSelector {
-	if (aSelector == @selector(undo:))
-		return [self.undoManager canUndo] && self.undoManager.groupingLevel == 0 && ![FeedDownload isUpdating];
-	if (aSelector == @selector(redo:))
-		return [self.undoManager canRedo] && self.undoManager.groupingLevel == 0 && ![FeedDownload isUpdating];
-	if (aSelector == @selector(copy:) || aSelector == @selector(remove:))
-		return self.dataStore.selectedNodes.count > 0;
-	if (aSelector == @selector(editSelectedItem)) {
-		FeedGroup *chosen = [self clickedItem];
-		if (!chosen) chosen = self.dataStore.selectedObjects.firstObject;
-		if (chosen && chosen.type != SEPARATOR)
-			return YES; // can edit only if selection is not a separator
-		return NO;
-	}
-	return [super respondsToSelector:aSelector];
-}
-
-/// Perform undo operation and redraw UI & menu bar unread count
-- (void)undo:(id)sender {
-	[self.undoManager undo];
-	[self saveWithUnpredictableChange];
-}
-
-/// Perform redo operation and redraw UI & menu bar unread count
-- (void)redo:(id)sender {
-	[self.undoManager redo];
-	[self saveWithUnpredictableChange];
-}
-
-/// Copy human readable description of selected nodes to clipboard.
-- (void)copy:(id)sender {
-	NSMutableString *str = [[NSMutableString alloc] init];
-	for (NSTreeNode *node in [self filterOutRedundant:self.dataStore.selectedNodes]) {
-		[self traverseChildren:node appendString:str prefix:@""];
-	}
-	[[NSPasteboard generalPasteboard] clearContents];
-	[[NSPasteboard generalPasteboard] setString:str forType:NSPasteboardTypeString];
-}
 
 /**
- Go through all children recursively and prepend the string with spaces as nesting
- @param obj Root Node or parent Node
- @param str An initialized @c NSMutableString to append to
- @param prefix Should be @c @@"" for the first call
+ Expected user selection as displayed in outline (border highlight).
+ Return clicked row only if it isn't included in the selection.
  */
-- (void)traverseChildren:(NSTreeNode*)obj appendString:(NSMutableString*)str prefix:(NSString*)prefix {
-	[str appendFormat:@"%@%@\n", prefix, [obj.representedObject readableDescription]];
-	prefix = [prefix stringByAppendingString:@"  "];
-	for (NSTreeNode *child in obj.childNodes) {
-		[self traverseChildren:child appendString:str prefix:prefix];
+- (NSArray<NSTreeNode*>*)userSelectionAll {
+	NSOutlineView *ov = self.view.outline;
+	NSTreeNode *clicked = [ov itemAtRow: ov.clickedRow];
+	if (!clicked || [self.dataStore.selectedNodes containsObject:clicked]) {
+		return self.dataStore.selectedNodes;
 	}
+	return @[clicked];
 }
 
-/// Remove redundant nodes that are already present in some selected parent node
-- (NSArray<NSTreeNode*>*)filterOutRedundant:(NSArray<NSTreeNode*>*)nodes {
-	NSMutableArray<NSTreeNode*> *result = [NSMutableArray arrayWithCapacity:nodes.count];
-	for (NSTreeNode *current in nodes) {
-		BOOL skip = NO;
-		for (NSTreeNode *stored in result) {
-			NSIndexPath *p = current.indexPath;
-			while (p.length > stored.indexPath.length)
-				p = [p indexPathByRemovingLastIndex];
-			if ([p isEqualTo:stored.indexPath]) {
-				skip = YES; break;
-			}
+/// Return clicked row (if present) or first selected node otherwise.
+- (NSTreeNode*)userSelectionFirst {
+	NSTreeNode *clicked = [self.view.outline itemAtRow: self.view.outline.clickedRow];
+	if (clicked) return clicked;
+	return self.dataStore.selectedNodes.firstObject;
+}
+
+/// Loop over all descendants and update @c sortIndex @c (FeedGroup) as well as all @c indexPath @c (Feed)
+- (void)restoreOrderingAndIndexPathStr:(NSArray<NSTreeNode*>*)parentsList {
+	for (NSTreeNode *parent in parentsList) {
+		for (NSUInteger i = 0; i < parent.childNodes.count; i++) {
+			FeedGroup *fg = parent.childNodes[i].representedObject;
+			[fg setSortIndexIfChanged:(int32_t)i];
 		}
-		if (skip == NO) [result addObject:current];
 	}
-	return result;
 }
 
 @end
