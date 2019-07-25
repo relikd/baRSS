@@ -58,16 +58,30 @@
 + (instancetype)newGroup:(FeedGroupType)type inContext:(NSManagedObjectContext*)moc {
 	FeedGroup *fg = [[FeedGroup alloc] initWithEntity: FeedGroup.entity insertIntoManagedObjectContext:moc];
 	fg.type = type;
-	if (type == FEED)
-		fg.feed = [Feed newFeedAndMetaInContext:moc];
+	switch (type) {
+		case GROUP:     break;
+		case FEED:      fg.feed = [Feed newFeedAndMetaInContext:moc]; break;
+		case SEPARATOR: fg.name = @"---"; break;
+	}
 	return fg;
 }
 
+/// Set @c parent and @c sortIndex. Also if type is @c FEED calculate and set @c indexPath string.
 - (void)setParent:(FeedGroup *)parent andSortIndex:(int32_t)sortIndex {
 	self.parent = parent;
 	self.sortIndex = sortIndex;
 	if (self.type == FEED)
 		[self.feed calculateAndSetIndexPathString];
+}
+
+/// Set @c sortIndex of @c FeedGroup. Iterate over all @c Feed child items and update @c indexPath string.
+- (void)setSortIndexIfChanged:(int32_t)sortIndex {
+	if (self.sortIndex != sortIndex) {
+		self.sortIndex = sortIndex;
+		[self iterateSorted:NO overDescendantFeeds:^(Feed *feed, BOOL *cancel) {
+			[feed calculateAndSetIndexPathString];
+		}];
+	}
 }
 
 /// Set @c name attribute but only if value differs.
