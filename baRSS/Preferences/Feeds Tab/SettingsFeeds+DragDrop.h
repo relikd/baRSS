@@ -21,7 +21,7 @@
 //  SOFTWARE.
 
 #import "SettingsFeeds.h"
-#import "OpmlExport.h"
+#import "OpmlFile.h"
 
 @interface SettingsFeeds (DragDrop) <NSOutlineViewDataSource, NSFilePromiseProviderDelegate, NSPasteboardTypeOwner, OpmlFileImportDelegate, OpmlFileExportDelegate>
 - (void)prepareOutlineViewForDragDrop:(NSOutlineView*)outline;
