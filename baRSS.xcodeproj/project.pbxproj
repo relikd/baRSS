@@ -38,6 +38,7 @@
 		54BF444A22D0F4F300660096 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 54BF444922D0F4F300660096 /* AppIcon.icns */; };
 		54D55D7322E624CD00057B98 /* SettingsFeeds+DragDrop.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D55D7222E624CD00057B98 /* SettingsFeeds+DragDrop.m */; };
 		54D857CE227C5785001BA1C8 /* RefreshStatisticsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D857CD227C5785001BA1C8 /* RefreshStatisticsView.m */; };
+		54E3C02122EE076D006E2E24 /* opml-icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 54E3C02022EE076D006E2E24 /* opml-icon.icns */; };
 		54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E8831E211B509D00064188 /* ModalFeedEdit.m */; };
 		54E9CF32225914300023696F /* SettingsAbout.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E9CF31225914300023696F /* SettingsAbout.m */; };
 		54F39C2E210BE1F700AEE730 /* DBv1.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */; };
@@ -133,6 +134,7 @@
 		54D857CD227C5785001BA1C8 /* RefreshStatisticsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RefreshStatisticsView.m; sourceTree = "<group>"; };
 		54D857D022802309001BA1C8 /* SettingsGeneralView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsGeneralView.h; sourceTree = "<group>"; };
 		54D857D122802309001BA1C8 /* SettingsGeneralView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsGeneralView.m; sourceTree = "<group>"; };
+		54E3C02022EE076D006E2E24 /* opml-icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "opml-icon.icns"; sourceTree = "<group>"; };
 		54E8831D211B509D00064188 /* ModalFeedEdit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalFeedEdit.h; sourceTree = "<group>"; };
 		54E8831E211B509D00064188 /* ModalFeedEdit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalFeedEdit.m; sourceTree = "<group>"; };
 		54E9CF30225914300023696F /* SettingsAbout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsAbout.h; sourceTree = "<group>"; };
@@ -259,7 +261,7 @@
 				54A07A8322105E0800082C51 /* Core Data */,
 				546FC44D2118B357007CC3A3 /* Preferences */,
 				54ACC28A21061B3C0020715F /* Info.plist */,
-				54BF444922D0F4F300660096 /* AppIcon.icns */,
+				54F7101322EE0DDA006985D1 /* Artwork */,
 				54ACC28B21061B3C0020715F /* main.m */,
 				54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */,
 			);
@@ -329,6 +331,15 @@
 				544B01192114B41200386E5C /* ModalSheet.m */,
 			);
 			path = Helper;
+			sourceTree = "<group>";
+		};
+		54F7101322EE0DDA006985D1 /* Artwork */ = {
+			isa = PBXGroup;
+			children = (
+				54BF444922D0F4F300660096 /* AppIcon.icns */,
+				54E3C02022EE076D006E2E24 /* opml-icon.icns */,
+			);
+			path = Artwork;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -401,6 +412,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				54BF444A22D0F4F300660096 /* AppIcon.icns in Resources */,
+				54E3C02122EE076D006E2E24 /* opml-icon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
