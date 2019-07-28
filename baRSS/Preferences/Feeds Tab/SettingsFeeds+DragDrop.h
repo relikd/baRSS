@@ -25,4 +25,5 @@
 
 @interface SettingsFeeds (DragDrop) <NSOutlineViewDataSource, NSFilePromiseProviderDelegate, NSPasteboardTypeOwner, OpmlFileImportDelegate, OpmlFileExportDelegate>
 - (void)prepareOutlineViewForDragDrop:(NSOutlineView*)outline;
+- (void)importOpmlFiles:(NSArray<NSURL*>*)files;
 @end

@@ -99,7 +99,7 @@ const NSPasteboardType dragReorder = @"de.relikd.baRSS.drag-reorder";
 	} else {
 		// File import
 		NSArray<NSURL*> *files = [info.draggingPasteboard readObjectsForClasses:@[NSURL.class] options:@{ NSPasteboardURLReadingContentsConformToTypesKey: @[UTI_OPML] }];
-		[[OpmlFileImport withDelegate:self] importFiles:files];
+		[self importOpmlFiles:files];
 	}
 	return YES;
 }
@@ -107,6 +107,11 @@ const NSPasteboardType dragReorder = @"de.relikd.baRSS.drag-reorder";
 
 #pragma mark - OPML File Import
 
+
+/// Helper method is also called from Application Delegate
+- (void)importOpmlFiles:(NSArray<NSURL*>*)files {
+	[[OpmlFileImport withDelegate:self] importFiles:files];
+}
 
 /// Filter out file urls that are not opml files
 - (void)outlineView:(NSOutlineView *)outlineView updateDraggingItemsForDrag:(id <NSDraggingInfo>)info {
@@ -134,7 +139,7 @@ const NSPasteboardType dragReorder = @"de.relikd.baRSS.drag-reorder";
 
 /// OPML import (did end). Save changes, select newly inserted, and perform web request.
 - (void)opmlFileImportDidEnd:(NSManagedObjectContext*)moc {
-	if (!moc.hasChanges) { // exit early, dont need to create empty arrays
+	if (moc.undoManager.groupingLevel == 1 && !moc.hasChanges) { // exit early, dont need to create empty arrays
 		[self endCoreDataChangeUndoEmpty:YES forceUndo:YES];
 		return;
 	}
@@ -153,7 +158,8 @@ const NSPasteboardType dragReorder = @"de.relikd.baRSS.drag-reorder";
 	}
 	// Persist state, because on crash we have at least inserted items (without articles & icons)
 	[StoreCoordinator saveContext:moc andParent:YES];
-	[self.dataStore setSelectionIndexPaths:selection];
+	if (selection.count > 0)
+		[self.dataStore setSelectionIndexPaths:selection];
 	[FeedDownload batchDownloadFeeds:feedsList favicons:YES showErrorAlert:YES finally:^{
 		[self endCoreDataChangeUndoEmpty:NO forceUndo:NO];
 		[self someDatesChangedScheduleUpdateTimer];

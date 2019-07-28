@@ -25,6 +25,7 @@
 #import "FeedDownload.h"
 #import "Preferences.h"
 #import "DrawImage.h"
+#import "SettingsFeeds+DragDrop.h"
 
 @interface AppHook()
 @property (strong) NSWindowController *prefWindow;
@@ -69,6 +70,19 @@
 	}
 	// TODO: handle other app schemes like configuration export / import
 	// NSURLComponents *comp = [NSURLComponents componentsWithString:url];
+}
+
+/// Handle opml file imports
+- (void)application:(NSApplication *)sender openFiles:(NSArray<NSString *> *)filenames {
+	NSMutableArray<NSURL*> *urls = [NSMutableArray arrayWithCapacity:filenames.count];
+	for (NSString *file in filenames) {
+		NSURL *u = [NSURL fileURLWithPath:file];
+		if (u) [urls addObject:u];
+	}
+	[self openPreferences];
+	SettingsFeeds *sf = [(Preferences*)(self.prefWindow.window) selectFeedsTab];
+	[sf importOpmlFiles:urls];
+	[sender replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
 }
 
 
