@@ -97,7 +97,7 @@ NS_INLINE NSInteger RadioGroupSelection(NSView *view) {
 		if (finally) dispatch_group_enter(group);
 		
 		NSData *data = [NSData dataWithContentsOfURL:url];
-		RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:@"opml-file-import"];
+		RSXMLData *xml = [[RSXMLData alloc] initWithData:data url:url];
 		RSOPMLParser *parser = [RSOPMLParser parserWithXMLData:xml];
 		[parser parseAsync:^(RSOPMLItem * _Nullable doc, NSError * _Nullable error) {
 			if (error) {
