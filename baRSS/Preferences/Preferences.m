@@ -49,9 +49,7 @@
 			TabItem(NSImageNameInfo, NSLocalizedString(@"About", nil), [SettingsAbout class]),
 		];
 		
-		NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey:@"preferencesTab"];
-		if (index > 0 || (NSUInteger)index < self.tabViewItems.count)
-			self.selectedTabViewItemIndex = index;
+		[self switchToTab:[[NSUserDefaults standardUserDefaults] integerForKey:@"preferencesTab"]];
 	}
 	return self;
 }
@@ -62,6 +60,12 @@ NS_INLINE NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Class cl
 	item.image = [NSImage imageNamed:imageName];
 	item.label = text;
 	return item;
+}
+
+/// Safely set selected index without out of bounds exception
+- (void)switchToTab:(NSInteger)index {
+	if (index > 0 || (NSUInteger)index < self.tabViewItems.count)
+		self.selectedTabViewItemIndex = index;
 }
 
 /// Delegate method, store last selected tab to user preferences
@@ -94,6 +98,12 @@ NS_INLINE NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Class cl
 		[w setFrameFromString:prevFrame];
 	}
 	return w;
+}
+
+- (SettingsFeeds*)selectFeedsTab {
+	PrefTabs *pref = (PrefTabs*)self.contentViewController;
+	[pref switchToTab:1];
+	return (SettingsFeeds*)[pref.tabViewItems[1] viewController];
 }
 
 - (void)windowWillClose:(NSNotification *)notification {

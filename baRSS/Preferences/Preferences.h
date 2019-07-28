@@ -22,6 +22,9 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class SettingsFeeds;
+
 @interface Preferences : NSWindow <NSWindowDelegate>
 + (instancetype)window;
+- (SettingsFeeds*)selectFeedsTab;
 @end
