@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 70 100">
+<style type="text/css"> .bw{fill:#000;} .fg{fill:#FBA43A;} </style>
+<path class="fg" d="M0,0H45Q70,0,70,25V100H0V0z"/>
+<path style="fill:#FFF;" d="M5,5H45Q65,5,65,25V95H5V5z"/>
+<text class="bw" x="9" y="55" style="font:bold 36px sans-serif">OP</text>
+<text class="bw" x="10" y="87" style="font:bold 34px sans-serif">ML</text>
+</svg>

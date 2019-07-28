@@ -113,8 +113,8 @@
 	[m addItemWithTitle:NSLocalizedString(@"New Group", nil) action:@selector(addGroup) keyEquivalent:@"g"];
 	[m addItemWithTitle:NSLocalizedString(@"New Separator", nil) action:@selector(addSeparator) keyEquivalent:@""];
 	[m addItem:[NSMenuItem separatorItem]]; // index: 6
-	[m addItemWithTitle:NSLocalizedString(@"Import Feeds …", nil) action:@selector(openImportDialog) keyEquivalent:@""];
-	[m addItemWithTitle:NSLocalizedString(@"Export Feeds …", nil) action:@selector(openExportDialog) keyEquivalent:@""];
+	[m addItemWithTitle:NSLocalizedString(@"Import Feeds …", nil) action:@selector(openImportDialog) keyEquivalent:@"o"];
+	[m addItemWithTitle:NSLocalizedString(@"Export Feeds …", nil) action:@selector(openExportDialog) keyEquivalent:@"s"];
 	[m addItem:[NSMenuItem separatorItem]]; // index: 9
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
