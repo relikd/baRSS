@@ -1,10 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 70 100">
-<style type="text/css"> .bg{fill:#FFFFFF;} .fg{fill:#FBA43A;} </style>
+<style type="text/css"> .bg{fill:#FFF;} .fg{fill:#FBA43A;} .bw{fill:#000;} </style>
 <defs>
-	<symbol id="file">
-		<path class="fg" d="M0,0H45Q70,0,70,25V100H0V0z"/>
-		<path class="bg" d="M5,5H45Q65,5,65,25V95H5V5z"/>
-	</symbol>
 	<symbol id="line">
 		<circle class="fg" cx="15" cy="5" r="5"/>
 		<circle class="bg" cx="15" cy="5" r="2.5"/>
@@ -16,10 +12,10 @@
 		<rect class="fg" x="32" y="3.5" width="28" height="3"/>
 	</symbol>
 </defs>
-<use xlink:href="#file"/>
-<text class="fg" x="10" y="90" style="font: bold 17.4px sans-serif">OPML</text>
-<use xlink:href="#line" y="20"/>
-<use xlink:href="#line" y="35"/>
-<use xlink:href="#line2" y="49"/>
-<use xlink:href="#line2" y="61"/>
+<path class="fg" d="M0,0H45Q70,0,70,25V100H0V0z"/>
+<path class="bg" d="M5,5H45Q65,5,65,25V95H5V5z"/>
+<text class="bw" x="10" y="90" style="font: bold 17.4px sans-serif">OPML</text>
+<use xlink:href="#line" y="25"/>
+<use xlink:href="#line" y="40"/>
+<use xlink:href="#line2" y="53"/>
 </svg>
