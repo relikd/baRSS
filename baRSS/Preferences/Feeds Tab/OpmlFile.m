@@ -212,14 +212,24 @@ NS_INLINE NSInteger RadioGroupSelection(NSView *view) {
 	sp.nameFieldStringValue = [NSString stringWithFormat:@"baRSS feeds %@", [NSDate dayStringLocalized]];
 	sp.allowedFileTypes = @[UTI_OPML];
 	sp.allowsOtherFileTypes = YES;
-	NSView *radioView = [NSView radioGroup:@[NSLocalizedString(@"Hierarchical", nil),
-											 NSLocalizedString(@"Flattened", nil)]];
-	sp.accessoryView = [NSView wrapView:radioView withLabel:NSLocalizedString(@"Export format:", nil) padding:PAD_M];
+	NSView *select = [NSView radioGroup:@[NSLocalizedString(@"Everything", nil),
+										  NSLocalizedString(@"Selection", nil)]];
+	NSView *nested = [NSView radioGroup:@[NSLocalizedString(@"Hierarchical", nil),
+										  NSLocalizedString(@"Flattened", nil)]];
+	NSView *v1 = [NSView wrapView:select withLabel:NSLocalizedString(@"Export:", nil) padding:PAD_M];
+	NSView *v2 = [NSView wrapView:nested withLabel:NSLocalizedString(@"Format:", nil) padding:PAD_M];
+	NSView *final = [[NSView alloc] init];
+	[v1 placeIn:final x:0 yTop:0];
+	[v2 placeIn:final x:NSWidth(v1.frame) + 100 yTop:0];
+	[final setFrameSize:NSMakeSize(NSMaxX(v2.frame), NSHeight(v2.frame))];
+	sp.accessoryView = final;
 	
 	[sp beginSheetModalForWindow:window completionHandler:^(NSModalResponse result) {
 		if (result == NSModalResponseOK) {
-			OpmlFileExportOptions opt = OpmlFileExportOptionFullBackup;
-			if (RadioGroupSelection(radioView) == 1)
+			OpmlFileExportOptions opt = 0;
+			if (RadioGroupSelection(select) == 0)
+				opt |= OpmlFileExportOptionFullBackup;
+			if (RadioGroupSelection(nested) == 1)
 				opt |= OpmlFileExportOptionFlattened;
 			[self writeOPMLFile:sp.URL withOptions:opt];
 		}

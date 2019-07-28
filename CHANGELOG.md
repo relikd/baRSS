@@ -14,6 +14,7 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 - Settings, Feeds: Right click menu with edit actions
 - Settings, Feeds: Drag & Drop feeds from / to OPML file
 - Settings, Feeds: Drag & Drop feed titles and urls as text
+- Settings, Feeds: OPML export with selected items only
 - Accessibility hints for most UI elements
 - Associate OPML files (double click and right click actions in Finder) 
 

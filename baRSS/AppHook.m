@@ -68,8 +68,6 @@
 			[self reopenPreferencesIfOpen];
 		}];
 	}
-	// TODO: handle other app schemes like configuration export / import
-	// NSURLComponents *comp = [NSURLComponents componentsWithString:url];
 }
 
 /// Handle opml file imports
