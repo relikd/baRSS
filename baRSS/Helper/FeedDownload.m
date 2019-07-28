@@ -245,7 +245,7 @@ static BOOL _nextUpdateIsForced = NO;
 	[self asyncRequest:request block:^(NSData * _Nullable data, NSError * _Nullable error, NSHTTPURLResponse *response) {
 		RSParsedFeed *result = nil;
 		if (data) { // data = nil if (error || 304)
-			RSXMLData *xml = [[RSXMLData alloc] initWithData:data urlString:response.URL.absoluteString];
+			RSXMLData *xml = [[RSXMLData alloc] initWithData:data url:response.URL];
 			if (xmlBlock && xmlBlock(xml, &error)) {
 				return;
 			}
@@ -279,7 +279,7 @@ static BOOL _nextUpdateIsForced = NO;
 		if (*err)
 			return NO;
 		if (!parsedMeta || parsedMeta.feedLinks.count == 0) {
-			*err = RSXMLMakeErrorWrongParser(RSXMLErrorExpectingFeed, RSXMLErrorExpectingHTML);
+			*err = RSXMLMakeErrorWrongParser(RSXMLErrorExpectingFeed, RSXMLErrorExpectingHTML, xml.url);
 			return NO;
 		}
 		__block NSString *chosenURL = nil;
@@ -451,7 +451,7 @@ static BOOL _nextUpdateIsForced = NO;
 	[self asyncRequest:[self newRequestURL:hostURL] block:^(NSData * _Nullable htmlData, NSError * _Nullable error, NSHTTPURLResponse *response) {
 		if (htmlData) {
 			// TODO: use session delegate to stop downloading after <head>
-			RSXMLData *xml = [[RSXMLData alloc] initWithData:htmlData urlString:hostURL];
+			RSXMLData *xml = [[RSXMLData alloc] initWithData:htmlData url:response.URL];
 			RSHTMLMetadataParser *parser = [RSHTMLMetadataParser parserWithXMLData:xml];
 			RSHTMLMetadata *meta = [parser parseSync:&error];
 			if (error) meta = nil;

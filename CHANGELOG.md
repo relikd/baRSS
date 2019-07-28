@@ -22,6 +22,7 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 - Settings, Feeds: Actions 'delete' and 'edit' use clicked items instead of selected items
 - Comparison of existing articles with nonexistent guid and link
 - Don't mark articles read if opening URLs failed
+- If an error occurs, show document URL (path to file or web url)
 
 ### Changed
 - Interface builder files replaced with code equivalent
