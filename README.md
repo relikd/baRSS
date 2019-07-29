@@ -38,14 +38,24 @@ Install
 Requires macOS Sierra (10.12) or higher.
 
 ### Easy way
-go to [releases](https://github.com/relikd/baRSS/releases) and downloaded the latest version.
+Go to [releases](https://github.com/relikd/baRSS/releases) and downloaded the latest version.
 
 ### Build from source
 
-You'll need Xcode and [Carthage](https://github.com/Carthage/Carthage#installing-carthage). The latter is optional, you can build the [RSXML](https://github.com/relikd/RSXML) library from source instead. Carthage just makes it more convenient.
+You'll need Xcode and [Carthage](https://github.com/Carthage/Carthage#installing-carthage). 
+The latter is optional, you can build the [RSXML](https://github.com/relikd/RSXML) library from source instead. 
+Carthage just makes it more convenient.
 Download and unzip this project, navigate to the root folder and run `carthage bootstrap --platform macOS`. 
 
-That's it. Open Xcode and build the project. Note, there are some compiler flags that append 'beta' to the development release. If you prefer the optimized release version go to `Product > Archive`.
+Next you need to clone [QLOPML](https://github.com/relikd/QLOPML) in the same folder where this project is located.
+Alternatively you can simply delete the `QLOPML` project reference without much harm.
+`QLOPML` is a Quick Look plugin for `.opml` files.
+It will display the file contents whenever you hit space.
+
+That's it. 
+Open Xcode and build the project. 
+Note, there are some compiler flags that append 'beta' to the development release. 
+If you prefer the optimized release version go to `Product > Archive`.
 
 
 Hidden options

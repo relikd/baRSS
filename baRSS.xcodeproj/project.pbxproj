@@ -27,6 +27,7 @@
 		5496B511214D6275003ED4ED /* UserPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5496B510214D6275003ED4ED /* UserPrefs.m */; };
 		54A07A7F220E04CF00082C51 /* NSFetchRequest+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A07A7E220E04CF00082C51 /* NSFetchRequest+Ext.m */; };
 		54A07A82220E723D00082C51 /* MapUnreadTotal.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A07A81220E723D00082C51 /* MapUnreadTotal.m */; };
+		54A2D63922EF81A4007C61F3 /* QLOPML.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54A2D63822EF8193007C61F3 /* QLOPML.qlgenerator */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		54ACC28C21061B3C0020715F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28B21061B3C0020715F /* main.m */; };
 		54ACC29521061E270020715F /* FeedDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29421061E270020715F /* FeedDownload.m */; };
 		54ACC29821061FBA0020715F /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29721061FBA0020715F /* Preferences.m */; };
@@ -47,6 +48,16 @@
 		54FE73D3212316CD003EAC65 /* BarMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 54FE73D2212316CD003EAC65 /* BarMenu.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		54A2D63722EF8193007C61F3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 54A2D62E22EF8183007C61F3 /* QLOPML.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 540A649822EE78B200470937;
+			remoteInfo = QLOPML;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		544DCCBB212A2B4D002DBC46 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -66,6 +77,16 @@
 			dstSubfolderSpec = 16;
 			files = (
 				544DCCBE212A2B6F002DBC46 /* RSXML.framework.dSYM in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		54CE4D4522EF509400E89C16 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/QuickLook;
+			dstSubfolderSpec = 1;
+			files = (
+				54A2D63922EF81A4007C61F3 /* QLOPML.qlgenerator in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,6 +130,7 @@
 		54A07A7E220E04CF00082C51 /* NSFetchRequest+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSFetchRequest+Ext.m"; sourceTree = "<group>"; };
 		54A07A80220E723D00082C51 /* MapUnreadTotal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapUnreadTotal.h; sourceTree = "<group>"; };
 		54A07A81220E723D00082C51 /* MapUnreadTotal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapUnreadTotal.m; sourceTree = "<group>"; };
+		54A2D62E22EF8183007C61F3 /* QLOPML.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = QLOPML.xcodeproj; path = ../QLOPML/QLOPML.xcodeproj; sourceTree = "<group>"; };
 		54ACC27C21061B3B0020715F /* baRSS Beta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "baRSS Beta.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		54ACC28321061B3B0020715F /* DBv1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DBv1.xcdatamodel; sourceTree = "<group>"; };
 		54ACC28A21061B3C0020715F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -231,12 +253,21 @@
 			path = "Core Data";
 			sourceTree = "<group>";
 		};
+		54A2D63422EF8193007C61F3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				54A2D63822EF8193007C61F3 /* QLOPML.qlgenerator */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		54ACC27321061B3B0020715F = {
 			isa = PBXGroup;
 			children = (
 				540CD14821C094A2004AB594 /* README.md */,
 				54892F1D2235285700271CBA /* CHANGELOG.md */,
 				54ACC27E21061B3B0020715F /* baRSS */,
+				54A2D62E22EF8183007C61F3 /* QLOPML.xcodeproj */,
 				54ACC27D21061B3B0020715F /* Products */,
 				544FBD4321064AEB008A260C /* Frameworks */,
 			);
@@ -353,6 +384,7 @@
 				54ACC27921061B3B0020715F /* Frameworks */,
 				54ACC27A21061B3B0020715F /* Resources */,
 				544DCCBB212A2B4D002DBC46 /* Embed Frameworks */,
+				54CE4D4522EF509400E89C16 /* CopyFiles */,
 				544DCCBC212A2B5A002DBC46 /* CopyFiles */,
 				543964EE2215C27B0016AAA3 /* ShellScript */,
 			);
@@ -399,12 +431,28 @@
 			mainGroup = 54ACC27321061B3B0020715F;
 			productRefGroup = 54ACC27D21061B3B0020715F /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 54A2D63422EF8193007C61F3 /* Products */;
+					ProjectRef = 54A2D62E22EF8183007C61F3 /* QLOPML.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				54ACC27B21061B3B0020715F /* baRSS */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		54A2D63822EF8193007C61F3 /* QLOPML.qlgenerator */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = QLOPML.qlgenerator;
+			remoteRef = 54A2D63722EF8193007C61F3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		54ACC27A21061B3B0020715F /* Resources */ = {

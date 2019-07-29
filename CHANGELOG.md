@@ -16,7 +16,8 @@ and this project does NOT adhere to [Semantic Versioning](https://semver.org/spe
 - Settings, Feeds: Drag & Drop feed titles and urls as text
 - Settings, Feeds: OPML export with selected items only
 - Accessibility hints for most UI elements
-- Associate OPML files (double click and right click actions in Finder) 
+- Associate OPML files (double click and right click actions in Finder)
+- Quick Look preview for OPML files
 
 ### Fixed
 - Adding feed: Show users any 5xx server error response and extracted failure reason
