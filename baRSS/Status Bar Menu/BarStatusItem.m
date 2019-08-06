@@ -22,7 +22,6 @@
 
 #import "BarStatusItem.h"
 #import "Constants.h"
-#import "DrawImage.h"
 #import "FeedDownload.h"
 #import "StoreCoordinator.h"
 #import "UserPrefs.h"
