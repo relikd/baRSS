@@ -36,11 +36,4 @@ IB_DESIGNABLE
 @end
 
 
-static NSImageName const RSSImageSettingsGlobal    = @"RSSImageSettingsGlobal";
-static NSImageName const RSSImageSettingsGroup     = @"RSSImageSettingsGroup";
-static NSImageName const RSSImageSettingsFeed      = @"RSSImageSettingsFeed";
-static NSImageName const RSSImageDefaultRSSIcon    = @"RSSImageDefaultRSSIcon";
-static NSImageName const RSSImageMenuBarIconActive = @"RSSImageMenuBarIconActive";
-static NSImageName const RSSImageMenuBarIconPaused = @"RSSImageMenuBarIconPaused";
-
 void RegisterImageViewNames(void);

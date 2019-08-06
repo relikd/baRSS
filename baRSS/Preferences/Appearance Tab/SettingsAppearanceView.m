@@ -22,7 +22,7 @@
 
 #import "SettingsAppearanceView.h"
 #import "NSView+Ext.h"
-#import "DrawImage.h"
+#import "Constants.h"
 #import "UserPrefs.h"
 
 @interface SettingsAppearanceView()

@@ -67,6 +67,8 @@
 	item.title = [self shortArticleName];
 	item.enabled = (self.link.length > 0);
 	item.state = (self.unread && [UserPrefs defaultYES:@"feedTickMark"] ? NSControlStateValueOn : NSControlStateValueOff);
+	item.onStateImage = [NSImage imageNamed:RSSImageMenuItemUnread];
+	item.accessibilityLabel = (self.unread ? NSLocalizedString(@"article: unread", @"accessibility label, feed menu item") : NSLocalizedString(@"article: read", @"accessibility label, feed menu item"));
 	item.toolTip = (self.abstract ? self.abstract : self.body); // fall back to body (html)
 	item.representedObject = self.objectID;
 	item.target = [self class];

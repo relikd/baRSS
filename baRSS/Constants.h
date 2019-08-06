@@ -31,6 +31,29 @@
 /// UTI type used for opml files
 static const NSPasteboardType UTI_OPML = @"org.opml";
 
+
+#pragma mark - NSImageName constants
+
+
+/// Default RSS icon (with border, with gradient, orange)
+static NSImageName const RSSImageDefaultRSSIcon    = @"RSSImageDefaultRSSIcon";
+/// Settings, global icon (menu bar, black)
+static NSImageName const RSSImageSettingsGlobal    = @"RSSImageSettingsGlobal";
+/// Settings, group icon (folder, black)
+static NSImageName const RSSImageSettingsGroup     = @"RSSImageSettingsGroup";
+/// Settings, feed icon (RSS, no border, no gradient, black)
+static NSImageName const RSSImageSettingsFeed      = @"RSSImageSettingsFeed";
+/// Menu bar, bar icon (RSS, with border, no gradient, orange)
+static NSImageName const RSSImageMenuBarIconActive = @"RSSImageMenuBarIconActive";
+/// Menu bar, bar icon (RSS, with border, no gradient, paused, orange)
+static NSImageName const RSSImageMenuBarIconPaused = @"RSSImageMenuBarIconPaused";
+/// Menu item, unread state icon (blue dot)
+static NSImageName const RSSImageMenuItemUnread    = @"RSSImageMenuItemUnread";
+
+
+#pragma mark - NSNotificationName constants
+
+
 /**
  @c notification.object is @c NSNumber of type @c NSUInteger.
  Represents number of feeds that are proccessed in background update. Sends @c 0 when all downloads are finished.
@@ -62,6 +85,9 @@ static const NSNotificationName kNotificationTotalUnreadCountChanged = @"baRSS-n
  Else @c nil if count has to be fetched from core data.
  */
 static const NSNotificationName kNotificationTotalUnreadCountReset = @"baRSS-notification-total-unread-count-reset";
+
+
+#pragma mark - Internal
 
 
 /**

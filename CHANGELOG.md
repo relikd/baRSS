@@ -30,6 +30,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 
 ### Changed
 - *UI:* Interface builder files replaced with code equivalent
+- *UI:* Mark unread articles with blue dot, instead of tick mark
 - *Settings, Feeds:* Single add button for feeds, groups, and separators
 - *Settings, Feeds:* Always append new items at the end
 - *Adding feed:* Display error reason if user cancels the creation of a new feed item
