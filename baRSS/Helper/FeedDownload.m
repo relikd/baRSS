@@ -475,13 +475,17 @@ static BOOL _nextUpdateIsForced = NO;
 		else if (meta.iconLinks.count > 0) {
 			// at least any url (even if all items in list have size 0)
 			NSString *iconURL = meta.iconLinks.firstObject.link;
-			// we dont need much, lets find the smallest icon ...
-			int smallest = 9001;
+			double best = DBL_MAX;
 			for (RSHTMLMetadataIconLink *icon in meta.iconLinks) {
-				int size = (int)[icon getSize].width;
-				if (size > 0 && size < smallest) {
-					smallest = size;
-					iconURL = icon.link;
+				CGSize size = [icon getSize];
+				CGFloat area = size.width * size.height;
+				if (area > 0) {
+					// find icon with closest matching size 32x32
+					double match = fabs(log10(area) - log10(32*32));
+					if (match < best) {
+						best = match;
+						iconURL = icon.link;
+					}
 				}
 			}
 			if (iconURL && iconURL.length > 0)
