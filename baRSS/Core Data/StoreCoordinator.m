@@ -64,13 +64,35 @@
 }
 
 
+#pragma mark - Options
+
+
+/// @return Value for option with @c key or @c nil.
++ (nullable NSString*)optionForKey:(NSString*)key {
+	return [[[Options fetchRequest] where:@"key = %@", key] fetchFirst:[self getMainContext]].value;
+}
+
+/// Init new option with given @c key
++ (void)setOption:(NSString*)key value:(NSString*)value {
+	NSManagedObjectContext *moc = [self getMainContext];
+	Options *opt = [[[Options fetchRequest] where:@"key = %@", key] fetchFirst:moc];
+	if (!opt) {
+		opt = [[Options alloc] initWithEntity:Options.entity insertIntoManagedObjectContext:moc];
+		opt.key = key;
+	}
+	opt.value = value;
+	[self saveContext:moc andParent:YES];
+	[moc reset];
+}
+
+
 #pragma mark - Feed Update
 
 /// @return @c NSDate of next (earliest) feed update. May be @c nil.
 + (NSDate*)nextScheduledUpdate {
 	NSFetchRequest *fr = [FeedMeta fetchRequest];
 	[fr addFunctionExpression:@"min:" onKeyPath:@"scheduled" name:@"minDate" type:NSDateAttributeType];
-	return [fr fetchAllRows: [self getMainContext]].firstObject[@"minDate"];
+	return [fr fetchFirstDict: [self getMainContext]][@"minDate"];
 }
 
 /**
@@ -140,7 +162,7 @@
 
 /// @return URL of @c Feed item where @c Feed.indexPath @c = @c path.
 + (NSString*)urlForFeedWithIndexPath:(nonnull NSString*)path {
-	return [[[[Feed fetchRequest] where:@"indexPath = %@", path] select:@[@"link"]] fetchFirst: [self getMainContext]][@"link"];
+	return [[[[Feed fetchRequest] where:@"indexPath = %@", path] select:@[@"link"]] fetchFirstDict: [self getMainContext]][@"link"];
 }
 
 /// @return Unsorted list of object IDs where @c Feed.indexPath begins with @c path @c + @c "."

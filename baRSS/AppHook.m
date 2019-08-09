@@ -26,6 +26,7 @@
 #import "Preferences.h"
 #import "DrawImage.h"
 #import "SettingsFeeds+DragDrop.h"
+#import "UserPrefs.h"
 
 @interface AppHook()
 @property (strong) NSWindowController *prefWindow;
@@ -40,6 +41,7 @@
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
+	[self migrateVersionUpdate];
 	_statusItem = [BarStatusItem new];
 	NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
 	[appleEventManager setEventHandler:self andSelector:@selector(handleGetURLEvent:withReplyEvent:)
@@ -175,6 +177,13 @@
 		}
 	}
 	return NSTerminateNow;
+}
+
+/// Called during application start. Perform any version dependent updates here
+- (void)migrateVersionUpdate {
+	// Currently unused, but you'll be thankful to know the previous version number in the future
+	[UserPrefs dbUpdateFileVersion];
+	[UserPrefs dbUpdateAppVersion];
 }
 
 

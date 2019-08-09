@@ -40,7 +40,12 @@
 	return [self fetchAllRows:moc];
 }
 
-/// Set @c limit to @c 1 and fetch first objcect. May return object type or @c NSDictionary if @c resultType @c = @c NSManagedObjectIDResultType.
+/// Same as @c fetchFirst: but with dictionary return type
+- (NSDictionary*)fetchFirstDict:(NSManagedObjectContext*)moc {
+	return [self fetchFirst:moc];
+}
+
+/// Set @c limit to @c 1 and fetch first object. May return object type or @c NSDictionary if @c resultType @c = @c NSManagedObjectIDResultType.
 - (id)fetchFirst:(NSManagedObjectContext*)moc {
 	self.fetchLimit = 1;
 	return [[self fetchAllRows:moc] firstObject];

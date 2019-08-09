@@ -21,9 +21,13 @@
 //  SOFTWARE.
 
 #import "UserPrefs.h"
+#import "StoreCoordinator.h"
+
 #import <Cocoa/Cocoa.h>
 
 @implementation UserPrefs
+
+#pragma mark - User Preferences Plist
 
 /// @return @c YES if key is not set. Otherwise, return user defaults property from plist.
 + (BOOL)defaultYES:(NSString*)key {
@@ -66,7 +70,9 @@
 	return [[NSWorkspace sharedWorkspace] openURLs:urls withAppBundleIdentifier:[self getHttpApplication] options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
 }
 
+
 #pragma mark - Hidden Plist Properties -
+
 
 /// @return The limit on how many links should be opened at the same time, if user holds the option key.
 /// Default: @c 10
@@ -84,6 +90,63 @@
 /// Default: @c 40
 + (NSUInteger)articlesInMenuLimit {
 	return (NSUInteger)[self defaultInt:40 forKey:@"articlesInMenuLimit"];
+}
+
+
+#pragma mark - Application Info Plist
+
+
+/// @return The application name, e.g., 'baRSS' or 'baRSS Beta'
++ (NSString*)appName {
+	return [[NSBundle mainBundle] infoDictionary][(NSString*)kCFBundleNameKey];
+}
+
+/// @return The application version number, e.g., '0.9.4'
++ (NSString*)appVersion {
+	return [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"];
+}
+
+/// @return The application version number including build number, e.g., '0.9.4 (9906)'
++ (NSString*)appVersionWithBuildNo {
+	NSString *buildNo = [[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"];
+	return [[self appVersion] stringByAppendingFormat:@" (%@)", buildNo];
+}
+
+
+#pragma mark - Core Data Properties -
+
+
+/// Helper method that retrieves and transforms option value to int
++ (int)dbIntForKey:(NSString*)key defaultsTo:(int)otherwise {
+	NSString *str = [StoreCoordinator optionForKey:key];
+	if (!str) return otherwise;
+	int num = [NSDecimalNumber decimalNumberWithString:str].intValue;
+	return isnan(num) ? otherwise : num;
+}
+
+/// Check whether the database was just initialized (first install)
++ (BOOL)dbIsUnusedInitalState {
+	return [StoreCoordinator optionForKey:@"db-version"] == nil;
+}
+
+/// Check whether the stored database version is up to date
++ (BOOL)dbIsCurrentFileVersion {
+	return [self dbIntForKey:@"db-version" defaultsTo:-1] == dbFileVersion;
+}
+
+/// Write current database version to core data
++ (void)dbUpdateFileVersion {
+	[StoreCoordinator setOption:@"db-version" value:[NSString stringWithFormat:@"%d", dbFileVersion]];
+}
+
+/// Check whether the stored application version is up to date
++ (BOOL)dbIsCurrentAppVersion {
+	return [[StoreCoordinator optionForKey:@"app-version"] isEqualToString:[self appVersion]];
+}
+
+/// Write current application version to core data
++ (void)dbUpdateAppVersion {
+	[StoreCoordinator setOption:@"app-version" value:[self appVersion]];
 }
 
 @end

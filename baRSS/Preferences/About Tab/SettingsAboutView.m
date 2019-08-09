@@ -22,17 +22,20 @@
 
 #import "SettingsAboutView.h"
 #import "NSView+Ext.h"
+#import "UserPrefs.h"
 
 @implementation SettingsAboutView
 
 - (instancetype)init {
 	self = [super initWithFrame: NSZeroRect];
-	NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
-	NSString *name = infoDict[@"CFBundleName"];
-	NSString *version = [NSString stringWithFormat:NSLocalizedString(@"Version %@", nil), infoDict[@"CFBundleShortVersionString"]];
+	NSString *name = [UserPrefs appName];
+	NSString *version = [NSString stringWithFormat:NSLocalizedString(@"Version %@", nil),
 #if DEBUG
-	version = [version stringByAppendingFormat:@" (%@)", infoDict[@"CFBundleVersion"]];
+						 [UserPrefs appVersionWithBuildNo]
+#else
+						 [UserPrefs appVersion]
 #endif
+						 ];
 	
 	// Application icon image (top-centered)
 	NSImageView *logo = [[NSView imageView:NSImageNameApplicationIcon size:64] placeIn:self x:CENTER yTop:PAD_M];

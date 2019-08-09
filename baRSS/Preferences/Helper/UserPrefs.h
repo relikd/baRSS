@@ -23,6 +23,7 @@
 #import <Foundation/Foundation.h>
 
 @interface UserPrefs : NSObject
+// User Preferences Plist
 + (BOOL)defaultYES:(NSString*)key;
 + (BOOL)defaultNO:(NSString*)key;
 
@@ -30,7 +31,20 @@
 + (void)setHttpApplication:(NSString*)bundleID;
 + (BOOL)openURLsWithPreferredBrowser:(NSArray<NSURL*>*)urls;
 
+// Hidden Plist Properties
 + (NSUInteger)openFewLinksLimit; // Change with: 'defaults write de.relikd.baRSS openFewLinksLimit -int 10'
 + (NSUInteger)shortArticleNamesLimit; // Change with: 'defaults write de.relikd.baRSS shortArticleNamesLimit -int 50'
 + (NSUInteger)articlesInMenuLimit; // Change with: 'defaults write de.relikd.baRSS articlesInMenuLimit -int 40'
+
+// Application Info Plist
++ (NSString*)appName;
++ (NSString*)appVersion;
++ (NSString*)appVersionWithBuildNo;
+
+// Core Data Properties
++ (BOOL)dbIsUnusedInitalState;
++ (BOOL)dbIsCurrentFileVersion;
++ (BOOL)dbIsCurrentAppVersion;
++ (void)dbUpdateFileVersion;
++ (void)dbUpdateAppVersion;
 @end
