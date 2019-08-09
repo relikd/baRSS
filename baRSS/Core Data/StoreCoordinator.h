@@ -23,10 +23,16 @@
 #import <Foundation/Foundation.h>
 #import "DBv1+CoreDataModel.h"
 
+static const int dbFileVersion = 1; // update in case database structure changes
+
 @interface StoreCoordinator : NSObject
 // Managing contexts
 + (NSManagedObjectContext*)createChildContext;
 + (void)saveContext:(NSManagedObjectContext*)context andParent:(BOOL)flag;
+
+// Options
++ (nullable NSString*)optionForKey:(NSString*)key;
++ (void)setOption:(NSString*)key value:(NSString*)value;
 
 // Feed update
 + (NSDate*)nextScheduledUpdate;

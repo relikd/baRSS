@@ -26,8 +26,9 @@
 // Perform core data request and fetch data
 - (NSArray<ResultType>*)fetchAllRows:(NSManagedObjectContext*)moc;
 - (NSArray<NSManagedObjectID*>*)fetchIDs:(NSManagedObjectContext*)moc;
+- (NSDictionary*)fetchFirstDict:(NSManagedObjectContext*)moc; // limit 1
+- (ResultType)fetchFirst:(NSManagedObjectContext*)moc; // limit 1
 - (NSUInteger)fetchCount:(NSManagedObjectContext*)moc;
-- (id)fetchFirst:(NSManagedObjectContext*)moc; // limit 1
 
 // Selecting, filtering, sorting results
 - (instancetype)select:(NSArray<NSString*>*)cols; // sets .propertiesToFetch
