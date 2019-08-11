@@ -29,5 +29,6 @@
 - (void)setUnreadCountRelative:(NSInteger)count;
 - (void)asyncReloadUnreadCount;
 - (void)updateBarIcon;
+- (void)showWelcomeMessage;
 @end
 

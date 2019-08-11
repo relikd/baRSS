@@ -39,6 +39,7 @@ static const int dbFileVersion = 1; // update in case database structure changes
 + (NSArray<Feed*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc;
 
 // Count elements
++ (BOOL)isEmpty;
 + (NSUInteger)countTotalUnread;
 + (NSUInteger)countRootItemsInContext:(NSManagedObjectContext*)moc;
 + (NSArray<NSDictionary*>*)countAggregatedUnread;

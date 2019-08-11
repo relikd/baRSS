@@ -16,6 +16,8 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Settings, Feeds:* Drag & Drop feed titles and urls as text
 - *Settings, Feeds:* OPML export with selected items only
 - *UI:* Accessibility hints for most UI elements
+- *UI*: Show welcome message upon first usage (empty db)
+- *DB*: Table for options. E.g., with what version was the db last used
 - Associate OPML files (double click and right click actions in Finder)
 - Quick Look preview for OPML files
 
