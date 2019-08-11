@@ -17,7 +17,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Settings, Feeds:* OPML export with selected items only
 - *UI:* Accessibility hints for most UI elements
 - *UI*: Show welcome message upon first usage (empty db)
-- *DB*: Table for options. E.g., with what version was the db last used
+- Welcome message also adds Github releases feed
 - Associate OPML files (double click and right click actions in Finder)
 - Quick Look preview for OPML files
 
@@ -37,6 +37,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Settings, Feeds:* Always append new items at the end
 - *Adding feed:* Display error reason if user cancels the creation of a new feed item
 - *Adding feed:* Refresh interval hotkeys set to: `⌘1` … `⌘6`
+- *DB*: New table for options. E.g., what app version modified the database
 
 
 ## [0.9.4] - 2019-04-02

@@ -39,7 +39,8 @@
 + (void)forceUpdateAllFeeds;
 // Downloading
 + (void)newFeed:(NSString *)urlStr askUser:(nonnull NSString*(^)(RSHTMLMetadata *meta))askUser block:(nonnull void(^)(RSParsedFeed *parsed, NSError *error, NSHTTPURLResponse *response))block;
-+ (void)autoDownloadAndParseURL:(NSString*)urlStr successBlock:(nullable os_block_t)block;
++ (void)autoDownloadAndParseURL:(NSString*)urlStr addAnyway:(BOOL)flag modify:(nullable void(^)(Feed *feed))block;
++ (void)autoDownloadAndParseUpdateURL;
 + (void)batchDownloadFeeds:(NSArray<Feed*> *)list favicons:(BOOL)fav showErrorAlert:(BOOL)alert finally:(nullable os_block_t)block;
 // Favicon image download
 + (void)downloadFavicon:(NSString*)urlStr finished:(void(^)(NSImage * _Nullable img))block;
