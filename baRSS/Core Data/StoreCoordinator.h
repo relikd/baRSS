@@ -20,7 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Foundation/Foundation.h>
+@import Cocoa;
 #import "DBv1+CoreDataModel.h"
 
 static int const dbFileVersion = 1; // update in case database structure changes

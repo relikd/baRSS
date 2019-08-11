@@ -25,7 +25,6 @@
 #import "AppHook.h"
 #import "BarStatusItem.h"
 
-
 @implementation SettingsAppearance
 
 - (void)loadView {

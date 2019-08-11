@@ -20,6 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+@import Cocoa;
 #import "FeedMeta+CoreDataClass.h"
 
 static int32_t const kDefaultFeedRefreshInterval = 30 * 60;

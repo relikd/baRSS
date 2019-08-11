@@ -20,9 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Foundation/Foundation.h>
-#import <Cocoa/Cocoa.h>
-
+@import Cocoa;
 @class FeedGroup;
 
 typedef NS_OPTIONS(NSUInteger, OpmlFileExportOptions) {

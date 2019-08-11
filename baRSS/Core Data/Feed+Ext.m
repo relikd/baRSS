@@ -20,6 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+@import RSXML;
 #import "Feed+Ext.h"
 #import "Constants.h"
 #import "UserPrefs.h"
@@ -27,8 +28,6 @@
 #import "FeedGroup+Ext.h"
 #import "FeedArticle+Ext.h"
 #import "StoreCoordinator.h"
-
-#import <RSXML/RSXML.h>
 
 @implementation Feed (Ext)
 

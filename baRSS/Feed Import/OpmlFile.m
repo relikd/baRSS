@@ -20,6 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+@import RSXML;
 #import "OpmlFile.h"
 #import "FeedMeta+Ext.h"
 #import "FeedGroup+Ext.h"
@@ -27,8 +28,6 @@
 #import "Constants.h"
 #import "NSDate+Ext.h"
 #import "NSView+Ext.h"
-
-#import <RSXML/RSXML.h>
 
 #pragma mark - Helper
 

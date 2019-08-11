@@ -20,7 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
+@import Cocoa;
 
 typedef int32_t Interval;
 typedef NS_ENUM(int32_t, TimeUnitType) {

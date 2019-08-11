@@ -20,9 +20,8 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+@import QuartzCore;
 #import "NSDate+Ext.h"
-
-#import <QuartzCore/QuartzCore.h>
 
 static TimeUnitType const _values[] = {
 	TimeUnitYears,
