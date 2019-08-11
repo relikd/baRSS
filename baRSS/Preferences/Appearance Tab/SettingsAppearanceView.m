@@ -30,8 +30,8 @@
 @end
 
 
-/***/ static const CGFloat IconSize = 18;
-/***/ static const CGFloat colWidth = (IconSize + PAD_M); // checkbox column width
+/***/ static CGFloat const IconSize = 18;
+/***/ static CGFloat const colWidth = (IconSize + PAD_M); // checkbox column width
 
 
 @implementation SettingsAppearanceView
@@ -63,8 +63,8 @@
 
 /// Create new entry with 1-3 checkboxes and a descriptive label
 - (NSTextField*)entry:(char*)m label:(NSString*)text {
-	static const char* scope[] = { "global", "group", "feed" };
-	static const char* ident[] = { "TintMenuBarIcon", "UpdateAll", "OpenUnread", "MarkRead", "MarkUnread", "UnreadCount", "TickMark", "ShortNames", "LimitArticles" };
+	static char* const scope[] = { "global", "group", "feed" };
+	static char* const ident[] = { "TintMenuBarIcon", "UpdateAll", "OpenUnread", "MarkRead", "MarkUnread", "UnreadCount", "TickMark", "ShortNames", "LimitArticles" };
 	CGFloat y = PAD_WIN + IconSize + PAD_S + self.row * (PAD_S + HEIGHT_LABEL);
 	
 	// Add checkboxes: row 0 - 8, col 0 - 2

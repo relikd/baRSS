@@ -22,23 +22,23 @@
 
 #import <Cocoa/Cocoa.h>
 
-/***/ static const CGFloat PAD_WIN = 20; // window padding
-/***/ static const CGFloat PAD_L = 16;
-/***/ static const CGFloat PAD_M = 8;
-/***/ static const CGFloat PAD_S = 4;
-/***/ static const CGFloat PAD_XS = 2;
+/***/ static CGFloat const PAD_WIN = 20; // window padding
+/***/ static CGFloat const PAD_L = 16;
+/***/ static CGFloat const PAD_M = 8;
+/***/ static CGFloat const PAD_S = 4;
+/***/ static CGFloat const PAD_XS = 2;
 
-/***/ static const CGFloat HEIGHT_LABEL = 17;
-/***/ static const CGFloat HEIGHT_LABEL_SMALL = 14;
-/***/ static const CGFloat HEIGHT_INPUTFIELD = 21;
-/***/ static const CGFloat HEIGHT_BUTTON = 21;
-/***/ static const CGFloat HEIGHT_INLINEBUTTON = 16;
-/***/ static const CGFloat HEIGHT_POPUP = 21;
-/***/ static const CGFloat HEIGHT_SPINNER = 16;
-/***/ static const CGFloat HEIGHT_CHECKBOX = 14;
+/***/ static CGFloat const HEIGHT_LABEL = 17;
+/***/ static CGFloat const HEIGHT_LABEL_SMALL = 14;
+/***/ static CGFloat const HEIGHT_INPUTFIELD = 21;
+/***/ static CGFloat const HEIGHT_BUTTON = 21;
+/***/ static CGFloat const HEIGHT_INLINEBUTTON = 16;
+/***/ static CGFloat const HEIGHT_POPUP = 21;
+/***/ static CGFloat const HEIGHT_SPINNER = 16;
+/***/ static CGFloat const HEIGHT_CHECKBOX = 14;
 
 /// Static variable to calculate origin center coordinate in its @c superview. The value of this var isn't used.
-static const CGFloat CENTER = -0.015625;
+static CGFloat const CENTER = -0.015625;
 
 /// Calculate @c origin.y going down from the top border of its @c superview
 NS_INLINE CGFloat YFromTop(NSView *view) { return NSHeight(view.superview.frame) - NSMinY(view.frame) - view.alignmentRectInsets.bottom; }

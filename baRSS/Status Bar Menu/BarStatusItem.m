@@ -53,9 +53,9 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mainMenuWillOpen) name:NSMenuDidBeginTrackingNotification object:self.statusItem.menu];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mainMenuDidClose) name:NSMenuDidEndTrackingNotification object:self.statusItem.menu];
 	// Some icon unread count notification callback methods
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkChanged:) name:kNotificationNetworkStatusChanged object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(unreadCountChanged:) name:kNotificationTotalUnreadCountChanged object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(unreadCountReset:) name:kNotificationTotalUnreadCountReset object:nil];
+	RegisterNotification(kNotificationNetworkStatusChanged, @selector(networkChanged:), self);
+	RegisterNotification(kNotificationTotalUnreadCountChanged, @selector(unreadCountChanged:), self);
+	RegisterNotification(kNotificationTotalUnreadCountReset, @selector(unreadCountReset:), self);
 	return self;
 }
 

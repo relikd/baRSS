@@ -49,7 +49,7 @@
 - (void)fixCache:(NSButton *)sender {
 	NSUInteger deleted = [StoreCoordinator deleteUnreferenced];
 	[StoreCoordinator restoreFeedIndexPaths];
-	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
+	PostNotification(kNotificationTotalUnreadCountReset, nil);
 	// show only if >0, but hey, this button will vanish anyway ...
 	NSAlert *alert = [[NSAlert alloc] init];
 	alert.messageText = [NSString stringWithFormat:@"Removed %lu unreferenced core data entries.", deleted];

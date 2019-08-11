@@ -31,9 +31,9 @@
 
 /// Designated initializer. 'Done' and 'Cancel' buttons will be added automatically.
 - (instancetype)initWithView:(NSView*)content {
-	static const NSInteger minWidth = 320;
-	static const NSInteger maxWidth = 1200;
-	static const CGFloat contentOffsetY = PAD_WIN + HEIGHT_BUTTON + PAD_L;
+	static NSInteger const minWidth = 320;
+	static NSInteger const maxWidth = 1200;
+	static CGFloat const contentOffsetY = PAD_WIN + HEIGHT_BUTTON + PAD_L;
 	
 	NSInteger w = [[NSUserDefaults standardUserDefaults] integerForKey:@"modalSheetWidth"];
 	if      (w < minWidth)  w = minWidth;

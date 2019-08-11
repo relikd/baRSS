@@ -205,7 +205,7 @@ NS_INLINE void DrawGradient(CGContextRef c, CGFloat size, NSColor *color) {
 		[rgbColor getHue:&h saturation:&s brightness:&b alpha:&a];
 	} @catch (NSException *e) {}
 	
-	static const CGFloat impact = 0.3;
+	static CGFloat const impact = 0.3;
 	NSColor *darker = [NSColor colorWithHue:h saturation:(s + impact > 1 ? 1 : s + impact) brightness:b alpha:a];
 	NSColor *lighter = [NSColor colorWithHue:h saturation:(s - impact < 0 ? 0 : s - impact) brightness:b alpha:a];
 	const void* cgColors[] = {

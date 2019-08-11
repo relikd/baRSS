@@ -89,7 +89,7 @@
 		fa.unread = !fa.unread;
 		[StoreCoordinator saveContext:moc andParent:YES];
 		NSNumber *num = (fa.unread ? @+1 : @-1);
-		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:num];
+		PostNotification(kNotificationTotalUnreadCountChanged, num);
 	}
 	[moc reset];
 }

@@ -151,8 +151,8 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 
 /// Check user preferences for preferred display style.
 - (BOOL)allowDisplayOfHeaderItem:(MenuItemTag)tag {
-	static const char * A[] = {"", "global", "feed", "group"};
-	static const char * B[] = {"", "MarkRead", "MarkUnread", "OpenUnread"};
+	static char* const A[] = {"", "global", "feed", "group"};
+	static char* const B[] = {"", "MarkRead", "MarkUnread", "OpenUnread"};
 	int idx = (self.isMainMenu ? 1 : (self.isFeedMenu ? 2 : 3));
 	return [UserPrefs defaultYES:[NSString stringWithFormat:@"%s%s", A[idx], B[tag & 3]]]; // first 2 bits
 }
@@ -210,7 +210,7 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 		[StoreCoordinator saveContext:moc andParent:YES];
 		[moc reset];
 		NSNumber *num = [NSNumber numberWithInteger: (markRead ? -1 : +1) * (NSInteger)list.count ];
-		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:num];
+		PostNotification(kNotificationTotalUnreadCountChanged, num);
 	}
 }
 

@@ -97,7 +97,7 @@
 	diff += [self insertArticles:localSet withRemoteSet:obj.articles]; // insert new in correct order
 	// Get new total article count and post unread-count-change notification
 	if (flag && diff != 0) {
-		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountChanged object:@(diff)];
+		PostNotification(kNotificationTotalUnreadCountChanged, @(diff));
 	}
 }
 

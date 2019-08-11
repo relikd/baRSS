@@ -45,8 +45,8 @@
 	// TODO: move unread counts to status item and keep in sync when changing feeds in preferences
 	self.unreadMap = [[MapUnreadTotal alloc] initWithCoreData: [StoreCoordinator countAggregatedUnread]];
 	// Register for notifications
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedUpdated:) name:kNotificationFeedUpdated object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedIconUpdated:) name:kNotificationFeedIconUpdated object:nil];
+	RegisterNotification(kNotificationFeedUpdated, @selector(feedUpdated:), self);
+	RegisterNotification(kNotificationFeedIconUpdated, @selector(feedIconUpdated:), self);
 	return self;
 }
 
