@@ -28,14 +28,18 @@
 #import "FeedMeta+Ext.h"
 #import "FeedGroup+Ext.h"
 #import "NSDate+Ext.h"
+#include <stdatomic.h>
 
 static BOOL _requestsAreUrgent = NO;
-
+static _Atomic(NSUInteger) _queueSize = 0;
 
 @implementation WebFeed
 
 /// Disables @c NSURLNetworkServiceTypeBackground (ideally only temporarily)
 + (void)setRequestsAreUrgent:(BOOL)flag { _requestsAreUrgent = flag; }
+
+/// @return Number of feeds being currently downloaded.
++ (NSUInteger)feedsInQueue { return _queueSize; }
 
 
 #pragma mark - Request Generator
@@ -292,11 +296,14 @@ static BOOL _requestsAreUrgent = NO;
  */
 + (void)batchDownloadFeeds:(NSArray<Feed*> *)list favicons:(BOOL)fav showErrorAlert:(BOOL)alert finally:(nullable os_block_t)block {
 	[UpdateScheduler beginUpdate];
-	PostNotification(kNotificationBackgroundUpdateInProgress, @(list.count));
+	atomic_fetch_add_explicit(&_queueSize, list.count, memory_order_relaxed);
+	PostNotification(kNotificationBackgroundUpdateInProgress, @(_queueSize));
 	dispatch_group_t group = dispatch_group_create();
 	for (Feed *f in list) {
 		dispatch_group_enter(group);
 		[self backgroundUpdateBoth:f favicon:fav alert:alert finally:^(BOOL success){
+			atomic_fetch_sub_explicit(&_queueSize, 1, memory_order_relaxed);
+			PostNotification(kNotificationBackgroundUpdateInProgress, @(_queueSize));
 			dispatch_group_leave(group);
 		}];
 	}

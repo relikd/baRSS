@@ -25,6 +25,8 @@
 @class Feed;
 
 @interface WebFeed : NSObject
+@property (class, readonly) NSUInteger feedsInQueue;
+
 + (void)setRequestsAreUrgent:(BOOL)flag;
 // Downloading
 + (void)newFeed:(NSString *)urlStr askUser:(nonnull NSString*(^)(RSHTMLMetadata *meta))askUser block:(nonnull void(^)(RSParsedFeed *parsed, NSError *error, NSHTTPURLResponse *response))block;
