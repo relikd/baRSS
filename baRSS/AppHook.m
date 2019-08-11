@@ -51,11 +51,12 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+	[_statusItem asyncReloadUnreadCount];
+	[FeedDownload registerNetworkChangeNotification]; // will call update scheduler
 	if ([StoreCoordinator isEmpty]) {
 		[_statusItem showWelcomeMessage];
+		[FeedDownload autoDownloadAndParseUpdateURL];
 	}
-	[FeedDownload registerNetworkChangeNotification]; // will call update scheduler
-	[_statusItem asyncReloadUnreadCount];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
@@ -71,7 +72,7 @@
 		url = [url substringFromIndex:2];
 	}
 	if ([scheme isEqualToString:@"feed"]) {
-		[FeedDownload autoDownloadAndParseURL:url successBlock:nil];
+		[FeedDownload autoDownloadAndParseURL:url addAnyway:NO modify:nil];
 	}
 }
 

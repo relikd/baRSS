@@ -26,6 +26,7 @@
 #import "Feed+Ext.h"
 #import "FeedMeta+Ext.h"
 #import "FeedGroup+Ext.h"
+#import "NSDate+Ext.h"
 
 #import <SystemConfiguration/SystemConfiguration.h>
 
@@ -342,21 +343,30 @@ static BOOL _nextUpdateIsForced = NO;
  Creates new @c FeedGroup, @c Feed, @c FeedMeta and @c FeedArticle instances and saves them to the persistent store.
  Update duration is set to the default of 30 minutes.
  */
-+ (void)autoDownloadAndParseURL:(NSString*)url successBlock:(nullable os_block_t)block {
++ (void)autoDownloadAndParseURL:(NSString*)url addAnyway:(BOOL)flag modify:(nullable void(^)(Feed *feed))block {
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	Feed *f = [Feed appendToRootWithDefaultIntervalInContext:moc];
 	f.meta.url = url;
-	[self backgroundUpdateBoth:f favicon:YES alert:YES finally:^(BOOL successful){
-		if (!successful) {
+	[self backgroundUpdateBoth:f favicon:YES alert:!flag finally:^(BOOL successful){
+		if (!flag && !successful) {
 			[moc deleteObject:f.group];
+		} else if (block) {
+			block(f); // only on success
 		}
 		[StoreCoordinator saveContext:moc andParent:YES];
 		[moc reset];
 		if (successful) {
 			PostNotification(kNotificationGroupInserted, f.group.objectID);
 			[self scheduleUpdateForUpcomingFeeds];
-			if (block) block();
 		}
+	}];
+}
+
+/// Insert Github URL for version releases with update interval 2 days and rename @c FeedGroup item.
++ (void)autoDownloadAndParseUpdateURL {
+	[self autoDownloadAndParseURL:versionUpdateURL addAnyway:YES modify:^(Feed *feed) {
+		feed.group.name = NSLocalizedString(@"baRSS releases", nil);
+		[feed.meta setRefreshAndSchedule:2 * TimeUnitDays];
 	}];
 }
 
