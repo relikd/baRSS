@@ -20,7 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
+@import Cocoa;
 
 /***/ static CGFloat const PAD_WIN = 20; // window padding
 /***/ static CGFloat const PAD_L = 16;

@@ -23,8 +23,6 @@
 #import "UserPrefs.h"
 #import "StoreCoordinator.h"
 
-#import <Cocoa/Cocoa.h>
-
 @implementation UserPrefs
 
 #pragma mark - User Preferences Plist

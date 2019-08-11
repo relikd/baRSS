@@ -20,12 +20,11 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+@import RSXML.RSParsedArticle;
 #import "FeedArticle+Ext.h"
 #import "Constants.h"
 #import "UserPrefs.h"
 #import "StoreCoordinator.h"
-
-#import <RSXML/RSParsedArticle.h>
 
 @implementation FeedArticle (Ext)
 

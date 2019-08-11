@@ -20,10 +20,9 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
+@import Cocoa;
 #import "ModalSheet.h"
-
-@class FeedGroup;
+@class FeedGroup, ModalSheet;
 
 @interface ModalEditDialog : NSViewController
 + (instancetype)modalWith:(FeedGroup*)group;

@@ -23,6 +23,8 @@
 #ifndef Constants_h
 #define Constants_h
 
+@import Cocoa;
+
 // TODO: Add support for media player? image feed?
 // <enclosure url="https://url.mp3" length="63274022" type="audio/mpeg" />
 // TODO: Disable 'update all' menu item during update?

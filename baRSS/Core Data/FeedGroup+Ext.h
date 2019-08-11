@@ -20,8 +20,8 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+@import Cocoa;
 #import "FeedGroup+CoreDataClass.h"
-#import <Cocoa/Cocoa.h>
 
 /// Enum type to distinguish different @c FeedGroup types: @c GROUP, @c FEED, @c SEPARATOR
 typedef NS_ENUM(int16_t, FeedGroupType) {

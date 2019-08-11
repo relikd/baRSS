@@ -20,9 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
-#import <CoreData/CoreData.h>
-
+@import Cocoa;
 @class BarStatusItem;
 
 @interface AppHook : NSApplication <NSApplicationDelegate>

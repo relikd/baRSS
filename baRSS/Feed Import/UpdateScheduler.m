@@ -20,12 +20,11 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+@import SystemConfiguration;
 #import "UpdateScheduler.h"
 #import "WebFeed.h"
 #import "Constants.h"
 #import "StoreCoordinator.h"
-
-#import <SystemConfiguration/SystemConfiguration.h>
 
 static NSTimer *_timer;
 static SCNetworkReachabilityRef _reachability = NULL;

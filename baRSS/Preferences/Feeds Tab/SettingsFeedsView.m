@@ -29,7 +29,6 @@
 #import "NSDate+Ext.h"
 #import "NSView+Ext.h"
 
-
 @interface SettingsFeedsView()
 @property (weak) SettingsFeeds *controller;
 @end

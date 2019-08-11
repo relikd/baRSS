@@ -20,9 +20,8 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Foundation/Foundation.h>
-#import <RSXML/RSXML.h>
-
+@import Cocoa;
+@import RSXML;
 @class Feed;
 
 @interface WebFeed : NSObject
