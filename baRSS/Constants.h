@@ -29,7 +29,7 @@
 
 
 /// UTI type used for opml files
-static const NSPasteboardType UTI_OPML = @"org.opml";
+static NSPasteboardType const UTI_OPML = @"org.opml";
 
 
 #pragma mark - NSImageName constants
@@ -54,37 +54,45 @@ static NSImageName const RSSImageMenuItemUnread    = @"RSSImageMenuItemUnread";
 #pragma mark - NSNotificationName constants
 
 
+/// Helper method calls @c (defaultCenter)postNotification:
+NS_INLINE void PostNotification(NSNotificationName name, id obj) { [[NSNotificationCenter defaultCenter] postNotificationName:name object:obj]; }
+NS_INLINE void RegisterNotification(NSNotificationName name, SEL action, id observer) { [[NSNotificationCenter defaultCenter] addObserver:observer selector:action name:name object:nil]; }
 /**
  @c notification.object is @c NSNumber of type @c NSUInteger.
  Represents number of feeds that are proccessed in background update. Sends @c 0 when all downloads are finished.
  */
-static const NSNotificationName kNotificationBackgroundUpdateInProgress = @"baRSS-notification-background-update-in-progress";
+static NSNotificationName const kNotificationBackgroundUpdateInProgress = @"baRSS-notification-background-update-in-progress";
+/**
+ @c notification.object is @c NSManagedObjectID of type @c FeedGroup.
+ Called whenever a new feed group was created in @c autoDownloadAndParseURL:
+ */
+static NSNotificationName const kNotificationGroupInserted = @"baRSS-notification-group-inserted";
 /**
  @c notification.object is @c NSManagedObjectID of type @c Feed.
  Called whenever download of a feed finished and object was modified (not if statusCode 304).
  */
-static const NSNotificationName kNotificationFeedUpdated = @"baRSS-notification-feed-updated";
+static NSNotificationName const kNotificationFeedUpdated = @"baRSS-notification-feed-updated";
 /**
  @c notification.object is @c NSManagedObjectID of type @c Feed.
  Called whenever the icon attribute of an item was updated.
  */
-static const NSNotificationName kNotificationFeedIconUpdated = @"baRSS-notification-feed-icon-updated";
+static NSNotificationName const kNotificationFeedIconUpdated = @"baRSS-notification-feed-icon-updated";
 /**
  @c notification.object is @c NSNumber of type @c BOOL.
  @c YES if network became reachable. @c NO on connection lost.
  */
-static const NSNotificationName kNotificationNetworkStatusChanged = @"baRSS-notification-network-status-changed";
+static NSNotificationName const kNotificationNetworkStatusChanged = @"baRSS-notification-network-status-changed";
 /**
  @c notification.object is @c NSNumber of type @c NSInteger.
  Represents a relative change (e.g., negative if items were marked read)
  */
-static const NSNotificationName kNotificationTotalUnreadCountChanged = @"baRSS-notification-total-unread-count-changed";
+static NSNotificationName const kNotificationTotalUnreadCountChanged = @"baRSS-notification-total-unread-count-changed";
 /**
  @c notification.object is either @c nil or @c NSNumber of type @c NSInteger.
  If new count is known an absoulte number is passed.
  Else @c nil if count has to be fetched from core data.
  */
-static const NSNotificationName kNotificationTotalUnreadCountReset = @"baRSS-notification-total-unread-count-reset";
+static NSNotificationName const kNotificationTotalUnreadCountReset = @"baRSS-notification-total-unread-count-reset";
 
 
 #pragma mark - Internal

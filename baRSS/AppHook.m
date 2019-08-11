@@ -71,9 +71,7 @@
 		url = [url substringFromIndex:2];
 	}
 	if ([scheme isEqualToString:@"feed"]) {
-		[FeedDownload autoDownloadAndParseURL:url successBlock:^{
-			[self reopenPreferencesIfOpen];
-		}];
+		[FeedDownload autoDownloadAndParseURL:url successBlock:nil];
 	}
 }
 

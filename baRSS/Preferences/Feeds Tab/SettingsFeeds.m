@@ -48,9 +48,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 	// Register for notifications
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedUpdated:) name:kNotificationFeedUpdated object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(feedUpdated:) name:kNotificationFeedIconUpdated object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateInProgress:) name:kNotificationBackgroundUpdateInProgress object:nil];
+	RegisterNotification(kNotificationFeedUpdated, @selector(feedUpdated:), self);
+	RegisterNotification(kNotificationFeedIconUpdated, @selector(feedUpdated:), self);
+	RegisterNotification(kNotificationGroupInserted, @selector(groupInserted:), self);
+	RegisterNotification(kNotificationBackgroundUpdateInProgress, @selector(updateInProgress:), self);
 }
 
 - (void)dealloc {
@@ -160,6 +161,11 @@
 			[moc refreshObject:feed mergeChanges:YES];
 		[self.dataStore rearrangeObjects]; // update display, show new icon
 	}
+}
+
+/// Callback method fired when feed is inserted via a 'feed://' url
+- (void)groupInserted:(NSNotification*)notify {
+	[self.dataStore fetch:self];
 }
 
 

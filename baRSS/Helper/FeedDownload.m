@@ -330,7 +330,7 @@ static BOOL _nextUpdateIsForced = NO;
 		}
 		[StoreCoordinator saveContext:moc andParent:YES];
 		if (needsNotification)
-			[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedUpdated object:oid];
+			PostNotification(kNotificationFeedUpdated, oid);
 		if (block) block(success);
 	}];
 }
@@ -353,6 +353,7 @@ static BOOL _nextUpdateIsForced = NO;
 		[StoreCoordinator saveContext:moc andParent:YES];
 		[moc reset];
 		if (successful) {
+			PostNotification(kNotificationGroupInserted, f.group.objectID);
 			[self scheduleUpdateForUpcomingFeeds];
 			if (block) block();
 		}
@@ -388,7 +389,7 @@ static BOOL _nextUpdateIsForced = NO;
  */
 + (void)batchDownloadFeeds:(NSArray<Feed*> *)list favicons:(BOOL)fav showErrorAlert:(BOOL)alert finally:(nullable os_block_t)block {
 	_isUpdating = YES;
-	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationBackgroundUpdateInProgress object:@(list.count)];
+	PostNotification(kNotificationBackgroundUpdateInProgress, @(list.count));
 	dispatch_group_t group = dispatch_group_create();
 	for (Feed *f in list) {
 		dispatch_group_enter(group);
@@ -399,7 +400,7 @@ static BOOL _nextUpdateIsForced = NO;
 	dispatch_group_notify(group, dispatch_get_main_queue(), ^{
 		if (block) block();
 		_isUpdating = NO;
-		[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationBackgroundUpdateInProgress object:@(0)];
+		PostNotification(kNotificationBackgroundUpdateInProgress, @(0));
 	});
 }
 
@@ -426,7 +427,7 @@ static BOOL _nextUpdateIsForced = NO;
 		Feed *f = [moc objectWithID:oid];
 		if (f && [f setIconImage:img]) {
 			[StoreCoordinator saveContext:moc andParent:YES];
-			[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationFeedIconUpdated object:oid];
+			PostNotification(kNotificationFeedIconUpdated, oid);
 		}
 		if (block) block();
 	}];
@@ -549,7 +550,7 @@ static BOOL _nextUpdateIsForced = NO;
 static void networkReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkConnectionFlags flags, void *object) {
 	if (_reachability == NULL) return;
 	_isReachable = [FeedDownload hasConnectivity:flags];
-	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationNetworkStatusChanged object:@(_isReachable)];
+	PostNotification(kNotificationNetworkStatusChanged, @(_isReachable));
 	if (_isReachable) {
 		[FeedDownload resumeUpdates];
 	} else {

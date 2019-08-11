@@ -24,7 +24,7 @@
 
 #import <QuartzCore/QuartzCore.h>
 
-static const TimeUnitType _values[] = {
+static TimeUnitType const _values[] = {
 	TimeUnitYears,
 	TimeUnitWeeks,
 	TimeUnitDays,

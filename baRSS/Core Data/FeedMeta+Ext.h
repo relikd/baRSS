@@ -22,7 +22,7 @@
 
 #import "FeedMeta+CoreDataClass.h"
 
-static const int32_t kDefaultFeedRefreshInterval = 30 * 60;
+static int32_t const kDefaultFeedRefreshInterval = 30 * 60;
 
 @interface FeedMeta (Ext)
 // HTTP response

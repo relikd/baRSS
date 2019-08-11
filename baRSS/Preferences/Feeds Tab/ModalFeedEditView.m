@@ -40,7 +40,7 @@
 	self.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
 	
 	CGFloat x = NSWidth(labels.frame) + PAD_S;
-	static const CGFloat rowHeight = PAD_S + HEIGHT_INPUTFIELD;
+	static CGFloat const rowHeight = PAD_S + HEIGHT_INPUTFIELD;
 	[labels placeIn:self x:0 yTop:0];
 	
 	// 1. row

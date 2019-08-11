@@ -23,7 +23,7 @@
 #import <Foundation/Foundation.h>
 #import "DBv1+CoreDataModel.h"
 
-static const int dbFileVersion = 1; // update in case database structure changes
+static int const dbFileVersion = 1; // update in case database structure changes
 
 @interface StoreCoordinator : NSObject
 // Managing contexts
