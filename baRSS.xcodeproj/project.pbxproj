@@ -29,8 +29,9 @@
 		54A07A82220E723D00082C51 /* MapUnreadTotal.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A07A81220E723D00082C51 /* MapUnreadTotal.m */; };
 		54A2D63922EF81A4007C61F3 /* QLOPML.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = 54A2D63822EF8193007C61F3 /* QLOPML.qlgenerator */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		54ACC28C21061B3C0020715F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC28B21061B3C0020715F /* main.m */; };
-		54ACC29521061E270020715F /* FeedDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29421061E270020715F /* FeedDownload.m */; };
+		54ACC29521061E270020715F /* UpdateScheduler.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29421061E270020715F /* UpdateScheduler.m */; };
 		54ACC29821061FBA0020715F /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29721061FBA0020715F /* Preferences.m */; };
+		54AD4E0023005297000AE386 /* WebFeed.m in Sources */ = {isa = PBXBuildFile; fileRef = 54AD4DFF23005297000AE386 /* WebFeed.m */; };
 		54B51704226DC339006C1B29 /* ModalFeedEditView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B51703226DC339006C1B29 /* ModalFeedEditView.m */; };
 		54B517072270E990006C1B29 /* NSView+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B517062270E92A006C1B29 /* NSView+Ext.m */; };
 		54B749DA2204A85C0022CC6D /* BarStatusItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B749D92204A85C0022CC6D /* BarStatusItem.m */; };
@@ -135,10 +136,12 @@
 		54ACC28321061B3B0020715F /* DBv1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DBv1.xcdatamodel; sourceTree = "<group>"; };
 		54ACC28A21061B3C0020715F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		54ACC28B21061B3C0020715F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		54ACC29321061E270020715F /* FeedDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FeedDownload.h; sourceTree = "<group>"; };
-		54ACC29421061E270020715F /* FeedDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FeedDownload.m; sourceTree = "<group>"; };
+		54ACC29321061E270020715F /* UpdateScheduler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UpdateScheduler.h; sourceTree = "<group>"; };
+		54ACC29421061E270020715F /* UpdateScheduler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UpdateScheduler.m; sourceTree = "<group>"; };
 		54ACC29621061FBA0020715F /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		54ACC29721061FBA0020715F /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
+		54AD4DFE23005297000AE386 /* WebFeed.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebFeed.h; sourceTree = "<group>"; };
+		54AD4DFF23005297000AE386 /* WebFeed.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WebFeed.m; sourceTree = "<group>"; };
 		54B51702226DC339006C1B29 /* ModalFeedEditView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModalFeedEditView.h; sourceTree = "<group>"; };
 		54B51703226DC339006C1B29 /* ModalFeedEditView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ModalFeedEditView.m; sourceTree = "<group>"; };
 		54B517052270E8C6006C1B29 /* NSView+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSView+Ext.h"; sourceTree = "<group>"; };
@@ -201,8 +204,6 @@
 			children = (
 				54209E922117325100F3B5EF /* DrawImage.h */,
 				54209E932117325100F3B5EF /* DrawImage.m */,
-				54ACC29321061E270020715F /* FeedDownload.h */,
-				54ACC29421061E270020715F /* FeedDownload.m */,
 				54BB048721FD2AB500C303A5 /* NSDate+Ext.h */,
 				54BB048821FD2AB500C303A5 /* NSDate+Ext.m */,
 				54B517052270E8C6006C1B29 /* NSView+Ext.h */,
@@ -290,6 +291,7 @@
 				544936F721F1E51E00DEE9AA /* Helper */,
 				541A90EF21257D4F002680A6 /* Status Bar Menu */,
 				54A07A8322105E0800082C51 /* Core Data */,
+				54AD4E04230084FD000AE386 /* Feed Import */,
 				546FC44D2118B357007CC3A3 /* Preferences */,
 				54ACC28A21061B3C0020715F /* Info.plist */,
 				54F7101322EE0DDA006985D1 /* Artwork */,
@@ -297,6 +299,19 @@
 				54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */,
 			);
 			path = baRSS;
+			sourceTree = "<group>";
+		};
+		54AD4E04230084FD000AE386 /* Feed Import */ = {
+			isa = PBXGroup;
+			children = (
+				54ACC29321061E270020715F /* UpdateScheduler.h */,
+				54ACC29421061E270020715F /* UpdateScheduler.m */,
+				54AD4DFE23005297000AE386 /* WebFeed.h */,
+				54AD4DFF23005297000AE386 /* WebFeed.m */,
+				54F6025B21C1D4170006D338 /* OpmlFile.h */,
+				54F6025C21C1D4170006D338 /* OpmlFile.m */,
+			);
+			path = "Feed Import";
 			sourceTree = "<group>";
 		};
 		54D857CF228022AB001BA1C8 /* General Tab */ = {
@@ -339,8 +354,6 @@
 				546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */,
 				54D55D7122E624CD00057B98 /* SettingsFeeds+DragDrop.h */,
 				54D55D7222E624CD00057B98 /* SettingsFeeds+DragDrop.m */,
-				54F6025B21C1D4170006D338 /* OpmlFile.h */,
-				54F6025C21C1D4170006D338 /* OpmlFile.m */,
 				54E8831D211B509D00064188 /* ModalFeedEdit.h */,
 				54E8831E211B509D00064188 /* ModalFeedEdit.m */,
 				5478DF02225A7AE200D30C64 /* SettingsFeedsView.h */,
@@ -491,6 +504,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				54AD4E0023005297000AE386 /* WebFeed.m in Sources */,
 				54B51704226DC339006C1B29 /* ModalFeedEditView.m in Sources */,
 				546A6A2C22C584AF0034E806 /* SettingsAppearanceView.m in Sources */,
 				54E9CF32225914300023696F /* SettingsAbout.m in Sources */,
@@ -500,7 +514,7 @@
 				544B011D2114EE9100386E5C /* AppHook.m in Sources */,
 				546FC44321189975007CC3A3 /* SettingsGeneral.m in Sources */,
 				546A6A2922C583390034E806 /* SettingsGeneralView.m in Sources */,
-				54ACC29521061E270020715F /* FeedDownload.m in Sources */,
+				54ACC29521061E270020715F /* UpdateScheduler.m in Sources */,
 				54BB048921FD2AB500C303A5 /* NSDate+Ext.m in Sources */,
 				5477D34E21233C62002BA27F /* FeedGroup+Ext.m in Sources */,
 				5478DF04225A7AE200D30C64 /* SettingsFeedsView.m in Sources */,

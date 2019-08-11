@@ -22,7 +22,7 @@
 
 #import "BarStatusItem.h"
 #import "Constants.h"
-#import "FeedDownload.h"
+#import "UpdateScheduler.h"
 #import "StoreCoordinator.h"
 #import "UserPrefs.h"
 #import "BarMenu.h"
@@ -117,7 +117,7 @@
 /// Update menu bar icon and text according to unread count and user preferences.
 - (void)updateBarIcon {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		BOOL hasNet = [FeedDownload allowNetworkConnection];
+		BOOL hasNet = [UpdateScheduler allowNetworkConnection];
 		BOOL tint = (self.unreadCountTotal > 0 && hasNet && [UserPrefs defaultYES:@"globalTintMenuBarIcon"]);
 		self.statusItem.image = [NSImage imageNamed:(hasNet ? RSSImageMenuBarIconActive : RSSImageMenuBarIconPaused)];
 		self.statusItem.image.template = !tint;
@@ -169,13 +169,13 @@
 	// 'Pause Updates' item
 	NSMenuItem *pause = [menu addItemWithTitle:NSLocalizedString(@"Pause Updates", nil) action:@selector(pauseUpdates) keyEquivalent:@""];
 	pause.target = self;
-	if ([FeedDownload isPaused])
+	if ([UpdateScheduler isPaused])
 		pause.title = NSLocalizedString(@"Resume Updates", nil);
 	// 'Update all feeds' item
 	if ([UserPrefs defaultYES:@"globalUpdateAll"]) {
 		NSMenuItem *updateAll = [menu addItemWithTitle:NSLocalizedString(@"Update all feeds", nil) action:@selector(updateAllFeeds) keyEquivalent:@""];
 		updateAll.target = self;
-		updateAll.enabled = [FeedDownload allowNetworkConnection];
+		updateAll.enabled = [UpdateScheduler allowNetworkConnection];
 		self.updateAllItem = updateAll;
 	}
 	// Separator between main header and default header
@@ -184,14 +184,14 @@
 
 /// Called when user clicks on 'Pause Updates' (main menu only).
 - (void)pauseUpdates {
-	[FeedDownload setPaused:![FeedDownload isPaused]];
+	[UpdateScheduler setPaused:![UpdateScheduler isPaused]];
 	[self updateBarIcon];
 }
 
 /// Called when user clicks on 'Update all feeds' (main menu only).
 - (void)updateAllFeeds {
 //	[self asyncReloadUnreadCount]; // should not be necessary
-	[FeedDownload forceUpdateAllFeeds];
+	[UpdateScheduler forceUpdateAllFeeds];
 }
 
 @end

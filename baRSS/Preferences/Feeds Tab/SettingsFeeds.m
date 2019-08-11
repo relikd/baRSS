@@ -25,7 +25,7 @@
 #import "StoreCoordinator.h"
 #import "ModalFeedEdit.h"
 #import "FeedGroup+Ext.h"
-#import "FeedDownload.h"
+#import "UpdateScheduler.h"
 #import "SettingsFeedsView.h"
 #import "NSDate+Ext.h"
 
@@ -65,7 +65,7 @@
 	self.timerStatusInfo = [NSTimer timerWithTimeInterval:NSTimeIntervalSince1970 target:self selector:@selector(keepTimerRunning) userInfo:nil repeats:YES];
 	[[NSRunLoop mainRunLoop] addTimer:self.timerStatusInfo forMode:NSRunLoopCommonModes];
 	// start spinner if update is in progress when preferences open
-	[self activateSpinner:([FeedDownload isUpdating] ? -1 : 0)];
+	[self activateSpinner:([UpdateScheduler isUpdating] ? -1 : 0)];
 }
 
 /// Timer cleanup
@@ -147,7 +147,7 @@
 
 /// Query core data for next update date and set bottom status message
 - (void)someDatesChangedScheduleUpdateTimer {
-	[FeedDownload scheduleUpdateForUpcomingFeeds];
+	[UpdateScheduler scheduleNextFeed];
 	[self.timerStatusInfo fire];
 }
 
@@ -174,7 +174,7 @@
 
 /// Callback method to update status info. Will be called more often when interval is getting shorter.
 - (void)keepTimerRunning {
-	NSDate *date = [FeedDownload dateScheduled];
+	NSDate *date = [UpdateScheduler dateScheduled];
 	if (date) {
 		double nextFire = fabs(date.timeIntervalSinceNow);
 		if (nextFire > 1e9) { // distance future, over 31 years
@@ -280,9 +280,9 @@
 /// Returning @c NO will result in a Action-Not-Available-Buzzer sound
 - (BOOL)respondsToSelector:(SEL)aSelector {
 	if (aSelector == @selector(undo:))
-		return [self.undoManager canUndo] && self.undoManager.groupingLevel == 0 && ![FeedDownload isUpdating];
+		return [self.undoManager canUndo] && self.undoManager.groupingLevel == 0 && ![UpdateScheduler isUpdating];
 	if (aSelector == @selector(redo:))
-		return [self.undoManager canRedo] && self.undoManager.groupingLevel == 0 && ![FeedDownload isUpdating];
+		return [self.undoManager canRedo] && self.undoManager.groupingLevel == 0 && ![UpdateScheduler isUpdating];
 	if (aSelector == @selector(copy:) || aSelector == @selector(remove:))
 		return ([self userSelectionFirst] != nil);
 	if (aSelector == @selector(editSelectedItem)) {
