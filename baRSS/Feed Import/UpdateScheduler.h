@@ -23,6 +23,7 @@
 @import Cocoa;
 
 @interface UpdateScheduler : NSObject
+@property (class, readonly) NSUInteger feedsInQueue;
 @property (class, readonly) NSDate *dateScheduled;
 @property (class, readonly) BOOL allowNetworkConnection;
 @property (class, readonly) BOOL isUpdating;

@@ -65,7 +65,7 @@
 	self.timerStatusInfo = [NSTimer timerWithTimeInterval:NSTimeIntervalSince1970 target:self selector:@selector(keepTimerRunning) userInfo:nil repeats:YES];
 	[[NSRunLoop mainRunLoop] addTimer:self.timerStatusInfo forMode:NSRunLoopCommonModes];
 	// start spinner if update is in progress when preferences open
-	[self activateSpinner:([UpdateScheduler isUpdating] ? -1 : 0)];
+	[self activateSpinner:[UpdateScheduler feedsInQueue]];
 }
 
 /// Timer cleanup
@@ -190,7 +190,7 @@
 }
 
 /// Start ( @c c @c > @c 0 ) or stop ( @c c @c = @c 0 ) activity spinner. Also, sets status info.
-- (void)activateSpinner:(NSInteger)c {
+- (void)activateSpinner:(NSUInteger)c {
 	if (c == 0) {
 		[self.view.spinner stopAnimation:nil];
 		self.view.status.stringValue = @"";
@@ -200,8 +200,6 @@
 		[self.view.spinner startAnimation:nil];
 		if (c == 1) { // exactly one feed
 			self.view.status.stringValue = NSLocalizedString(@"Updating 1 feed …", nil);
-		} else if (c < 0) { // unknown number of feeds
-			self.view.status.stringValue = NSLocalizedString(@"Updating feeds …", nil);
 		} else {
 			self.view.status.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Updating %lu feeds …", nil), c];
 		}
@@ -210,7 +208,7 @@
 
 /// Callback method fired when background feed update begins and ends.
 - (void)updateInProgress:(NSNotification*)notify {
-	[self activateSpinner:[notify.object integerValue]];
+	[self activateSpinner:[notify.object unsignedIntegerValue]];
 }
 
 

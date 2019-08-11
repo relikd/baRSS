@@ -26,6 +26,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Adding feed:* If URLs can't be resolved in the first run (5xx error), try a second time. E.g., `Done` click (issue: #5)
 - *Adding feed:* Prefer favicons with size `32x32`
 - *Settings, Feeds:* Actions `delete` and `edit` use clicked items instead of selected items
+- *Settings, Feeds:* Accurate download count instead of `Updating feeds …`
 - *UI:* If an error occurs, show document URL (path to file or web url)
 - Comparison of existing articles with nonexistent guid and link
 - Don't mark articles read if opening URLs failed

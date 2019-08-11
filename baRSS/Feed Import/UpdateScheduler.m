@@ -38,6 +38,9 @@ static BOOL _nextUpdateIsForced = NO;
 
 #pragma mark - User Interaction
 
+/// @return Number of feeds being currently downloaded.
++ (NSUInteger)feedsInQueue { return [WebFeed feedsInQueue]; }
+
 /// @return Date when background update will fire. If updates are paused, date is @c distantFuture.
 + (NSDate *)dateScheduled { return _timer.fireDate; }
 
