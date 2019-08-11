@@ -42,6 +42,10 @@ static const CGFloat CENTER = -0.015625;
 
 /// Calculate @c origin.y going down from the top border of its @c superview
 NS_INLINE CGFloat YFromTop(NSView *view) { return NSHeight(view.superview.frame) - NSMinY(view.frame) - view.alignmentRectInsets.bottom; }
+/// @c MAX()
+NS_INLINE CGFloat Max(CGFloat a, CGFloat b) { return a < b ? b : a; }
+/// @c Max(NSWidth(a.frame),NSWidth(b.frame))
+NS_INLINE CGFloat NSMaxWidth(NSView *a, NSView *b) { return Max(NSWidth(a.frame), NSWidth(b.frame)); }
 
 
 /*
@@ -66,6 +70,7 @@ NS_INLINE CGFloat YFromTop(NSView *view) { return NSHeight(view.superview.frame)
 + (NSView*)radioGroup:(NSArray<NSString*>*)entries target:(id)target action:(nonnull SEL)action;
 + (NSView*)radioGroup:(NSArray<NSString*>*)entries;
 // UI: Enclosing Container
++ (NSPopover*)popover:(NSSize)size;
 - (NSScrollView*)wrapContent:(NSView*)content inScrollView:(NSRect)rect;
 + (NSView*)wrapView:(NSView*)other withLabel:(NSString*)str padding:(CGFloat)pad;
 // Insert UI elements in parent view
@@ -98,4 +103,5 @@ NS_INLINE CGFloat YFromTop(NSView *view) { return NSHeight(view.superview.frame)
 @interface NSTextField (Ext)
 - (instancetype)gray;
 - (instancetype)selectable;
+- (instancetype)multiline:(NSSize)size;
 @end

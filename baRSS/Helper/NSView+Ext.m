@@ -56,8 +56,7 @@
 	NSView *parent = [[NSView alloc] init];
 	for (NSUInteger i = 0; i < labels.count; i++) {
 		NSTextField *lbl = [[NSView label:labels[i]] placeIn:parent xRight:0 yTop:y + off];
-		if (w < NSWidth(lbl.frame))
-			w = NSWidth(lbl.frame);
+		w = Max(w, NSWidth(lbl.frame));
 		y += h + pad;
 	}
 	[parent setFrameSize: NSMakeSize(w, y - pad)];
@@ -151,8 +150,7 @@
 		btn.tag = (NSInteger)i-1;
 		if (btn.tag == 0)
 			btn.state = NSControlStateValueOn;
-		if (w < NSWidth(btn.frame)) // find max width (before alignmentRect:)
-			w = NSWidth(btn.frame);
+		w = Max(w, NSWidth(btn.frame)); // find max width (before alignmentRect:)
 		[btn placeIn:parent x:0 y:h];
 		h += NSHeight([btn alignmentRectForFrame:btn.frame]) + PAD_XS;
 	}
@@ -171,6 +169,15 @@
 
 #pragma mark - UI: Enclosing Container -
 
+
+/// Create transient popover with initial view controller and view @c size
++ (NSPopover*)popover:(NSSize)size {
+	NSPopover *pop = [[NSPopover alloc] init];
+	pop.behavior = NSPopoverBehaviorTransient;
+	pop.contentViewController = [[NSViewController alloc] init];
+	pop.contentViewController.view = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, size.width, size.height)];
+	return pop;
+}
 
 /// Insert @c scrollView, remove @c self from current view and set as @c documentView for the newly created scroll view.
 - (NSScrollView*)wrapContent:(NSView*)content inScrollView:(NSRect)rect {
@@ -351,5 +358,15 @@ NS_INLINE void SetFontAndResize(NSControl *control, NSFont *font) {
 
 /// Set @c .selectable to @c YES
 - (instancetype)selectable { self.selectable = YES; return self; }
+
+/// Set @c .maximumNumberOfLines @c = @c 7 and @c preferredMaxLayoutWidth.
+- (instancetype)multiline:(NSSize)size {
+	[self setFrameSize:size];
+	self.preferredMaxLayoutWidth = size.width;
+	self.lineBreakMode = NSLineBreakByWordWrapping;
+	self.usesSingleLineMode = NO;
+	self.maximumNumberOfLines = 7; // used in ModalFeedEditView
+	return self;
+}
 
 @end

@@ -50,9 +50,7 @@
 						 GrayLabel(NSLocalizedString(@"median:", nil)), [self createInlineButton:info[@"median"] callback:callback]];
 		NSView *buttonsView = [self placeViewsHorizontally:arr];
 		
-		CGFloat w = NSWidth(buttonsView.frame);
-		if (w < NSWidth(dateView.frame))
-			w = NSWidth(dateView.frame);
+		CGFloat w = NSMaxWidth(dateView, buttonsView);
 		[self setFrameSize:NSMakeSize(w, NSHeight(buttonsView.frame) + PAD_M + NSHeight(dateView.frame))];
 		
 		[dateView placeIn:self x:CENTER yTop:0];

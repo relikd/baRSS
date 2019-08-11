@@ -27,6 +27,7 @@
 #import "DrawImage.h"
 #import "SettingsFeeds+DragDrop.h"
 #import "UserPrefs.h"
+#import "StoreCoordinator.h"
 
 @interface AppHook()
 @property (strong) NSWindowController *prefWindow;
@@ -41,17 +42,20 @@
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
-	[self migrateVersionUpdate];
+	RegisterImageViewNames();
 	_statusItem = [BarStatusItem new];
 	NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
 	[appleEventManager setEventHandler:self andSelector:@selector(handleGetURLEvent:withReplyEvent:)
 						 forEventClass:kInternetEventClass andEventID:kAEGetURL];
+	[self migrateVersionUpdate];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-	RegisterImageViewNames();
-//	feed://https://feeds.feedburner.com/simpledesktops
+	if ([StoreCoordinator isEmpty]) {
+		[_statusItem showWelcomeMessage];
+	}
 	[FeedDownload registerNetworkChangeNotification]; // will call update scheduler
+	[_statusItem asyncReloadUnreadCount];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
@@ -59,6 +63,7 @@
 }
 
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
+//	feed://https://feeds.feedburner.com/simpledesktops
 	NSString *url = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
 	NSString *scheme = [[[NSURL URLWithString:url] scheme] lowercaseString];
 	url = [url substringFromIndex:scheme.length + 1]; // + ':'

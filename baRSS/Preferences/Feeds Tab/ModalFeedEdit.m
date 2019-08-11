@@ -338,7 +338,7 @@
 	
 	// apply fitting size and display
 	self.view.warningPopover.contentSize = newSize;
-	[self.view.warningPopover showRelativeToRect:sender.bounds ofView:sender preferredEdge:NSRectEdgeMinY];
+	[self.view.warningPopover showRelativeToRect:NSZeroRect ofView:sender preferredEdge:NSRectEdgeMinY];
 }
 
 /// Either hit by Cmd+R or reload button inside warning popover error description

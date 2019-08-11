@@ -70,23 +70,11 @@
 
 /// Prepare popover controller to display errors during download
 - (void)prepareWarningPopover {
-	NSPopover *pop = [[NSPopover alloc] init];
-	pop.behavior = NSPopoverBehaviorTransient;
-	pop.contentViewController = [[NSViewController alloc] init];
-	
-	NSView *content = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 300, 100)];
-	pop.contentViewController.view = content;
-	
+	self.warningPopover = [NSView popover: NSMakeSize(300, 100)];
+	NSView *content = self.warningPopover.contentViewController.view;
 	// User visible error description text (after click on warning button)
-	NSTextField *txt = [[[NSView label:@""] selectable] sizableWidthAndHeight];
-	txt.frame = NSInsetRect(content.frame, 4, 2);
-	txt.preferredMaxLayoutWidth = NSWidth(txt.frame);
-	txt.lineBreakMode = NSLineBreakByWordWrapping;
-	txt.maximumNumberOfLines = 7;
-	[content addSubview:txt];
-	
-	self.warningPopover = pop;
-	self.warningText = txt;
+	self.warningText = [[[[[NSView label:@""] selectable] sizableWidthAndHeight]
+						multiline:NSMakeSize(292, 96)] placeIn:content x:4 y:2];
 	// Reload button is only visible on 5xx server error (right of ––––)
 	self.warningReload = [[[[NSView buttonIcon:NSImageNameRefreshTemplate size:16] placeIn:content x:35 yTop:21]
 						   tooltip:NSLocalizedString(@"Retry download (⌘R)", nil)]

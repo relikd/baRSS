@@ -112,6 +112,11 @@
 
 #pragma mark - Count Elements
 
+/// @return @c YES if core data has no stored @c FeedGroup
++ (BOOL)isEmpty {
+	return [[FeedGroup fetchRequest] fetchFirst:[self getMainContext]] == nil;
+}
+
 /// @return Sum of all unread @c FeedArticle items.
 + (NSUInteger)countTotalUnread {
 	return [[[FeedArticle fetchRequest] where:@"unread = YES"] fetchCount: [self getMainContext]];
