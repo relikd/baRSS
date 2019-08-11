@@ -20,7 +20,8 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import "FeedDownload.h"
+#import "WebFeed.h"
+#import "UpdateScheduler.h"
 #import "Constants.h"
 #import "StoreCoordinator.h"
 #import "Feed+Ext.h"
@@ -28,124 +29,16 @@
 #import "FeedGroup+Ext.h"
 #import "NSDate+Ext.h"
 
-#import <SystemConfiguration/SystemConfiguration.h>
-
-static NSTimer *_timer;
-static SCNetworkReachabilityRef _reachability = NULL;
-static BOOL _isReachable = NO;
-static BOOL _isUpdating = NO;
-static BOOL _updatePaused = NO;
-static BOOL _nextUpdateIsForced = NO;
+static BOOL _requestsAreUrgent = NO;
 
 
-@implementation FeedDownload
+@implementation WebFeed
+
+/// Disables @c NSURLNetworkServiceTypeBackground (ideally only temporarily)
++ (void)setRequestsAreUrgent:(BOOL)flag { _requestsAreUrgent = flag; }
 
 
-#pragma mark - User Interaction -
-
-/// @return Date when background update will fire. If updates are paused, date is @c distantFuture.
-+ (NSDate *)dateScheduled { return _timer.fireDate; }
-
-/// @return @c YES if current network state is reachable and updates are not paused by user.
-+ (BOOL)allowNetworkConnection { return (_isReachable && !_updatePaused); }
-
-/// @return @c YES if batch update is running
-+ (BOOL)isUpdating { return _isUpdating; }
-
-/// @return @c YES if update is paused by user.
-+ (BOOL)isPaused { return _updatePaused; }
-
-/// Set paused flag and cancel timer regardless of network connectivity.
-+ (void)setPaused:(BOOL)flag {
-	_updatePaused = flag;
-	if (_updatePaused)
-		[self pauseUpdates];
-	else
-		[self resumeUpdates];
-}
-
-/// Cancel current timer and stop any updates until enabled again.
-+ (void)pauseUpdates {
-	[self scheduleTimer:nil];
-}
-
-/// Start normal (non forced) schedule if network is reachable.
-+ (void)resumeUpdates {
-	if (_isReachable)
-		[self scheduleUpdateForUpcomingFeeds];
-}
-
-
-#pragma mark - Update Feed Timer -
-
-
-/**
- Get date of next up feed and start the timer.
- */
-+ (void)scheduleUpdateForUpcomingFeeds {
-	if (![self allowNetworkConnection]) // timer will restart once connection exists
-		return;
-	NSDate *nextTime = [StoreCoordinator nextScheduledUpdate]; // if nextTime = nil, then no feeds to update
-	if (nextTime && [nextTime timeIntervalSinceNow] < 1) { // mostly, if app was closed for a long time
-		nextTime = [NSDate dateWithTimeIntervalSinceNow:1];
-	}
-	[self scheduleTimer:nextTime];
-}
-
-/**
- Start download of all feeds (immediatelly) regardless of @c .scheduled property.
- */
-+ (void)forceUpdateAllFeeds {
-	if (![self allowNetworkConnection]) // timer will restart once connection exists
-		return;
-	_nextUpdateIsForced = YES;
-	[self scheduleTimer:[NSDate dateWithTimeIntervalSinceNow:0.05]];
-}
-
-/**
- Set new @c .fireDate and @c .tolerance for update timer.
-
- @param nextTime If @c nil timer will be disabled with a @c .fireDate very far in the future.
- */
-+ (void)scheduleTimer:(NSDate*)nextTime {
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-		_timer = [NSTimer timerWithTimeInterval:NSTimeIntervalSince1970 target:[self class] selector:@selector(updateTimerCallback) userInfo:nil repeats:YES];
-		[[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSRunLoopCommonModes];
-	});
-	if (!nextTime)
-		nextTime = [NSDate distantFuture];
-	NSTimeInterval tolerance = [nextTime timeIntervalSinceNow] * 0.15;
-	_timer.tolerance = (tolerance < 1 ? 1 : tolerance); // at least 1 sec
-	_timer.fireDate = nextTime;
-}
-
-/**
- Called when schedule timer runs out (earliest @c .schedule date). Or if forced by user request.
- */
-+ (void)updateTimerCallback {
-#ifdef DEBUG
-	NSLog(@"fired");
-#endif
-	BOOL updateAll = _nextUpdateIsForced;
-	_nextUpdateIsForced = NO;
-	
-	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
-	NSArray<Feed*> *list = [StoreCoordinator getListOfFeedsThatNeedUpdate:updateAll inContext:moc];
-	//NSAssert(list.count > 0, @"ERROR: Something went wrong, timer fired too early.");
-	if (![self allowNetworkConnection]) {
-		[moc reset];
-		return;
-	}
-	[self batchDownloadFeeds:list favicons:updateAll showErrorAlert:NO finally:^{
-		[StoreCoordinator saveContext:moc andParent:YES]; // save parents too ...
-		[moc reset];
-		[self resumeUpdates]; // always reset the timer
-	}];
-}
-
-
-#pragma mark - Request Generator -
+#pragma mark - Request Generator
 
 
 /// @return Base URL part. E.g., https://stackoverflow.com/a/15897956/10616114 ==> https://stackoverflow.com/
@@ -176,7 +69,7 @@ static BOOL _nextUpdateIsForced = NO;
 		else if (meta.modified.length > 0)
 			[req setValue:meta.modified forHTTPHeaderField:@"If-Modified-Since"];
 	}
-	if (!_nextUpdateIsForced) // any request that is not forced, is a background update
+	if (!_requestsAreUrgent) // any request that is not forced, is a background update
 		req.networkServiceType = NSURLNetworkServiceTypeBackground;
 	return req;
 }
@@ -229,7 +122,7 @@ static BOOL _nextUpdateIsForced = NO;
 }
 
 
-#pragma mark - Download RSS Feed -
+#pragma mark - Download RSS Feed
 
 
 /**
@@ -264,7 +157,7 @@ static BOOL _nextUpdateIsForced = NO;
 
 /**
  Perform feed download request from URL alone. Not updating any @c Feed item.
-
+ 
  @note @c askUser will not be called if url is XML already.
  
  @param urlStr XML URL or HTTP URL that will be parsed to find feed URLs.
@@ -357,7 +250,7 @@ static BOOL _nextUpdateIsForced = NO;
 		[moc reset];
 		if (successful) {
 			PostNotification(kNotificationGroupInserted, f.group.objectID);
-			[self scheduleUpdateForUpcomingFeeds];
+			[UpdateScheduler scheduleNextFeed];
 		}
 	}];
 }
@@ -391,14 +284,14 @@ static BOOL _nextUpdateIsForced = NO;
 
 /**
  Start download of all feeds in list. Either with or without favicons.
-
+ 
  @param list Download list using @c feed.meta.url as download url. (while reusing etag and modified headers)
  @param fav If @c YES continue with favicon download after xml download finished.
  @param alert If @c YES display Error Popup to user.
  @param block Called after all downloads finished.
  */
 + (void)batchDownloadFeeds:(NSArray<Feed*> *)list favicons:(BOOL)fav showErrorAlert:(BOOL)alert finally:(nullable os_block_t)block {
-	_isUpdating = YES;
+	[UpdateScheduler beginUpdate];
 	PostNotification(kNotificationBackgroundUpdateInProgress, @(list.count));
 	dispatch_group_t group = dispatch_group_create();
 	for (Feed *f in list) {
@@ -409,13 +302,13 @@ static BOOL _nextUpdateIsForced = NO;
 	}
 	dispatch_group_notify(group, dispatch_get_main_queue(), ^{
 		if (block) block();
-		_isUpdating = NO;
+		[UpdateScheduler endUpdate];
 		PostNotification(kNotificationBackgroundUpdateInProgress, @(0));
 	});
 }
 
 
-#pragma mark - Download Favicon -
+#pragma mark - Download Favicon
 
 
 /**
@@ -457,7 +350,7 @@ static BOOL _nextUpdateIsForced = NO;
 	}];
 }
 
-/// Download html page and parse all icon urls. Starting a successive request on the url of the smallest icon.
+/// Download html page and parse all icon urls. Starting a successive request on the favicon url.
 + (void)downloadFaviconByParsingHTML:(NSString*)hostURL finished:(void(^)(NSImage * _Nullable img))block {
 	[self asyncRequest:[self newRequestURL:hostURL] block:^(NSData * _Nullable htmlData, NSError * _Nullable error, NSHTTPURLResponse *response) {
 		if (htmlData) {
@@ -522,63 +415,6 @@ static BOOL _nextUpdateIsForced = NO;
 //		}
 		dispatch_async(dispatch_get_main_queue(), ^{ block(img); });
 	}];
-}
-
-
-#pragma mark - Network Connection & Reachability -
-
-
-/// Set callback on @c self to listen for network reachability changes.
-+ (void)registerNetworkChangeNotification {
-	// https://stackoverflow.com/questions/11240196/notification-when-wifi-connected-os-x
-	if (_reachability != NULL) return;
-	_reachability = SCNetworkReachabilityCreateWithName(NULL, "1.1.1.1");
-	if (_reachability == NULL) return;
-	// If reachability information is available now, we don't get a callback later
-	SCNetworkConnectionFlags flags;
-	if (SCNetworkReachabilityGetFlags(_reachability, &flags))
-		networkReachabilityCallback(_reachability, flags, NULL);
-	if (!SCNetworkReachabilitySetCallback(_reachability, networkReachabilityCallback, NULL) ||
-		!SCNetworkReachabilityScheduleWithRunLoop(_reachability, [[NSRunLoop currentRunLoop] getCFRunLoop], kCFRunLoopCommonModes))
-	{
-		CFRelease(_reachability);
-		_reachability = NULL;
-	}
-}
-
-/// Remove @c self callback (network reachability changes).
-+ (void)unregisterNetworkChangeNotification {
-	if (_reachability != NULL) {
-		SCNetworkReachabilitySetCallback(_reachability, nil, nil);
-		SCNetworkReachabilitySetDispatchQueue(_reachability, nil);
-		CFRelease(_reachability);
-		_reachability = NULL;
-	}
-}
-
-/// Called when network interface or reachability changes.
-static void networkReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkConnectionFlags flags, void *object) {
-	if (_reachability == NULL) return;
-	_isReachable = [FeedDownload hasConnectivity:flags];
-	PostNotification(kNotificationNetworkStatusChanged, @(_isReachable));
-	if (_isReachable) {
-		[FeedDownload resumeUpdates];
-	} else {
-		[FeedDownload pauseUpdates];
-	}
-}
-
-/// @return @c YES if network connection established.
-+ (BOOL)hasConnectivity:(SCNetworkReachabilityFlags)flags {
-	if ((flags & kSCNetworkReachabilityFlagsReachable) == 0)
-		return NO;
-	if ((flags & kSCNetworkReachabilityFlagsConnectionRequired) == 0)
-		return YES;
-	if ((flags & kSCNetworkReachabilityFlagsInterventionRequired) == 0 &&
-		((flags & kSCNetworkReachabilityFlagsConnectionOnDemand) != 0 ||
-		 (flags & kSCNetworkReachabilityFlagsConnectionOnTraffic) != 0))
-		return YES; // no-intervention AND ( on-demand OR on-traffic )
-	return NO;
 }
 
 @end

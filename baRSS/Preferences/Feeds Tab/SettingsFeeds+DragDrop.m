@@ -23,7 +23,7 @@
 #import "SettingsFeeds+DragDrop.h"
 #import "StoreCoordinator.h"
 #import "Constants.h"
-#import "FeedDownload.h"
+#import "WebFeed.h"
 #import "FeedGroup+Ext.h"
 
 // Pasteboard type used during internal row reordering
@@ -160,7 +160,7 @@ const NSPasteboardType dragReorder = @"de.relikd.baRSS.drag-reorder";
 	[StoreCoordinator saveContext:moc andParent:YES];
 	if (selection.count > 0)
 		[self.dataStore setSelectionIndexPaths:selection];
-	[FeedDownload batchDownloadFeeds:feedsList favicons:YES showErrorAlert:YES finally:^{
+	[WebFeed batchDownloadFeeds:feedsList favicons:YES showErrorAlert:YES finally:^{
 		[self endCoreDataChangeUndoEmpty:NO forceUndo:NO];
 		[self someDatesChangedScheduleUpdateTimer];
 	}];

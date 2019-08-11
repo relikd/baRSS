@@ -24,11 +24,11 @@
 #import "FeedMeta+Ext.h"
 #import "FeedGroup+Ext.h"
 #import "StoreCoordinator.h"
-#import "FeedDownload.h"
 #import "Constants.h"
 #import "NSDate+Ext.h"
 #import "NSView+Ext.h"
 
+#import <RSXML/RSXML.h>
 
 #pragma mark - Helper
 

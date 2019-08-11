@@ -20,23 +20,13 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import <RSXML/RSXML.h>
 
 @class Feed;
 
-@interface FeedDownload : NSObject
-@property (class, readonly) NSDate *dateScheduled;
-@property (class, readonly) BOOL allowNetworkConnection;
-@property (class, readonly) BOOL isUpdating;
-@property (class, setter=setPaused:) BOOL isPaused;
-
-// Register for network change notifications
-+ (void)registerNetworkChangeNotification;
-+ (void)unregisterNetworkChangeNotification;
-// Scheduling
-+ (void)scheduleUpdateForUpcomingFeeds;
-+ (void)forceUpdateAllFeeds;
+@interface WebFeed : NSObject
++ (void)setRequestsAreUrgent:(BOOL)flag;
 // Downloading
 + (void)newFeed:(NSString *)urlStr askUser:(nonnull NSString*(^)(RSHTMLMetadata *meta))askUser block:(nonnull void(^)(RSParsedFeed *parsed, NSError *error, NSHTTPURLResponse *response))block;
 + (void)autoDownloadAndParseURL:(NSString*)urlStr addAnyway:(BOOL)flag modify:(nullable void(^)(Feed *feed))block;

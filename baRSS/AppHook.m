@@ -22,7 +22,8 @@
 
 #import "AppHook.h"
 #import "BarStatusItem.h"
-#import "FeedDownload.h"
+#import "WebFeed.h"
+#import "UpdateScheduler.h"
 #import "Preferences.h"
 #import "DrawImage.h"
 #import "SettingsFeeds+DragDrop.h"
@@ -52,15 +53,15 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	[_statusItem asyncReloadUnreadCount];
-	[FeedDownload registerNetworkChangeNotification]; // will call update scheduler
+	[UpdateScheduler registerNetworkChangeNotification]; // will call update scheduler
 	if ([StoreCoordinator isEmpty]) {
 		[_statusItem showWelcomeMessage];
-		[FeedDownload autoDownloadAndParseUpdateURL];
+		[WebFeed autoDownloadAndParseUpdateURL];
 	}
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
-	[FeedDownload unregisterNetworkChangeNotification];
+	[UpdateScheduler unregisterNetworkChangeNotification];
 }
 
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
@@ -72,7 +73,7 @@
 		url = [url substringFromIndex:2];
 	}
 	if ([scheme isEqualToString:@"feed"]) {
-		[FeedDownload autoDownloadAndParseURL:url addAnyway:NO modify:nil];
+		[WebFeed autoDownloadAndParseURL:url addAnyway:NO modify:nil];
 	}
 }
 
@@ -107,7 +108,7 @@
 - (void)preferencesClosed:(id)sender {
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:self.prefWindow.window];
 	self.prefWindow = nil;
-	[FeedDownload scheduleUpdateForUpcomingFeeds];
+	[UpdateScheduler scheduleNextFeed];
 }
 
 /// Close previous preferences window and re-open at the same position (will drop undo manager stack!)

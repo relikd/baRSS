@@ -21,7 +21,7 @@
 //  SOFTWARE.
 
 #import "ModalFeedEdit.h"
-#import "FeedDownload.h"
+#import "WebFeed.h"
 #import "StoreCoordinator.h"
 #import "Feed+Ext.h"
 #import "FeedMeta+Ext.h"
@@ -158,8 +158,8 @@
 	if (self.modalSheet.didCloseAndCancel)
 		return;
 	[self preDownload];
-	[FeedDownload newFeed:self.previousURL askUser:^NSString *(RSHTMLMetadata *meta) {
-		self.faviconURL = [FeedDownload faviconUrlForMetadata:meta]; // we can re-use favicon url if we find one
+	[WebFeed newFeed:self.previousURL askUser:^NSString *(RSHTMLMetadata *meta) {
+		self.faviconURL = [WebFeed faviconUrlForMetadata:meta]; // we can re-use favicon url if we find one
 		return [self letUserChooseXmlUrlFromList:meta.feedLinks];
 	} block:^(RSParsedFeed *result, NSError *error, NSHTTPURLResponse* response) {
 		if (self.modalSheet.didCloseAndCancel)
@@ -239,7 +239,7 @@
 			self.faviconURL = self.feedResult.link;
 		if (self.faviconURL.length == 0)
 			self.faviconURL = responseURL;
-		[FeedDownload downloadFavicon:self.faviconURL finished:^(NSImage * _Nullable img) {
+		[WebFeed downloadFavicon:self.faviconURL finished:^(NSImage * _Nullable img) {
 			if (self.modalSheet.didCloseAndCancel)
 				return;
 			self.view.favicon.image = img;
