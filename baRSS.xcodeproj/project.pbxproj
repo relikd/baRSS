@@ -32,6 +32,7 @@
 		54ACC29521061E270020715F /* UpdateScheduler.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29421061E270020715F /* UpdateScheduler.m */; };
 		54ACC29821061FBA0020715F /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29721061FBA0020715F /* Preferences.m */; };
 		54AD4E0023005297000AE386 /* WebFeed.m in Sources */ = {isa = PBXBuildFile; fileRef = 54AD4DFF23005297000AE386 /* WebFeed.m */; };
+		54AD4E0C2301853D000AE386 /* NSString+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54AD4E0B2301853D000AE386 /* NSString+Ext.m */; };
 		54B51704226DC339006C1B29 /* ModalFeedEditView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B51703226DC339006C1B29 /* ModalFeedEditView.m */; };
 		54B517072270E990006C1B29 /* NSView+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B517062270E92A006C1B29 /* NSView+Ext.m */; };
 		54B749DA2204A85C0022CC6D /* BarStatusItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B749D92204A85C0022CC6D /* BarStatusItem.m */; };
@@ -142,6 +143,8 @@
 		54ACC29721061FBA0020715F /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		54AD4DFE23005297000AE386 /* WebFeed.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebFeed.h; sourceTree = "<group>"; };
 		54AD4DFF23005297000AE386 /* WebFeed.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WebFeed.m; sourceTree = "<group>"; };
+		54AD4E0A2301853D000AE386 /* NSString+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Ext.h"; sourceTree = "<group>"; };
+		54AD4E0B2301853D000AE386 /* NSString+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+Ext.m"; sourceTree = "<group>"; };
 		54B51702226DC339006C1B29 /* ModalFeedEditView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModalFeedEditView.h; sourceTree = "<group>"; };
 		54B51703226DC339006C1B29 /* ModalFeedEditView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ModalFeedEditView.m; sourceTree = "<group>"; };
 		54B517052270E8C6006C1B29 /* NSView+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSView+Ext.h"; sourceTree = "<group>"; };
@@ -208,6 +211,8 @@
 				54BB048821FD2AB500C303A5 /* NSDate+Ext.m */,
 				54B517052270E8C6006C1B29 /* NSView+Ext.h */,
 				54B517062270E92A006C1B29 /* NSView+Ext.m */,
+				54AD4E0A2301853D000AE386 /* NSString+Ext.h */,
+				54AD4E0B2301853D000AE386 /* NSString+Ext.m */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -506,6 +511,7 @@
 			files = (
 				54AD4E0023005297000AE386 /* WebFeed.m in Sources */,
 				54B51704226DC339006C1B29 /* ModalFeedEditView.m in Sources */,
+				54AD4E0C2301853D000AE386 /* NSString+Ext.m in Sources */,
 				546A6A2C22C584AF0034E806 /* SettingsAppearanceView.m in Sources */,
 				54E9CF32225914300023696F /* SettingsAbout.m in Sources */,
 				54B749E0220636200022CC6D /* FeedArticle+Ext.m in Sources */,
