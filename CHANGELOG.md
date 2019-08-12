@@ -30,6 +30,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *UI:* If an error occurs, show document URL (path to file or web url)
 - Comparison of existing articles with nonexistent guid and link
 - Don't mark articles read if opening URLs failed
+- HTML tag removal keeps structure intact
 
 ### Changed
 - *UI:* Interface builder files replaced with code equivalent

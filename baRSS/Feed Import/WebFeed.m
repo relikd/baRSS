@@ -28,6 +28,8 @@
 #import "FeedMeta+Ext.h"
 #import "FeedGroup+Ext.h"
 #import "NSDate+Ext.h"
+#import "NSString+Ext.h"
+
 #include <stdatomic.h>
 
 static BOOL _requestsAreUrgent = NO;
@@ -104,25 +106,12 @@ static _Atomic(NSUInteger) _queueSize = 0;
 			data = nil;
 		} else if (status >= 500 && status < 600) { // 5xx Server Error
 			NSString *reason = [NSString stringWithFormat:NSLocalizedString(@"Server HTTP error %ld.\n––––\n%@", nil),
-								status, [self extractReadableHTML:data]];
+								status, [NSString plainTextFromHTMLData:data]];
 			error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorBadServerResponse userInfo:@{NSLocalizedDescriptionKey: reason}];
 			data = nil;
 		}
 		block(data, error, httpResponse); // if status == 304, data & error nil
 	}] resume];
-}
-
-/// Helper method to extract readable text from HTML
-+ (NSString*)extractReadableHTML:(NSData*)data {
-	NSString *str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-	// replace all <tags> with (presumably) non-used character
-	str = [[NSRegularExpression regularExpressionWithPattern:@"<[^>]*>\\s*" options:kNilOptions error:nil]
-		   stringByReplacingMatchesInString:str options:kNilOptions range:NSMakeRange(0, str.length) withTemplate:@"◊"];
-	// then replace multiple occurences of that character with a single new line
-	str = [[NSRegularExpression regularExpressionWithPattern:@"◊+" options:kNilOptions error:nil]
-		   stringByReplacingMatchesInString:str options:kNilOptions range:NSMakeRange(0, str.length) withTemplate:@"\n"];
-	// finally trim whitespace at start and end
-	return [str stringByTrimmingCharactersInSet: NSCharacterSet.whitespaceAndNewlineCharacterSet];
 }
 
 

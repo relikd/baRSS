@@ -25,6 +25,7 @@
 #import "Constants.h"
 #import "UserPrefs.h"
 #import "StoreCoordinator.h"
+#import "NSString+Ext.h"
 
 @implementation FeedArticle (Ext)
 
@@ -34,11 +35,10 @@
 	fa.unread = YES;
 	fa.guid = entry.guid;
 	fa.title = entry.title;
-	if (entry.abstract.length > 0) { // remove html tags and save plain text to db
-		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"<[^>]*>" options:kNilOptions error:nil];
-		fa.abstract = [regex stringByReplacingMatchesInString:entry.abstract options:kNilOptions range:NSMakeRange(0, entry.abstract.length) withTemplate:@""];
-	}
-	fa.body = entry.body;
+	if (entry.abstract.length > 0)
+		fa.abstract = [entry.abstract htmlToPlainText];
+	if (entry.body.length > 0)
+		fa.body = [entry.body htmlToPlainText];
 	fa.author = entry.author;
 	fa.link = entry.link;
 	fa.published = entry.datePublished;
