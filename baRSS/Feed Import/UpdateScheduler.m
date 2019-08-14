@@ -28,8 +28,7 @@
 
 static NSTimer *_timer;
 static SCNetworkReachabilityRef _reachability = NULL;
-static BOOL _isReachable = NO;
-static BOOL _isUpdating = NO;
+static BOOL _isReachable = YES;
 static BOOL _updatePaused = NO;
 static BOOL _nextUpdateIsForced = NO;
 
@@ -48,13 +47,14 @@ static BOOL _nextUpdateIsForced = NO;
 + (BOOL)allowNetworkConnection { return (_isReachable && !_updatePaused); }
 
 /// @return @c YES if batch update is running
-+ (BOOL)isUpdating { return _isUpdating; }
++ (BOOL)isUpdating { return [WebFeed feedsInQueue] > 0; }
 
 /// @return @c YES if update is paused by user.
 + (BOOL)isPaused { return _updatePaused; }
 
 /// Set paused flag and cancel timer regardless of network connectivity.
 + (void)setPaused:(BOOL)flag {
+	// TODO: should pause persist between app launches?
 	_updatePaused = flag;
 	if (_updatePaused)
 		[self pauseUpdates];
@@ -72,12 +72,6 @@ static BOOL _nextUpdateIsForced = NO;
 	if (_isReachable)
 		[self scheduleNextFeed];
 }
-
-/// Set @c isUpdating @c = @c YES
-+ (void)beginUpdate { _isUpdating = YES; }
-
-/// Set @c isUpdating @c = @c NO
-+ (void)endUpdate { _isUpdating = NO; }
 
 
 #pragma mark - Update Feed Timer
@@ -133,23 +127,32 @@ static BOOL _nextUpdateIsForced = NO;
 #endif
 	BOOL updateAll = _nextUpdateIsForced;
 	_nextUpdateIsForced = NO;
-	if (updateAll)
-		[WebFeed setRequestsAreUrgent:YES];
 	
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	NSArray<Feed*> *list = [StoreCoordinator getListOfFeedsThatNeedUpdate:updateAll inContext:moc];
 	//NSAssert(list.count > 0, @"ERROR: Something went wrong, timer fired too early.");
-	if (![self allowNetworkConnection]) {
-		[WebFeed setRequestsAreUrgent:NO];
-		[moc reset];
-		return;
-	}
-	[WebFeed batchDownloadFeeds:list favicons:updateAll showErrorAlert:NO finally:^{
-		[WebFeed setRequestsAreUrgent:NO];
+	
+	[self downloadList:list background:!updateAll finally:^{
 		[StoreCoordinator saveContext:moc andParent:YES]; // save parents too ...
 		[moc reset];
 		[self resumeUpdates]; // always reset the timer
 	}];
+}
+
+/// Download list of feeds. Either silently in background or in foreground with alerts.
++ (void)downloadList:(NSArray<Feed*>*)list background:(BOOL)flag finally:(nullable os_block_t)block {
+	if (![self allowNetworkConnection]) {
+		if (block) block();
+	} else if (flag) {
+		[WebFeed batchDownloadFeeds:list showErrorAlert:NO finally:block];
+	} else {
+		// TODO: add undo grouping?
+		[WebFeed setRequestsAreUrgent:YES];
+		[WebFeed batchDownloadFeeds:list showErrorAlert:YES finally:^{
+			[WebFeed setRequestsAreUrgent:NO];
+			if (block) block();
+		}];
+	}
 }
 
 

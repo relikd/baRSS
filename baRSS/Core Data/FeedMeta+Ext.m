@@ -26,6 +26,14 @@
 
 @implementation FeedMeta (Ext)
 
+/// Create new instance with default @c refresh interval and set @c scheduled to distant past.
++ (instancetype)newMetaInContext:(NSManagedObjectContext*)moc {
+	FeedMeta *meta = [[FeedMeta alloc] initWithEntity:FeedMeta.entity insertIntoManagedObjectContext:moc];
+	meta.refresh = kDefaultFeedRefreshInterval;
+	meta.scheduled = [NSDate distantPast]; // will cause update to refresh as soon as possible
+	return meta;
+}
+
 #pragma mark - HTTP response
 
 /// Increment @c errorCount and set new @c scheduled date (2^N minutes, max. 5.7 days).

@@ -29,9 +29,9 @@
 
 #pragma mark - Properties
 
-/// @return Returns "(error)" if @c self.name is @c nil.
+/// @return Returns "(no title)" if @c self.name is @c nil.
 - (nonnull NSString*)nameOrError {
-	return (self.name ? self.name : NSLocalizedString(@"(error)", nil));
+	return (self.name ? self.name : NSLocalizedString(@"(no title)", nil));
 }
 
 /// @return Return @c 16x16px NSImageNameFolder image.

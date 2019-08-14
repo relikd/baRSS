@@ -72,11 +72,10 @@
 @property (strong) RefreshStatisticsView *statisticsView;
 
 @property (copy) NSString *previousURL; // check if changed and avoid multiple download
-@property (copy) NSString *httpDate;
-@property (copy) NSString *httpEtag;
 @property (copy) NSString *faviconURL;
 @property (strong) NSError *feedError; // download error or xml parser error
 @property (strong) RSParsedFeed *feedResult; // parsed result
+@property (strong) NSHTTPURLResponse *httpResponse;
 @property (assign) BOOL didDownloadFeed; // check if feed articles need update
 @end
 
@@ -119,7 +118,7 @@
 	[meta setRefreshAndSchedule:[NSDate intervalForPopup:self.view.refreshUnit andField:self.view.refreshNum]];
 	// updateTimer will be scheduled once preferences is closed
 	if (self.didDownloadFeed) {
-		[meta setEtag:self.httpEtag modified:self.httpDate];
+		[meta setSucessfulWithResponse:self.httpResponse];
 		[feed updateWithRSS:self.feedResult postUnreadCountChange:YES];
 		[feed setIconImage:self.view.favicon.image];
 	}
@@ -141,10 +140,9 @@
 	if ([self.view.name.stringValue isEqualToString:self.feedResult.title]) {
 		self.view.name.stringValue = @"";
 	}
-	self.feedResult = nil;
 	self.feedError = nil;
-	self.httpEtag = nil;
-	self.httpDate = nil;
+	self.feedResult = nil;
+	self.httpResponse = nil;
 	self.faviconURL = nil;
 	self.previousURL = self.view.url.stringValue;
 }
@@ -167,8 +165,7 @@
 		self.didDownloadFeed = YES;
 		self.feedResult = result;
 		self.feedError = error;
-		self.httpEtag = [response allHeaderFields][@"Etag"];
-		self.httpDate = [response allHeaderFields][@"Date"]; // @"Expires", @"Last-Modified"
+		self.httpResponse = response;
 		[self postDownload:response.URL.absoluteString];
 	}];
 }
