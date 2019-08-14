@@ -26,6 +26,7 @@
 static int32_t const kDefaultFeedRefreshInterval = 30 * 60;
 
 @interface FeedMeta (Ext)
++ (instancetype)newMetaInContext:(NSManagedObjectContext*)moc;
 // HTTP response
 - (void)setErrorAndPostponeSchedule;
 - (void)setSucessfulWithResponse:(NSHTTPURLResponse*)response;
@@ -33,4 +34,5 @@ static int32_t const kDefaultFeedRefreshInterval = 30 * 60;
 - (void)setUrlIfChanged:(NSString*)url;
 - (void)setEtag:(NSString*)etag modified:(NSString*)modified;
 - (BOOL)setRefreshAndSchedule:(int32_t)refresh;
+- (void)scheduleNow:(NSTimeInterval)future;
 @end

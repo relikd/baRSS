@@ -154,6 +154,8 @@
 		[self.unreadMap updateAllCounts:updated forPath:feed.indexPath];
 		// 2. rebuild articles menu if it is open
 		if (item.submenu.isFeedMenu) { // menu item is visible
+			if (feed.group.name)
+				item.title = feed.group.name; // will replace (no title)
 			item.image = [feed iconImage16];
 			item.enabled = (feed.articles.count > 0);
 			if (item.submenu.numberOfItems > 0) { // replace articles menu

@@ -34,7 +34,7 @@
 /// Instantiates new @c Feed and @c FeedMeta entities in context.
 + (instancetype)newFeedAndMetaInContext:(NSManagedObjectContext*)moc {
 	Feed *feed = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:moc];
-	feed.meta = [[FeedMeta alloc] initWithEntity:FeedMeta.entity insertIntoManagedObjectContext:moc];
+	feed.meta = [FeedMeta newMetaInContext:moc];
 	return feed;
 }
 
@@ -43,7 +43,6 @@
 	NSUInteger lastIndex = [StoreCoordinator countRootItemsInContext:moc];
 	FeedGroup *fg = [FeedGroup newGroup:FEED inContext:moc];
 	[fg setParent:nil andSortIndex:(int32_t)lastIndex];
-	[fg.feed.meta setRefreshAndSchedule:kDefaultFeedRefreshInterval];
 	return fg.feed;
 }
 

@@ -143,7 +143,7 @@ NS_INLINE NSInteger RadioGroupSelection(NSView *view) {
 			interval = (int32_t)[refresh integerValue];
 		
 		newFeed.feed.meta.url = [item attributeForKey:OPMLXMLURLKey];
-		[newFeed.feed.meta setRefreshAndSchedule:interval];
+		newFeed.feed.meta.refresh = interval;
 	} else { // GROUP
 		for (NSUInteger i = 0; i < item.children.count; i++) {
 			[self importFeed:item.children[i] parent:newFeed index:(int32_t)i inContext:moc];

@@ -25,20 +25,25 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Adding feed:* Show users any 5xx server error response and extracted failure reason
 - *Adding feed:* If URLs can't be resolved in the first run (5xx error), try a second time. E.g., `Done` click (issue: #5)
 - *Adding feed:* Prefer favicons with size `32x32`
+- *Adding feed:* Inserting feeds when offline will postpone download until network is reachable again
+- *Adding feed:* Inserting feeds when paused will postpone download until unpaused 
 - *Settings, Feeds:* Actions `delete` and `edit` use clicked items instead of selected items
 - *Settings, Feeds:* Accurate download count instead of `Updating feeds …`
+- *Status Bar Menu*: Feed title is updated properly
 - *UI:* If an error occurs, show document URL (path to file or web url)
 - Comparison of existing articles with nonexistent guid and link
 - Don't mark articles read if opening URLs failed
 - HTML tag removal keeps structure intact
 
 ### Changed
-- *UI:* Interface builder files replaced with code equivalent
-- *UI:* Mark unread articles with blue dot, instead of tick mark
-- *Settings, Feeds:* Single add button for feeds, groups, and separators
-- *Settings, Feeds:* Always append new items at the end
 - *Adding feed:* Display error reason if user cancels the creation of a new feed item
 - *Adding feed:* Refresh interval hotkeys set to: `⌘1` … `⌘6`
+- *Settings, Feeds:* Single add button for feeds, groups, and separators
+- *Settings, Feeds:* Always append new items at the end
+- *Status Bar Menu*: Show `(no title)` instead of `(error)`
+- *Status Bar Menu*: `Update all feeds` will show error alerts for broken URLs
+- *UI:* Interface builder files replaced with code equivalent
+- *UI:* Mark unread articles with blue dot, instead of tick mark
 - *DB*: New table for options. E.g., what app version modified the database
 
 

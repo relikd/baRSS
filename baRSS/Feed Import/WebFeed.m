@@ -233,18 +233,12 @@ static _Atomic(NSUInteger) _queueSize = 0;
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	Feed *f = [Feed appendToRootWithDefaultIntervalInContext:moc];
 	f.meta.url = url;
-	[self backgroundUpdateBoth:f favicon:YES alert:!flag finally:^(BOOL successful){
-		if (!flag && !successful) {
-			[moc deleteObject:f.group];
-		} else if (block) {
-			block(f); // only on success
-		}
-		[StoreCoordinator saveContext:moc andParent:YES];
+	if (block) block(f);
+	[StoreCoordinator saveContext:moc andParent:YES];
+	[UpdateScheduler downloadList:@[f] background:flag finally:^{
+		PostNotification(kNotificationGroupInserted, f.group.objectID);
 		[moc reset];
-		if (successful) {
-			PostNotification(kNotificationGroupInserted, f.group.objectID);
-			[UpdateScheduler scheduleNextFeed];
-		}
+		[UpdateScheduler scheduleNextFeed];
 	}];
 }
 
@@ -252,20 +246,20 @@ static _Atomic(NSUInteger) _queueSize = 0;
 + (void)autoDownloadAndParseUpdateURL {
 	[self autoDownloadAndParseURL:versionUpdateURL addAnyway:YES modify:^(Feed *feed) {
 		feed.group.name = NSLocalizedString(@"baRSS releases", nil);
-		[feed.meta setRefreshAndSchedule:2 * TimeUnitDays];
+		feed.meta.refresh = 2 * TimeUnitDays;
 	}];
 }
 
 /**
- Start download of feed xml, then continue with favicon download (optional).
+ Start download of feed xml, then continue with favicon (if newly added or 'Update all').
  
- @param fav If @c YES continue with favicon download after xml download finished.
  @param alert If @c YES display Error Popup to user.
  @param block Parameter @c success is @c YES if xml download succeeded (regardless of favicon result).
  */
-+ (void)backgroundUpdateBoth:(Feed*)feed favicon:(BOOL)fav alert:(BOOL)alert finally:(nullable void(^)(BOOL success))block {
++ (void)backgroundUpdateBoth:(Feed*)feed alert:(BOOL)alert finally:(nullable void(^)(BOOL success))block {
+	BOOL recentlyAdded = (feed.articles.count == 0);
 	[self backgroundUpdateFeed:feed showErrorAlert:alert finally:^(BOOL success) {
-		if (fav && success) {
+		if (success && (recentlyAdded || _requestsAreUrgent)) {
 			[self backgroundUpdateFavicon:feed replaceExisting:NO finally:^{
 				if (block) block(YES);
 			}];
@@ -276,21 +270,19 @@ static _Atomic(NSUInteger) _queueSize = 0;
 }
 
 /**
- Start download of all feeds in list. Either with or without favicons.
+ Start download of all feeds in list. Favicons will be loaded for new feeds and for 'Update all'.
  
  @param list Download list using @c feed.meta.url as download url. (while reusing etag and modified headers)
- @param fav If @c YES continue with favicon download after xml download finished.
  @param alert If @c YES display Error Popup to user.
  @param block Called after all downloads finished.
  */
-+ (void)batchDownloadFeeds:(NSArray<Feed*> *)list favicons:(BOOL)fav showErrorAlert:(BOOL)alert finally:(nullable os_block_t)block {
-	[UpdateScheduler beginUpdate];
++ (void)batchDownloadFeeds:(NSArray<Feed*>*)list showErrorAlert:(BOOL)alert finally:(nullable os_block_t)block {
 	atomic_fetch_add_explicit(&_queueSize, list.count, memory_order_relaxed);
 	PostNotification(kNotificationBackgroundUpdateInProgress, @(_queueSize));
 	dispatch_group_t group = dispatch_group_create();
 	for (Feed *f in list) {
 		dispatch_group_enter(group);
-		[self backgroundUpdateBoth:f favicon:fav alert:alert finally:^(BOOL success){
+		[self backgroundUpdateBoth:f alert:alert finally:^(BOOL success){
 			atomic_fetch_sub_explicit(&_queueSize, 1, memory_order_relaxed);
 			PostNotification(kNotificationBackgroundUpdateInProgress, @(_queueSize));
 			dispatch_group_leave(group);
@@ -298,8 +290,7 @@ static _Atomic(NSUInteger) _queueSize = 0;
 	}
 	dispatch_group_notify(group, dispatch_get_main_queue(), ^{
 		if (block) block();
-		[UpdateScheduler endUpdate];
-		PostNotification(kNotificationBackgroundUpdateInProgress, @(0));
+		PostNotification(kNotificationBackgroundUpdateInProgress, @(_queueSize));
 	});
 }
 
