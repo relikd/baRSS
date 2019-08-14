@@ -28,7 +28,9 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Adding feed:* Inserting feeds when offline will postpone download until network is reachable again
 - *Adding feed:* Inserting feeds when paused will postpone download until unpaused 
 - *Settings, Feeds:* Actions `delete` and `edit` use clicked items instead of selected items
-- *Settings, Feeds:* Accurate download count instead of `Updating feeds …`
+- *Settings, Feeds:* Status info with accurate download count (instead of `Updating feeds …`)
+- *Settings, Feeds:* Status info shows `No network connection` and `Updates paused`
+- *Settings, Feeds:* After feed edit, run update scheduler immediately
 - *Status Bar Menu*: Feed title is updated properly
 - *UI:* If an error occurs, show document URL (path to file or web url)
 - Comparison of existing articles with nonexistent guid and link

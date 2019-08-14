@@ -38,6 +38,5 @@
 
 - (void)beginCoreDataChange;
 - (BOOL)endCoreDataChangeUndoEmpty:(BOOL)undoEmpty forceUndo:(BOOL)force;
-- (void)someDatesChangedScheduleUpdateTimer;
 - (void)restoreOrderingAndIndexPathStr:(NSArray<NSTreeNode*>*)parentsList;
 @end

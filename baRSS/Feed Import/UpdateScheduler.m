@@ -25,6 +25,7 @@
 #import "WebFeed.h"
 #import "Constants.h"
 #import "StoreCoordinator.h"
+#import "NSDate+Ext.h"
 
 static NSTimer *_timer;
 static SCNetworkReachabilityRef _reachability = NULL;
@@ -56,21 +57,33 @@ static BOOL _nextUpdateIsForced = NO;
 + (void)setPaused:(BOOL)flag {
 	// TODO: should pause persist between app launches?
 	_updatePaused = flag;
+	if (flag) [self scheduleTimer:nil];
+	else      [self scheduleNextFeed];
+}
+
+/// Update status. 'Paused', 'No conection', or 'Next update in ...'
++ (NSString*)remainingTimeTillNextUpdate:(nullable double*)remaining {
+	double time = fabs(_timer.fireDate.timeIntervalSinceNow);
+	if (remaining)
+		*remaining = time;
+	if (!_isReachable)
+		return NSLocalizedString(@"No network connection", nil);
 	if (_updatePaused)
-		[self pauseUpdates];
-	else
-		[self resumeUpdates];
+		return NSLocalizedString(@"Updates paused", nil);
+	if (time > 1e9) // distance future, over 31 years
+		return @""; // aka. no feeds in list
+	return [NSString stringWithFormat:NSLocalizedString(@"Next update in %@", nil),
+			[NSDate stringForRemainingTime:_timer.fireDate]];
 }
 
-/// Cancel current timer and stop any updates until enabled again.
-+ (void)pauseUpdates {
-	[self scheduleTimer:nil];
-}
-
-/// Start normal (non forced) schedule if network is reachable.
-+ (void)resumeUpdates {
-	if (_isReachable)
-		[self scheduleNextFeed];
+/// Update status. 'Updating X feeds …' or empty string if not updating.
++ (NSString*)updatingXFeeds {
+	NSUInteger c = [WebFeed feedsInQueue];
+	switch (c) {
+		case 0:  return @"";
+		case 1:  return NSLocalizedString(@"Updating 1 feed …", nil);
+		default: return [NSString stringWithFormat:NSLocalizedString(@"Updating %lu feeds …", nil), c];
+	}
 }
 
 
@@ -83,6 +96,8 @@ static BOOL _nextUpdateIsForced = NO;
 + (void)scheduleNextFeed {
 	if (![self allowNetworkConnection]) // timer will restart once connection exists
 		return;
+	if ([WebFeed feedsInQueue] > 0) // assume every update ends with scheduleNextFeed
+		return; // skip until called again
 	NSDate *nextTime = [StoreCoordinator nextScheduledUpdate]; // if nextTime = nil, then no feeds to update
 	if (nextTime && [nextTime timeIntervalSinceNow] < 1) { // mostly, if app was closed for a long time
 		nextTime = [NSDate dateWithTimeIntervalSinceNow:1];
@@ -116,6 +131,7 @@ static BOOL _nextUpdateIsForced = NO;
 	NSTimeInterval tolerance = [nextTime timeIntervalSinceNow] * 0.15;
 	_timer.tolerance = (tolerance < 1 ? 1 : tolerance); // at least 1 sec
 	_timer.fireDate = nextTime;
+	PostNotification(kNotificationScheduleTimerChanged, nil);
 }
 
 /**
@@ -135,7 +151,7 @@ static BOOL _nextUpdateIsForced = NO;
 	[self downloadList:list background:!updateAll finally:^{
 		[StoreCoordinator saveContext:moc andParent:YES]; // save parents too ...
 		[moc reset];
-		[self resumeUpdates]; // always reset the timer
+		[self scheduleNextFeed]; // always reset the timer
 	}];
 }
 
@@ -193,9 +209,9 @@ static void networkReachabilityCallback(SCNetworkReachabilityRef target, SCNetwo
 	_isReachable = [UpdateScheduler hasConnectivity:flags];
 	PostNotification(kNotificationNetworkStatusChanged, @(_isReachable));
 	if (_isReachable) {
-		[UpdateScheduler resumeUpdates];
+		[UpdateScheduler scheduleNextFeed];
 	} else {
-		[UpdateScheduler pauseUpdates];
+		[UpdateScheduler scheduleTimer:nil];
 	}
 }
 
