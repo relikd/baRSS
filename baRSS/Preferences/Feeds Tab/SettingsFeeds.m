@@ -27,7 +27,6 @@
 #import "FeedGroup+Ext.h"
 #import "UpdateScheduler.h"
 #import "SettingsFeedsView.h"
-#import "NSDate+Ext.h"
 
 @interface SettingsFeeds ()
 @property (strong) SettingsFeedsView *view; // override super
@@ -51,7 +50,10 @@
 	RegisterNotification(kNotificationFeedUpdated, @selector(feedUpdated:), self);
 	RegisterNotification(kNotificationFeedIconUpdated, @selector(feedUpdated:), self);
 	RegisterNotification(kNotificationGroupInserted, @selector(groupInserted:), self);
-	RegisterNotification(kNotificationBackgroundUpdateInProgress, @selector(updateInProgress:), self);
+	// Status bar
+	RegisterNotification(kNotificationScheduleTimerChanged, @selector(updateStatusInfo), self);
+	RegisterNotification(kNotificationNetworkStatusChanged, @selector(updateStatusInfo), self);
+	RegisterNotification(kNotificationBackgroundUpdateInProgress, @selector(updateStatusInfo), self);
 }
 
 - (void)dealloc {
@@ -62,10 +64,9 @@
 - (void)viewWillAppear {
 	// needed to scroll outline view to top (if prefs open on another tab)
 	[self.dataStore setSelectionIndexPath:[NSIndexPath indexPathWithIndex:0]];
-	self.timerStatusInfo = [NSTimer timerWithTimeInterval:NSTimeIntervalSince1970 target:self selector:@selector(keepTimerRunning) userInfo:nil repeats:YES];
+	self.timerStatusInfo = [NSTimer timerWithTimeInterval:NSTimeIntervalSince1970 target:self selector:@selector(updateStatusInfo) userInfo:nil repeats:YES];
 	[[NSRunLoop mainRunLoop] addTimer:self.timerStatusInfo forMode:NSRunLoopCommonModes];
-	// start spinner if update is in progress when preferences open
-	[self activateSpinner:[UpdateScheduler feedsInQueue]];
+	[self updateStatusInfo];
 }
 
 /// Timer cleanup
@@ -143,12 +144,7 @@
 	[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
 	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
 	[self.dataStore rearrangeObjects]; // update ordering
-}
-
-/// Query core data for next update date and set bottom status message
-- (void)someDatesChangedScheduleUpdateTimer {
 	[UpdateScheduler scheduleNextFeed];
-	[self.timerStatusInfo fire];
 }
 
 /// Callback method fired when feed (or icon) has been updated in the background.
@@ -172,43 +168,22 @@
 #pragma mark - Activity Spinner & Status Info
 
 
-/// Callback method to update status info. Will be called more often when interval is getting shorter.
-- (void)keepTimerRunning {
-	NSDate *date = [UpdateScheduler dateScheduled];
-	if (date) {
-		double nextFire = fabs(date.timeIntervalSinceNow);
-		if (nextFire > 1e9) { // distance future, over 31 years
-			self.view.status.stringValue = @"";
-			return;
-		}
-		self.view.status.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Next update in %@", nil),
-										[NSDate stringForRemainingTime:date]];
-		// Next update is aligned with minute (fmod) else update 1/sec
-		NSDate *nextUpdate = [NSDate dateWithTimeIntervalSinceNow: (nextFire > 60 ? fmod(nextFire, 60) : 1)];
-		[self.timerStatusInfo setFireDate:nextUpdate];
-	}
-}
-
-/// Start ( @c c @c > @c 0 ) or stop ( @c c @c = @c 0 ) activity spinner. Also, sets status info.
-- (void)activateSpinner:(NSUInteger)c {
-	if (c == 0) {
-		[self.view.spinner stopAnimation:nil];
-		self.view.status.stringValue = @"";
-		[self.timerStatusInfo fire];
-	} else {
+/// Callback method to update status info. Called more often as the interval is getting shorter.
+- (void)updateStatusInfo {
+	if ([UpdateScheduler feedsInQueue] > 0) {
 		[self.timerStatusInfo setFireDate:[NSDate distantFuture]];
+		self.view.status.stringValue = [UpdateScheduler updatingXFeeds];
 		[self.view.spinner startAnimation:nil];
-		if (c == 1) { // exactly one feed
-			self.view.status.stringValue = NSLocalizedString(@"Updating 1 feed …", nil);
-		} else {
-			self.view.status.stringValue = [NSString stringWithFormat:NSLocalizedString(@"Updating %lu feeds …", nil), c];
+	} else {
+		[self.view.spinner stopAnimation:nil];
+		double remaining;
+		self.view.status.stringValue = [UpdateScheduler remainingTimeTillNextUpdate:&remaining];
+		if (remaining < 1e5) { // keep timer running if < 28 hours
+			// Next update is aligned with minute (fmod) else update 1/sec
+			NSDate *nextUpdate = [NSDate dateWithTimeIntervalSinceNow: (remaining > 60 ? fmod(remaining, 60) : 1)];
+			[self.timerStatusInfo setFireDate:nextUpdate];
 		}
 	}
-}
-
-/// Callback method fired when background feed update begins and ends.
-- (void)updateInProgress:(NSNotification*)notify {
-	[self activateSpinner:[notify.object unsignedIntegerValue]];
 }
 
 
@@ -252,7 +227,7 @@
 	[self.dataStore removeObjectsAtArrangedObjectIndexPaths:[nodes valueForKeyPath:@"indexPath"]];
 	[self restoreOrderingAndIndexPathStr:parentNodes];
 	[self endCoreDataChangeUndoEmpty:NO forceUndo:NO];
-	[self someDatesChangedScheduleUpdateTimer];
+	[UpdateScheduler scheduleNextFeed];
 	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
 }
 
@@ -325,16 +300,18 @@
 	[self beginCoreDataChange];
 	if (!fg || ![fg isKindOfClass:[FeedGroup class]]) {
 		fg = [self insertFeedGroupAtSelection:(flag ? GROUP : FEED)];
+	} else {
+		flag = (fg.type == GROUP);
 	}
 	
-	ModalEditDialog *editDialog = (fg.type == GROUP ? [ModalGroupEdit modalWith:fg] : [ModalFeedEdit modalWith:fg]);
+	ModalEditDialog *editDialog = (flag ? [ModalGroupEdit modalWith:fg] : [ModalFeedEdit modalWith:fg]);
 	
 	[self.view.window beginSheet:[editDialog getModalSheet] completionHandler:^(NSModalResponse returnCode) {
 		if (returnCode == NSModalResponseOK) {
 			[editDialog applyChangesToCoreDataObject];
 		}
 		if ([self endCoreDataChangeUndoEmpty:YES forceUndo:(returnCode != NSModalResponseOK)]) {
-			if (!flag) [self someDatesChangedScheduleUpdateTimer]; // only for feed edit
+			if (!flag) [UpdateScheduler scheduleNextFeed]; // only for feed edit
 			[self.dataStore rearrangeObjects]; // update display, edited title or icon
 		}
 	}];

@@ -163,7 +163,7 @@ const NSPasteboardType dragReorder = @"de.relikd.baRSS.drag-reorder";
 	
 	[UpdateScheduler downloadList:feedsList background:NO finally:^{
 		[self endCoreDataChangeUndoEmpty:NO forceUndo:NO];
-		[self someDatesChangedScheduleUpdateTimer];
+		[UpdateScheduler scheduleNextFeed];
 	}];
 }
 

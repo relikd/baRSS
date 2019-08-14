@@ -290,7 +290,6 @@ static _Atomic(NSUInteger) _queueSize = 0;
 	}
 	dispatch_group_notify(group, dispatch_get_main_queue(), ^{
 		if (block) block();
-		PostNotification(kNotificationBackgroundUpdateInProgress, @(_queueSize));
 	});
 }
 

@@ -67,6 +67,11 @@ NS_INLINE void RegisterNotification(NSNotificationName name, SEL action, id obse
  */
 static NSNotificationName const kNotificationBackgroundUpdateInProgress = @"baRSS-notification-background-update-in-progress";
 /**
+ @c notification.object is @c nil.
+ Called whenever the update schedule timer is modified.
+ */
+static NSNotificationName const kNotificationScheduleTimerChanged = @"baRSS-notification-schedule-timer-changed";
+/**
  @c notification.object is @c NSManagedObjectID of type @c FeedGroup.
  Called whenever a new feed group was created in @c autoDownloadAndParseURL:
  */

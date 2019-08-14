@@ -31,6 +31,10 @@
 @property (class, readonly) BOOL isUpdating;
 @property (class, setter=setPaused:) BOOL isPaused;
 
+// Getter
++ (NSString*)remainingTimeTillNextUpdate:(nullable double*)remaining;
++ (NSString*)updatingXFeeds;
+// Scheduling
 + (void)scheduleNextFeed;
 + (void)forceUpdateAllFeeds;
 + (void)downloadList:(NSArray<Feed*>*)list background:(BOOL)flag finally:(nullable os_block_t)block;
