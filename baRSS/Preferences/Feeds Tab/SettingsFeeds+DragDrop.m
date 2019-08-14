@@ -159,7 +159,7 @@ const NSPasteboardType dragReorder = @"de.relikd.baRSS.drag-reorder";
 	// Persist state, because on crash we have at least inserted items (without articles & icons)
 	[StoreCoordinator saveContext:moc andParent:YES];
 	if (selection.count > 0)
-		[self.dataStore setSelectionIndexPaths:selection];
+		[self.dataStore setSelectionIndexPaths:[selection sortedArrayUsingSelector:@selector(compare:)]];
 	[WebFeed batchDownloadFeeds:feedsList favicons:YES showErrorAlert:YES finally:^{
 		[self endCoreDataChangeUndoEmpty:NO forceUndo:NO];
 		[self someDatesChangedScheduleUpdateTimer];
