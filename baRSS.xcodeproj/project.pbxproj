@@ -33,6 +33,7 @@
 		54ACC29821061FBA0020715F /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29721061FBA0020715F /* Preferences.m */; };
 		54AD4E0023005297000AE386 /* WebFeed.m in Sources */ = {isa = PBXBuildFile; fileRef = 54AD4DFF23005297000AE386 /* WebFeed.m */; };
 		54AD4E0C2301853D000AE386 /* NSString+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54AD4E0B2301853D000AE386 /* NSString+Ext.m */; };
+		54AD4EE72305B17D000AE386 /* container-migration.plist in Resources */ = {isa = PBXBuildFile; fileRef = 54AD4EE62305B17D000AE386 /* container-migration.plist */; };
 		54B51704226DC339006C1B29 /* ModalFeedEditView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B51703226DC339006C1B29 /* ModalFeedEditView.m */; };
 		54B517072270E990006C1B29 /* NSView+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B517062270E92A006C1B29 /* NSView+Ext.m */; };
 		54B749DA2204A85C0022CC6D /* BarStatusItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B749D92204A85C0022CC6D /* BarStatusItem.m */; };
@@ -145,6 +146,8 @@
 		54AD4DFF23005297000AE386 /* WebFeed.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WebFeed.m; sourceTree = "<group>"; };
 		54AD4E0A2301853D000AE386 /* NSString+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Ext.h"; sourceTree = "<group>"; };
 		54AD4E0B2301853D000AE386 /* NSString+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+Ext.m"; sourceTree = "<group>"; };
+		54AD4EE42305AF60000AE386 /* baRSS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = baRSS.entitlements; sourceTree = "<group>"; };
+		54AD4EE62305B17D000AE386 /* container-migration.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "container-migration.plist"; sourceTree = "<group>"; };
 		54B51702226DC339006C1B29 /* ModalFeedEditView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModalFeedEditView.h; sourceTree = "<group>"; };
 		54B51703226DC339006C1B29 /* ModalFeedEditView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ModalFeedEditView.m; sourceTree = "<group>"; };
 		54B517052270E8C6006C1B29 /* NSView+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSView+Ext.h"; sourceTree = "<group>"; };
@@ -290,6 +293,7 @@
 		54ACC27E21061B3B0020715F /* baRSS */ = {
 			isa = PBXGroup;
 			children = (
+				54AD4EE42305AF60000AE386 /* baRSS.entitlements */,
 				544B011B2114EE9100386E5C /* AppHook.h */,
 				544B011C2114EE9100386E5C /* AppHook.m */,
 				541958872190FF1200581B79 /* Constants.h */,
@@ -301,6 +305,7 @@
 				54ACC28A21061B3C0020715F /* Info.plist */,
 				54F7101322EE0DDA006985D1 /* Artwork */,
 				54ACC28B21061B3C0020715F /* main.m */,
+				54AD4EE62305B17D000AE386 /* container-migration.plist */,
 				54ACC28221061B3B0020715F /* DBv1.xcdatamodeld */,
 			);
 			path = baRSS;
@@ -405,6 +410,7 @@
 				54CE4D4522EF509400E89C16 /* CopyFiles */,
 				544DCCBC212A2B5A002DBC46 /* CopyFiles */,
 				543964EE2215C27B0016AAA3 /* ShellScript */,
+				54FB05D12305BFAB00A088AD /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -431,8 +437,11 @@
 							com.apple.ApplicationGroups.Mac = {
 								enabled = 0;
 							};
+							com.apple.HardenedRuntime = {
+								enabled = 1;
+							};
 							com.apple.Sandbox = {
-								enabled = 0;
+								enabled = 1;
 							};
 						};
 					};
@@ -478,6 +487,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				54BF444A22D0F4F300660096 /* AppIcon.icns in Resources */,
+				54AD4EE72305B17D000AE386 /* container-migration.plist in Resources */,
 				54E3C02122EE076D006E2E24 /* opml-icon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -501,6 +511,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# https://crunchybagel.com/auto-incrementing-build-numbers-in-xcode/\nbuildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"\n";
+		};
+		54FB05D12305BFAB00A088AD /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# replace '$(PRODUCT_NAME)' with actual value\nfile=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/container-migration.plist\"\nsed -i ''  \"s/\\$(PRODUCT_NAME)/${PRODUCT_NAME}/\"  \"$file\"\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -674,10 +702,13 @@
 				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_ENTITLEMENTS = baRSS/baRSS.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = UY657LKNHJ;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -722,10 +753,13 @@
 				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_ENTITLEMENTS = baRSS/baRSS.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = UY657LKNHJ;
 				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",

@@ -83,17 +83,16 @@ With this Terminal command you can customize this number:
 ToDo
 ----
 
-- [ ] Missing
-	- [ ] App Icon & UI icons (a shout out to all designers out there!)
-	- [ ] Text / UI localization
-	- [ ] Feeds with authentication
-	- [ ] Sandbox (does work, except for:)
-		- [ ] Default RSS application checkbox (disable or other workaround)
+- [ ] Localizations
+- [x] Sandbox
+	- [ ] Default RSS application checkbox (disable or other workaround)
 
 
 - [ ] Nice to have (... on increased demand)
+	- [ ] Feed Generator for websites without feeds
 	- [ ] Automatically choose best update interval (e.g., avg)
 	- [ ] Sync with online services
+	- [ ] Feeds with authentication
 	- [ ] Notification Center
 	- [ ] Distraction Mode
 		- [ ] Distract less: Sleep timer. (e.g., disable updates during working hours)
