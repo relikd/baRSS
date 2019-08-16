@@ -21,6 +21,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - Associate OPML files (double click and right click actions in Finder)
 - Quick Look preview for OPML files
 - Sandboxing & hardened runtime environment
+- Config URL scheme `barss:` with `open/preferences` and `config/fixcache`
 
 ### Fixed
 - *Adding feed:* Show users any 5xx server error response and extracted failure reason
@@ -43,6 +44,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Adding feed:* Refresh interval hotkeys set to: `⌘1` … `⌘6`
 - *Settings, Feeds:* Single add button for feeds, groups, and separators
 - *Settings, Feeds:* Always append new items at the end
+- *Settings, General*: Moved `Fix cache` button to `About` text section
 - *Status Bar Menu*: Show `(no title)` instead of `(error)`
 - *Status Bar Menu*: `Update all feeds` will show error alerts for broken URLs
 - *UI:* Interface builder files replaced with code equivalent
@@ -106,4 +108,4 @@ Initial release
 [0.9.3]: https://github.com/relikd/baRSS/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/relikd/baRSS/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/relikd/baRSS/compare/v0.9...v0.9.1
-[0.9]: https://github.com/relikd/baRSS/compare/e1f36514a8aa2d5fb9a575b6eb19adc2ce4a04d9...v0.9
+[0.9]: https://github.com/relikd/baRSS/compare/2fecf33d3101b0e7888bafee9d3b0f8b9cee30c6...v0.9

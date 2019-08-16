@@ -60,7 +60,7 @@
 	[mas beginEditing];
 	[self str:mas add:@"Programming\n" bold:YES];
 	[self str:mas add:@"Oleg Geier\n\n" bold:NO];
-	[self str:mas add:@"Source Code available\n" bold:YES];
+	[self str:mas add:@"Source Code Available\n" bold:YES];
 	[self str:mas add:@"github.com" link:@"https://github.com/relikd/baRSS"];
 	[self str:mas add:@" (MIT License)\nor " bold:NO];
 	[self str:mas add:@"gitlab.com" link:@"https://gitlab.com/relikd/baRSS"];
@@ -68,6 +68,8 @@
 	[self str:mas add:@"3rd-Party Libraries\n" bold:YES];
 	[self str:mas add:@"RSXML" link:@"https://github.com/relikd/RSXML"];
 	[self str:mas add:@" (MIT License)" bold:NO];
+	[self str:mas add:@"\n\n\n\nOptions\n" bold:YES];
+	[self str:mas add:@"Fix Cache" link:@"barss:config/fixcache"];
 	[mas endEditing];
 	return mas;
 }

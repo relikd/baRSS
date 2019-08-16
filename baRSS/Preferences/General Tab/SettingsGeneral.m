@@ -46,17 +46,6 @@
 
 #pragma mark - UI interaction with IBAction
 
-- (void)fixCache:(NSButton *)sender {
-	NSUInteger deleted = [StoreCoordinator deleteUnreferenced];
-	[StoreCoordinator restoreFeedIndexPaths];
-	PostNotification(kNotificationTotalUnreadCountReset, nil);
-	// show only if >0, but hey, this button will vanish anyway ...
-	NSAlert *alert = [[NSAlert alloc] init];
-	alert.messageText = [NSString stringWithFormat:@"Removed %lu unreferenced core data entries.", deleted];
-	alert.alertStyle = NSAlertStyleInformational;
-	[alert runModal];
-}
-
 - (void)changeHttpApplication:(NSPopUpButton *)sender {
 	[UserPrefs setHttpApplication:sender.selectedItem.representedObject];
 }
@@ -101,22 +90,12 @@
  @return Application name such as 'Safari' or 'baRSS'
  */
 - (NSString*)applicationNameForBundleId:(NSString*)bundleID {
-	CFStringRef bundleIDRef = CFBridgingRetain(bundleID);
-	if (!bundleIDRef)
-		return nil;
-	CFArrayRef arr = LSCopyApplicationURLsForBundleIdentifier(bundleIDRef, NULL);
-	CFRelease(bundleIDRef);
-	if (!arr)
-		return nil;
-	CFDictionaryRef infoDict = NULL;
-	if (CFArrayGetCount(arr) > 0)
-		infoDict = CFBundleCopyInfoDictionaryForURL(CFArrayGetValueAtIndex(arr, 0));
-	CFRelease(arr);
-	if (!infoDict)
-		return nil;
-	NSString *name = CFDictionaryGetValue(infoDict, kCFBundleNameKey);
-	CFRelease(infoDict);
-	return name;
+	NSArray<NSURL*> *urls = CFBridgingRelease(LSCopyApplicationURLsForBundleIdentifier((__bridge CFStringRef)bundleID, NULL));
+	if (urls.count > 0) {
+		NSDictionary *info = CFBridgingRelease(CFBundleCopyInfoDictionaryForURL((CFURLRef)urls.firstObject));
+		return info[(NSString*)kCFBundleNameKey];
+	}
+	return nil;
 }
 
 /**
@@ -126,12 +105,7 @@
  @return Array of @c bundleIDs of installed applications supporting that url scheme.
  */
 - (NSArray<NSString*>*)listOfBundleIdsForScheme:(NSString*)scheme {
-	CFStringRef schemeRef = CFBridgingRetain(scheme);
-	if (!schemeRef)
-		return nil;
-	CFArrayRef allHandlers = LSCopyAllHandlersForURLScheme(schemeRef);
-	CFRelease(schemeRef);
-	return (NSArray*)CFBridgingRelease(allHandlers);
+	return CFBridgingRelease(LSCopyAllHandlersForURLScheme((__bridge CFStringRef _Nonnull)(scheme)));
 }
 
 /**
@@ -141,12 +115,7 @@
  @return @c bundleID of default application
  */
 - (NSString*)defaultBundleIdForScheme:(NSString*)scheme {
-	CFStringRef schemeRef = CFBridgingRetain(scheme);
-	if (!schemeRef)
-		return nil;
-	CFStringRef defaultHandler = LSCopyDefaultHandlerForURLScheme(schemeRef);
-	CFRelease(schemeRef);
-	return (NSString*)CFBridgingRelease(defaultHandler);
+	return CFBridgingRelease(LSCopyDefaultHandlerForURLScheme((__bridge CFStringRef _Nonnull)(scheme)));
 }
 
 /**
@@ -157,18 +126,12 @@
  */
 - (BOOL)setDefaultRSSApplication:(NSString*)bundleID {
 	// TODO: Does not work with sandboxing.
-	CFStringRef bundleIDRef = CFBridgingRetain(bundleID);
-	if (!bundleIDRef)
-		return NO;
-	CFStringRef schemeRef = CFBridgingRetain(@"feed");
-	if (!schemeRef) {
-		CFRelease(bundleIDRef);
-		return NO;
-	}
-	OSStatus s = LSSetDefaultHandlerForURLScheme(schemeRef, bundleIDRef);
-	CFRelease(schemeRef);
-	CFRelease(bundleIDRef);
+	OSStatus s = LSSetDefaultHandlerForURLScheme(CFSTR("feed"), (__bridge CFStringRef _Nonnull)(bundleID));
 	return s == 0;
 }
+
+// Rebuild Launch Services cache
+// https://eclecticlight.co/2017/08/11/launch-services-database-problems-correcting-and-rebuilding/
+// /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -kill -r -v -apps u
 
 @end

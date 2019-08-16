@@ -26,6 +26,7 @@
 // User Preferences Plist
 + (BOOL)defaultYES:(NSString*)key;
 + (BOOL)defaultNO:(NSString*)key;
++ (NSUInteger)defaultUInt:(NSUInteger)defaultInt forKey:(NSString*)key;
 
 + (NSString*)getHttpApplication;
 + (void)setHttpApplication:(NSString*)bundleID;

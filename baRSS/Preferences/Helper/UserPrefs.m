@@ -41,9 +41,9 @@
 }
 
 /// @return Return @c defaultInt if key is not set. Otherwise, return user defaults property from plist.
-+ (NSInteger)defaultInt:(NSInteger)defaultInt forKey:(NSString*)key {
++ (NSUInteger)defaultUInt:(NSUInteger)defaultInt forKey:(NSString*)key {
 	NSInteger ret = [[NSUserDefaults standardUserDefaults] integerForKey:key];
-	if (ret > 0) return ret;
+	if (ret > 0) return (NSUInteger)ret;
 	return defaultInt;
 }
 
@@ -74,21 +74,15 @@
 
 /// @return The limit on how many links should be opened at the same time, if user holds the option key.
 /// Default: @c 10
-+ (NSUInteger)openFewLinksLimit {
-	return (NSUInteger)[self defaultInt:10 forKey:@"openFewLinksLimit"];
-}
++ (NSUInteger)openFewLinksLimit { return [self defaultUInt:10 forKey:@"openFewLinksLimit"]; }
 
 /// @return The limit on when to truncate article titles (Short names setting must be active).
 /// Default: @c 60
-+ (NSUInteger)shortArticleNamesLimit {
-	return (NSUInteger)[self defaultInt:60 forKey:@"shortArticleNamesLimit"];
-}
++ (NSUInteger)shortArticleNamesLimit { return [self defaultUInt:60 forKey:@"shortArticleNamesLimit"]; }
 
 /// @return The maximum number of articles displayed per feed (Limit articles setting must be active).
 /// Default: @c 40
-+ (NSUInteger)articlesInMenuLimit {
-	return (NSUInteger)[self defaultInt:40 forKey:@"articlesInMenuLimit"];
-}
++ (NSUInteger)articlesInMenuLimit { return [self defaultUInt:40 forKey:@"articlesInMenuLimit"]; }
 
 
 #pragma mark - Application Info Plist

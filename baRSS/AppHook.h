@@ -21,11 +21,11 @@
 //  SOFTWARE.
 
 @import Cocoa;
-@class BarStatusItem;
+@class BarStatusItem, Preferences;
 
 @interface AppHook : NSApplication <NSApplicationDelegate>
 @property (readonly, strong) BarStatusItem *statusItem;
 @property (readonly, strong) NSPersistentContainer *persistentContainer;
 
-- (void)openPreferences;
+- (Preferences*)openPreferences;
 @end

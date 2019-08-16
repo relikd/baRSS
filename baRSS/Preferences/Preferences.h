@@ -25,5 +25,5 @@
 
 @interface Preferences : NSWindow <NSWindowDelegate>
 + (instancetype)window;
-- (SettingsFeeds*)selectFeedsTab;
+- (__kindof NSViewController*)selectTab:(NSUInteger)index;
 @end

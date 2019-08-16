@@ -23,7 +23,6 @@
 @import Cocoa;
 
 @interface SettingsGeneral : NSViewController
-- (void)fixCache:(NSButton *)sender;
 - (void)changeHttpApplication:(NSPopUpButton *)sender;
 - (void)changeDefaultRSSReader:(NSPopUpButton *)sender;
 @end

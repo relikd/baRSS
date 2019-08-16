@@ -21,6 +21,7 @@
 //  SOFTWARE.
 
 #import "AppHook.h"
+#import "Constants.h"
 #import "BarStatusItem.h"
 #import "WebFeed.h"
 #import "UpdateScheduler.h"
@@ -46,7 +47,7 @@
 	RegisterImageViewNames();
 	_statusItem = [BarStatusItem new];
 	NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
-	[appleEventManager setEventHandler:self andSelector:@selector(handleGetURLEvent:withReplyEvent:)
+	[appleEventManager setEventHandler:self andSelector:@selector(handleAppleEvent:withReplyEvent:)
 						 forEventClass:kInternetEventClass andEventID:kAEGetURL];
 	[self migrateVersionUpdate];
 }
@@ -64,30 +65,11 @@
 	[UpdateScheduler unregisterNetworkChangeNotification];
 }
 
-- (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
-//	feed://https://feeds.feedburner.com/simpledesktops
-	NSString *url = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
-	NSString *scheme = [[[NSURL URLWithString:url] scheme] lowercaseString];
-	url = [url substringFromIndex:scheme.length + 1]; // + ':'
-	if (url.length >= 2 && [[url substringToIndex:2] isEqualToString:@"//"]) {
-		url = [url substringFromIndex:2];
-	}
-	if ([scheme isEqualToString:@"feed"]) {
-		[WebFeed autoDownloadAndParseURL:url addAnyway:NO modify:nil];
-	}
-}
-
-/// Handle opml file imports
-- (void)application:(NSApplication *)sender openFiles:(NSArray<NSString *> *)filenames {
-	NSMutableArray<NSURL*> *urls = [NSMutableArray arrayWithCapacity:filenames.count];
-	for (NSString *file in filenames) {
-		NSURL *u = [NSURL fileURLWithPath:file];
-		if (u) [urls addObject:u];
-	}
-	[self openPreferences];
-	SettingsFeeds *sf = [(Preferences*)(self.prefWindow.window) selectFeedsTab];
-	[sf importOpmlFiles:urls];
-	[sender replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
+/// Called during application start. Perform any version dependent updates here
+- (void)migrateVersionUpdate {
+	// Currently unused, but you'll be thankful to know the previous version number in the future
+	[UserPrefs dbUpdateFileVersion];
+	[UserPrefs dbUpdateAppVersion];
 }
 
 
@@ -95,13 +77,14 @@
 
 
 /// Called whenever the user activates the preferences (either through menu click or hotkey).
-- (void)openPreferences {
+- (Preferences*)openPreferences {
 	if (!self.prefWindow) {
 		self.prefWindow = [[NSWindowController alloc] initWithWindow:[Preferences window]];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preferencesClosed:) name:NSWindowWillCloseNotification object:self.prefWindow.window];
 	}
 	[NSApp activateIgnoringOtherApps:YES];
 	[self.prefWindow showWindow:nil];
+	return (Preferences*)self.prefWindow.window;
 }
 
 /// Callback method after user closes the preferences window.
@@ -116,8 +99,7 @@
 	if (self.prefWindow) {
 		CGPoint screenPoint = self.prefWindow.window.frame.origin;
 		[self.prefWindow close];
-		[self openPreferences];
-		[self.prefWindow.window setFrameOrigin:screenPoint];
+		[[self openPreferences] setFrameOrigin:screenPoint];
 	}
 }
 
@@ -184,11 +166,64 @@
 	return NSTerminateNow;
 }
 
-/// Called during application start. Perform any version dependent updates here
-- (void)migrateVersionUpdate {
-	// Currently unused, but you'll be thankful to know the previous version number in the future
-	[UserPrefs dbUpdateFileVersion];
-	[UserPrefs dbUpdateAppVersion];
+
+#pragma mark - Application Input (URLs and Files)
+
+
+/**
+ Callback method fired on opml file import
+ */
+- (void)application:(NSApplication *)sender openFiles:(NSArray<NSString *> *)filenames {
+	NSMutableArray<NSURL*> *urls = [NSMutableArray arrayWithCapacity:filenames.count];
+	for (NSString *file in filenames) {
+		NSURL *u = [NSURL fileURLWithPath:file];
+		if (u) [urls addObject:u];
+	}
+	SettingsFeeds *sf = [[self openPreferences] selectTab:1];
+	[sf importOpmlFiles:urls];
+	[sender replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
+}
+
+/**
+ Callback method fired when opened with an URL (@c feed: and @c barss: scheme)
+ */
+- (void)handleAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
+	NSString *url = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
+	NSString *scheme = [[[NSURL URLWithString:url] scheme] lowercaseString];
+	url = [url substringFromIndex:scheme.length + 1]; // + ':'
+	if (url.length >= 2 && [[url substringToIndex:2] isEqualToString:@"//"]) {
+		url = [url substringFromIndex:2];
+	}
+	if ([scheme isEqualToString:kURLSchemeFeed]) {
+		[WebFeed autoDownloadAndParseURL:url addAnyway:NO modify:nil];
+	} else if ([scheme isEqualToString:kURLSchemeBarss]) {
+		NSMutableArray<NSString*> *comp = [[url pathComponents] mutableCopy];
+		NSString *action = comp.firstObject;
+		if (action) {
+			[comp removeObjectAtIndex:0];
+			[self handleConfigURLScheme:action parameters:comp];
+		}
+	}
+}
+
+/**
+ Helper method for handling the @c barss: scheme (see below).
+       @textblock
+ barss:open/preferences[/0-4]
+ barss:config/fixcache[/silent]
+       @/textblock
+ */
+- (void)handleConfigURLScheme:(const NSString*)action parameters:(NSArray<NSString*>*)params {
+	if ([action isEqualToString:kURLActionOpen]) {
+		if ([params.firstObject isEqualToString:kURLParamPreferences]) {
+			NSDecimalNumber *num = [NSDecimalNumber decimalNumberWithString:params.lastObject];
+			[[self openPreferences] selectTab:num.unsignedIntegerValue];
+		}
+	} else if ([action isEqualToString:kURLActionConfig]) {
+		if ([params.firstObject isEqualToString:kURLParamFixCache]) {
+			[StoreCoordinator cleanupAndShowAlert:![params.lastObject isEqualToString:kURLParamSilent]];
+		}
+	}
 }
 
 
@@ -224,12 +259,6 @@ static NSEventModifierFlags fnKeyFlags = NSEventModifierFlagShift | NSEventModif
 					return;
 			}
 		}
-//		else {
-//			if (key == NSEnterCharacter || key == NSCarriageReturnCharacter) {
-//				if ([self sendAction:@selector(enterPressed:) to:nil from:self])
-//					return;
-//			}
-//		}
 #pragma clang diagnostic pop
 	}
 	[super sendEvent:event];
