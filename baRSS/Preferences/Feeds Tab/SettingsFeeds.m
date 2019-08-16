@@ -142,7 +142,7 @@
 //	NSInteger ins = [[[moc.insertedObjects filteredSetUsingPredicate:pred] valueForKeyPath:@"@sum.unread"] integerValue];
 //	NSLog(@"%ld, %ld", del, ins);
 	[StoreCoordinator saveContext:self.dataStore.managedObjectContext andParent:YES];
-	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
+	PostNotification(kNotificationTotalUnreadCountReset, nil);
 	[self.dataStore rearrangeObjects]; // update ordering
 	[UpdateScheduler scheduleNextFeed];
 }
@@ -228,7 +228,7 @@
 	[self restoreOrderingAndIndexPathStr:parentNodes];
 	[self endCoreDataChangeUndoEmpty:NO forceUndo:NO];
 	[UpdateScheduler scheduleNextFeed];
-	[[NSNotificationCenter defaultCenter] postNotificationName:kNotificationTotalUnreadCountReset object:nil];
+	PostNotification(kNotificationTotalUnreadCountReset, nil);
 }
 
 - (void)openImportDialog {

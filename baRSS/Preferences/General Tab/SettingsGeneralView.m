@@ -36,10 +36,6 @@
 	
 	self.popupHttpApplication = [[self createPopup:x top: PAD_WIN + 1] action:@selector(changeHttpApplication:) target:controller];
 	self.popupDefaultRSSReader = [[self createPopup:x top: YFromTop(self.popupHttpApplication) + PAD_M] action:@selector(changeDefaultRSSReader:) target:controller];
-	
-	// Add fix cache button
-	[[[[NSView button:NSLocalizedString(@"Fix Cache", nil)] action:@selector(fixCache:) target:controller]
-	  tooltip:NSLocalizedString(@"Will remove unreferenced feed entries", nil)] placeIn:self xRight:PAD_WIN y:PAD_WIN];
 	return self;
 }
 

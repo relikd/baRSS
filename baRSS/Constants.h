@@ -104,6 +104,26 @@ static NSNotificationName const kNotificationTotalUnreadCountChanged = @"baRSS-n
 static NSNotificationName const kNotificationTotalUnreadCountReset = @"baRSS-notification-total-unread-count-reset";
 
 
+#pragma mark - URL Scheme constants
+
+/// @c feed: URL scheme. Used for feed subscriptions.
+/// @note E.g., @c feed://https://feeds.feedburner.com/simpledesktops
+static NSString* const kURLSchemeFeed = @"feed";
+/// @c barss: URL scheme. Used for configuring the app.
+/// @note E.g., @c barss://open/preferences
+static NSString* const kURLSchemeBarss = @"barss";
+/// Use @c barss:open to display information
+static NSString* const kURLActionOpen = @"open";
+/// Use @c barss:config to perform configuration steps
+static NSString* const kURLActionConfig = @"config";
+/// Open preferences window with optional tab index. E.g., @c barss:open/preferences/1
+static NSString* const kURLParamPreferences = @"preferences";
+/// Run core data cleanup with optional silent parameter. E.g., @c barss:config/fixcache/silent
+static NSString* const kURLParamFixCache = @"fixcache";
+/// Disables error alerts and other interactive UI
+static NSString* const kURLParamSilent = @"silent";
+
+
 #pragma mark - Internal
 
 

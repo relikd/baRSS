@@ -56,7 +56,5 @@ static int const dbFileVersion = 1; // update in case database structure changes
 + (NSArray<FeedArticle*>*)articlesAtPath:(nullable NSString*)path isFeed:(BOOL)feedFlag sorted:(BOOL)sortFlag unread:(BOOL)readFlag inContext:(NSManagedObjectContext*)moc limit:(NSUInteger)limit;
 
 // Restore sound state
-+ (void)restoreFeedIndexPaths;
-+ (NSUInteger)deleteUnreferenced;
-+ (NSUInteger)deleteAllGroups;
++ (void)cleanupAndShowAlert:(BOOL)flag;
 @end

@@ -58,9 +58,19 @@
 				<string>feed</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>de.relikd.baRSS.url.config</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>barss</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>11016</string>
+	<string>11155</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.news</string>
 	<key>LSMinimumSystemVersion</key>

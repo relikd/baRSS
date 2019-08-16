@@ -21,6 +21,7 @@
 //  SOFTWARE.
 
 #import "StoreCoordinator.h"
+#import "Constants.h"
 #import "NSFetchRequest+Ext.h"
 #import "AppHook.h"
 #import "Feed+Ext.h"
@@ -224,6 +225,19 @@
 
 #pragma mark - Restore Sound State
 
++ (void)cleanupAndShowAlert:(BOOL)flag {
+	NSUInteger deleted = [self deleteUnreferenced];
+	[self restoreFeedIndexPaths];
+	PostNotification(kNotificationTotalUnreadCountReset, nil);
+	if (flag) {
+		NSAlert *alert = [[NSAlert alloc] init];
+		alert.messageText = NSLocalizedString(@"Database cleanup successful", nil);
+		alert.informativeText = [NSString stringWithFormat:NSLocalizedString(@"Removed %lu unreferenced database entries.", nil), deleted];
+		alert.alertStyle = NSAlertStyleInformational;
+		[alert runModal];
+	}
+}
+
 /// Iterate over all @c Feed and re-calculate @c indexPath.
 + (void)restoreFeedIndexPaths {
 	NSManagedObjectContext *moc = [self getMainContext];
@@ -252,13 +266,13 @@
 }
 
 /// Delete all @c FeedGroup items.
-+ (NSUInteger)deleteAllGroups {
-	NSManagedObjectContext *moc = [self getMainContext];
-	NSUInteger deleted = [self batchDelete:FeedGroup.entity nullAttribute:nil inContext:moc];
-	[self saveContext:moc andParent:YES];
-	[moc reset];
-	return deleted;
-}
+//+ (NSUInteger)deleteAllGroups {
+//	NSManagedObjectContext *moc = [self getMainContext];
+//	NSUInteger deleted = [self batchDelete:FeedGroup.entity nullAttribute:nil inContext:moc];
+//	[self saveContext:moc andParent:YES];
+//	[moc reset];
+//	return deleted;
+//}
 
 /**
  Perform batch delete on entities of type @c entity where @c column @c IS @c NULL. If @c column is @c nil, delete all rows.

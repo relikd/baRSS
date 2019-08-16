@@ -25,6 +25,7 @@
 #import "SettingsFeeds.h"
 #import "SettingsAppearance.h"
 #import "SettingsAbout.h"
+#import "UserPrefs.h"
 
 /// Managing individual tabs in application preferences
 @interface PrefTabs : NSTabViewController
@@ -48,8 +49,7 @@
 			flexibleWidth,
 			TabItem(NSImageNameInfo, NSLocalizedString(@"About", nil), [SettingsAbout class]),
 		];
-		
-		[self switchToTab:[[NSUserDefaults standardUserDefaults] integerForKey:@"preferencesTab"]];
+		[self switchToTab:[UserPrefs defaultUInt:0 forKey:@"preferencesTab"]];
 	}
 	return self;
 }
@@ -63,9 +63,14 @@ NS_INLINE NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Class cl
 }
 
 /// Safely set selected index without out of bounds exception
-- (void)switchToTab:(NSInteger)index {
-	if (index > 0 || (NSUInteger)index < self.tabViewItems.count)
-		self.selectedTabViewItemIndex = index;
+- (__kindof NSViewController*)switchToTab:(NSUInteger)index {
+	if (index < 0 || index >= self.tabViewItems.count)
+		return nil;
+	NSTabViewItem *tab = self.tabViewItems[index];
+	if (tab.identifier == NSToolbarFlexibleSpaceItemIdentifier)
+		return nil;
+	self.selectedTabViewItemIndex = (NSInteger)index;
+	return [tab viewController];
 }
 
 /// Delegate method, store last selected tab to user preferences
@@ -100,10 +105,9 @@ NS_INLINE NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Class cl
 	return w;
 }
 
-- (SettingsFeeds*)selectFeedsTab {
-	PrefTabs *pref = (PrefTabs*)self.contentViewController;
-	[pref switchToTab:1];
-	return (SettingsFeeds*)[pref.tabViewItems[1] viewController];
+/// Selects tab (if not flexible space or out of bounds) and returns associated view controller
+- (__kindof NSViewController*)selectTab:(NSUInteger)index {
+	return [(PrefTabs*)self.contentViewController switchToTab:index];
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
