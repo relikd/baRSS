@@ -20,6 +20,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - Welcome message also adds Github releases feed
 - Associate OPML files (double click and right click actions in Finder)
 - Quick Look preview for OPML files
+- Sandboxing & hardened runtime environment
 
 ### Fixed
 - *Adding feed:* Show users any 5xx server error response and extracted failure reason
