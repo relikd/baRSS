@@ -7,6 +7,10 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 
 ## [Unreleased]
 ### Added
+- App Signing
+- Sandboxing & hardened runtime environment
+- Associate OPML files (double click and right click actions in Finder)
+- Quick Look preview for OPML files
 - *Adding feed:* 5xx server errors have a reload button which will initiate a new download with the same URL
 - *Adding feed:* `⌘R` will reload the same URL
 - *Settings, Feeds:* `⌘R` will reload the data source
@@ -18,9 +22,6 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *UI:* Accessibility hints for most UI elements
 - *UI*: Show welcome message upon first usage (empty db)
 - Welcome message also adds Github releases feed
-- Associate OPML files (double click and right click actions in Finder)
-- Quick Look preview for OPML files
-- Sandboxing & hardened runtime environment
 - Config URL scheme `barss:` with `open/preferences` and `config/fixcache`
 
 ### Fixed

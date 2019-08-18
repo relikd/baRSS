@@ -1,3 +1,8 @@
+[![Current release](https://img.shields.io/github/release/relikd/baRSS)](https://github.com/relikd/baRSS/releases)
+[![All downloads](https://img.shields.io/github/downloads/relikd/baRSS/total)](https://github.com/relikd/baRSS/releases)
+[![GitHub license](https://img.shields.io/github/license/relikd/baRSS)](https://github.com/relikd/baRSS/blob/master/LICENSE)
+
+
 # baRSS – *Menu Bar RSS Reader*
 
 ![screenshot](doc/screenshot.png)
@@ -11,7 +16,7 @@ If you want a feature to be added, drop me an email or create an issue.
 Look at the other issues, in case somebody else already filed one similar. 
 If you like this project and want to say thank you drop me a line (or other stuff like money). 
 Regardless, I'll continue development as long as I'm using it on my own. 
-Admittedly, I've invested way too much time in this project already (1595h+) …
+Admittedly, I've invested way too much time in this project already (1774h+) …
 
 
 ### Why is this project not written in Swift?
@@ -85,7 +90,7 @@ ToDo
 
 - [ ] Localizations
 - [x] Sandbox
-	- [ ] Default RSS application checkbox (disable or other workaround)
+	- [x] Default RSS application checkbox (disable or other workaround)
 
 
 - [ ] Nice to have (... on increased demand)
