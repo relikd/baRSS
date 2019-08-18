@@ -93,7 +93,7 @@
 	NSArray<NSURL*> *urls = CFBridgingRelease(LSCopyApplicationURLsForBundleIdentifier((__bridge CFStringRef)bundleID, NULL));
 	if (urls.count > 0) {
 		NSDictionary *info = CFBridgingRelease(CFBundleCopyInfoDictionaryForURL((CFURLRef)urls.firstObject));
-		return info[(NSString*)kCFBundleNameKey];
+		return info[(NSString*)kCFBundleExecutableKey];
 	}
 	return nil;
 }
