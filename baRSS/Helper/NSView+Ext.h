@@ -61,6 +61,7 @@ NS_INLINE CGFloat NSMaxWidth(NSView *a, NSView *b) { return Max(NSWidth(a.frame)
 + (NSButton*)button:(NSString*)text;
 + (NSButton*)buttonImageSquare:(nonnull NSImageName)name;
 + (NSButton*)buttonIcon:(nonnull NSImageName)name size:(CGFloat)size;
++ (NSButton*)helpButton;
 + (NSButton*)inlineButton:(NSString*)text;
 + (NSPopUpButton*)popupButton:(CGFloat)w;
 // UI: Others

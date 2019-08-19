@@ -94,6 +94,14 @@
 	return btn;
 }
 
+/// Create round button with question mark. @c 21x21px
++ (NSButton*)helpButton {
+	NSButton *btn = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 21, 21)];
+	btn.bezelStyle = NSBezelStyleHelpButton;
+	btn.title = @"";
+	return btn;
+}
+
 /// Create gray inline button with rounded corners. @c 16px height.
 + (NSButton*)inlineButton:(NSString*)text {
 	NSButton *btn = [[NSButton alloc] initWithFrame: NSMakeRect(0, 0, 0, HEIGHT_INLINEBUTTON)];

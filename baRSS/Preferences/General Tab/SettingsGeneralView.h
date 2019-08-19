@@ -25,7 +25,7 @@
 
 @interface SettingsGeneralView : NSView
 @property (weak) IBOutlet NSPopUpButton* popupHttpApplication;
-@property (weak) IBOutlet NSPopUpButton* popupDefaultRSSReader;
+@property (weak) IBOutlet NSTextField *defaultReader;
 
 - (instancetype)initWithController:(SettingsGeneral*)controller NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithFrame:(NSRect)frameRect NS_UNAVAILABLE;
