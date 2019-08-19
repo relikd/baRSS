@@ -24,5 +24,5 @@
 
 @interface SettingsGeneral : NSViewController
 - (void)changeHttpApplication:(NSPopUpButton *)sender;
-- (void)changeDefaultRSSReader:(NSPopUpButton *)sender;
+- (void)clickHowToDefaults:(NSButton *)sender;
 @end

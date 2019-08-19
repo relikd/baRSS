@@ -19,6 +19,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Settings, Feeds:* Drag & Drop feeds from / to OPML file
 - *Settings, Feeds:* Drag & Drop feed titles and urls as text
 - *Settings, Feeds:* OPML export with selected items only
+- *Settings, General*: [Auxiliary application](https://github.com/relikd/URL-Scheme-Defaults) for changing default feed reader
 - *UI:* Accessibility hints for most UI elements
 - *UI*: Show welcome message upon first usage (empty db)
 - Welcome message also adds Github releases feed
@@ -46,6 +47,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Settings, Feeds:* Single add button for feeds, groups, and separators
 - *Settings, Feeds:* Always append new items at the end
 - *Settings, General*: Moved `Fix cache` button to `About` text section
+- *Settings, General*: Changing default feed reader is prohibited within sandbox  
 - *Status Bar Menu*: Show `(no title)` instead of `(error)`
 - *Status Bar Menu*: `Update all feeds` will show error alerts for broken URLs
 - *UI:* Interface builder files replaced with code equivalent
