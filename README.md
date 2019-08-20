@@ -1,34 +1,61 @@
+[![macOS 10.12+](https://img.shields.io/badge/macOS-10.12+-888)](#download--install)
 [![Current release](https://img.shields.io/github/release/relikd/baRSS)](https://github.com/relikd/baRSS/releases)
 [![All downloads](https://img.shields.io/github/downloads/relikd/baRSS/total)](https://github.com/relikd/baRSS/releases)
-[![GitHub license](https://img.shields.io/github/license/relikd/baRSS)](https://github.com/relikd/baRSS/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/relikd/baRSS)](LICENSE)
 
 
-# baRSS – *Menu Bar RSS Reader*
+baRSS – *Menu Bar RSS Reader*
+=============================
 
-![screenshot](doc/screenshot.png)
-
-For nearly a decade I've been using the then free version of [RSS Menu](https://itunes.apple.com/us/app/rss-menu/id423069534). 
-However, with the release of macOS Mojave, 32bit applications are no longer supported. 
-Furthermore, the currently available version in the Mac App Store was last updated in 2014 (as of writing).
-
-*baRSS* was build from scratch with a minimal footprint in mind. It will be available on the AppStore eventually. 
-If you want a feature to be added, drop me an email or create an issue. 
-Look at the other issues, in case somebody else already filed one similar. 
-If you like this project and want to say thank you drop me a line (or other stuff like money). 
-Regardless, I'll continue development as long as I'm using it on my own. 
-Admittedly, I've invested way too much time in this project already (1774h+) …
+![screenshot](screenshot.png)
 
 
-### Why is this project not written in Swift?
+What is it?
+-----------
 
-Actually, I started this project with Swift. Even without adding much functionality, the app was exceeding the 10 Mb file size. 
-Compared to the nearly finished Alpha version with 500 Kb written in Objective-C. 
-The reason for that, Swift frameworks are always packed into the final application. 
-I decided that this level of encapsulation is a waste of space for such a small application.
+A RSS & Atom feed reader that lives in the system status bar.  
+Very much inspired by [RSS Menu]; go ahead and check that out.
 
-With Swift 5 and ABI stability this would not be any issue, but sadly Swift 5 was released after already half of the project was done.
-In retrospect it would be much nicer to have it written it like that from the beginning.
-But on the other hand, this project is macOS 10.12 compatible.
+*baRSS* will automatically update feeds for you, and inform you when new content is available.
+The new articles are just a menu away.
+
+
+### Features
+
+*baRSS* is unobtrusive, fast, and built from scratch with minimal footprint in mind.
+The application uses less than 30 Mb memory and has a ridiculous file size of 1 Mb.
+
+Speaking of reducing web traffic.
+In contrast to other applications, *baRSS* does not save any cached web sessions or cookies as a matter of fact.
+But it will reuse `ETag` and `Last-Modified` headers to avoid unnecessary transmissions.
+Further, tuning the update frequently will decrease the traffic even more.
+
+
+### Why create something that already existed?
+
+First, open source is awesome!
+Secondly, RSS Menu made some design decisions I didn't like.
+For example, the new integrated browser window.
+
+One thing I liked most, was the fact that feeds were opened in the default browser.
+Not like 99% of the other feed readers on the market that show a separate HTML viewer window.
+No rendering issues, no broken links, no content that is different from the actual news article.
+
+I know, the whole purpose of RSS is to deliver content without the need of opening a webpage.
+But for me RSS is more about being informed whenever a blog or news feed has some updated content.
+E.g, subscribing to video channels without having to have an account.
+
+
+### Why is this project not written in Swift?!
+
+Actually, I started this project with Swift.
+Even without adding much functionality, the app was exceeding the 10 Mb file size.
+The working alpha version, written in Objective-C, had only 500 Kb.
+The reason being that Swift frameworks are always packed into the final application.
+
+Sadly, this was before Swift 5 and ABI stability.
+Had I only started the project a year later…
+But on the other hand, now it is macOS 10.12 compatible.
 
 
 ### 3rd Party Libraries
@@ -37,8 +64,9 @@ This project uses a modified version of Brent Simmons [RSXML](https://github.com
 RSXML is licensed under a MIT license (same as this project).
 
 
-Install
--------
+
+Download & Install
+------------------
 
 Requires macOS Sierra (10.12) or higher.
 
@@ -52,8 +80,8 @@ The latter is optional, you can build the [RSXML](https://github.com/relikd/RSXM
 Carthage just makes it more convenient.
 Download and unzip this project, navigate to the root folder and run `carthage bootstrap --platform macOS`. 
 
-Next you need to clone [QLOPML](https://github.com/relikd/QLOPML) in the same folder where this project is located.
-Alternatively you can simply delete the `QLOPML` project reference without much harm.
+Next, you need to clone [QLOPML](https://github.com/relikd/QLOPML) in the same folder where this project is.
+Alternatively, you can simply delete the `QLOPML` project reference without much harm.
 `QLOPML` is a Quick Look plugin for `.opml` files.
 It will display the file contents whenever you hit space.
 
@@ -61,6 +89,7 @@ That's it.
 Open Xcode and build the project. 
 Note, there are some compiler flags that append 'beta' to the development release. 
 If you prefer the optimized release version go to `Product > Archive`.
+
 
 
 Hidden options
@@ -71,15 +100,18 @@ This number can be changed with the following Terminal command (default: 10):
 
 ```defaults write de.relikd.baRSS openFewLinksLimit -int 10```
 
-2) In preferences you can choose to show 'Short article names'. This will limit the number of displayed characters to 60 (default). 
-With this Terminal command you can customize this number:
+
+2) If you hold down the option key and click on an article item, you can mark a single item (un-)read.
+
+
+3) In preferences you can choose to show 'Short article names'. This will limit the number of displayed characters to 60 (default). 
+With this Terminal command you can customize this limit:
 
 ```defaults write de.relikd.baRSS shortArticleNamesLimit -int 50```
 
-3) If you hold down the option key and click on an article item, you can mark a single item (un-)read.
 
-4) Limit number of displayed articles in feed menu.
-**Note:** unread count for feed and group may be different than the unread items inside (if unread articles are omitted).
+4) Limit the number of displayed articles per feed menu.
+**Note:** displayed unread count may be different than the unread items inside ('Open unread' will open hidden items too).
 
 ```defaults write de.relikd.baRSS articlesInMenuLimit -int 40```
 
@@ -88,24 +120,33 @@ With this Terminal command you can customize this number:
 ToDo
 ----
 
+The following list is not exhaustive but rather a collection of nice things that will be added eventually.
+I may postpone some until demand increases …
+
 - [ ] Localizations
-- [x] Sandbox
-	- [x] Default RSS application checkbox (disable or other workaround)
+- [ ] Feed generator for websites without feeds
+- [ ] Automatically choose best update interval (e.g., avg)
+- [ ] Sync with online services
+- [ ] Feeds with authentication
+- [ ] Notification Center
+- [ ] Distraction Mode
+	- [ ] Distract less: Sleep timer. (e.g., disable updates during working hours)
+	- [ ] Distract more: Automatically open feed items
+- [ ] Add support for media types
+	- [ ] music / video? (open media player)
+	- [ ] Pure image feed? (show images directly in menu)
+- [ ] Per feed / group settings
+	- [ ] select launch application (e.g., for podcasts)
+	- [ ] exclude unread count from menu bar (e.g., unimportant feeds)
+- [ ] ~~Infinite storage. (load more button)~~
 
 
-- [ ] Nice to have (... on increased demand)
-	- [ ] Feed Generator for websites without feeds
-	- [ ] Automatically choose best update interval (e.g., avg)
-	- [ ] Sync with online services
-	- [ ] Feeds with authentication
-	- [ ] Notification Center
-	- [ ] Distraction Mode
-		- [ ] Distract less: Sleep timer. (e.g., disable updates during working hours)
-		- [ ] Distract more: Automatically open feed items
-	- [ ] Add support for media types
-		- [ ] music / video? (open media player)
-		- [ ] Pure image feed? (show images directly in menu)
-	- [ ] Per feed / group settings
-		- [ ] select launch application (e.g., for podcasts)
-		- [ ] exclude unread count from menu bar (e.g., unimportant feeds)
-	- [ ] ~~Infinite storage. (load more button)~~
+
+##### Trivia
+
+- Start of project: __July 19, 2018__
+- Estimated development time: __1774h+__
+- First prototype used __feedparser python__ library
+
+
+[RSS Menu]: https://itunes.apple.com/us/app/rss-menu/id423069534
