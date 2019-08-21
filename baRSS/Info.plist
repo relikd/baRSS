@@ -11,7 +11,7 @@
 			<array>
 				<dict>
 					<key>CFBundleTypeName</key>
-					<string>org.opml</string>
+					<string>org.opml.opml</string>
 					<key>LSHandlerRank</key>
 					<string>Default</string>
 				</dict>
@@ -23,7 +23,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>opml-icon</string>
 			<key>CFBundleTypeName</key>
-			<string>OPML file</string>
+			<string>OPML document</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSItemContentTypes</key>
@@ -70,7 +70,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>11518</string>
+	<string>11519</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.news</string>
 	<key>LSMinimumSystemVersion</key>
@@ -94,7 +94,7 @@
 				<string>public.xml</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>OPML file</string>
+			<string>OPML document</string>
 			<key>UTTypeIconFile</key>
 			<string>opml-icon</string>
 			<key>UTTypeIdentifier</key>
@@ -103,8 +103,6 @@
 			<string>http://dev.opml.org/spec2.html</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
-				<key>com.apple.ostype</key>
-				<array/>
 				<key>public.filename-extension</key>
 				<array>
 					<string>opml</string>
@@ -112,6 +110,8 @@
 				<key>public.mime-type</key>
 				<array>
 					<string>text/xml</string>
+					<string>text/x-opml</string>
+					<string>application/xml</string>
 				</array>
 			</dict>
 		</dict>
