@@ -71,8 +71,10 @@ static _Atomic(NSUInteger) _queueSize = 0;
 	NSMutableURLRequest *req = [self newRequestURL:meta.url];
 	if (!flag) {
 		// Both fields should be sent (if server provides both) RFC: https://tools.ietf.org/html/rfc7232#section-2.4
-		if (meta.etag.length > 0)
-			[req setValue:meta.etag forHTTPHeaderField:@"If-None-Match"]; // ETag
+		if (meta.etag.length > 0) {
+			NSString *etag = [meta.etag stringByReplacingOccurrencesOfString:@"-gzip" withString:@""];
+			[req setValue:etag forHTTPHeaderField:@"If-None-Match"]; // ETag
+		}
 		if (meta.modified.length > 0)
 			[req setValue:meta.modified forHTTPHeaderField:@"If-Modified-Since"];
 	}
