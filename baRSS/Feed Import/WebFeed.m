@@ -70,9 +70,10 @@ static _Atomic(NSUInteger) _queueSize = 0;
 + (NSURLRequest*)newRequest:(FeedMeta*)meta ignoreCache:(BOOL)flag {
 	NSMutableURLRequest *req = [self newRequestURL:meta.url];
 	if (!flag) {
+		// Both fields should be sent (if server provides both) RFC: https://tools.ietf.org/html/rfc7232#section-2.4
 		if (meta.etag.length > 0)
 			[req setValue:meta.etag forHTTPHeaderField:@"If-None-Match"]; // ETag
-		else if (meta.modified.length > 0)
+		if (meta.modified.length > 0)
 			[req setValue:meta.modified forHTTPHeaderField:@"If-Modified-Since"];
 	}
 	if (!_requestsAreUrgent) // any request that is not forced, is a background update

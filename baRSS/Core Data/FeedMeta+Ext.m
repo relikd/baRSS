@@ -54,7 +54,10 @@
 - (void)setSucessfulWithResponse:(NSHTTPURLResponse*)response {
 	self.errorCount = 0; // reset counter
 	NSDictionary *header = [response allHeaderFields];
-	[self setEtag:header[@"Etag"] modified:header[@"Date"]]; // @"Expires", @"Last-Modified"
+	if (response.statusCode != 304) { // not all servers set etag / modified when returning 304
+		[self setEtag:header[@"Etag"] modified:header[@"Last-Modified"]];
+		[self setUrlIfChanged:response.URL.absoluteString];
+	}
 	[self scheduleNow:self.refresh];
 }
 
