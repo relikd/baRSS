@@ -83,4 +83,6 @@
 	}];
 }
 
+// x-apple.systempreferences:com.apple.preferences.users?startupItemsPref
+
 @end
