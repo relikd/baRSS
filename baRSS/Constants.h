@@ -31,7 +31,7 @@
 
 
 /// UTI type used for opml files
-static NSPasteboardType const UTI_OPML = @"org.opml";
+static NSPasteboardType const UTI_OPML = @"org.opml.opml";
 /// URL with newest baRSS releases. Automatically added when user starts baRSS for the first time.
 static NSString* const versionUpdateURL = @"https://github.com/relikd/baRSS/releases.atom";
 /// URL to help page of auxiliary application "URL Scheme Defaults"
