@@ -66,7 +66,7 @@
 	[self str:mas add:@"gitlab.com" link:@"https://gitlab.com/relikd/baRSS"];
 	[self str:mas add:@" (MIT License)\n\n" bold:NO];
 	[self str:mas add:@"3rd-Party Libraries\n" bold:YES];
-	[self str:mas add:@"RSXML" link:@"https://github.com/relikd/RSXML"];
+	[self str:mas add:@"RSXML2" link:@"https://github.com/relikd/RSXML2"];
 	[self str:mas add:@" (MIT License)" bold:NO];
 	[self str:mas add:@"\n\n\n\nOptions\n" bold:YES];
 	[self str:mas add:@"Fix Cache" link:@"barss:config/fixcache"];

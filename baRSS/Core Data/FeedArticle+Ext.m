@@ -20,7 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-@import RSXML.RSParsedArticle;
+@import RSXML2.RSParsedArticle;
 #import "FeedArticle+Ext.h"
 #import "Constants.h"
 #import "UserPrefs.h"

@@ -14,9 +14,9 @@
 		54209E942117325100F3B5EF /* DrawImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 54209E932117325100F3B5EF /* DrawImage.m */; };
 		544B011A2114B41200386E5C /* ModalSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* ModalSheet.m */; };
 		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
-		544DCCB9212A2B4D002DBC46 /* RSXML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML.framework */; };
-		544DCCBA212A2B4D002DBC46 /* RSXML.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		544DCCBE212A2B6F002DBC46 /* RSXML.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 544DCCBD212A2B6F002DBC46 /* RSXML.framework.dSYM */; };
+		544DCCB9212A2B4D002DBC46 /* RSXML2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML2.framework */; };
+		544DCCBA212A2B4D002DBC46 /* RSXML2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		544DCCBE212A2B6F002DBC46 /* RSXML2.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 544DCCBD212A2B6F002DBC46 /* RSXML2.framework.dSYM */; };
 		54501010230E9C8600F0B165 /* FeedDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 5450100F230E9C8600F0B165 /* FeedDownload.m */; };
 		546A6A2922C583390034E806 /* SettingsGeneralView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D857D122802309001BA1C8 /* SettingsGeneralView.m */; };
 		546A6A2C22C584AF0034E806 /* SettingsAppearanceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 546A6A2A22C584AF0034E806 /* SettingsAppearanceView.m */; };
@@ -72,7 +72,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				544DCCBA212A2B4D002DBC46 /* RSXML.framework in Embed Frameworks */,
+				544DCCBA212A2B4D002DBC46 /* RSXML2.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -83,7 +83,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				544DCCBE212A2B6F002DBC46 /* RSXML.framework.dSYM in CopyFiles */,
+				544DCCBE212A2B6F002DBC46 /* RSXML2.framework.dSYM in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,8 +116,8 @@
 		544B01192114B41200386E5C /* ModalSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalSheet.m; sourceTree = "<group>"; };
 		544B011B2114EE9100386E5C /* AppHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppHook.h; sourceTree = "<group>"; };
 		544B011C2114EE9100386E5C /* AppHook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppHook.m; sourceTree = "<group>"; };
-		544DCCB8212A2B4D002DBC46 /* RSXML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSXML.framework; path = Carthage/Build/Mac/RSXML.framework; sourceTree = "<group>"; };
-		544DCCBD212A2B6F002DBC46 /* RSXML.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = RSXML.framework.dSYM; path = Carthage/Build/Mac/RSXML.framework.dSYM; sourceTree = "<group>"; };
+		544DCCB8212A2B4D002DBC46 /* RSXML2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSXML2.framework; path = Carthage/Build/Mac/RSXML2.framework; sourceTree = "<group>"; };
+		544DCCBD212A2B6F002DBC46 /* RSXML2.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = RSXML2.framework.dSYM; path = Carthage/Build/Mac/RSXML2.framework.dSYM; sourceTree = "<group>"; };
 		5450100E230E9C8600F0B165 /* FeedDownload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FeedDownload.h; sourceTree = "<group>"; };
 		5450100F230E9C8600F0B165 /* FeedDownload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeedDownload.m; sourceTree = "<group>"; };
 		546A6A2A22C584AF0034E806 /* SettingsAppearanceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsAppearanceView.m; sourceTree = "<group>"; };
@@ -195,7 +195,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				544DCCB9212A2B4D002DBC46 /* RSXML.framework in Frameworks */,
+				544DCCB9212A2B4D002DBC46 /* RSXML2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,8 +241,8 @@
 		544FBD4321064AEB008A260C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				544DCCB8212A2B4D002DBC46 /* RSXML.framework */,
-				544DCCBD212A2B6F002DBC46 /* RSXML.framework.dSYM */,
+				544DCCB8212A2B4D002DBC46 /* RSXML2.framework */,
+				544DCCBD212A2B6F002DBC46 /* RSXML2.framework.dSYM */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
