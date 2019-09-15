@@ -20,7 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-@import RSXML;
+@import RSXML2;
 #import "ModalFeedEdit.h"
 #import "ModalFeedEditView.h"
 #import "RefreshStatisticsView.h"
