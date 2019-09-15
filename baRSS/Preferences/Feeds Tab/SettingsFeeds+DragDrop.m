@@ -144,9 +144,8 @@ const NSPasteboardType dragReorder = @"de.relikd.baRSS.drag-reorder";
 		return;
 	}
 	// Get list of feeds, and root level selection
-	NSUInteger count = moc.insertedObjects.count;
-	NSMutableArray<NSIndexPath*> *selection = [NSMutableArray arrayWithCapacity:count];
-	NSMutableArray<Feed*> *feedsList = [NSMutableArray arrayWithCapacity:count];
+	NSMutableArray<NSIndexPath*> *selection = [NSMutableArray array];
+	NSMutableArray<Feed*> *feedsList = [NSMutableArray array];
 	for (__kindof NSManagedObject *obj in moc.insertedObjects) {
 		if ([obj isKindOfClass:[Feed class]]) {
 			[feedsList addObject:obj]; // list of feeds that need download
@@ -161,8 +160,10 @@ const NSPasteboardType dragReorder = @"de.relikd.baRSS.drag-reorder";
 	if (selection.count > 0)
 		[self.dataStore setSelectionIndexPaths:[selection sortedArrayUsingSelector:@selector(compare:)]];
 	
-	[UpdateScheduler downloadList:feedsList background:NO finally:^{
+	[UpdateScheduler downloadList:feedsList userInitiated:YES finally:^{
 		[self endCoreDataChangeUndoEmpty:NO forceUndo:NO];
+		for (Feed *f in feedsList)
+			[moc refreshObject:f.group mergeChanges:NO]; // fixes blank icon if imported with no inet conn
 		[UpdateScheduler scheduleNextFeed];
 	}];
 }
@@ -243,7 +244,7 @@ const NSPasteboardType dragReorder = @"de.relikd.baRSS.drag-reorder";
 	return result;
 }
 
-NS_INLINE BOOL IndexPathIsChildOfParent(NSIndexPath *child, NSIndexPath *parent) {
+static inline BOOL IndexPathIsChildOfParent(NSIndexPath *child, NSIndexPath *parent) {
 	while (child.length > parent.length)
 		child = [child indexPathByRemovingLastIndex];
 	return [child isEqualTo:parent];

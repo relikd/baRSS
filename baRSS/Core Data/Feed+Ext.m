@@ -28,6 +28,7 @@
 #import "FeedGroup+Ext.h"
 #import "FeedArticle+Ext.h"
 #import "StoreCoordinator.h"
+#import "NSURL+Ext.h"
 
 @implementation Feed (Ext)
 
@@ -36,14 +37,6 @@
 	Feed *feed = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:moc];
 	feed.meta = [FeedMeta newMetaInContext:moc];
 	return feed;
-}
-
-/// Instantiates new @c FeedGroup with @c FEED type, set the update interval to @c 30min and @c sortIndex to last root index.
-+ (instancetype)appendToRootWithDefaultIntervalInContext:(NSManagedObjectContext*)moc {
-	NSUInteger lastIndex = [StoreCoordinator countRootItemsInContext:moc];
-	FeedGroup *fg = [FeedGroup newGroup:FEED inContext:moc];
-	[fg setParent:nil andSortIndex:(int32_t)lastIndex];
-	return fg.feed;
 }
 
 /// Call @c indexPathString on @c .group and update @c .indexPath if current value is different.
@@ -56,7 +49,7 @@
 /// @return Fully initialized @c NSMenuItem with @c title, @c tooltip, @c image, and @c action.
 - (NSMenuItem*)newMenuItem {
 	NSMenuItem *item = [NSMenuItem new];
-	item.title = self.group.nameOrError;
+	item.title = self.group.anyName;
 	item.toolTip = self.subtitle;
 	item.enabled = (self.articles.count > 0);
 	item.image = self.iconImage16;
@@ -84,9 +77,6 @@
 	if (![self.title isEqualToString:obj.title])       self.title = obj.title;
 	if (![self.subtitle isEqualToString:obj.subtitle]) self.subtitle = obj.subtitle;
 	if (![self.link isEqualToString:obj.link])         self.link = obj.link;
-	
-	if (self.group.name.length == 0) // in case a blank group was initialized
-		self.group.name = obj.title;
 	
 	// Add and remove articles
 	NSMutableSet<FeedArticle*> *localSet = [self.articles mutableCopy];
@@ -117,6 +107,7 @@
 		// reverse enumeration ensures correct article order
 		FeedArticle *storedArticle = [self findRemoteArticle:article inLocalSet:localSet];
 		if (storedArticle) {
+			// TODO: stop bullshitting with ghost articles
 			[localSet removeObject:storedArticle];
 			// If we encounter an already existing item, assume newly inserted are "ghost" items and mark read.
 			if (newlyInserted.count > 0) {
@@ -215,15 +206,13 @@
 #pragma mark - Icon -
 
 
-/**
- @return Return @c 16x16px image. Either from core data storage or generated default RSS icon.
- */
+/// @return @c 16x16px image. Either from favicon cache or generated default RSS icon.
 - (nonnull NSImage*)iconImage16 {
 	NSImage *img = nil;
 	if (self.articles.count == 0) {
 		img = [NSImage imageNamed:NSImageNameCaution];
-	} else if (self.icon.icon) {
-		img = [[NSImage alloc] initWithData:self.icon.icon];
+	} else if (self.hasIcon) {
+		img = [[NSImage alloc] initByReferencingURL:[self iconPath]];
 	} else {
 		img = [NSImage imageNamed:RSSImageDefaultRSSIcon];
 	}
@@ -231,23 +220,26 @@
 	return img;
 }
 
-/**
- Set favicon icon or delete relationship if @c img is not a valid image.
- 
- @return @c YES if icon was updated (core data did change).
-*/
-- (BOOL)setIconImage:(NSImage*)img {
-	if (img && [img isValid]) {
-		if (!self.icon)
-			self.icon = [[FeedIcon alloc] initWithEntity:FeedIcon.entity insertIntoManagedObjectContext:self.managedObjectContext];
-		self.icon.icon = [img TIFFRepresentation];
-		return YES;
-	} else if (self.icon) {
-		[self.managedObjectContext deleteObject:self.icon];
-		self.icon = nil;
-		return YES;
+/// Checks if file at @c iconPath is an actual file
+- (BOOL)hasIcon { return [[self iconPath] existsAndIsDir:NO]; }
+
+/// Image file path at e.g., "Application Support/baRSS/favicons/p42". @warning File may not exist!
+- (NSURL*)iconPath {
+	NSString *pk = self.objectID.URIRepresentation.lastPathComponent;
+	return [[NSURL faviconsCacheURL] URLByAppendingPathComponent:pk isDirectory:NO];
+}
+
+/// Move favicon from @c $TMPDIR to permanent destination in Application Support.
+- (void)setNewIcon:(NSURL*)location {
+	if (!location) {
+		[[self iconPath] remove];
+	} else {
+		if (self.objectID.isTemporaryID) {
+			[self.managedObjectContext obtainPermanentIDsForObjects:@[self] error:nil];
+		}
+		[location moveTo:[self iconPath]];
+		PostNotification(kNotificationFeedIconUpdated, self.objectID);
 	}
-	return NO;
 }
 
 @end

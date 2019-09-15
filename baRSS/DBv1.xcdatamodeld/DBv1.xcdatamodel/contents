@@ -7,7 +7,6 @@
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="articles" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FeedArticle" inverseName="feed" inverseEntity="FeedArticle" syncable="YES"/>
         <relationship name="group" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedGroup" inverseName="feed" inverseEntity="FeedGroup" syncable="YES"/>
-        <relationship name="icon" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FeedIcon" inverseName="feed" inverseEntity="FeedIcon" syncable="YES"/>
         <relationship name="meta" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FeedMeta" inverseName="feed" inverseEntity="FeedMeta" syncable="YES"/>
     </entity>
     <entity name="FeedArticle" representedClassName="FeedArticle" syncable="YES" codeGenerationType="class">
@@ -30,10 +29,6 @@
         <relationship name="feed" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Feed" inverseName="group" inverseEntity="Feed" syncable="YES"/>
         <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedGroup" inverseName="children" inverseEntity="FeedGroup" syncable="YES"/>
     </entity>
-    <entity name="FeedIcon" representedClassName="FeedIcon" syncable="YES" codeGenerationType="class">
-        <attribute name="icon" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" customClassName="NSImage" syncable="YES"/>
-        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="icon" inverseEntity="Feed" syncable="YES"/>
-    </entity>
     <entity name="FeedMeta" representedClassName="FeedMeta" syncable="YES" codeGenerationType="class">
         <attribute name="errorCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="etag" optional="YES" attributeType="String" syncable="YES"/>
@@ -48,10 +43,9 @@
         <attribute name="value" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Feed" positionX="-278.84765625" positionY="-112.953125" width="128" height="165"/>
+        <element name="Feed" positionX="-278.84765625" positionY="-112.953125" width="128" height="150"/>
         <element name="FeedArticle" positionX="-96.77734375" positionY="-113.83984375" width="128" height="195"/>
         <element name="FeedGroup" positionX="-460.37890625" positionY="-111.62890625" width="130.52734375" height="135"/>
-        <element name="FeedIcon" positionX="-202.79296875" positionY="137.71875" width="128" height="75"/>
         <element name="FeedMeta" positionX="-348.02734375" positionY="136.89453125" width="128" height="150"/>
         <element name="Options" positionX="-279" positionY="36" width="128" height="75"/>
     </elements>

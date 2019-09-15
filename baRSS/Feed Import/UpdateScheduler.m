@@ -22,24 +22,33 @@
 
 @import SystemConfiguration;
 #import "UpdateScheduler.h"
-#import "WebFeed.h"
 #import "Constants.h"
 #import "StoreCoordinator.h"
 #import "NSDate+Ext.h"
+
+#import "FeedDownload.h"
+#import "FaviconDownload.h"
+#import "Feed+Ext.h"
+#import "FeedMeta+Ext.h"
+#import "FeedGroup+Ext.h"
+
+#include <stdatomic.h>
 
 static NSTimer *_timer;
 static SCNetworkReachabilityRef _reachability = NULL;
 static BOOL _isReachable = YES;
 static BOOL _updatePaused = NO;
 static BOOL _nextUpdateIsForced = NO;
-
+static _Atomic(NSUInteger) _queueSize = 0;
 
 @implementation UpdateScheduler
 
-#pragma mark - User Interaction
+// ################################################################
+// #  MARK: - Getter & Setter -
+// ################################################################
 
 /// @return Number of feeds being currently downloaded.
-+ (NSUInteger)feedsInQueue { return [WebFeed feedsInQueue]; }
++ (NSUInteger)feedsInQueue { return _queueSize; }
 
 /// @return Date when background update will fire. If updates are paused, date is @c distantFuture.
 + (NSDate *)dateScheduled { return _timer.fireDate; }
@@ -48,7 +57,7 @@ static BOOL _nextUpdateIsForced = NO;
 + (BOOL)allowNetworkConnection { return (_isReachable && !_updatePaused); }
 
 /// @return @c YES if batch update is running
-+ (BOOL)isUpdating { return [WebFeed feedsInQueue] > 0; }
++ (BOOL)isUpdating { return _queueSize > 0; }
 
 /// @return @c YES if update is paused by user.
 + (BOOL)isPaused { return _updatePaused; }
@@ -78,7 +87,7 @@ static BOOL _nextUpdateIsForced = NO;
 
 /// Update status. 'Updating X feeds …' or empty string if not updating.
 + (NSString*)updatingXFeeds {
-	NSUInteger c = [WebFeed feedsInQueue];
+	NSUInteger c = _queueSize;
 	switch (c) {
 		case 0:  return @"";
 		case 1:  return NSLocalizedString(@"Updating 1 feed …", nil);
@@ -86,17 +95,15 @@ static BOOL _nextUpdateIsForced = NO;
 	}
 }
 
+// ################################################################
+// #  MARK: - Schedule Timer Actions -
+// ################################################################
 
-#pragma mark - Update Feed Timer
-
-
-/**
- Get date of next up feed and start the timer.
- */
+/// Get date of next up feed and start the timer.
 + (void)scheduleNextFeed {
 	if (![self allowNetworkConnection]) // timer will restart once connection exists
 		return;
-	if ([WebFeed feedsInQueue] > 0) // assume every update ends with scheduleNextFeed
+	if (_queueSize > 0) // assume every update ends with scheduleNextFeed
 		return; // skip until called again
 	NSDate *nextTime = [StoreCoordinator nextScheduledUpdate]; // if nextTime = nil, then no feeds to update
 	if (nextTime && [nextTime timeIntervalSinceNow] < 1) { // mostly, if app was closed for a long time
@@ -105,9 +112,7 @@ static BOOL _nextUpdateIsForced = NO;
 	[self scheduleTimer:nextTime];
 }
 
-/**
- Start download of all feeds (immediatelly) regardless of @c .scheduled property.
- */
+/// Start download of all feeds (immediatelly) regardless of @c .scheduled property.
 + (void)forceUpdateAllFeeds {
 	if (![self allowNetworkConnection]) // timer will restart once connection exists
 		return;
@@ -118,7 +123,7 @@ static BOOL _nextUpdateIsForced = NO;
 /**
  Set new @c .fireDate and @c .tolerance for update timer.
 
- @param nextTime If @c nil timer will be disabled with a @c .fireDate very far in the future.
+ @param nextTime If @c nil disable timer and set @c .fireDate to distant future.
  */
 + (void)scheduleTimer:(NSDate*)nextTime {
 	static dispatch_once_t onceToken;
@@ -134,9 +139,7 @@ static BOOL _nextUpdateIsForced = NO;
 	PostNotification(kNotificationScheduleTimerChanged, nil);
 }
 
-/**
- Called when schedule timer runs out (earliest @c .schedule date). Or if forced by user request.
- */
+/// Called when schedule timer runs out (earliest @c .schedule date). Or if forced by user.
 + (void)updateTimerCallback {
 #ifdef DEBUG
 	NSLog(@"fired");
@@ -145,35 +148,115 @@ static BOOL _nextUpdateIsForced = NO;
 	_nextUpdateIsForced = NO;
 	
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
-	NSArray<Feed*> *list = [StoreCoordinator getListOfFeedsThatNeedUpdate:updateAll inContext:moc];
+	NSArray<Feed*> *list = [StoreCoordinator listOfFeedsThatNeedUpdate:updateAll inContext:moc];
 	//NSAssert(list.count > 0, @"ERROR: Something went wrong, timer fired too early.");
 	
-	[self downloadList:list background:!updateAll finally:^{
+	[self downloadList:list userInitiated:updateAll finally:^{
 		[StoreCoordinator saveContext:moc andParent:YES]; // save parents too ...
 		[moc reset];
 		[self scheduleNextFeed]; // always reset the timer
 	}];
 }
 
-/// Download list of feeds. Either silently in background or in foreground with alerts.
-+ (void)downloadList:(NSArray<Feed*>*)list background:(BOOL)flag finally:(nullable os_block_t)block {
-	if (![self allowNetworkConnection]) {
-		if (block) block();
-	} else if (flag) {
-		[WebFeed batchDownloadFeeds:list showErrorAlert:NO finally:block];
-	} else {
-		// TODO: add undo grouping?
-		[WebFeed setRequestsAreUrgent:YES];
-		[WebFeed batchDownloadFeeds:list showErrorAlert:YES finally:^{
-			[WebFeed setRequestsAreUrgent:NO];
-			if (block) block();
-		}];
-	}
+// ################################################################
+// #  MARK: - Download Actions -
+// ################################################################
+
+/// Perform @c FaviconDownload on all core data @c Feed entries.
++ (void)updateAllFavicons {
+	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
+	for (Feed *f in [StoreCoordinator listOfFeedsThatNeedUpdate:YES inContext:moc])
+		[FaviconDownload updateFeed:f finally:nil];
+	[moc reset];
 }
 
+/// Download list of feeds. Either silently in background or with alerts in foreground.
++ (void)downloadList:(NSArray<Feed*>*)list userInitiated:(BOOL)flag finally:(nullable os_block_t)block {
+	if (![self allowNetworkConnection]) {
+		if (block) block();
+		return;
+	}
+	// Else: batch download
+	atomic_fetch_add_explicit(&_queueSize, list.count, memory_order_relaxed);
+	PostNotification(kNotificationBackgroundUpdateInProgress, @(_queueSize));
+	dispatch_group_t group = dispatch_group_create();
+	for (Feed *f in list) {
+		dispatch_group_enter(group);
+		[self updateFeed:f alert:flag isForced:flag finally:^{
+			atomic_fetch_sub_explicit(&_queueSize, 1, memory_order_relaxed);
+			PostNotification(kNotificationBackgroundUpdateInProgress, @(_queueSize));
+			dispatch_group_leave(group);
+		}];
+	}
+	if (block) dispatch_group_notify(group, dispatch_get_main_queue(), block);
+}
 
-#pragma mark - Network Connection & Reachability
+/// Helper method to show modal error alert
+static inline void AlertDownloadError(NSError *err, NSString *url) {
+	NSAlert *alertPopup = [NSAlert alertWithError:err];
+	alertPopup.informativeText = [NSString stringWithFormat:@"Error loading source: %@", url];
+	[alertPopup runModal];
+}
 
+/**
+ Start download request with existing @c Feed object. Reuses etag and modified headers (unless articles count is 0).
+ @note Will post a @c kNotificationArticlesUpdated notification if download was successful and status code is @b not 304.
+ */
++ (void)updateFeed:(Feed*)feed alert:(BOOL)alert isForced:(BOOL)forced finally:(nullable os_block_t)block {
+	NSManagedObjectContext *moc = feed.managedObjectContext;
+	NSManagedObjectID *oid = feed.objectID;
+	[[FeedDownload withFeed:feed forced:forced] startWithBlock:^(FeedDownload *mem) {
+		if (alert && mem.error) // but still copy values for error count increment
+			AlertDownloadError(mem.error, mem.request.URL.absoluteString);
+		Feed *f = [moc objectWithID:oid];
+		BOOL recentlyAdded = (f.articles.count == 0); // before copy values
+		BOOL downloadIcon = (!f.hasIcon && (recentlyAdded || forced));
+		BOOL needsNotification = [mem copyValuesTo:f ignoreError:NO];
+		[StoreCoordinator saveContext:moc andParent:YES];
+		if (needsNotification)
+			PostNotification(kNotificationArticlesUpdated, oid);
+		if (downloadIcon && !mem.error) {
+			[FaviconDownload updateFeed:f finally:block];
+		} else if (block) block(); // always call block(); with or without favicon download
+	}];
+}
+
+/**
+ Download feed at url and append to persistent store in root folder. On error present user modal alert.
+ Creates new @c FeedGroup, @c Feed, @c FeedMeta and @c FeedArticle instances and saves them to the persistent store.
+ */
++ (void)autoDownloadAndParseURL:(NSString*)url addAnyway:(BOOL)flag name:(nullable NSString*)title refresh:(int32_t)interval {
+	[[FeedDownload withURL:url] startWithBlock:^(FeedDownload *mem) {
+		if (!flag && mem.error) {
+			AlertDownloadError(mem.error, url);
+			return;
+		}
+		NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
+		FeedGroup *fg = [FeedGroup appendToRoot:FEED inContext:moc];
+		[fg setNameIfChanged:title];
+		[fg.feed.meta setRefreshIfChanged:interval];
+		[mem copyValuesTo:fg.feed ignoreError:YES];
+		[StoreCoordinator saveContext:moc andParent:YES];
+		PostNotification(kNotificationFeedGroupInserted, fg.objectID);
+		if (!mem.error) [FaviconDownload updateFeed:fg.feed finally:nil];
+		[moc reset];
+		[UpdateScheduler scheduleNextFeed];
+	}];
+}
+
+/// Download and process feed url. Auto update feed title with an update interval of 30 min.
++ (void)autoDownloadAndParseURL:(NSString*)url {
+	[self autoDownloadAndParseURL:url addAnyway:NO name:nil refresh:kDefaultFeedRefreshInterval];
+}
+
+/// Insert Github URL for version releases with update interval 2 days and rename @c FeedGroup item.
++ (void)autoDownloadAndParseUpdateURL {
+	[self autoDownloadAndParseURL:versionUpdateURL addAnyway:YES name:NSLocalizedString(@"baRSS releases", nil) refresh:2 * TimeUnitDays];
+}
+
+// ################################################################
+// #  MARK: - Network Connection & Reachability -
+// ################################################################
 
 /// Set callback on @c self to listen for network reachability changes.
 + (void)registerNetworkChangeNotification {

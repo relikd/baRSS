@@ -1,6 +1,6 @@
 //
 //  The MIT License (MIT)
-//  Copyright (c) 2018 Oleg Geier
+//  Copyright (c) 2019 Oleg Geier
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -21,20 +21,7 @@
 //  SOFTWARE.
 
 @import Cocoa;
-#import "Feed+CoreDataClass.h"
-@class RSParsedFeed;
 
-@interface Feed (Ext)
-@property (readonly) BOOL hasIcon;
-@property (nonnull, readonly) NSImage* iconImage16;
-
-// Generator methods / Feed update
-+ (instancetype)newFeedAndMetaInContext:(NSManagedObjectContext*)context;
-- (void)updateWithRSS:(RSParsedFeed*)obj postUnreadCountChange:(BOOL)flag;
-- (NSMenuItem*)newMenuItem;
-// Getter & Setter
-- (void)calculateAndSetIndexPathString;
-- (void)setNewIcon:(NSURL*)location;
-// Article properties
-- (NSArray<FeedArticle*>*)sortedArticles;
+@interface NSError (Ext)
++ (instancetype)statusCode:(NSInteger)code reason:(nullable NSString*)reason;
 @end

@@ -47,9 +47,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 	// Register for notifications
-	RegisterNotification(kNotificationFeedUpdated, @selector(feedUpdated:), self);
+	RegisterNotification(kNotificationArticlesUpdated, @selector(feedUpdated:), self);
 	RegisterNotification(kNotificationFeedIconUpdated, @selector(feedUpdated:), self);
-	RegisterNotification(kNotificationGroupInserted, @selector(groupInserted:), self);
+	RegisterNotification(kNotificationFeedGroupInserted, @selector(feedGroupInserted:), self);
 	// Status bar
 	RegisterNotification(kNotificationScheduleTimerChanged, @selector(updateStatusInfo), self);
 	RegisterNotification(kNotificationNetworkStatusChanged, @selector(updateStatusInfo), self);
@@ -58,6 +58,8 @@
 
 - (void)dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	NSUInteger c = [StoreCoordinator cleanupFavicons];
+	if (c > 0) NSLog(@"Removed %lu unreferenced favicons", c);
 }
 
 /// Initialize status info timer
@@ -97,10 +99,8 @@
 	self.dataStore.sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]];
 	
 	NSError *error;
-	BOOL ok = [self.dataStore fetchWithRequest:nil merge:NO error:&error];
-	if (!ok || error) {
-		[[NSApplication sharedApplication] presentError:error];
-	}
+	[self.dataStore fetchWithRequest:nil merge:NO error:&error];
+	if (error) [NSApp presentError:error];
 }
 
 /**
@@ -160,7 +160,7 @@
 }
 
 /// Callback method fired when feed is inserted via a 'feed://' url
-- (void)groupInserted:(NSNotification*)notify {
+- (void)feedGroupInserted:(NSNotification*)notify {
 	[self.dataStore fetch:self];
 }
 
@@ -312,7 +312,7 @@
 		}
 		if ([self endCoreDataChangeUndoEmpty:YES forceUndo:(returnCode != NSModalResponseOK)]) {
 			if (!flag) [UpdateScheduler scheduleNextFeed]; // only for feed edit
-			[self.dataStore rearrangeObjects]; // update display, edited title or icon
+			[self.dataStore.managedObjectContext refreshObject:fg mergeChanges:NO]; // update title & icon
 		}
 	}];
 }

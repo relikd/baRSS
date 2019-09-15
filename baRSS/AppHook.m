@@ -22,14 +22,14 @@
 
 #import "AppHook.h"
 #import "Constants.h"
-#import "BarStatusItem.h"
-#import "WebFeed.h"
-#import "UpdateScheduler.h"
-#import "Preferences.h"
 #import "DrawImage.h"
-#import "SettingsFeeds+DragDrop.h"
 #import "UserPrefs.h"
+#import "Preferences.h"
+#import "BarStatusItem.h"
+#import "UpdateScheduler.h"
 #import "StoreCoordinator.h"
+#import "SettingsFeeds+DragDrop.h"
+#import "NSURL+Ext.h"
 
 @interface AppHook()
 @property (strong) NSWindowController *prefWindow;
@@ -53,11 +53,15 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+	BOOL initial = [[NSURL faviconsCacheURL] mkdir];
 	[_statusItem asyncReloadUnreadCount];
 	[UpdateScheduler registerNetworkChangeNotification]; // will call update scheduler
 	if ([StoreCoordinator isEmpty]) {
 		[_statusItem showWelcomeMessage];
-		[WebFeed autoDownloadAndParseUpdateURL];
+		[UpdateScheduler autoDownloadAndParseUpdateURL];
+	} else {
+		// mostly for version migration 0.9.4 ~> 1.0 (favicon storage)
+		if (initial) [UpdateScheduler updateAllFavicons];
 	}
 }
 
@@ -109,8 +113,8 @@
 
 @synthesize persistentContainer = _persistentContainer;
 
+/// The persistent container for the application. This implementation creates and returns a container, having loaded the store for the application to it.
 - (NSPersistentContainer *)persistentContainer {
-	// The persistent container for the application. This implementation creates and returns a container, having loaded the store for the application to it.
 	@synchronized (self) {
 		if (_persistentContainer == nil) {
 			_persistentContainer = [[NSPersistentContainer alloc] initWithName:@"DBv1"];
@@ -125,28 +129,23 @@
 	return _persistentContainer;
 }
 
+/// Save changes in the application's managed object context before the application terminates.
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
-	// Save changes in the application's managed object context before the application terminates.
 	NSManagedObjectContext *context = self.persistentContainer.viewContext;
-	
 	if (![context commitEditing]) {
 		NSLog(@"%@:%@ unable to commit editing to terminate", [self class], NSStringFromSelector(_cmd));
 		return NSTerminateCancel;
 	}
-	
 	if (!context.hasChanges) {
 		return NSTerminateNow;
 	}
-	
 	NSError *error = nil;
 	if (![context save:&error]) {
-		
 		// Customize this code block to include application-specific recovery steps.
 		BOOL result = [sender presentError:error];
 		if (result) {
 			return NSTerminateCancel;
 		}
-		
 		NSString *question = NSLocalizedString(@"Could not save changes while quitting. Quit anyway?", @"Quit without saves error question message");
 		NSString *info = NSLocalizedString(@"Quitting now will lose any changes you have made since the last successful save", @"Quit without saves error question info");
 		NSString *quitButton = NSLocalizedString(@"Quit anyway", @"Quit anyway button title");
@@ -157,9 +156,7 @@
 		[alert addButtonWithTitle:quitButton];
 		[alert addButtonWithTitle:cancelButton];
 		
-		NSInteger answer = [alert runModal];
-		
-		if (answer == NSAlertSecondButtonReturn) {
+		if ([alert runModal] == NSAlertSecondButtonReturn) {
 			return NSTerminateCancel;
 		}
 	}
@@ -170,9 +167,7 @@
 #pragma mark - Application Input (URLs and Files)
 
 
-/**
- Callback method fired on opml file import
- */
+/// Callback method fired on opml file import
 - (void)application:(NSApplication *)sender openFiles:(NSArray<NSString *> *)filenames {
 	NSMutableArray<NSURL*> *urls = [NSMutableArray arrayWithCapacity:filenames.count];
 	for (NSString *file in filenames) {
@@ -184,9 +179,7 @@
 	[sender replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
 }
 
-/**
- Callback method fired when opened with an URL (@c feed: and @c barss: scheme)
- */
+/// Callback method fired when opened with an URL (@c feed: and @c barss: scheme)
 - (void)handleAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
 	NSString *url = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
 	NSString *scheme = [[[NSURL URLWithString:url] scheme] lowercaseString];
@@ -195,7 +188,7 @@
 		url = [url substringFromIndex:2];
 	}
 	if ([scheme isEqualToString:kURLSchemeFeed]) {
-		[WebFeed autoDownloadAndParseURL:url addAnyway:NO modify:nil];
+		[UpdateScheduler autoDownloadAndParseURL:url];
 	} else if ([scheme isEqualToString:kURLSchemeBarss]) {
 		NSMutableArray<NSString*> *comp = [[url pathComponents] mutableCopy];
 		NSString *action = comp.firstObject;

@@ -21,17 +21,22 @@
 //  SOFTWARE.
 
 #import "FeedGroup+Ext.h"
-#import "FeedMeta+Ext.h"
 #import "Feed+Ext.h"
+#import "FeedMeta+Ext.h"
+#import "StoreCoordinator.h"
 #import "NSDate+Ext.h"
 
 @implementation FeedGroup (Ext)
 
 #pragma mark - Properties
 
-/// @return Returns "(no title)" if @c self.name is @c nil.
-- (nonnull NSString*)nameOrError {
-	return (self.name ? self.name : NSLocalizedString(@"(no title)", nil));
+/// Try return @c self.name or @c self.feed.title ; If both fail return "(no title)"
+- (nonnull NSString*)anyName {
+	if (self.name.length > 0)
+		return self.name;
+	if (self.type == FEED && self.feed.title.length > 0)
+		return self.feed.title;
+	return NSLocalizedString(@"(no title)", nil);
 }
 
 /// @return Return @c 16x16px NSImageNameFolder image.
@@ -66,6 +71,14 @@
 	return fg;
 }
 
+/// Instantiates new @c FeedGroup at root level and append at end.
++ (instancetype)appendToRoot:(FeedGroupType)type inContext:(NSManagedObjectContext*)moc {
+	NSUInteger lastIndex = [StoreCoordinator countRootItemsInContext:moc];
+	FeedGroup *fg = [FeedGroup newGroup:type inContext:moc];
+	[fg setParent:nil andSortIndex:(int32_t)lastIndex];
+	return fg;
+}
+
 /// Set @c parent and @c sortIndex. Also if type is @c FEED calculate and set @c indexPath string.
 - (void)setParent:(FeedGroup *)parent andSortIndex:(int32_t)sortIndex {
 	self.parent = parent;
@@ -85,15 +98,19 @@
 }
 
 /// Set @c name attribute but only if value differs.
-- (void)setNameIfChanged:(NSString*)name {
-	if (![self.name isEqualToString: name])
+- (void)setNameIfChanged:(nullable NSString*)name {
+	if (name.length == 0) {
+		if (self.name.length > 0)
+			self.name = nil; // nullify empty strings
+	} else if (![self.name isEqualToString: name]) {
 		self.name = name;
+	}
 }
 
 /// @return Fully initialized @c NSMenuItem with @c title and @c image.
 - (NSMenuItem*)newMenuItem {
 	NSMenuItem *item = [NSMenuItem new];
-	item.title = self.nameOrError;
+	item.title = self.anyName;
 	item.enabled = (self.children.count > 0);
 	item.image = self.groupIconImage16;
 	item.representedObject = self.objectID;
@@ -155,8 +172,8 @@
 /// @return Simplified description of the feed object.
 - (NSString*)readableDescription {
 	switch (self.type) {
-		case GROUP:     return [NSString stringWithFormat:@"%@:", self.name];
-		case FEED:      return [NSString stringWithFormat:@"%@ (%@)", self.name, self.feed.meta.url];
+		case GROUP:     return [NSString stringWithFormat:@"%@:", self.anyName];
+		case FEED:      return [NSString stringWithFormat:@"%@ (%@)", self.anyName, self.feed.meta.url];
 		case SEPARATOR: return @"-------------";
 	}
 }

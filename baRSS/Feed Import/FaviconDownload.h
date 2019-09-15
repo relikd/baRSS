@@ -1,6 +1,6 @@
 //
 //  The MIT License (MIT)
-//  Copyright (c) 2018 Oleg Geier
+//  Copyright (c) 2019 Oleg Geier
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy of
 //  this software and associated documentation files (the "Software"), to deal in
@@ -21,20 +21,27 @@
 //  SOFTWARE.
 
 @import Cocoa;
-#import "Feed+CoreDataClass.h"
-@class RSParsedFeed;
+@class Feed, RSHTMLMetadata, FeedDownload;
+@protocol FaviconDownloadDelegate;
 
-@interface Feed (Ext)
-@property (readonly) BOOL hasIcon;
-@property (nonnull, readonly) NSImage* iconImage16;
+@interface FaviconDownload : NSObject
+/// @c img and @c path are @c nil if image is not valid or couldn't be downloaded.
+typedef void(^FaviconDownloadBlock)(NSImage * _Nullable img, NSURL * _Nullable path);
 
-// Generator methods / Feed update
-+ (instancetype)newFeedAndMetaInContext:(NSManagedObjectContext*)context;
-- (void)updateWithRSS:(RSParsedFeed*)obj postUnreadCountChange:(BOOL)flag;
-- (NSMenuItem*)newMenuItem;
-// Getter & Setter
-- (void)calculateAndSetIndexPathString;
-- (void)setNewIcon:(NSURL*)location;
-// Article properties
-- (NSArray<FeedArticle*>*)sortedArticles;
+// Instantiation methods
++ (instancetype)withURL:(nonnull NSString*)urlStr isImageURL:(BOOL)flag;
++ (instancetype)updateFeed:(Feed*)feed finally:(nullable os_block_t)block;
+// Actions
+- (instancetype)startWithDelegate:(id<FaviconDownloadDelegate>)observer;
+- (instancetype)startWithBlock:(nonnull FaviconDownloadBlock)block;
+- (void)cancel;
+// Extract from HTML metadata
++ (nullable NSString*)urlForMetadata:(RSHTMLMetadata*)meta;
+@end
+
+
+@protocol FaviconDownloadDelegate <NSObject>
+@required
+/// Called after image download. Called on error, but not if download is cancled.
+- (void)faviconDownload:(FaviconDownload*)sender didFinish:(nullable NSURL*)path;
 @end

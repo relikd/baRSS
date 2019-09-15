@@ -51,6 +51,7 @@
 	[self scheduleNow:retryWaitTime];
 }
 
+/// Copy Etag & Last-Modified headers and update URL (if not 304). Then schedule new update date. Will reset errorCount to @c 0
 - (void)setSucessfulWithResponse:(NSHTTPURLResponse*)response {
 	self.errorCount = 0; // reset counter
 	NSDictionary *header = [response allHeaderFields];
@@ -68,24 +69,15 @@
 	if (![self.url isEqualToString:url]) self.url = url;
 }
 
+/// Set @c refresh attribute but only if value differs.
+- (void)setRefreshIfChanged:(int32_t)refresh {
+	if (self.refresh != refresh) self.refresh = refresh;
+}
+
 /// Set @c etag and @c modified attributes. Only values that differ will be updated.
 - (void)setEtag:(NSString*)etag modified:(NSString*)modified {
 	if (![self.etag isEqualToString:etag])         self.etag = etag;
 	if (![self.modified isEqualToString:modified]) self.modified = modified;
-}
-
-/**
- Set @c refresh and calculate new @c scheduled date.
-
- @return @c YES if refresh interval has changed
- */
-- (BOOL)setRefreshAndSchedule:(int32_t)refresh {
-	if (self.refresh != refresh) {
-		self.refresh = refresh;
-		[self scheduleNow:self.refresh];
-		return YES;
-	}
-	return NO;
 }
 
 /// Set next scheduled feed update or @c nil if @c refresh @c <= @c 0.

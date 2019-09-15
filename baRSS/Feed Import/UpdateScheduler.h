@@ -37,7 +37,11 @@
 // Scheduling
 + (void)scheduleNextFeed;
 + (void)forceUpdateAllFeeds;
-+ (void)downloadList:(NSArray<Feed*>*)list background:(BOOL)flag finally:(nullable os_block_t)block;
++ (void)downloadList:(NSArray<Feed*>*)list userInitiated:(BOOL)flag finally:(nullable os_block_t)block;
++ (void)updateAllFavicons;
+// Auto Download & Parse Feed URL
++ (void)autoDownloadAndParseURL:(NSString*)url;
++ (void)autoDownloadAndParseUpdateURL;
 // Register for network change notifications
 + (void)registerNetworkChangeNotification;
 + (void)unregisterNetworkChangeNotification;
