@@ -12,6 +12,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - Associate OPML files (double click and right click actions in Finder)
 - Quick Look preview for OPML files
 - *Adding feed:* 5xx server errors have a reload button which will initiate a new download with the same URL
+- *Adding feed:* Empty feed title will automatically reuse title from xml file (even if xml title changes)
 - *Adding feed:* `⌘R` will reload the same URL
 - *Settings, Feeds:* `⌘R` will reload the data source
 - *Settings, Feeds:* Refresh interval string localizations
@@ -26,11 +27,12 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - Config URL scheme `barss:` with `open/preferences` and `config/fixcache`
 
 ### Fixed
-- *Adding feed:* Show users any 5xx server error response and extracted failure reason
+- *Adding feed:* Show proper HTTP status code error message (4xx and 5xx)
+- *Adding feed:* Show (HTML) extracted failure reason for 5xx server errors
 - *Adding feed:* If URLs can't be resolved in the first run (5xx error), try a second time. E.g., `Done` click (issue: #5)
 - *Adding feed:* Prefer favicons with size `32x32`
-- *Adding feed:* Inserting feeds when offline will postpone download until network is reachable again
-- *Adding feed:* Inserting feeds when paused will postpone download until unpaused 
+- *Adding feed:* Inserting feeds when offline/paused will postpone download until network is reachable again
+- *Adding feed:* `Cancel` will indeed cancel download, not just continue and ignore results
 - *Settings, Feeds:* Actions `delete` and `edit` use clicked items instead of selected items
 - *Settings, Feeds:* Status info with accurate download count (instead of `Updating feeds …`)
 - *Settings, Feeds:* Status info shows `No network connection` and `Updates paused`
@@ -47,12 +49,13 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Settings, Feeds:* Single add button for feeds, groups, and separators
 - *Settings, Feeds:* Always append new items at the end
 - *Settings, General*: Moved `Fix cache` button to `About` text section
-- *Settings, General*: Changing default feed reader is prohibited within sandbox  
+- *Settings, General*: Changing default feed reader is prohibited within sandbox
 - *Status Bar Menu*: Show `(no title)` instead of `(error)`
 - *Status Bar Menu*: `Update all feeds` will show error alerts for broken URLs
 - *UI:* Interface builder files replaced with code equivalent
 - *UI:* Mark unread articles with blue dot, instead of tick mark
 - *DB*: New table for options. E.g., what app version modified the database
+- Dropping database table `FeedIcon` in favor of image files cache
 
 
 ## [0.9.4] - 2019-04-02

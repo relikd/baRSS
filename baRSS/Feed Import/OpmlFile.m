@@ -32,7 +32,7 @@
 #pragma mark - Helper
 
 /// Loop over all subviews and find the @c NSButton that is selected.
-NS_INLINE NSInteger RadioGroupSelection(NSView *view) {
+static NSInteger RadioGroupSelection(NSView *view) {
 	for (NSButton *btn in view.subviews) {
 		if ([btn isKindOfClass:[NSButton class]] && btn.state == NSControlStateValueOn) {
 			return btn.tag;
@@ -93,8 +93,7 @@ NS_INLINE NSInteger RadioGroupSelection(NSView *view) {
 - (void)enumerateFiles:(NSArray<NSURL*>*)files withBlock:(void(^)(RSOPMLItem *item))block finally:(nullable dispatch_block_t)finally {
 	dispatch_group_t group = dispatch_group_create();
 	for (NSURL *url in files) {
-		if (finally) dispatch_group_enter(group);
-		
+		dispatch_group_enter(group);
 		NSData *data = [NSData dataWithContentsOfURL:url];
 		RSXMLData *xml = [[RSXMLData alloc] initWithData:data url:url];
 		RSOPMLParser *parser = [RSOPMLParser parserWithXMLData:xml];
@@ -106,7 +105,7 @@ NS_INLINE NSInteger RadioGroupSelection(NSView *view) {
 					block(itm);
 				}
 			}
-			if (finally) dispatch_group_leave(group);
+			dispatch_group_leave(group);
 		}];
 	}
 	if (finally) dispatch_group_notify(group, dispatch_get_main_queue(), finally);
@@ -251,9 +250,7 @@ NS_INLINE NSInteger RadioGroupSelection(NSView *view) {
 		NSData *xml = [doc XMLDataWithOptions:NSXMLNodePreserveAttributeOrder | NSXMLNodePrettyPrint];
 		[xml writeToURL:url options:NSDataWritingAtomic error:&error];
 	}
-	if (error) {
-		[NSApp presentError:error];
-	}
+	if (error) [NSApp presentError:error];
 	return error;
 }
 
@@ -293,8 +290,8 @@ NS_INLINE NSInteger RadioGroupSelection(NSView *view) {
 		// dont add group node if hierarchical == NO
 		NSXMLElement *outline = [NSXMLElement elementWithName:@"outline"];
 		[parent addChild:outline];
-		[outline addAttribute:[NSXMLNode attributeWithName:OPMLTitleKey stringValue:item.name]];
-		[outline addAttribute:[NSXMLNode attributeWithName:OPMLTextKey stringValue:item.name]];
+		[outline addAttribute:[NSXMLNode attributeWithName:OPMLTitleKey stringValue:item.anyName]];
+		[outline addAttribute:[NSXMLNode attributeWithName:OPMLTextKey stringValue:item.anyName]];
 		
 		if (item.type == SEPARATOR) {
 			[outline addAttribute:[NSXMLNode attributeWithName:@"separator" stringValue:@"true"]]; // baRSS specific

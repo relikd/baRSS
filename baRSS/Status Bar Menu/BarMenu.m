@@ -28,6 +28,7 @@
 #import "MapUnreadTotal.h"
 #import "StoreCoordinator.h"
 #import "Feed+Ext.h"
+#import "FeedGroup+Ext.h"
 #import "FeedArticle+Ext.h"
 
 
@@ -45,7 +46,7 @@
 	// TODO: move unread counts to status item and keep in sync when changing feeds in preferences
 	self.unreadMap = [[MapUnreadTotal alloc] initWithCoreData: [StoreCoordinator countAggregatedUnread]];
 	// Register for notifications
-	RegisterNotification(kNotificationFeedUpdated, @selector(feedUpdated:), self);
+	RegisterNotification(kNotificationArticlesUpdated, @selector(articlesUpdated:), self);
 	RegisterNotification(kNotificationFeedIconUpdated, @selector(feedIconUpdated:), self);
 	return self;
 }
@@ -129,21 +130,15 @@
 - (void)updateFeedMenuItem:(NSManagedObjectID*)oid withBlock:(void(^)(Feed *feed, NSMenuItem *item))block {
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	Feed *feed = [moc objectWithID:oid];
-	if (![feed isKindOfClass:[Feed class]]) {
-		[moc reset];
-		return;
+	if ([feed isKindOfClass:[Feed class]]) {
+		NSMenuItem *item = [self.statusItem.mainMenu deepestItemWithPath:feed.indexPath];
+		if (item) block(feed, item);
 	}
-	NSMenuItem *item = [self.statusItem.mainMenu deepestItemWithPath:feed.indexPath];
-	if (!item) {
-		[moc reset];
-		return;
-	}
-	block(feed, item);
 	[moc reset];
 }
 
 /// Callback method fired when feed has been updated in the background.
-- (void)feedUpdated:(NSNotification*)notify {
+- (void)articlesUpdated:(NSNotification*)notify {
 	[self updateFeedMenuItem:notify.object withBlock:^(Feed *feed, NSMenuItem *item) {
 		// 1. update in-memory unread count
 		UnreadTotal *updated = [UnreadTotal new];
@@ -154,8 +149,7 @@
 		[self.unreadMap updateAllCounts:updated forPath:feed.indexPath];
 		// 2. rebuild articles menu if it is open
 		if (item.submenu.isFeedMenu) { // menu item is visible
-			if (feed.group.name)
-				item.title = feed.group.name; // will replace (no title)
+			item.title = feed.group.anyName; // will replace (no title)
 			item.image = [feed iconImage16];
 			item.enabled = (feed.articles.count > 0);
 			if (item.submenu.numberOfItems > 0) { // replace articles menu

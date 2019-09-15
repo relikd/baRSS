@@ -21,10 +21,12 @@
 //  SOFTWARE.
 
 #import "StoreCoordinator.h"
-#import "Constants.h"
-#import "NSFetchRequest+Ext.h"
 #import "AppHook.h"
+#import "Constants.h"
+#import "FaviconDownload.h"
 #import "Feed+Ext.h"
+#import "NSURL+Ext.h"
+#import "NSFetchRequest+Ext.h"
 
 @implementation StoreCoordinator
 
@@ -57,7 +59,7 @@
 	NSError *error = nil;
 	if (context.hasChanges && ![context save:&error]) {
 		// Customize this code block to include application-specific recovery steps.
-		[[NSApplication sharedApplication] presentError:error];
+		[NSApp presentError:error];
 	}
 	if (flag && context.parentContext) {
 		[self saveContext:context.parentContext andParent:flag];
@@ -101,11 +103,11 @@
 
  @param forceAll If @c YES get a list of all @c Feed regardless of schedules time.
  */
-+ (NSArray<Feed*>*)getListOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc {
++ (NSArray<Feed*>*)listOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc {
 	NSFetchRequest *fr = [Feed fetchRequest];
 	if (!forceAll) {
-		// when fetching also get those feeds that would need update soon (now + 10s)
-		[fr where:@"meta.scheduled <= %@", [NSDate dateWithTimeIntervalSinceNow:+10]];
+		// when fetching also get those feeds that would need update soon (now + 2s)
+		[fr where:@"meta.scheduled <= %@", [NSDate dateWithTimeIntervalSinceNow:+2]];
 	}
 	return [fr fetchAllRows:moc];
 }
@@ -154,11 +156,6 @@
 /// @return Unsorted list of @c Feed items where @c articles.count @c == @c 0.
 + (NSArray<Feed*>*)listOfFeedsMissingArticlesInContext:(NSManagedObjectContext*)moc {
 	return [[[Feed fetchRequest] where:@"articles.@count == 0"] fetchAllRows:moc];
-}
-
-/// @return Unsorted list of @c Feed items where @c icon is @c nil.
-+ (NSArray<Feed*>*)listOfFeedsMissingIconsInContext:(NSManagedObjectContext*)moc {
-	return [[[Feed fetchRequest] where:@"icon = NULL"] fetchAllRows:moc];
 }
 
 /// @return Single @c Feed item where @c Feed.indexPath @c = @c path.
@@ -225,6 +222,7 @@
 
 #pragma mark - Restore Sound State
 
+/// Remove orphan core data entries with optional alert message of removed items count.
 + (void)cleanupAndShowAlert:(BOOL)flag {
 	NSUInteger deleted = [self deleteUnreferenced];
 	[self restoreFeedIndexPaths];
@@ -256,7 +254,6 @@
 	NSManagedObjectContext *moc = [self getMainContext];
 	deleted += [self batchDelete:Feed.entity nullAttribute:@"group" inContext:moc];
 	deleted += [self batchDelete:FeedMeta.entity nullAttribute:@"feed" inContext:moc];
-	deleted += [self batchDelete:FeedIcon.entity nullAttribute:@"feed" inContext:moc];
 	deleted += [self batchDelete:FeedArticle.entity nullAttribute:@"feed" inContext:moc];
 	if (deleted > 0) {
 		[self saveContext:moc andParent:YES];
@@ -289,6 +286,27 @@
 	NSBatchDeleteResult *res = [moc executeRequest:bdr error:&err];
 	if (err) NSLog(@"%@", err);
 	return [res.result unsignedIntegerValue];
+}
+
+/// Remove orphan favicons. @return Number of removed items.
++ (NSUInteger)cleanupFavicons {
+	NSURL *base = [[NSURL faviconsCacheURL] URLByResolvingSymlinksInPath];
+	if (![base existsAndIsDir:YES]) return 0;
+	
+	NSFileManager *fm = [NSFileManager defaultManager];
+	NSDirectoryEnumerationOptions opt = NSDirectoryEnumerationSkipsSubdirectoryDescendants | NSDirectoryEnumerationSkipsPackageDescendants | NSDirectoryEnumerationSkipsHiddenFiles;
+	NSDirectoryEnumerator *enumerator = [fm enumeratorAtURL:base includingPropertiesForKeys:nil options:opt errorHandler:nil];
+	NSMutableArray<NSURL*> *toBeDeleted = [NSMutableArray array];
+	
+	NSArray<NSManagedObjectID*> *feedIds = [[Feed fetchRequest] fetchIDs:[self getMainContext]];
+	NSArray<NSString*> *pks = [feedIds valueForKeyPath:@"URIRepresentation.lastPathComponent"];
+	
+	for (NSURL *path in enumerator)
+		if (![pks containsObject:path.lastPathComponent])
+			[toBeDeleted addObject:path];
+	for (NSURL *path in toBeDeleted)
+		[fm removeItemAtURL:path error:nil];
+	return toBeDeleted.count;
 }
 
 @end

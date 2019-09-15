@@ -203,7 +203,7 @@ NSUserInterfaceItemIdentifier const CustomCellName = @"NameColumnCell";
 }
 
 - (void)setObjectValue:(FeedGroup*)fg {
-	self.textField.objectValue = fg.name;
+	self.textField.objectValue = fg.anyName;
 	self.imageView.image = fg.iconImage16;
 }
 

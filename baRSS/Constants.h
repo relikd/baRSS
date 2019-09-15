@@ -61,8 +61,8 @@ static NSImageName const RSSImageMenuItemUnread    = @"RSSImageMenuItemUnread";
 
 
 /// Helper method calls @c (defaultCenter)postNotification:
-NS_INLINE void PostNotification(NSNotificationName name, id obj) { [[NSNotificationCenter defaultCenter] postNotificationName:name object:obj]; }
-NS_INLINE void RegisterNotification(NSNotificationName name, SEL action, id observer) { [[NSNotificationCenter defaultCenter] addObserver:observer selector:action name:name object:nil]; }
+static inline void PostNotification(NSNotificationName name, id obj) { [[NSNotificationCenter defaultCenter] postNotificationName:name object:obj]; }
+static inline void RegisterNotification(NSNotificationName name, SEL action, id observer) { [[NSNotificationCenter defaultCenter] addObserver:observer selector:action name:name object:nil]; }
 /**
  @c notification.object is @c NSNumber of type @c NSUInteger.
  Represents number of feeds that are proccessed in background update. Sends @c 0 when all downloads are finished.
@@ -77,12 +77,12 @@ static NSNotificationName const kNotificationScheduleTimerChanged = @"baRSS-noti
  @c notification.object is @c NSManagedObjectID of type @c FeedGroup.
  Called whenever a new feed group was created in @c autoDownloadAndParseURL:
  */
-static NSNotificationName const kNotificationGroupInserted = @"baRSS-notification-group-inserted";
+static NSNotificationName const kNotificationFeedGroupInserted = @"baRSS-notification-feed-inserted";
 /**
  @c notification.object is @c NSManagedObjectID of type @c Feed.
- Called whenever download of a feed finished and object was modified (not if statusCode 304).
+ Called whenever download of a feed finished and articles were modified (not if statusCode 304).
  */
-static NSNotificationName const kNotificationFeedUpdated = @"baRSS-notification-feed-updated";
+static NSNotificationName const kNotificationArticlesUpdated = @"baRSS-notification-articles-updated";
 /**
  @c notification.object is @c NSManagedObjectID of type @c Feed.
  Called whenever the icon attribute of an item was updated.

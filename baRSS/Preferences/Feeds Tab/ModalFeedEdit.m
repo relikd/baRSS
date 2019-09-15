@@ -20,20 +20,25 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+@import RSXML;
 #import "ModalFeedEdit.h"
-#import "WebFeed.h"
-#import "StoreCoordinator.h"
+#import "ModalFeedEditView.h"
+#import "RefreshStatisticsView.h"
+#import "Constants.h"
+#import "FeedDownload.h"
+#import "FaviconDownload.h"
 #import "Feed+Ext.h"
 #import "FeedMeta+Ext.h"
 #import "FeedGroup+Ext.h"
-#import "ModalFeedEditView.h"
-#import "RefreshStatisticsView.h"
-#import "NSDate+Ext.h"
 #import "NSView+Ext.h"
+#import "NSDate+Ext.h"
+#import "NSURL+Ext.h"
 
-
-#pragma mark - ModalEditDialog -
-
+// ################################################################
+// #
+// #  MARK: - ModalEditDialog -
+// #
+// ################################################################
 
 @interface ModalEditDialog() <NSWindowDelegate>
 @property (strong) FeedGroup *feedGroup;
@@ -62,21 +67,20 @@
 }
 @end
 
+// ################################################################
+// #
+// #  MARK: - ModalFeedEdit -
+// #
+// ################################################################
 
-#pragma mark - ModalFeedEdit -
-
-
-@interface ModalFeedEdit() <RefreshIntervalButtonDelegate>
+@interface ModalFeedEdit() <FeedDownloadDelegate, RefreshIntervalButtonDelegate, FaviconDownloadDelegate>
 @property (strong) IBOutlet ModalFeedEditView *view; // override
 
-@property (strong) RefreshStatisticsView *statisticsView;
-
 @property (copy) NSString *previousURL; // check if changed and avoid multiple download
-@property (copy) NSString *faviconURL;
-@property (strong) NSError *feedError; // download error or xml parser error
-@property (strong) RSParsedFeed *feedResult; // parsed result
-@property (strong) NSHTTPURLResponse *httpResponse;
-@property (assign) BOOL didDownloadFeed; // check if feed articles need update
+@property (strong) NSURL *faviconFile;
+@property (strong) FeedDownload *memFeed;
+@property (weak) FaviconDownload *memIcon;
+@property (strong) RefreshStatisticsView *statisticsView;
 @end
 
 @implementation ModalFeedEdit
@@ -91,17 +95,20 @@
 	[self populateTextFields:self.feedGroup];
 }
 
-/**
- Pre-fill UI control field values with @c FeedGroup properties.
- */
+/// Pre-fill UI control field values with @c FeedGroup properties.
 - (void)populateTextFields:(FeedGroup*)fg {
 	if (!fg || [fg hasChanges]) return; // hasChanges is true only if newly created
-	self.view.name.objectValue = fg.name;
+	self.view.name.objectValue = fg.name; // user given feed title
+	self.view.name.placeholderString = fg.feed.title; // actual feed title
 	self.view.url.objectValue = fg.feed.meta.url;
 	self.previousURL = self.view.url.stringValue;
 	self.view.favicon.image = [fg.feed iconImage16];
 	[NSDate setInterval:fg.feed.meta.refresh forPopup:self.view.refreshUnit andField:self.view.refreshNum animate:NO];
 	[self statsForCoreDataObject];
+}
+
+- (void)dealloc {
+	[self.faviconFile remove]; // Delete temporary favicon (if still exists)
 }
 
 #pragma mark - Edit Feed Data
@@ -111,63 +118,42 @@
  Set @c scheduled to a new date if refresh interval was changed.
  */
 - (void)applyChangesToCoreDataObject {
-	Feed *feed = self.feedGroup.feed;
+	Feed *f = self.feedGroup.feed;
+	Interval intv = [NSDate intervalForPopup:self.view.refreshUnit andField:self.view.refreshNum];
 	[self.feedGroup setNameIfChanged:self.view.name.stringValue];
-	FeedMeta *meta = feed.meta;
-	[meta setUrlIfChanged:self.previousURL];
-	[meta setRefreshAndSchedule:[NSDate intervalForPopup:self.view.refreshUnit andField:self.view.refreshNum]];
-	// updateTimer will be scheduled once preferences is closed
-	if (self.didDownloadFeed) {
-		[meta setSucessfulWithResponse:self.httpResponse];
-		[feed updateWithRSS:self.feedResult postUnreadCountChange:YES];
-		[feed setIconImage:self.view.favicon.image];
+	[f.meta setRefreshIfChanged:intv];
+	if (self.memFeed) {
+		[self.memFeed copyValuesTo:f ignoreError:YES];
+		[f setNewIcon:self.faviconFile]; // only if downloaded anything (nil deletes icon!)
+		self.faviconFile = nil;
 	}
 }
 
+/// Cancel any running download task and free volatile variables
+- (void)cancelDownloads {
+	[self.memFeed cancel];  self.memFeed = nil;
+	[self.memIcon cancel];  self.memIcon = nil;
+	[self.faviconFile remove];  self.faviconFile = nil;
+}
+
 /**
- Prepare UI (nullify @c result, @c error and start @c ProgressIndicator).
- Also disable 'Done' button during download and re-enable after all downloads are finished.
+ Prepare UI (nullify results and start @c ProgressIndicator ).
+ Also disable 'Done' button during download and re-enable after download is finished.
  */
-- (void)preDownload {
+- (void)downloadRSS {
+	[self cancelDownloads];
 	[self.modalSheet setDoneEnabled:NO]; // prevent user from closing the dialog during download
 	[self.view.spinnerURL startAnimation:nil];
 	[self.view.spinnerName startAnimation:nil];
 	self.view.favicon.image = nil;
 	self.view.warningButton.hidden = YES;
-	self.didDownloadFeed = NO;
-	// Assuming the user has not changed title since the last fetch.
-	// Reset to "" because after download it will be pre-filled with new feed title
-	if ([self.view.name.stringValue isEqualToString:self.feedResult.title]) {
+	// User didn't change title since last fetch. Will be pre-filled with new title after download
+	if ([self.view.name.stringValue isEqualToString:self.view.name.placeholderString]) {
 		self.view.name.stringValue = @"";
+		self.view.name.placeholderString = NSLocalizedString(@"Loading …", nil);
 	}
-	self.feedError = nil;
-	self.feedResult = nil;
-	self.httpResponse = nil;
-	self.faviconURL = nil;
 	self.previousURL = self.view.url.stringValue;
-}
-
-/**
- All properties will be parsed and stored in class variables.
- This should avoid unnecessary core data operations if user decides to cancel the edit.
- The save operation will only be executed if user clicks on the 'OK' button.
- */
-- (void)downloadRSS {
-	if (self.modalSheet.didCloseAndCancel)
-		return;
-	[self preDownload];
-	[WebFeed newFeed:self.previousURL askUser:^NSString *(RSHTMLMetadata *meta) {
-		self.faviconURL = [WebFeed faviconUrlForMetadata:meta]; // we can re-use favicon url if we find one
-		return [self letUserChooseXmlUrlFromList:meta.feedLinks];
-	} block:^(RSParsedFeed *result, NSError *error, NSHTTPURLResponse* response) {
-		if (self.modalSheet.didCloseAndCancel)
-			return;
-		self.didDownloadFeed = YES;
-		self.feedResult = result;
-		self.feedError = error;
-		self.httpResponse = response;
-		[self postDownload:response.URL.absoluteString];
-	}];
+	self.memFeed = [[FeedDownload withURL:self.previousURL] startWithDelegate:self];
 }
 
 /**
@@ -176,12 +162,7 @@
  
  @return Either URL string or @c nil if user canceled the selection.
  */
-- (NSString*)letUserChooseXmlUrlFromList:(NSArray<RSHTMLMetadataFeedLink*> *)list {
-	if (list.count == 1) { // nothing to choose
-		// Feeds like https://news.ycombinator.com/ return 503 if URLs are requested too rapidly
-		//CFRunLoopRunInMode(kCFRunLoopDefaultMode, 1.0, false); // Non-blocking sleep (1s)
-		return list.firstObject.link;
-	}
+- (NSString*)feedDownload:(FeedDownload*)sender selectFeedFromList:(NSArray<RSHTMLMetadataFeedLink*>*)list {
 	NSMenu *menu = [[NSMenu alloc] initWithTitle:NSLocalizedString(@"Choose feed menu", nil)];
 	menu.autoenablesItems = NO;
 	for (RSHTMLMetadataFeedLink *fl in list) {
@@ -196,62 +177,53 @@
 	return nil; // user selection canceled
 }
 
-/**
- Update UI TextFields with downloaded values.
- Title will be updated if TextField is empty. URL on redirect.
- Finally begin favicon download and return control to user (enable 'Done' button).
- */
-- (void)postDownload:(NSString*)responseURL {
-	if (self.modalSheet.didCloseAndCancel)
-		return;
-	
-	BOOL hasError = (self.feedError != nil);
-	// 1. Stop spinner animation for name field. (keep spinner for URL running until favicon downloaded)
-	[self.view.spinnerName stopAnimation:nil];
-	// 2. If URL was redirected, replace original text field value with new one. (e.g., https redirect)
-	if (responseURL.length > 0 && ![responseURL isEqualToString:self.previousURL]) {
-		if (!hasError) {
-			// If the url has changed and there is an error:
-			// This probably means the feed URL was resolved, but the successive download returned 5xx error.
-			// Presumably to prevent site crawlers accessing many pages in quick succession. (delay of 1s does help)
-			// By not setting previousURL, a second hit on the 'Done' button will retry the resolved URL again.
-			self.previousURL = responseURL;
-		}
-		self.view.url.stringValue = responseURL;
+/// If URL was redirected, replace original text field value with new one. (e.g., https redirect)
+- (void)feedDownload:(FeedDownload*)sender urlRedirected:(NSString*)newURL {
+	if (!sender.error) {
+		// If the url has changed and there is an error:
+		// This probably means the feed URL was resolved, but the successive download returned 5xx error.
+		// Presumably to prevent site crawlers accessing many pages in quick succession. (delay of 1s does help)
+		// By not setting previousURL, a second hit on the 'Done' button will retry the resolved URL again.
+		self.previousURL = newURL;
 	}
-	// 3. Copy parsed feed title to text field. (only if user hasn't set anything else yet)
-	NSString *parsedTitle = self.feedResult.title;
-	if (parsedTitle.length > 0 && [self.view.name.stringValue isEqualToString:@""]) {
-		self.view.name.stringValue = parsedTitle; // no damage to replace an empty string
+	self.view.url.stringValue = newURL;
+}
+
+/// Update UI TextFields with downloaded values. Title updated if TextField is empty, URL if redirect.
+- (void)feedDownloadDidFinish:(FeedDownload*)sender {
+	// Stop spinner for name field but keep running for URL until favicon downloaded
+	[self.view.spinnerName stopAnimation:nil];
+	NSString *newTitle = sender.xmlfeed.title;
+	self.view.name.placeholderString = newTitle;
+	if (newTitle.length > 0 && self.view.name.stringValue.length == 0) {
+		self.view.name.stringValue = newTitle; // only if default title wasn't changed
 	}
 	// TODO: user preference to automatically select refresh interval (selection: None,min,max,avg,median)
-	[self statsForDownloadObject];
-	// 4. Continue with favicon download (or finish with error)
+	[self statsForDownloadObject:sender.xmlfeed.articles];
+	BOOL hasError = (sender.error != nil);
 	self.view.favicon.hidden = hasError;
 	self.view.warningButton.hidden = !hasError;
-	if (hasError) {
-		[self finishDownloadWithFavicon];
-	} else {
-		if (!self.faviconURL)
-			self.faviconURL = self.feedResult.link;
-		if (self.faviconURL.length == 0)
-			self.faviconURL = responseURL;
-		[WebFeed downloadFavicon:self.faviconURL finished:^(NSImage * _Nullable img) {
-			if (self.modalSheet.didCloseAndCancel)
-				return;
-			self.view.favicon.image = img;
-			[self finishDownloadWithFavicon];
-		}];
-	}
+	// Start favicon download
+	if (hasError)
+		[self downloadComplete];
+	else
+		self.memIcon = [[sender faviconDownload] startWithDelegate:self];
 }
 
 /**
  The last step of the download process.
- Stop spinning animation set favivon image preview (right of url bar) and re-enable 'Done' button.
+ Stop spinning animation, set favivon image (right of url bar), and re-enable 'Done' button.
  */
-- (void)finishDownloadWithFavicon {
-	if (self.modalSheet.didCloseAndCancel)
-		return;
+- (void)faviconDownload:(FaviconDownload*)sender didFinish:(nullable NSURL*)path {
+	// Create image from favicon temporary file location or default icon if no favicon exists.
+	NSImage *img = path ? [[NSImage alloc] initByReferencingURL:path] : [NSImage imageNamed:RSSImageDefaultRSSIcon];
+	self.view.favicon.image = img;
+	self.faviconFile = path;
+	[self downloadComplete];
+}
+
+/// Called regardless of favicon download.
+- (void)downloadComplete {
 	[self.view.spinnerURL stopAnimation:nil];
 	[self.modalSheet setDoneEnabled:YES];
 }
@@ -259,15 +231,15 @@
 #pragma mark - Feed Statistics
 
 /// Perform statistics on newly downloaded feed item
-- (void)statsForDownloadObject {
-	NSMutableArray<NSDate*> *arr = [NSMutableArray arrayWithCapacity:self.feedResult.articles.count];
-	for (RSParsedArticle *a in self.feedResult.articles) {
+- (void)statsForDownloadObject:(NSArray<RSParsedArticle*>*)articles {
+	NSMutableArray<NSDate*> *arr = [NSMutableArray arrayWithCapacity:articles.count];
+	for (RSParsedArticle *a in articles) {
 		NSDate *d = a.datePublished;
 		if (!d) d = a.dateModified;
 		if (!d) continue;
 		[arr addObject:d];
 	}
-	[self appendViewWithFeedStatistics:arr count:self.feedResult.articles.count];
+	[self appendViewWithFeedStatistics:arr count:articles.count];
 }
 
 /// Perform statistics on stored core data object
@@ -301,8 +273,10 @@
 
 
 /// Window delegate will be only called on button 'Done'.
-- (BOOL)windowShouldClose:(NSWindow *)sender {
-	if (![self.previousURL isEqualToString:self.view.url.stringValue]) {
+- (BOOL)windowShouldClose:(ModalSheet*)sender {
+	if (sender.didTapCancel) {
+		[self cancelDownloads];
+	} else if (![self.previousURL isEqualToString:self.view.url.stringValue]) { // 'Done' button
 		[[NSNotificationCenter defaultCenter] postNotificationName:NSControlTextDidEndEditingNotification object:self.view.url];
 		return NO;
 	}
@@ -310,8 +284,8 @@
 }
 
 /// Whenever the user finished entering the url (return key or focus change) perform a download request.
-- (void)controlTextDidEndEditing:(NSNotification *)obj {
-	if (obj.object == self.view.url) {
+- (void)controlTextDidEndEditing:(NSNotification*)obj {
+	if (obj.object == self.view.url && !self.modalSheet.didTapCancel) {
 		if (![self.previousURL isEqualToString:self.view.url.stringValue]) {
 			[self downloadRSS];
 		}
@@ -320,15 +294,18 @@
 
 /// Warning button next to url text field. Will be visible if an error occurs during download.
 - (void)didClickWarningButton:(NSButton*)sender {
-	if (!self.feedError)
-		return;
+	NSError *err = self.memFeed.error;
+	if (!err) return;
 	
 	// show reload button if server is temporarily offline (any 5xx server error)
-	BOOL serverError = (self.feedError.domain == NSURLErrorDomain && self.feedError.code == NSURLErrorBadServerResponse);
+	BOOL serverError = (err.code == NSURLErrorBadServerResponse && err.domain == NSURLErrorDomain);
 	self.view.warningReload.hidden = !serverError;
 	
 	// set error description as text
-	self.view.warningText.objectValue = self.feedError.localizedDescription;
+	if (serverError)
+		self.view.warningText.stringValue = [NSString stringWithFormat:@"%@\n––––\n%@", err.localizedDescription, err.localizedRecoverySuggestion];
+	else
+		self.view.warningText.objectValue = err.localizedDescription;
 	NSSize newSize = self.view.warningText.fittingSize; // width is limited by the textfield's preferred width
 	newSize.width += 2 * self.view.warningText.frame.origin.x; // the padding
 	newSize.height += 2 * self.view.warningText.frame.origin.y;
@@ -345,9 +322,11 @@
 
 @end
 
-
-#pragma mark - ModalGroupEdit -
-
+// ################################################################
+// #
+// #  MARK: - ModalGroupEdit -
+// #
+// ################################################################
 
 @implementation ModalGroupEdit
 /// Init view and set group name if edeting an already existing object.

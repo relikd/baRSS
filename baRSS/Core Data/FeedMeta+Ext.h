@@ -32,6 +32,6 @@ static int32_t const kDefaultFeedRefreshInterval = 30 * 60;
 - (void)setSucessfulWithResponse:(NSHTTPURLResponse*)response;
 // Setter
 - (void)setUrlIfChanged:(NSString*)url;
-- (BOOL)setRefreshAndSchedule:(int32_t)refresh;
+- (void)setRefreshIfChanged:(int32_t)refresh;
 - (void)scheduleNow:(NSTimeInterval)future;
 @end

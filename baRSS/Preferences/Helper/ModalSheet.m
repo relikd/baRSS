@@ -81,14 +81,14 @@
 
 /**
  Called after user has clicked the 'Done' (Return) or 'Cancel' (Esc) button.
- In the later case set @c .didCloseAndCancel @c = @c YES
+ In the later case set @c .didTapCancel @c = @c YES
  */
 - (void)didTapButton:(NSButton*)sender {
 	BOOL successful = (sender.tag == 42); // 'Done' button
-	if (successful && self.respondToShouldClose && ![self.delegate windowShouldClose:self]) {
+	_didTapCancel = !successful;
+	if (self.respondToShouldClose && ![self.delegate windowShouldClose:self]) {
 		return;
 	}
-	_didCloseAndCancel = !successful;
 	// Save modal view width for next time
 	CGFloat w = NSWidth(self.contentView.frame) - 2 * PAD_WIN;
 	[[NSUserDefaults standardUserDefaults] setInteger:(NSInteger)w forKey:@"modalSheetWidth"];
