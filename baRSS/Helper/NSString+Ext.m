@@ -103,11 +103,11 @@
 #pragma mark - Helper methods
 
 
-NS_INLINE BOOL OPEN(NSString *tag, NSString *match) {
+static inline BOOL OPEN(NSString *tag, NSString *match) {
 	return ([tag isEqualToString:match] || [tag hasPrefix:[match stringByAppendingString:@" "]]);
 }
 
-NS_INLINE BOOL CLOSE(NSString *tag, NSString *match) {
+static inline BOOL CLOSE(NSString *tag, NSString *match) {
 	return [tag isEqualToString:match];
 }
 
