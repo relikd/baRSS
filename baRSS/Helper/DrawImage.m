@@ -53,7 +53,7 @@
 
 
 /// @return @c MIN(s.width,s.height)
-NS_INLINE const CGFloat ShorterSide(NSSize s) {
+static inline const CGFloat ShorterSide(NSSize s) {
 	return (s.width < s.height ? s.width : s.height);
 }
 
@@ -69,18 +69,18 @@ NS_INLINE const CGFloat ShorterSide(NSSize s) {
 
 
 /// Add circle with @c radius
-NS_INLINE void PathAddCircle(CGMutablePathRef path, CGFloat radius) {
+static inline void PathAddCircle(CGMutablePathRef path, CGFloat radius) {
 	CGPathAddArc(path, NULL, radius, radius, radius, 0, M_PI * 2, YES);
 }
 
 /// Add ring with @c radius and @c innerRadius
-NS_INLINE void PathAddRing(CGMutablePathRef path, CGFloat radius, CGFloat innerRadius) {
+static inline void PathAddRing(CGMutablePathRef path, CGFloat radius, CGFloat innerRadius) {
 	CGPathAddArc(path, NULL, radius, radius, radius, 0, M_PI * 2, YES);
 	CGPathAddArc(path, NULL, radius, radius, innerRadius, 0, M_PI * -2, YES);
 }
 
 /// Add a single RSS icon radio wave
-NS_INLINE void PathAddRSSArc(CGMutablePathRef path, CGFloat radius, CGFloat thickness) {
+static inline void PathAddRSSArc(CGMutablePathRef path, CGFloat radius, CGFloat thickness) {
 	CGPathMoveToPoint(path, NULL, 0, radius + thickness);
 	CGPathAddArc(path, NULL, 0, 0, radius + thickness, M_PI_2, 0, YES);
 	CGPathAddLineToPoint(path, NULL, radius, 0);
@@ -89,7 +89,7 @@ NS_INLINE void PathAddRSSArc(CGMutablePathRef path, CGFloat radius, CGFloat thic
 }
 
 /// Add two vertical bars representing a pause icon
-NS_INLINE void PathAddPauseIcon(CGMutablePathRef path, CGAffineTransform at, CGFloat size, CGFloat thickness) {
+static inline void PathAddPauseIcon(CGMutablePathRef path, CGAffineTransform at, CGFloat size, CGFloat thickness) {
 	const CGFloat off = (size - 2 * thickness) / 4;
 	CGPathAddRect(path, &at, CGRectMake(off, 0, thickness, size));
 	CGPathAddRect(path, &at, CGRectMake(size/2 + off, 0, thickness, size));
@@ -109,7 +109,7 @@ NS_INLINE void PathAddPauseIcon(CGMutablePathRef path, CGAffineTransform at, CGF
 
 
 /// Create @c CGPath for global icon; a menu bar and an open menu below
-NS_INLINE void AddGlobalIconPath(CGContextRef c, CGFloat size) {
+static inline void AddGlobalIconPath(CGContextRef c, CGFloat size) {
 	CGMutablePathRef menu = CGPathCreateMutable();
 	CGPathAddRect(menu, NULL, CGRectMake(0, 0.8 * size, size, 0.2 * size));
 	CGPathAddRect(menu, NULL, CGRectMake(0.3 * size, 0, 0.55 * size, 0.75 * size));
@@ -125,7 +125,7 @@ NS_INLINE void AddGlobalIconPath(CGContextRef c, CGFloat size) {
 }
 
 /// Create @c CGPath for group icon; a folder symbol
-NS_INLINE void AddGroupIconPath(CGContextRef c, CGFloat size, BOOL showBackground) {
+static inline void AddGroupIconPath(CGContextRef c, CGFloat size, BOOL showBackground) {
 	const CGFloat r1 = size * 0.05; // corners
 	const CGFloat r2 = size * 0.08; // upper part, name tag
 	const CGFloat r3 = size * 0.15; // lower part, corners inside
@@ -162,10 +162,10 @@ NS_INLINE void AddGroupIconPath(CGContextRef c, CGFloat size, BOOL showBackgroun
 
 
 /**
-NS_INLINE Create @c CGPath for RSS icon; a circle in the lower left bottom and two radio waves going outwards.
-NS_INLINE @param connection If @c NO, draw only one radio wave and a pause icon in the upper right
-NS_INLINE */
-NS_INLINE void AddRSSIconPath(CGContextRef c, CGFloat size, BOOL connection) {
+ Create @c CGPath for RSS icon; a circle in the lower left bottom and two radio waves going outwards.
+ @param connection If @c NO, draw only one radio wave and a pause icon in the upper right
+ */
+static inline void AddRSSIconPath(CGContextRef c, CGFloat size, BOOL connection) {
 	CGMutablePathRef bars = CGPathCreateMutable(); // the rss bars
 	PathAddCircle(bars, size * 0.125);
 	PathAddRSSArc(bars, size * 0.45, size * 0.2);
@@ -185,7 +185,7 @@ NS_INLINE void AddRSSIconPath(CGContextRef c, CGFloat size, BOOL connection) {
 
 
 /// Create @c CGPath with rounded corners (optional). @param roundness Value between @c 0.0 and @c 1.0
-NS_INLINE void AddRoundedBackgroundPath(CGContextRef c, CGRect r, CGFloat roundness) {
+static void AddRoundedBackgroundPath(CGContextRef c, CGRect r, CGFloat roundness) {
 	const CGFloat corner = ShorterSide(r.size) * (roundness / 2.0);
 	if (corner > 0) {
 		CGMutablePathRef pth = CGPathCreateMutable();
@@ -198,7 +198,7 @@ NS_INLINE void AddRoundedBackgroundPath(CGContextRef c, CGRect r, CGFloat roundn
 }
 
 /// Insert and draw linear gradient with @c color saturation @c ±0.3
-NS_INLINE void DrawGradient(CGContextRef c, CGFloat size, NSColor *color) {
+static void DrawGradient(CGContextRef c, CGFloat size, NSColor *color) {
 	CGFloat h = 0, s = 1, b = 1, a = 1;
 	@try {
 		NSColor *rgbColor = [color colorUsingColorSpace:[NSColorSpace deviceRGBColorSpace]];
@@ -226,7 +226,7 @@ NS_INLINE void DrawGradient(CGContextRef c, CGFloat size, NSColor *color) {
 
 
 /// Scale and translate context to the center with respect to the new scale. If @c width @c != @c length align top left.
-NS_INLINE void SetContentScale(CGContextRef c, CGSize size, CGFloat scale) {
+static void SetContentScale(CGContextRef c, CGSize size, CGFloat scale) {
 	const CGFloat s = ShorterSide(size);
 	CGFloat offset = s * (1 - scale) / 2;
 	CGContextTranslateCTM(c, offset, size.height - s + offset); // top left alignment
@@ -234,7 +234,7 @@ NS_INLINE void SetContentScale(CGContextRef c, CGSize size, CGFloat scale) {
 }
 
 /// Helper method; set drawing color, add rounded background and prepare content scale
-NS_INLINE void DrawRoundedFrame(CGContextRef c, CGRect r, CGColorRef color, BOOL background, CGFloat corner, CGFloat defaultScale, CGFloat scaling) {
+static void DrawRoundedFrame(CGContextRef c, CGRect r, CGColorRef color, BOOL background, CGFloat corner, CGFloat defaultScale, CGFloat scaling) {
 	CGContextSetFillColorWithColor(c, color);
 	CGContextSetStrokeColorWithColor(c, color);
 	CGFloat contentScale = defaultScale;
@@ -251,7 +251,7 @@ NS_INLINE void DrawRoundedFrame(CGContextRef c, CGRect r, CGColorRef color, BOOL
 
 
 /// Draw global icon (menu bar)
-NS_INLINE void DrawGlobalIcon(CGRect r, CGColorRef color, BOOL background) {
+static void DrawGlobalIcon(CGRect r, CGColorRef color, BOOL background) {
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	DrawRoundedFrame(c, r, color, background, 0.4, 1.0, 0.7);
 	AddGlobalIconPath(c, ShorterSide(r.size));
@@ -259,7 +259,7 @@ NS_INLINE void DrawGlobalIcon(CGRect r, CGColorRef color, BOOL background) {
 }
 
 /// Draw group icon (folder)
-NS_INLINE void DrawGroupIcon(CGRect r, CGColorRef color, BOOL background) {
+static void DrawGroupIcon(CGRect r, CGColorRef color, BOOL background) {
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	const CGFloat s = ShorterSide(r.size);
 	const CGFloat l = s * 0.08; // line width
@@ -270,7 +270,7 @@ NS_INLINE void DrawGroupIcon(CGRect r, CGColorRef color, BOOL background) {
 }
 
 /// Draw RSS icon (flat without gradient)
-NS_INLINE void DrawRSSIcon(CGRect r, CGColorRef color, BOOL background, BOOL connection) {
+static void DrawRSSIcon(CGRect r, CGColorRef color, BOOL background, BOOL connection) {
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	DrawRoundedFrame(c, r, color, background, 0.4, 1.0, 0.7);
 	AddRSSIconPath(c, ShorterSide(r.size), connection);
@@ -278,7 +278,7 @@ NS_INLINE void DrawRSSIcon(CGRect r, CGColorRef color, BOOL background, BOOL con
 }
 
 /// Draw RSS icon (with orange gradient, corner @c 0.4, white radio waves)
-NS_INLINE void DrawRSSGradientIcon(CGRect r) {
+static void DrawRSSGradientIcon(CGRect r) {
 	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	DrawRoundedFrame(c, r, NSColor.whiteColor.CGColor, YES, 0.4, 1.0, 0.7);
@@ -293,7 +293,7 @@ NS_INLINE void DrawRSSGradientIcon(CGRect r) {
 }
 
 /// Draw unread icon (blue dot for unread menu item)
-NS_INLINE void DrawUnreadIcon(CGRect r, NSColor *color) {
+static void DrawUnreadIcon(CGRect r, NSColor *color) {
 	CGFloat size = ShorterSide(r.size) / 2.0;
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGMutablePathRef path = CGPathCreateMutable();
@@ -316,7 +316,7 @@ NS_INLINE void DrawUnreadIcon(CGRect r, NSColor *color) {
 
 
 /// Add single image to @c ImageNamed cache and set accessibility description
-NS_INLINE void Register(CGFloat size, NSImageName name, NSString *description, BOOL (^draw)(NSRect r)) {
+static void Register(CGFloat size, NSImageName name, NSString *description, BOOL (^draw)(NSRect r)) {
 	NSImage *img = [NSImage imageWithSize: NSMakeSize(size, size) flipped:NO drawingHandler:draw];
 	img.accessibilityDescription = description;
 	img.name = name;
@@ -332,4 +332,5 @@ void RegisterImageViewNames(void) {
 	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"RSS menu bar icon", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor rssOrange].CGColor, YES, YES); return YES; });
 	Register(16, RSSImageMenuBarIconPaused, NSLocalizedString(@"RSS menu bar icon, paused", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor rssOrange].CGColor, YES, NO); return YES; });
 	Register(12, RSSImageMenuItemUnread, NSLocalizedString(@"Unread icon", nil), ^(NSRect r) { DrawUnreadIcon(r, [NSColor systemBlueColor]); return YES; });
+	// TODO: user selected color for rss bar icon & unread dot
 }

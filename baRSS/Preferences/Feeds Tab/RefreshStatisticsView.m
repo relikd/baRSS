@@ -79,7 +79,7 @@
 }
 
 /// Label with smaller gray text, non-editable. @c 13px height.
-NS_INLINE NSTextField* GrayLabel(NSString *text) {
+static inline NSTextField* GrayLabel(NSString *text) {
 	return [[[NSView label:text] tiny] gray];
 }
 

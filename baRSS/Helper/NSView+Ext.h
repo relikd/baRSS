@@ -41,11 +41,11 @@
 static CGFloat const CENTER = -0.015625;
 
 /// Calculate @c origin.y going down from the top border of its @c superview
-NS_INLINE CGFloat YFromTop(NSView *view) { return NSHeight(view.superview.frame) - NSMinY(view.frame) - view.alignmentRectInsets.bottom; }
+static inline CGFloat YFromTop(NSView *view) { return NSHeight(view.superview.frame) - NSMinY(view.frame) - view.alignmentRectInsets.bottom; }
 /// @c MAX()
-NS_INLINE CGFloat Max(CGFloat a, CGFloat b) { return a < b ? b : a; }
+static inline CGFloat Max(CGFloat a, CGFloat b) { return a < b ? b : a; }
 /// @c Max(NSWidth(a.frame),NSWidth(b.frame))
-NS_INLINE CGFloat NSMaxWidth(NSView *a, NSView *b) { return Max(NSWidth(a.frame), NSWidth(b.frame)); }
+static inline CGFloat NSMaxWidth(NSView *a, NSView *b) { return Max(NSWidth(a.frame), NSWidth(b.frame)); }
 
 
 /*

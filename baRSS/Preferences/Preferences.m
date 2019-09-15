@@ -55,7 +55,7 @@
 }
 
 /// Helper method to generate tab item with image, label, and controller.
-NS_INLINE NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Class class) {
+static NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Class class) {
 	NSTabViewItem *item = [NSTabViewItem tabViewItemWithViewController: [class new]];
 	item.image = [NSImage imageNamed:imageName];
 	item.label = text;

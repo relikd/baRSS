@@ -221,9 +221,15 @@
  The @c autoresizingMask will be set accordingly.
  */
 - (instancetype)placeIn:(NSView*)parent x:(CGFloat)x y:(CGFloat)y {
-	SetCenterableOrigin(self, parent, x, y);
-	if (x == CENTER) self.autoresizingMask |= NSViewMinXMargin | NSViewMaxXMargin;
-	if (y == CENTER) self.autoresizingMask |= NSViewMinYMargin | NSViewMaxYMargin;
+	if (x == CENTER) {
+		x = (NSWidth(parent.frame) - NSWidth(self.frame)) / 2;
+		self.autoresizingMask |= NSViewMinXMargin | NSViewMaxXMargin;
+	}
+	if (y == CENTER) {
+		y = (NSHeight(parent.frame) - NSHeight(self.frame)) / 2;
+		self.autoresizingMask |= NSViewMinYMargin | NSViewMaxYMargin;
+	}
+	[self setFrameOrigin: NSMakePoint(x, y)];
 	self.frame = [self frameForAlignmentRect:self.frame];
 	[parent addSubview:self];
 	return self;
@@ -291,15 +297,10 @@
 	return self;
 }
 
-/// Helper method to get y origin point (from top) while respecting @c alignmentRectInsets and view sizes
-NS_INLINE void SetCenterableOrigin(NSView *view, NSView *parent, CGFloat x, CGFloat y) {
-	if (x == CENTER) x = (NSWidth(parent.frame) - NSWidth(view.frame)) / 2;
-	if (y == CENTER) y = (NSHeight(parent.frame) - NSHeight(view.frame)) / 2;
-	[view setFrameOrigin: NSMakePoint(x, y)];
-}
+
 
 /// Helper method to set frame width and keep same height
-NS_INLINE void SetFrameWidth(NSView *view, CGFloat w) {
+static inline void SetFrameWidth(NSView *view, CGFloat w) {
 	[view setFrameSize: NSMakeSize(w, NSHeight(view.frame))];
 }
 
@@ -352,7 +353,7 @@ NS_INLINE void SetFrameWidth(NSView *view, CGFloat w) {
 - (instancetype)textCenter { self.alignment = NSTextAlignmentCenter; return self; }
 
 /// Helper method to set new font, subsequently run @c sizeToFit
-NS_INLINE void SetFontAndResize(NSControl *control, NSFont *font) {
+static inline void SetFontAndResize(NSControl *control, NSFont *font) {
 	control.font = font; [control sizeToFit];
 }
 
