@@ -220,11 +220,9 @@
 			path = "Status Bar Menu";
 			sourceTree = "<group>";
 		};
-		544936F721F1E51E00DEE9AA /* Helper */ = {
+		544936F721F1E51E00DEE9AA /* NSCategories */ = {
 			isa = PBXGroup;
 			children = (
-				54209E922117325100F3B5EF /* DrawImage.h */,
-				54209E932117325100F3B5EF /* DrawImage.m */,
 				54B517052270E8C6006C1B29 /* NSView+Ext.h */,
 				54B517062270E92A006C1B29 /* NSView+Ext.m */,
 				54AD4E0A2301853D000AE386 /* NSString+Ext.h */,
@@ -238,7 +236,7 @@
 				54B6F14C23155E1A002C94C9 /* NSURLRequest+Ext.h */,
 				54B6F14D23155E1A002C94C9 /* NSURLRequest+Ext.m */,
 			);
-			path = Helper;
+			path = NSCategories;
 			sourceTree = "<group>";
 		};
 		544FBD4321064AEB008A260C /* Frameworks */ = {
@@ -253,9 +251,10 @@
 		546FC44D2118B357007CC3A3 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
-				54E9CF2F225913850023696F /* Helper */,
 				54ACC29621061FBA0020715F /* Preferences.h */,
 				54ACC29721061FBA0020715F /* Preferences.m */,
+				544B01182114B41200386E5C /* ModalSheet.h */,
+				544B01192114B41200386E5C /* ModalSheet.m */,
 				54D857CF228022AB001BA1C8 /* General Tab */,
 				54E88323211B542E00064188 /* Feeds Tab */,
 				54D857D3228035D4001BA1C8 /* Appearance Tab */,
@@ -315,10 +314,11 @@
 			isa = PBXGroup;
 			children = (
 				54AD4EE42305AF60000AE386 /* baRSS.entitlements */,
+				541958872190FF1200581B79 /* Constants.h */,
 				544B011B2114EE9100386E5C /* AppHook.h */,
 				544B011C2114EE9100386E5C /* AppHook.m */,
-				541958872190FF1200581B79 /* Constants.h */,
-				544936F721F1E51E00DEE9AA /* Helper */,
+				54E9CF2F225913850023696F /* Helper */,
+				544936F721F1E51E00DEE9AA /* NSCategories */,
 				541A90EF21257D4F002680A6 /* Status Bar Menu */,
 				54A07A8322105E0800082C51 /* Core Data */,
 				54AD4E04230084FD000AE386 /* Feed Import */,
@@ -404,10 +404,10 @@
 		54E9CF2F225913850023696F /* Helper */ = {
 			isa = PBXGroup;
 			children = (
+				54209E922117325100F3B5EF /* DrawImage.h */,
+				54209E932117325100F3B5EF /* DrawImage.m */,
 				5496B50F214D6275003ED4ED /* UserPrefs.h */,
 				5496B510214D6275003ED4ED /* UserPrefs.m */,
-				544B01182114B41200386E5C /* ModalSheet.h */,
-				544B01192114B41200386E5C /* ModalSheet.m */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
