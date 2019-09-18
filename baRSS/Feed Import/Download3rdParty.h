@@ -22,9 +22,9 @@
 
 @import Cocoa;
 
-@interface NSError (Ext)
-// Generators
-+ (instancetype)statusCode:(NSInteger)code reason:(nullable NSString*)reason;
-+ (instancetype)canceledByUser;
-+ (instancetype)feedURLNotFound:(NSURL*)url;
+// TODO: Make plugins extensible? community extensions.
+@interface YouTubePlugin : NSObject
++ (NSString*)feedURL:(NSURL*)url;
++ (NSString*)videoImage:(NSString*)videoid;
++ (NSString*)videoImageHQ:(NSString*)videoid;
 @end

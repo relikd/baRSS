@@ -23,8 +23,10 @@
 @import RSXML2;
 #import "FeedDownload.h"
 #import "FaviconDownload.h"
+#import "Download3rdParty.h"
 #import "Feed+Ext.h"
 #import "FeedMeta+Ext.h"
+#import "NSError+Ext.h"
 #import "NSURLRequest+Ext.h"
 
 @interface FeedDownload()
@@ -122,6 +124,33 @@
 	[self.currentDownload cancel];
 }
 
+/**
+ Persist in memory object by copying all attributes to permanent core data storage.
+ 
+ @param flag If @c YES then @c FeedGroup won't increase the error count for the feed.
+ Feed will be scheduled as soon as the user reconnects to the internet.
+ @return @c YES if downloaded feed contains at least one article. ( @c 304 returns @c NO )
+ */
+- (BOOL)copyValuesTo:(nonnull Feed*)feed ignoreError:(BOOL)flag {
+	if (!flag && self.error) // Increase error count and schedule next update.
+		[feed.meta setErrorAndPostponeSchedule];
+	else if (self.response) // Update Etag & Last modified and schedule next update.
+		[feed.meta setSucessfulWithResponse:self.response];
+	else // Update URL but keep schedule (e.g., error while adding feed should auto-try once reconnected)
+		[feed.meta setUrlIfChanged:self.request.URL.absoluteString];
+	
+	// If feed is broken indicate that feed will not be updated
+	if (!self.xmlfeed || self.xmlfeed.articles.count == 0)
+		return NO;
+	// Else: Update stored articles and indicate that feed was updated
+	[feed updateWithRSS:self.xmlfeed postUnreadCountChange:YES];
+	return YES;
+}
+
+//  ---------------------------------------------------------------
+// |  MARK: - HTML Source Handling
+//  ---------------------------------------------------------------
+
 /// Take the @c urlStr and run a download @c dataTask: on it. Auto-detect if data is HTML or feed.
 - (void)downloadSource:(NSURLRequest*)request {
 	self.currentDownload = [request dataTask:^(NSData * _Nullable data, NSError * _Nullable error, NSHTTPURLResponse *response) {
@@ -133,9 +162,9 @@
 		}
 		RSXMLData *xml = [[RSXMLData alloc] initWithData:data url:response.URL];
 		if (!self.assertIsFeedURL && [xml.parserClass isHTMLParser])
-			[self processXMLDataHTML:xml];
+			[self processXMLDataHTML:xml]; // HTML source handling
 		else
-			[self processXMLDataFeed:xml];
+			[self processXMLDataFeed:xml]; // XML source handling
 	}];
 }
 
@@ -143,30 +172,39 @@
 - (void)processXMLDataHTML:(RSXMLData*)xml {
 	RSHTMLMetadataParser *parser = [RSHTMLMetadataParser parserWithXMLData:xml];
 	[parser parseAsync:^(RSHTMLMetadata * _Nullable meta, NSError * _Nullable error) {
+		NSString *feedURL = nil;
 		if (error) {
 			self.error = error;
-		} else if (!meta || meta.feedLinks.count == 0) {
-			self.error = RSXMLMakeErrorWrongParser(RSXMLErrorExpectingFeed, RSXMLErrorExpectingHTML, xml.url);
-		} else {
-			self.faviconURL = [FaviconDownload urlForMetadata:meta]; // we can re-use favicon url if we find one
-			NSString *chosenURL = meta.feedLinks.firstObject.link;
-			if (self.respondToSelectFeed && meta.feedLinks.count > 1)
-				chosenURL = [self.delegate feedDownload:self selectFeedFromList:meta.feedLinks];
-			
-			if (chosenURL.length > 0) {
-				self.assertIsFeedURL = YES;
-				// Feeds like https://news.ycombinator.com/ return 503 if URLs are requested too rapidly
-				//CFRunLoopRunInMode(kCFRunLoopDefaultMode, 1.0, false); // Non-blocking sleep (1s)
-				[self downloadSource:[NSURLRequest withURL:chosenURL]];
-				return;
-			} else { // User canceled operation, show appropriate error message
-				NSDictionary *info = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"Operation canceled.", nil) };
-				self.error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:info];
-			}
 		}
-		[self finishAndNotify];
+		else if (!meta || meta.feedLinks.count == 0) {
+			if ([xml.url.host hasSuffix:@"youtube.com"])
+				feedURL = [YouTubePlugin feedURL:xml.url];
+			if (feedURL.length == 0)
+				self.error = [NSError feedURLNotFound:xml.url];
+		}
+		else {
+			feedURL = meta.feedLinks.firstObject.link;
+			if (meta.feedLinks.count > 1 && self.respondToSelectFeed)
+				feedURL = [self.delegate feedDownload:self selectFeedFromList:meta.feedLinks];
+			if (!feedURL)
+				self.error = [NSError canceledByUser];
+		}
+		// finalize HTML parsing
+		if (self.error) {
+			[self finishAndNotify];
+		} else {
+			self.assertIsFeedURL = YES;
+			self.faviconURL = [FaviconDownload urlForMetadata:meta]; // re-use favicon url (if present)
+			// Feeds like https://news.ycombinator.com/ return 503 if URLs are requested too rapidly
+			//CFRunLoopRunInMode(kCFRunLoopDefaultMode, 1.0, false); // Non-blocking sleep (1s)
+			[self downloadSource:[NSURLRequest withURL:feedURL]];
+		}
 	}];
 }
+
+//  ---------------------------------------------------------------
+// |  MARK: - XML Source Handling
+//  ---------------------------------------------------------------
 
 /// The downloaded source seems to be proper feed data, lets parse it with @c RSXML @c RSFeedParser
 - (void)processXMLDataFeed:(RSXMLData*)xml {
@@ -195,29 +233,6 @@
 	// notify observer
 	if (self.respondToEnd) [self.delegate feedDownloadDidFinish:self];
 	if (self.block) { self.block(self); self.block = nil; }
-}
-
-/**
- Persist in memory object by copying all attributes to permanent core data storage.
-
- @param flag If @c YES then @c FeedGroup won't increase the error count for the feed.
-             Feed will be scheduled as soon as the user reconnects to the internet.
- @return @c YES if downloaded feed contains at least one article. ( @c 304 returns @c NO )
- */
-- (BOOL)copyValuesTo:(nonnull Feed*)feed ignoreError:(BOOL)flag {
-	if (!flag && self.error) // Increase error count and schedule next update.
-		[feed.meta setErrorAndPostponeSchedule];
-	else if (self.response) // Update Etag & Last modified and schedule next update.
-		[feed.meta setSucessfulWithResponse:self.response];
-	else // Update URL but keep schedule (e.g., error while adding feed should auto-try once reconnected)
-		[feed.meta setUrlIfChanged:self.request.URL.absoluteString];
-	
-	// If feed is broken indicate that feed will not be updated
-	if (!self.xmlfeed || self.xmlfeed.articles.count == 0)
-		return NO;
-	// Else: Update stored articles and indicate that feed was updated
-	[feed updateWithRSS:self.xmlfeed postUnreadCountChange:YES];
-	return YES;
 }
 
 @end

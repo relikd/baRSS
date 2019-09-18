@@ -20,6 +20,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
+@import RSXML2.RSXMLError;
 #import "NSError+Ext.h"
 
 @implementation NSError (Ext)
@@ -98,6 +99,10 @@ static const char* CodeDescription(NSInteger code) {
 	return "Unknown";
 }
 
+//  ---------------------------------------------------------------
+// |  MARK: - Generators
+//  ---------------------------------------------------------------
+
 /// Generate @c NSError from HTTP status code. E.g., @c code @c = @c 404 will return "404 Not Found".
 + (instancetype)statusCode:(NSInteger)code reason:(nullable NSString*)reason {
 	NSMutableDictionary *info = [NSMutableDictionary dictionaryWithCapacity:2];
@@ -107,7 +112,18 @@ static const char* CodeDescription(NSInteger code) {
 	NSInteger errCode = NSURLErrorUnknown;
 	if (code < 500) { if (code >= 400) errCode = NSURLErrorResourceUnavailable; }
 	else if (code < 600) errCode = NSURLErrorBadServerResponse;
-	return [NSError errorWithDomain:NSURLErrorDomain code:errCode userInfo:info];
+	return [self errorWithDomain:NSURLErrorDomain code:errCode userInfo:info];
+}
+
+/// Generate @c NSError for user canceled operation. With title "Operation canceled.".
++ (instancetype)canceledByUser {
+	NSDictionary *info = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"Operation canceled.", nil) };
+	return [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:info];
+}
+
+/// Generate @c NSError for webpages that don't contain feed urls.
++ (instancetype)feedURLNotFound:(NSURL*)url {
+	return RSXMLMakeErrorWrongParser(RSXMLErrorExpectingFeed, RSXMLErrorExpectingHTML, url);
 }
 
 @end
