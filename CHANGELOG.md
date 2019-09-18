@@ -13,6 +13,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - Quick Look preview for OPML files
 - *Adding feed:* 5xx server errors have a reload button which will initiate a new download with the same URL
 - *Adding feed:* Empty feed title will automatically reuse title from xml file (even if xml title changes)
+- *Adding feed:* Parser for YouTube channel, user, and playlist URLs
 - *Adding feed:* `⌘R` will reload the same URL
 - *Settings, Feeds:* `⌘R` will reload the data source
 - *Settings, Feeds:* Refresh interval string localizations

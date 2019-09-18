@@ -23,7 +23,6 @@
 #import "SettingsFeedsView.h"
 #import "StoreCoordinator.h"
 #import "FeedGroup+Ext.h"
-#import "FeedMeta+Ext.h"
 #import "DrawImage.h"
 #import "SettingsFeeds.h"
 #import "NSDate+Ext.h"

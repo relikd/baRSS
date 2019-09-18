@@ -22,9 +22,7 @@
 
 #import "FeedGroup+Ext.h"
 #import "Feed+Ext.h"
-#import "FeedMeta+Ext.h"
 #import "StoreCoordinator.h"
-#import "NSDate+Ext.h"
 
 @implementation FeedGroup (Ext)
 
