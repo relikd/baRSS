@@ -126,4 +126,21 @@ static const char* CodeDescription(NSInteger code) {
 	return RSXMLMakeErrorWrongParser(RSXMLErrorExpectingFeed, RSXMLErrorExpectingHTML, url);
 }
 
+//  ---------------------------------------------------------------
+// |  MARK: - User notification
+//  ---------------------------------------------------------------
+
+/// Will only execute and return @c YES if @c error @c != @c nil . Log error message to console.
+- (BOOL)inCaseLog:(nullable const char*)title {
+	if (title) printf("ERROR %s: %s, %s\n", title, self.description.UTF8String, self.userInfo.description.UTF8String);
+	else       printf("%s, %s\n", self.description.UTF8String, self.userInfo.description.UTF8String);
+	return YES;
+}
+
+/// Will only execute and return @c YES if @c error @c != @c nil . Present application modal error message.
+- (BOOL)inCasePresent:(NSApplication*)app {
+	[app presentError:self];
+	return YES;
+}
+
 @end

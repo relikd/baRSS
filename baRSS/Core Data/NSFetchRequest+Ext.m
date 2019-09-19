@@ -21,6 +21,7 @@
 //  SOFTWARE.
 
 #import "NSFetchRequest+Ext.h"
+#import "NSError+Ext.h"
 
 @implementation NSFetchRequest (Ext)
 
@@ -28,7 +29,7 @@
 - (NSArray*)fetchAllRows:(NSManagedObjectContext*)moc {
 	NSError *err;
 	NSArray *fetchResults = [moc executeFetchRequest:self error:&err];
-	if (err) NSLog(@"ERROR: Fetch request failed: %@", err);
+	[err inCaseLog:"Fetch request failed"];
 	//NSLog(@"%@ ==> %@", self, fetchResults); // debugging
 	return fetchResults;
 }

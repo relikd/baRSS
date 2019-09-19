@@ -22,9 +22,15 @@
 
 @import Cocoa;
 
+/// Log error message and prepend calling class and calling method.
+#define NSLogCaller(desc) { NSLog(@"%@:%@ %@", [self class], NSStringFromSelector(_cmd), desc); }
+
 @interface NSError (Ext)
 // Generators
 + (instancetype)statusCode:(NSInteger)code reason:(nullable NSString*)reason;
 + (instancetype)canceledByUser;
 + (instancetype)feedURLNotFound:(NSURL*)url;
+// User notification
+- (BOOL)inCaseLog:(nullable const char*)title;
+- (BOOL)inCasePresent:(NSApplication*)app;
 @end

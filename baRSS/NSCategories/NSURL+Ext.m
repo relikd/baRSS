@@ -22,6 +22,7 @@
 
 #import "NSURL+Ext.h"
 #import "UserPrefs.h" // appName in +faviconsCacheURL
+#import "NSError+Ext.h"
 
 @implementation NSURL (Ext)
 
@@ -50,9 +51,8 @@
 - (BOOL)mkdir {
 	if ([self existsAndIsDir:YES]) return NO;
 	NSError *err;
-	BOOL b = [[NSFileManager defaultManager] createDirectoryAtURL:self withIntermediateDirectories:YES attributes:nil error:&err];
-	if (err) [NSApp presentError:err];
-	return b;
+	[[NSFileManager defaultManager] createDirectoryAtURL:self withIntermediateDirectories:YES attributes:nil error:&err];
+	return ![err inCasePresent:NSApp];
 }
 
 /// Delete file or folder at URL. If item does not exist, this method does nothing.
