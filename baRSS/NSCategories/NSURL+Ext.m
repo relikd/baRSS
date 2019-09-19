@@ -57,7 +57,10 @@
 
 /// Delete file or folder at URL. If item does not exist, this method does nothing.
 - (void)remove {
-	BOOL success = [[NSFileManager defaultManager] removeItemAtURL:self error:nil];
+#ifdef DEBUG
+	BOOL success =
+#endif
+	[[NSFileManager defaultManager] removeItemAtURL:self error:nil];
 #ifdef DEBUG
 	if (success) printf("DEL %s\n", self.absoluteString.UTF8String);
 #endif
