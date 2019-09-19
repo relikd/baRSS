@@ -90,52 +90,36 @@
 }
 
 /**
- Append new articles and increment their sortIndex. Update unread counter on the way.
+ Append new articles and increment @c sortIndex and unread count.
+ New articles are in ascending order without any gaps in between.
  
- @note
- New articles should be in ascending order without any gaps in between.
- If new article is disjunct from the article before, assume a deleted article re-appeared and mark it as read.
- 
- @param localSet Use result set @c localSet of method call @c deleteArticles:withRemoteSet:.
- @param remoteSet Readonly copy of @c RSParsedFeed.articles.
+ @param localSet Use result set of @c deleteArticles:withRemoteSet:
  */
 - (NSUInteger)insertArticles:(NSMutableSet<FeedArticle*>*)localSet withRemoteSet:(NSArray<RSParsedArticle*>*)remoteSet {
 	int32_t currentIndex = [[localSet valueForKeyPath:@"@min.sortIndex"] intValue];
-	NSMutableArray<FeedArticle*>* newlyInserted = [NSMutableArray arrayWithCapacity:remoteSet.count];
-	
+	NSUInteger c = 0;
 	for (RSParsedArticle *article in [remoteSet reverseObjectEnumerator]) {
-		// reverse enumeration ensures correct article order
-		FeedArticle *storedArticle = [self findRemoteArticle:article inLocalSet:localSet];
-		if (storedArticle) {
-			// TODO: stop bullshitting with ghost articles
-			[localSet removeObject:storedArticle];
-			// If we encounter an already existing item, assume newly inserted are "ghost" items and mark read.
-			if (newlyInserted.count > 0) {
-				for (FeedArticle *ghostItem in newlyInserted) {
-					ghostItem.unread = NO;
-				}
-				[newlyInserted removeAllObjects];
-			}
-			// Ensures consecutive block of incrementing numbers on sortIndex
-			if (storedArticle.sortIndex != currentIndex) {
-				storedArticle.sortIndex = currentIndex;
-			}
+		// Reverse enumeration ensures correct article order
+		FeedArticle *stored = [self findRemoteArticle:article inLocalSet:localSet];
+		if (stored) {
+			[localSet removeObject:stored];
+			if (stored.sortIndex != currentIndex)
+				stored.sortIndex = currentIndex; // Ensures block of ascending indices
 		} else {
 			FeedArticle *newArticle = [FeedArticle newArticle:article inContext:self.managedObjectContext];
 			newArticle.sortIndex = currentIndex;
 			[self addArticlesObject:newArticle];
-			[newlyInserted addObject:newArticle];
+			c += 1;
 		}
 		currentIndex += 1;
 	}
-	return newlyInserted.count; // all ghost items are removed already
+	return c;
 }
 
 /**
  Delete all articles from core data, that aren't present anymore.
  
- @param localSet Input a copy of @c self.articles. Output the same set minus deleted articles.
- @param remoteSet Readonly copy of @c RSParsedFeed.articles.
+ @param localSet Input a copy of @c self.articles . Output same set minus deleted articles.
  */
 - (NSUInteger)deleteArticles:(NSMutableSet<FeedArticle*>*)localSet withRemoteSet:(NSArray<RSParsedArticle*>*)remoteSet {
 	NSUInteger c = 0;

@@ -42,6 +42,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *UI:* If an error occurs, show document URL (path to file or web url)
 - Comparison of existing articles with nonexistent guid and link
 - Don't mark articles read if opening URLs failed
+- Don't mark articles read that appear in the middle of a feed (ghost items)
 - HTML tag removal keeps structure intact
 
 ### Changed
