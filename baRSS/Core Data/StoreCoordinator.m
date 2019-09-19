@@ -26,6 +26,7 @@
 #import "FaviconDownload.h"
 #import "Feed+Ext.h"
 #import "NSURL+Ext.h"
+#import "NSError+Ext.h"
 #import "NSFetchRequest+Ext.h"
 
 @implementation StoreCoordinator
@@ -52,18 +53,13 @@
  @param flag If @c YES save any parent context as well (recursive).
  */
 + (void)saveContext:(NSManagedObjectContext*)context andParent:(BOOL)flag {
-	// Performs the save action for the application, which is to send the save: message to the application's managed object context. Any encountered errors are presented to the user.
-	if (![context commitEditing]) {
-		NSLog(@"%@:%@ unable to commit editing before saving", [self class], NSStringFromSelector(_cmd));
-	}
+	if (![context commitEditing])
+		NSLogCaller(@"unable to commit editing before saving");
 	NSError *error = nil;
-	if (context.hasChanges && ![context save:&error]) {
-		// Customize this code block to include application-specific recovery steps.
-		[NSApp presentError:error];
-	}
-	if (flag && context.parentContext) {
+	if (context.hasChanges && ![context save:&error])
+		[error inCasePresent:NSApp];
+	if (flag && context.parentContext)
 		[self saveContext:context.parentContext andParent:flag];
-	}
 }
 
 
@@ -284,7 +280,7 @@
 	bdr.resultType = NSBatchDeleteResultTypeCount;
 	NSError *err;
 	NSBatchDeleteResult *res = [moc executeRequest:bdr error:&err];
-	if (err) NSLog(@"%@", err);
+	[err inCaseLog:"Couldn't delete batch"];
 	return [res.result unsignedIntegerValue];
 }
 

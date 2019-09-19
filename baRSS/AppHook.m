@@ -30,6 +30,7 @@
 #import "StoreCoordinator.h"
 #import "SettingsFeeds+DragDrop.h"
 #import "NSURL+Ext.h"
+#import "NSError+Ext.h"
 
 @interface AppHook()
 @property (strong) NSWindowController *prefWindow;
@@ -119,10 +120,8 @@
 		if (_persistentContainer == nil) {
 			_persistentContainer = [[NSPersistentContainer alloc] initWithName:@"DBv1"];
 			[_persistentContainer loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription *storeDescription, NSError *error) {
-				if (error != nil) {
-					NSLog(@"Couldn't read NSPersistentContainer: %@, %@", error, error.userInfo);
+				if ([error inCaseLog:"Couldn't read NSPersistentContainer"])
 					abort();
-				}
 			}];
 		}
 	}
@@ -133,7 +132,7 @@
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
 	NSManagedObjectContext *context = self.persistentContainer.viewContext;
 	if (![context commitEditing]) {
-		NSLog(@"%@:%@ unable to commit editing to terminate", [self class], NSStringFromSelector(_cmd));
+		NSLogCaller(@"unable to commit editing to terminate");
 		return NSTerminateCancel;
 	}
 	if (!context.hasChanges) {

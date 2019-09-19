@@ -28,6 +28,7 @@
 #import "Constants.h"
 #import "NSDate+Ext.h"
 #import "NSView+Ext.h"
+#import "NSError+Ext.h"
 
 #pragma mark - Helper
 
@@ -98,9 +99,7 @@ static NSInteger RadioGroupSelection(NSView *view) {
 		RSXMLData *xml = [[RSXMLData alloc] initWithData:data url:url];
 		RSOPMLParser *parser = [RSOPMLParser parserWithXMLData:xml];
 		[parser parseAsync:^(RSOPMLItem * _Nullable doc, NSError * _Nullable error) {
-			if (error) {
-				[NSApp presentError:error];
-			} else {
+			if (![error inCasePresent:NSApp]) {
 				for (RSOPMLItem *itm in doc.children) {
 					block(itm);
 				}
@@ -250,7 +249,7 @@ static NSInteger RadioGroupSelection(NSView *view) {
 		NSData *xml = [doc XMLDataWithOptions:NSXMLNodePreserveAttributeOrder | NSXMLNodePrettyPrint];
 		[xml writeToURL:url options:NSDataWritingAtomic error:&error];
 	}
-	if (error) [NSApp presentError:error];
+	[error inCasePresent:NSApp];
 	return error;
 }
 

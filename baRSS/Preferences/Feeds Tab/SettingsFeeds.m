@@ -27,6 +27,7 @@
 #import "FeedGroup+Ext.h"
 #import "UpdateScheduler.h"
 #import "SettingsFeedsView.h"
+#import "NSError+Ext.h"
 
 @interface SettingsFeeds ()
 @property (strong) SettingsFeedsView *view; // override super
@@ -100,7 +101,7 @@
 	
 	NSError *error;
 	[self.dataStore fetchWithRequest:nil merge:NO error:&error];
-	if (error) [NSApp presentError:error];
+	[error inCasePresent:NSApp];
 }
 
 /**
