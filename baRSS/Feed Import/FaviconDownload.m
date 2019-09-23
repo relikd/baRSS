@@ -24,6 +24,7 @@
 #import "FaviconDownload.h"
 #import "Feed+Ext.h"
 #import "FeedMeta+Ext.h"
+#import "NSURL+Ext.h"
 #import "NSURLRequest+Ext.h"
 
 @interface FaviconDownload()
@@ -148,12 +149,10 @@
 		if (error) path = nil; // will also nullify img
 		NSImage *img = path ? [[NSImage alloc] initByReferencingURL:path] : nil;
 		if (img.valid) {
-			NSString *tmp = NSProcessInfo.processInfo.globallyUniqueString;
-			NSURL *dest = [path URLByDeletingLastPathComponent];
-			dest = [dest URLByAppendingPathComponent:tmp isDirectory:NO];
 			// move image to temporary destination, otherwise dataTask: will delete it.
-			[[NSFileManager defaultManager] moveItemAtURL:path toURL:dest error:nil];
-			self.fileURL = dest;
+			NSString *tmpFile = NSProcessInfo.processInfo.globallyUniqueString;
+			self.fileURL = [[path URLByDeletingLastPathComponent] file:tmpFile ext:nil];
+			[path moveTo:self.fileURL];
 		} else if (self.hostURL) {
 			[self loadImageFromDefaultLocation]; // starts a new request
 			return;

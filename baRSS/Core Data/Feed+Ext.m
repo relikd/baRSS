@@ -209,8 +209,7 @@
 
 /// Image file path at e.g., "Application Support/baRSS/favicons/p42". @warning File may not exist!
 - (NSURL*)iconPath {
-	NSString *pk = self.objectID.URIRepresentation.lastPathComponent;
-	return [[NSURL faviconsCacheURL] URLByAppendingPathComponent:pk isDirectory:NO];
+	return [[NSURL faviconsCacheURL] file:self.objectID.URIRepresentation.lastPathComponent ext:nil];
 }
 
 /// Move favicon from @c $TMPDIR to permanent destination in Application Support.

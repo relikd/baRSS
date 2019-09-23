@@ -120,12 +120,16 @@ static NSString* const kURLSchemeBarss = @"barss";
 static NSString* const kURLActionOpen = @"open";
 /// Use @c barss:config to perform configuration steps
 static NSString* const kURLActionConfig = @"config";
+/// Use @c barss:backup to backup opml file into container
+static NSString* const kURLActionBackup = @"backup";
 /// Open preferences window with optional tab index. E.g., @c barss:open/preferences/1
 static NSString* const kURLParamPreferences = @"preferences";
 /// Run core data cleanup with optional silent parameter. E.g., @c barss:config/fixcache/silent
 static NSString* const kURLParamFixCache = @"fixcache";
 /// Disables error alerts and other interactive UI
 static NSString* const kURLParamSilent = @"silent";
+/// Show backup directory in Finder. E.g., @c barss:backup/show
+static NSString* const kURLParamShow = @"show";
 
 
 #pragma mark - Internal

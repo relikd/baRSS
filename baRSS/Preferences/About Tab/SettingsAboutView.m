@@ -69,7 +69,8 @@
 	[self str:mas add:@"RSXML2" link:@"https://github.com/relikd/RSXML2"];
 	[self str:mas add:@" (MIT License)" bold:NO];
 	[self str:mas add:@"\n\n\n\nOptions\n" bold:YES];
-	[self str:mas add:@"Fix Cache" link:@"barss:config/fixcache"];
+	[self str:mas add:@"Fix Cache\n" link:@"barss:config/fixcache"];
+	[self str:mas add:@"Backup now\n" link:@"barss:backup/show"];
 	[mas endEditing];
 	return mas;
 }

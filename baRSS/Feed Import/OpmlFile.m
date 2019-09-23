@@ -262,7 +262,7 @@ static NSInteger RadioGroupSelection(NSView *view) {
 	NSXMLElement *head = [NSXMLElement elementWithName:@"head"];
 	head.children = @[[NSXMLElement elementWithName:@"title" stringValue:@"baRSS feeds"],
 					  [NSXMLElement elementWithName:@"ownerName" stringValue:@"baRSS"],
-					  [NSXMLElement elementWithName:@"dateCreated" stringValue:[NSDate dayStringISO8601]] ];
+					  [NSXMLElement elementWithName:@"dateCreated" stringValue:[NSDate timeStringISO8601]] ];
 	
 	NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
 	for (FeedGroup *item in list) {

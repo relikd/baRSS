@@ -25,7 +25,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *UI:* Accessibility hints for most UI elements
 - *UI*: Show welcome message upon first usage (empty db)
 - Welcome message also adds Github releases feed
-- Config URL scheme `barss:` with `open/preferences` and `config/fixcache`
+- Config URL scheme `barss:` with `open/preferences`, `config/fixcache`, and `backup/show`
 
 ### Fixed
 - *Adding feed:* Show proper HTTP status code error message (4xx and 5xx)
