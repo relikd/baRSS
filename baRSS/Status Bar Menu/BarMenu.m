@@ -69,19 +69,17 @@
 
 /// Populate menu with items.
 - (void)menuNeedsUpdate:(NSMenu*)menu {
-	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	if (menu.isFeedMenu) {
-		Feed *feed = [StoreCoordinator feedWithIndexPath:menu.titleIndexPath inContext:moc];
+		Feed *feed = [StoreCoordinator feedWithIndexPath:menu.titleIndexPath inContext:nil];
 		[self setArticles:[feed sortedArticles] forMenu:menu];
 	} else {
-		NSArray<FeedGroup*> *groups = [StoreCoordinator sortedFeedGroupsWithParent:menu.parentItem.representedObject inContext:moc];
+		NSArray<FeedGroup*> *groups = [StoreCoordinator sortedFeedGroupsWithParent:menu.parentItem.representedObject inContext:nil];
 		if (groups.count == 0) {
 			[menu addItemWithTitle:NSLocalizedString(@"~~~ no entries ~~~", nil) action:nil keyEquivalent:@""].enabled = NO;
 		} else {
 			[self setFeedGroups:groups forMenu:menu];
 		}
 	}
-	[moc reset];
 }
 
 /// Get rid of everything that is not needed.
@@ -128,13 +126,11 @@
  @warning @c item and @c feed will often mismatch.
  */
 - (void)updateFeedMenuItem:(NSManagedObjectID*)oid withBlock:(void(^)(Feed *feed, NSMenuItem *item))block {
-	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
-	Feed *feed = [moc objectWithID:oid];
+	Feed *feed = [[StoreCoordinator getMainContext] objectWithID:oid];
 	if ([feed isKindOfClass:[Feed class]]) {
 		NSMenuItem *item = [self.statusItem.mainMenu deepestItemWithPath:feed.indexPath];
 		if (item) block(feed, item);
 	}
-	[moc reset];
 }
 
 /// Callback method fired when feed has been updated in the background.

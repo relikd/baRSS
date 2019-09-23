@@ -27,6 +27,7 @@ static int const dbFileVersion = 1; // update in case database structure changes
 
 @interface StoreCoordinator : NSObject
 // Managing contexts
++ (NSManagedObjectContext*)getMainContext;
 + (NSManagedObjectContext*)createChildContext;
 + (void)saveContext:(NSManagedObjectContext*)context andParent:(BOOL)flag;
 
@@ -36,7 +37,7 @@ static int const dbFileVersion = 1; // update in case database structure changes
 
 // Feed update
 + (NSDate*)nextScheduledUpdate;
-+ (NSArray<Feed*>*)listOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc;
++ (NSArray<Feed*>*)listOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(nullable NSManagedObjectContext*)moc;
 
 // Count elements
 + (BOOL)isEmpty;
@@ -45,10 +46,8 @@ static int const dbFileVersion = 1; // update in case database structure changes
 + (NSArray<NSDictionary*>*)countAggregatedUnread;
 
 // Get List Of Elements
-+ (NSArray<FeedGroup*>*)sortedFeedGroupsWithParent:(id)parent inContext:(NSManagedObjectContext*)moc;
-+ (NSArray<FeedArticle*>*)sortedArticlesWithParent:(id)parent inContext:(NSManagedObjectContext*)moc;
-+ (NSArray<Feed*>*)listOfFeedsMissingArticlesInContext:(NSManagedObjectContext*)moc;
-+ (Feed*)feedWithIndexPath:(nonnull NSString*)path inContext:(NSManagedObjectContext*)moc;
++ (NSArray<FeedGroup*>*)sortedFeedGroupsWithParent:(id)parent inContext:(nullable NSManagedObjectContext*)moc;
++ (Feed*)feedWithIndexPath:(nonnull NSString*)path inContext:(nullable NSManagedObjectContext*)moc;
 + (NSString*)urlForFeedWithIndexPath:(nonnull NSString*)path;
 
 // Unread articles list & mark articled read

@@ -28,11 +28,13 @@
 #import "BarStatusItem.h"
 #import "UpdateScheduler.h"
 #import "StoreCoordinator.h"
+#import "OpmlFile.h"
 #import "SettingsFeeds+DragDrop.h"
 #import "NSURL+Ext.h"
+#import "NSDate+Ext.h"
 #import "NSError+Ext.h"
 
-@interface AppHook()
+@interface AppHook() <OpmlFileExportDelegate>
 @property (strong) NSWindowController *prefWindow;
 @end
 
@@ -203,6 +205,7 @@
        @textblock
  barss:open/preferences[/0-4]
  barss:config/fixcache[/silent]
+ barss:backup[/show]
        @/textblock
  */
 - (void)handleConfigURLScheme:(const NSString*)action parameters:(NSArray<NSString*>*)params {
@@ -215,7 +218,22 @@
 		if ([params.firstObject isEqualToString:kURLParamFixCache]) {
 			[StoreCoordinator cleanupAndShowAlert:![params.lastObject isEqualToString:kURLParamSilent]];
 		}
+	} else if ([action isEqualToString:kURLActionBackup]) {
+		NSURL *baseURL = [NSURL backupPathURL];
+		[baseURL mkdir]; // non destructive make dir
+		NSURL *dest = [baseURL file:[@"feeds_" stringByAppendingString:[NSDate dayStringISO8601]] ext:@"opml"];
+		NSURL *sym = [baseURL file:@"feeds_latest" ext:@"opml"];
+		[sym remove]; // remove old sym link, otherwise won't be updated
+		[[NSFileManager defaultManager] createSymbolicLinkAtURL:sym withDestinationURL:[NSURL URLWithString:dest.lastPathComponent] error:nil];
+		[[OpmlFileExport withDelegate:self] writeOPMLFile:dest withOptions:OpmlFileExportOptionFullBackup];
+		if ([params.firstObject isEqualToString:kURLParamShow])
+			[[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:@[dest]];
 	}
+}
+
+/// Callback method for OPML backup export
+- (NSArray<FeedGroup*>*)opmlFileExportListOfFeedGroups:(OpmlFileExportOptions)options {
+	return [StoreCoordinator sortedFeedGroupsWithParent:nil inContext:nil];
 }
 
 

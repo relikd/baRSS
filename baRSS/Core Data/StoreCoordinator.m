@@ -98,14 +98,15 @@
  List of @c Feed items that need to be updated. Scheduled time is now (or in past).
 
  @param forceAll If @c YES get a list of all @c Feed regardless of schedules time.
+ @param moc If @c nil perform requests on main context (ok for reading).
  */
-+ (NSArray<Feed*>*)listOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(NSManagedObjectContext*)moc {
++ (NSArray<Feed*>*)listOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(nullable NSManagedObjectContext*)moc {
 	NSFetchRequest *fr = [Feed fetchRequest];
 	if (!forceAll) {
 		// when fetching also get those feeds that would need update soon (now + 2s)
 		[fr where:@"meta.scheduled <= %@", [NSDate dateWithTimeIntervalSinceNow:+2]];
 	}
-	return [fr fetchAllRows:moc];
+	return [fr fetchAllRows:moc ? moc : [self getMainContext]];
 }
 
 
@@ -139,24 +140,30 @@
 
 #pragma mark - Get List Of Elements
 
-/// @return Sorted list of @c FeedGroup items where @c FeedGroup.parent @c = @c parent.
-+ (NSArray<FeedGroup*>*)sortedFeedGroupsWithParent:(id)parent inContext:(NSManagedObjectContext*)moc {
-	return [[[[FeedGroup fetchRequest] where:@"parent = %@", parent] sortASC:@"sortIndex"] fetchAllRows:moc];
+/**
+ @param moc If @c nil perform requests on main context (ok for reading).
+ @return Sorted list of @c FeedGroup items where @c FeedGroup.parent @c = @c parent.
+ */
++ (NSArray<FeedGroup*>*)sortedFeedGroupsWithParent:(id)parent inContext:(nullable NSManagedObjectContext*)moc {
+	return [[[[FeedGroup fetchRequest] where:@"parent = %@", parent] sortASC:@"sortIndex"] fetchAllRows:moc ? moc : [self getMainContext]];
 }
 
 /// @return Sorted list of @c FeedArticle items where @c FeedArticle.feed @c = @c parent.
-+ (NSArray<FeedArticle*>*)sortedArticlesWithParent:(id)parent inContext:(NSManagedObjectContext*)moc {
-	return [[[[FeedArticle fetchRequest] where:@"feed = %@", parent] sortDESC:@"sortIndex"] fetchAllRows:moc];
-}
+//+ (NSArray<FeedArticle*>*)sortedArticlesWithParent:(id)parent inContext:(NSManagedObjectContext*)moc {
+//	return [[[[FeedArticle fetchRequest] where:@"feed = %@", parent] sortDESC:@"sortIndex"] fetchAllRows:moc];
+//}
 
 /// @return Unsorted list of @c Feed items where @c articles.count @c == @c 0.
-+ (NSArray<Feed*>*)listOfFeedsMissingArticlesInContext:(NSManagedObjectContext*)moc {
-	return [[[Feed fetchRequest] where:@"articles.@count == 0"] fetchAllRows:moc];
-}
+//+ (NSArray<Feed*>*)listOfFeedsMissingArticlesInContext:(NSManagedObjectContext*)moc {
+//	return [[[Feed fetchRequest] where:@"articles.@count == 0"] fetchAllRows:moc];
+//}
 
-/// @return Single @c Feed item where @c Feed.indexPath @c = @c path.
-+ (Feed*)feedWithIndexPath:(nonnull NSString*)path inContext:(NSManagedObjectContext*)moc {
-	return [[[Feed fetchRequest] where:@"indexPath = %@", path] fetchFirst:moc];
+/**
+ @param moc If @c nil perform requests on main context (ok for reading).
+ @return Single @c Feed item where @c Feed.indexPath @c = @c path.
+ */
++ (Feed*)feedWithIndexPath:(nonnull NSString*)path inContext:(nullable NSManagedObjectContext*)moc {
+	return [[[Feed fetchRequest] where:@"indexPath = %@", path] fetchFirst:moc ? moc : [self getMainContext]];
 }
 
 /// @return URL of @c Feed item where @c Feed.indexPath @c = @c path.

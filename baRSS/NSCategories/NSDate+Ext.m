@@ -35,11 +35,15 @@ static TimeUnitType const _values[] = {
 
 @implementation NSDate (Ext)
 
-/// @return Day as string in iso format: @c YYYY-MM-DD'T'hh:mm:ss'Z'
-+ (NSString*)dayStringISO8601 {
+/// @return Time as string in iso format: @c YYYY-MM-DD'T'hh:mm:ss'Z'
++ (NSString*)timeStringISO8601 {
 	return [[[NSISO8601DateFormatter alloc] init] stringFromDate:[NSDate date]];
-//	NSDateComponents *now = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear fromDate:[NSDate date]];
-//	return [NSString stringWithFormat:@"%04ld-%02ld-%02ld", now.year, now.month, now.day];
+}
+
+/// @return Day as string in iso format: @c YYYY-MM-DD
++ (NSString*)dayStringISO8601 {
+	NSDateComponents *now = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear fromDate:[NSDate date]];
+	return [NSString stringWithFormat:@"%04ld-%02ld-%02ld", now.year, now.month, now.day];
 }
 
 /// @return Day as string in localized short format, e.g., @c DD.MM.YY

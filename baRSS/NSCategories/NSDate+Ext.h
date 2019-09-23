@@ -33,6 +33,7 @@ typedef NS_ENUM(int32_t, TimeUnitType) {
 };
 
 @interface NSDate (Ext)
++ (NSString*)timeStringISO8601;
 + (NSString*)dayStringISO8601;
 + (NSString*)dayStringLocalized;
 @end

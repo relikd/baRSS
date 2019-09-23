@@ -164,10 +164,8 @@ static _Atomic(NSUInteger) _queueSize = 0;
 
 /// Perform @c FaviconDownload on all core data @c Feed entries.
 + (void)updateAllFavicons {
-	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
-	for (Feed *f in [StoreCoordinator listOfFeedsThatNeedUpdate:YES inContext:moc])
+	for (Feed *f in [StoreCoordinator listOfFeedsThatNeedUpdate:YES inContext:nil])
 		[FaviconDownload updateFeed:f finally:nil];
-	[moc reset];
 }
 
 /// Download list of feeds. Either silently in background or with alerts in foreground.
