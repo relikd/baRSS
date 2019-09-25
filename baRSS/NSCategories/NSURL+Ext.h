@@ -22,6 +22,8 @@
 
 @import Cocoa;
 
+#define ENV_LOG_FILES 0
+
 @interface NSURL (Ext)
 // Generators
 + (NSURL*)applicationSupportURL;

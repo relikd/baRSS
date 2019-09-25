@@ -58,7 +58,7 @@ static NSURLSession* NonCachingURLSession(void) {
 	NSURLSessionDataTask *task = [NonCachingURLSession() dataTaskWithRequest:self completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
 		NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
 		NSInteger status = [httpResponse statusCode];
-#ifdef DEBUG
+#if DEBUG && ENV_LOG_DOWNLOAD
 		/*if (status != 304)*/ printf("GET %ld %s\n", status, self.URL.absoluteString.UTF8String);
 #endif
 		if (error || status == 304) {

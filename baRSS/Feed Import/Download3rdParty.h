@@ -22,6 +22,8 @@
 
 @import Cocoa;
 
+#define ENV_LOG_YOUTUBE 1
+
 // TODO: Make plugins extensible? community extensions.
 @interface YouTubePlugin : NSObject
 + (NSString*)feedURL:(NSURL*)url;
