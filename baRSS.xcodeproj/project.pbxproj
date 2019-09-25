@@ -27,6 +27,7 @@
 		5478DF04225A7AE200D30C64 /* SettingsFeedsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5478DF03225A7AE200D30C64 /* SettingsFeedsView.m */; };
 		548C6D0A230C33DE003A1AAF /* NSURL+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 548C6D09230C33DE003A1AAF /* NSURL+Ext.m */; };
 		5491005D2331435E00858AE2 /* Download3rdParty.m in Sources */ = {isa = PBXBuildFile; fileRef = 5491005C2331435E00858AE2 /* Download3rdParty.m */; };
+		54910067233A4D4000858AE2 /* URLScheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 54910066233A4D4000858AE2 /* URLScheme.m */; };
 		5496B511214D6275003ED4ED /* UserPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5496B510214D6275003ED4ED /* UserPrefs.m */; };
 		54A07A7F220E04CF00082C51 /* NSFetchRequest+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A07A7E220E04CF00082C51 /* NSFetchRequest+Ext.m */; };
 		54A07A82220E723D00082C51 /* MapUnreadTotal.m in Sources */ = {isa = PBXBuildFile; fileRef = 54A07A81220E723D00082C51 /* MapUnreadTotal.m */; };
@@ -138,6 +139,8 @@
 		548C6D09230C33DE003A1AAF /* NSURL+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSURL+Ext.m"; sourceTree = "<group>"; };
 		5491005B2331435E00858AE2 /* Download3rdParty.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Download3rdParty.h; sourceTree = "<group>"; };
 		5491005C2331435E00858AE2 /* Download3rdParty.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Download3rdParty.m; sourceTree = "<group>"; };
+		54910065233A4D4000858AE2 /* URLScheme.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = URLScheme.h; sourceTree = "<group>"; };
+		54910066233A4D4000858AE2 /* URLScheme.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = URLScheme.m; sourceTree = "<group>"; };
 		5496B50F214D6275003ED4ED /* UserPrefs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserPrefs.h; sourceTree = "<group>"; };
 		5496B510214D6275003ED4ED /* UserPrefs.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserPrefs.m; sourceTree = "<group>"; };
 		54A07A7D220E04CF00082C51 /* NSFetchRequest+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSFetchRequest+Ext.h"; sourceTree = "<group>"; };
@@ -408,6 +411,8 @@
 				54209E932117325100F3B5EF /* DrawImage.m */,
 				5496B50F214D6275003ED4ED /* UserPrefs.h */,
 				5496B510214D6275003ED4ED /* UserPrefs.m */,
+				54910065233A4D4000858AE2 /* URLScheme.h */,
+				54910066233A4D4000858AE2 /* URLScheme.m */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -586,6 +591,7 @@
 				54A07A82220E723D00082C51 /* MapUnreadTotal.m in Sources */,
 				54ACC29821061FBA0020715F /* Preferences.m in Sources */,
 				54195886218E1BDB00581B79 /* NSMenu+Ext.m in Sources */,
+				54910067233A4D4000858AE2 /* URLScheme.m in Sources */,
 				54F6025D21C1D4170006D338 /* OpmlFile.m in Sources */,
 				5496B511214D6275003ED4ED /* UserPrefs.m in Sources */,
 				546A6A2F22C585580034E806 /* SettingsAboutView.m in Sources */,

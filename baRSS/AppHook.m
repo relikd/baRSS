@@ -21,20 +21,18 @@
 //  SOFTWARE.
 
 #import "AppHook.h"
-#import "Constants.h"
 #import "DrawImage.h"
 #import "UserPrefs.h"
 #import "Preferences.h"
 #import "BarStatusItem.h"
 #import "UpdateScheduler.h"
 #import "StoreCoordinator.h"
-#import "OpmlFile.h"
 #import "SettingsFeeds+DragDrop.h"
+#import "URLScheme.h"
 #import "NSURL+Ext.h"
-#import "NSDate+Ext.h"
 #import "NSError+Ext.h"
 
-@interface AppHook() <OpmlFileExportDelegate>
+@interface AppHook()
 @property (strong) NSWindowController *prefWindow;
 @end
 
@@ -99,15 +97,6 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:self.prefWindow.window];
 	self.prefWindow = nil;
 	[UpdateScheduler scheduleNextFeed];
-}
-
-/// Close previous preferences window and re-open at the same position (will drop undo manager stack!)
-- (void)reopenPreferencesIfOpen {
-	if (self.prefWindow) {
-		CGPoint screenPoint = self.prefWindow.window.frame.origin;
-		[self.prefWindow close];
-		[[self openPreferences] setFrameOrigin:screenPoint];
-	}
 }
 
 
@@ -182,58 +171,7 @@
 
 /// Callback method fired when opened with an URL (@c feed: and @c barss: scheme)
 - (void)handleAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
-	NSString *url = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
-	NSString *scheme = [[[NSURL URLWithString:url] scheme] lowercaseString];
-	url = [url substringFromIndex:scheme.length + 1]; // + ':'
-	if (url.length >= 2 && [[url substringToIndex:2] isEqualToString:@"//"]) {
-		url = [url substringFromIndex:2];
-	}
-	if ([scheme isEqualToString:kURLSchemeFeed]) {
-		[UpdateScheduler autoDownloadAndParseURL:url];
-	} else if ([scheme isEqualToString:kURLSchemeBarss]) {
-		NSMutableArray<NSString*> *comp = [[url pathComponents] mutableCopy];
-		NSString *action = comp.firstObject;
-		if (action) {
-			[comp removeObjectAtIndex:0];
-			[self handleConfigURLScheme:action parameters:comp];
-		}
-	}
-}
-
-/**
- Helper method for handling the @c barss: scheme (see below).
-       @textblock
- barss:open/preferences[/0-4]
- barss:config/fixcache[/silent]
- barss:backup[/show]
-       @/textblock
- */
-- (void)handleConfigURLScheme:(const NSString*)action parameters:(NSArray<NSString*>*)params {
-	if ([action isEqualToString:kURLActionOpen]) {
-		if ([params.firstObject isEqualToString:kURLParamPreferences]) {
-			NSDecimalNumber *num = [NSDecimalNumber decimalNumberWithString:params.lastObject];
-			[[self openPreferences] selectTab:num.unsignedIntegerValue];
-		}
-	} else if ([action isEqualToString:kURLActionConfig]) {
-		if ([params.firstObject isEqualToString:kURLParamFixCache]) {
-			[StoreCoordinator cleanupAndShowAlert:![params.lastObject isEqualToString:kURLParamSilent]];
-		}
-	} else if ([action isEqualToString:kURLActionBackup]) {
-		NSURL *baseURL = [NSURL backupPathURL];
-		[baseURL mkdir]; // non destructive make dir
-		NSURL *dest = [baseURL file:[@"feeds_" stringByAppendingString:[NSDate dayStringISO8601]] ext:@"opml"];
-		NSURL *sym = [baseURL file:@"feeds_latest" ext:@"opml"];
-		[sym remove]; // remove old sym link, otherwise won't be updated
-		[[NSFileManager defaultManager] createSymbolicLinkAtURL:sym withDestinationURL:[NSURL URLWithString:dest.lastPathComponent] error:nil];
-		[[OpmlFileExport withDelegate:self] writeOPMLFile:dest withOptions:OpmlFileExportOptionFullBackup];
-		if ([params.firstObject isEqualToString:kURLParamShow])
-			[[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:@[dest]];
-	}
-}
-
-/// Callback method for OPML backup export
-- (NSArray<FeedGroup*>*)opmlFileExportListOfFeedGroups:(OpmlFileExportOptions)options {
-	return [StoreCoordinator sortedFeedGroupsWithParent:nil inContext:nil];
+	[URLScheme withURL:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
 }
 
 
