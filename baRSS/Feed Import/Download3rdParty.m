@@ -39,7 +39,7 @@
 	// https://www.youtube.com/channel/[channel-id]
 	// https://www.youtube.com/user/[user-name]
 	// https://www.youtube.com/playlist?list=[playlist-id]
-#ifdef DEBUG
+#if DEBUG && ENV_LOG_YOUTUBE
 	printf("resolving YouTube url:\n");
 	printf(" ↳ %s\n", url.absoluteString.UTF8String);
 #endif
@@ -64,7 +64,7 @@
 			}
 		}
 	}
-#ifdef DEBUG
+#if DEBUG && ENV_LOG_YOUTUBE
 	printf(" ↳ %s\n", found ? found.UTF8String : "could not resolve!");
 #endif
 	return found; // may be nil

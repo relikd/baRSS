@@ -89,11 +89,11 @@
 
 /// Delete file or folder at URL. If item does not exist, this method does nothing.
 - (void)remove {
-#ifdef DEBUG
+#if DEBUG && ENV_LOG_FILES
 	BOOL success =
 #endif
 	[[NSFileManager defaultManager] removeItemAtURL:self error:nil];
-#ifdef DEBUG
+#if DEBUG && ENV_LOG_FILES
 	if (success) printf("DEL %s\n", self.absoluteString.UTF8String);
 #endif
 }
@@ -102,7 +102,7 @@
 - (void)moveTo:(NSURL*)destination {
 	[[NSFileManager defaultManager] removeItemAtURL:destination error:nil];
 	[[NSFileManager defaultManager] moveItemAtURL:self toURL:destination error:nil];
-#ifdef DEBUG
+#if DEBUG && ENV_LOG_FILES
 	printf("MOVE %s\n", self.absoluteString.UTF8String);
 	printf(" ↳ %s\n", destination.absoluteString.UTF8String);
 #endif

@@ -168,7 +168,7 @@
 	NSURL *path = self.fileURL;
 	NSImage *img = [[NSImage alloc] initByReferencingURL:path];
 	if (!img.valid) { path = nil; img = nil; }
-#ifdef DEBUG
+#if DEBUG && ENV_LOG_DOWNLOAD
 	printf("ICON %1.0fx%1.0f %s\n", img.size.width, img.size.height, self.remoteURL.absoluteString.UTF8String);
 	printf(" ↳ %s\n", path.absoluteString.UTF8String);
 #endif

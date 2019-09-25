@@ -22,6 +22,8 @@
 
 @import Cocoa;
 
+#define ENV_LOG_DOWNLOAD 1
+
 @interface NSURLRequest (Ext)
 + (instancetype)withURL:(NSString*)urlStr;
 - (NSURLSessionDataTask*)dataTask:(nonnull void(^)(NSData * _Nullable data, NSError * _Nullable error, NSHTTPURLResponse *response))block;
