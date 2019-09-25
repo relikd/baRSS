@@ -57,7 +57,7 @@ typedef NS_OPTIONS(NSUInteger, OpmlFileExportOptions) {
 
 @interface OpmlFileExport : NSObject
 @property (weak) id<OpmlFileExportDelegate> delegate;
-+ (instancetype)withDelegate:(id<OpmlFileExportDelegate>)delegate;
++ (instancetype)withDelegate:(nullable id<OpmlFileExportDelegate>)delegate;
 - (void)showExportDialog:(NSWindow*)window;
 - (nullable NSError*)writeOPMLFile:(NSURL*)url withOptions:(OpmlFileExportOptions)opt;
 @end

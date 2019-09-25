@@ -197,7 +197,7 @@ static NSInteger RadioGroupSelection(NSView *view) {
 
 @implementation OpmlFileExport
 
-+ (instancetype)withDelegate:(id<OpmlFileExportDelegate>)delegate {
++ (instancetype)withDelegate:(nullable id<OpmlFileExportDelegate>)delegate {
 	OpmlFileExport *opml = [[super alloc] init];
 	opml.delegate = delegate;
 	return opml;
@@ -241,6 +241,7 @@ static NSInteger RadioGroupSelection(NSView *view) {
  */
 - (nullable NSError*)writeOPMLFile:(NSURL*)url withOptions:(OpmlFileExportOptions)opt {
 	NSArray<FeedGroup*> *list = [self.delegate opmlFileExportListOfFeedGroups:opt];
+	if (!list) list = [StoreCoordinator sortedFeedGroupsWithParent:nil inContext:nil]; // fetch all if delegate == nil
 	NSError *error;
 	// TODO: set error if nil or empty
 	if (list.count > 0) {
