@@ -22,7 +22,11 @@
 
 @import Cocoa;
 
-@interface NSString (Ext)
+@interface NSString (PlainHTML)
 + (NSString*)plainTextFromHTMLData:(NSData*)data;
 - (nonnull NSString*)htmlToPlainText;
+@end
+
+@interface NSString (HexColor)
+- (nullable NSColor*)hexColor;
 @end

@@ -22,7 +22,7 @@
 
 #import "NSString+Ext.h"
 
-@implementation NSString (Ext)
+@implementation NSString (PlainHTML)
 
 /// Init string with @c NSUTF8StringEncoding and call @c htmlToPlainText
 + (NSString*)plainTextFromHTMLData:(NSData*)data {
@@ -109,6 +109,54 @@ static inline BOOL OPEN(NSString *tag, NSString *match) {
 
 static inline BOOL CLOSE(NSString *tag, NSString *match) {
 	return [tag isEqualToString:match];
+}
+
+@end
+
+
+
+@implementation NSString (HexColor)
+
+/**
+ Color from hex string with format: @c #[0x|0X]([A]RGB|[AA]RRGGBB)
+
+ @return @c nil if string is not properly formatted.
+ */
+- (nullable NSColor*)hexColor {
+	if ([self characterAtIndex:0] != '#') // must start with '#'
+		return nil;
+	
+	NSScanner *scanner = [NSScanner scannerWithString:self];
+	scanner.scanLocation = 1;
+	unsigned int value;
+	if (![scanner scanHexInt:&value])
+		return nil;
+	
+	NSUInteger len = scanner.scanLocation - 1; // -'#'
+	if (len > 1 && ([self characterAtIndex:2] == 'x' || [self characterAtIndex:3] == 'X'))
+		len -= 2; // ignore '0x'RRGGBB
+	
+	unsigned int r = 0, g = 0, b = 0, a = 255;
+	switch (len) {
+		case 4: // #ARGB
+			// ignore alpha for now
+			// a = (value >> 8) & 0xF0;  a = a | (a >> 4);
+		case 3: // #RGB
+			r = (value >> 4) & 0xF0;  r = r | (r >> 4);
+			g = (value)      & 0xF0;  g = g | (g >> 4);
+			b = (value)      & 0x0F;  b = b | (b << 4);
+			break;
+		case 8: // #AARRGGBB
+			// a = (value >> 24) & 0xFF;
+		case 6: // #RRGGBB
+			r = (value >> 16) & 0xFF;
+			g = (value >> 8)  & 0xFF;
+			b = (value)       & 0xFF;
+			break;
+		default:
+			return nil;
+	}
+	return [NSColor colorWithCalibratedRed:r/255.f green:g/255.f blue:b/255.f alpha:a/255.f];
 }
 
 @end

@@ -24,6 +24,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Settings, General*: [Auxiliary application](https://github.com/relikd/URL-Scheme-Defaults) for changing default feed reader
 - *UI:* Accessibility hints for most UI elements
 - *UI*: Show welcome message upon first usage (empty db)
+- *UI*: Custom colors via user defaults plist (bar icon tint & unread indicator)
 - Welcome message also adds Github releases feed
 - Config URL scheme `barss:` with `open/preferences`, `config/fixcache`, and `backup/show`
 
