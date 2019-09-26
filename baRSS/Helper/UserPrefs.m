@@ -22,6 +22,7 @@
 
 #import "UserPrefs.h"
 #import "StoreCoordinator.h"
+#import "NSString+Ext.h"
 
 @implementation UserPrefs
 
@@ -83,6 +84,18 @@
 /// @return The maximum number of articles displayed per feed (Limit articles setting must be active).
 /// Default: @c 40
 + (NSUInteger)articlesInMenuLimit { return [self defaultUInt:40 forKey:@"articlesInMenuLimit"]; }
+
+/// @return Returns @c defaultColor if defaults value couldn't be parsed or wasn't modified by user.
++ (NSColor*)defaultColor:(NSColor*)defaultColor forKey:(NSString*)key {
+	NSString *colorStr = [[NSUserDefaults standardUserDefaults] stringForKey:key];
+	if (colorStr) {
+		NSColor *color = [colorStr hexColor];
+		if (color) return color;
+		NSLog(@"Error reading defaults '%@'. Hex color '%@' is invalid. It should be of the form #RBG or #RRGGBB.", key, colorStr);
+		[[NSUserDefaults standardUserDefaults] removeObjectForKey:key];
+	}
+	return defaultColor;
+}
 
 
 #pragma mark - Application Info Plist

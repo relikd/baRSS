@@ -115,16 +115,22 @@ static const char* CodeDescription(NSInteger code) {
 	return [self errorWithDomain:NSURLErrorDomain code:errCode userInfo:info];
 }
 
-/// Generate @c NSError for user canceled operation. With title "Operation canceled.".
-+ (instancetype)canceledByUser {
-	NSDictionary *info = @{ NSLocalizedDescriptionKey: NSLocalizedString(@"Operation canceled.", nil) };
-	return [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:info];
-}
-
 /// Generate @c NSError for webpages that don't contain feed urls.
 + (instancetype)feedURLNotFound:(NSURL*)url {
 	return RSXMLMakeErrorWrongParser(RSXMLErrorExpectingFeed, RSXMLErrorExpectingHTML, url);
 }
+
+/// Generate @c NSError for user canceled operation. With title "Operation was canceled."
++ (instancetype)canceledByUser {
+	return [NSError errorWithDomain:NSCocoaErrorDomain code:NSUserCancelledError userInfo:nil];
+}
+
+/*// Generate @c NSError for invalid or malformed input. With title "The value is invalid."
++ (instancetype)formattingError:(NSString*)description {
+	NSDictionary *info = nil;
+	if (description) info = @{ NSLocalizedRecoverySuggestionErrorKey: description };
+	return [NSError errorWithDomain:NSCocoaErrorDomain code:NSFormattingError userInfo:info];
+}*/
 
 //  ---------------------------------------------------------------
 // |  MARK: - User notification

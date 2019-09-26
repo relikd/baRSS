@@ -95,25 +95,36 @@ If you prefer the optimized release version go to `Product > Archive`.
 Hidden options
 --------------
 
-1) When holding down the option key, the menu will show an item to open only a few unread items at a time. 
+This listing contains of options that have no UI that can be configured. 
+Most likely, you wouldn't ever stumble upon these if not reading this chapter.
+**Note:** To reset an option run `defaults delete de.relikd.baRSS {KEY}`, where `{KEY}` is an option from below.
+
+
+1. If you hold down the option key and click on an article item, you can mark a single item (un-)read.
+
+2. When holding down the option key, the menu will show an item to open only a few unread items at a time. 
 This number can be changed with the following Terminal command (default: 10):
+```
+defaults write de.relikd.baRSS openFewLinksLimit -int 10
+```
 
-```defaults write de.relikd.baRSS openFewLinksLimit -int 10```
-
-
-2) If you hold down the option key and click on an article item, you can mark a single item (un-)read.
-
-
-3) In preferences you can choose to show 'Short article names'. This will limit the number of displayed characters to 60 (default). 
+3. In preferences you can choose to show 'Short article names'. This will limit the number of displayed characters to 60 (default). 
 With this Terminal command you can customize this limit:
+```
+defaults write de.relikd.baRSS shortArticleNamesLimit -int 50
+```
 
-```defaults write de.relikd.baRSS shortArticleNamesLimit -int 50```
-
-
-4) Limit the number of displayed articles per feed menu.
+4. Limit the number of displayed articles per feed menu.
 **Note:** displayed unread count may be different than the unread items inside ('Open unread' will open hidden items too).
+```
+defaults write de.relikd.baRSS articlesInMenuLimit -int 40
+```
 
-```defaults write de.relikd.baRSS articlesInMenuLimit -int 40```
+5. You can change the appearance of colors throughout the application. E.g., The tint color of the menu bar icon and the color of the blue dot of unread articles.
+```
+defaults write de.relikd.baRSS colorStatusIconTint -string "#37F"
+defaults write de.relikd.baRSS colorUnreadTickMark -string "#FBA33A"
+```
 
 
 

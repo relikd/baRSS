@@ -22,20 +22,7 @@
 
 #import "DrawImage.h"
 #import "Constants.h"
-
-@implementation NSColor (RandomColor)
-/// @return Color with random R, G, B values for testing purposes
-+ (NSColor*)randomColor {
-	return [NSColor colorWithRed:(arc4random()%50+20)/100.0
-						   green:(arc4random()%50+20)/100.0
-							blue:(arc4random()%50+20)/100.0
-						   alpha:1];
-}
-/// @return Orange color that is typically used for RSS
-+ (NSColor*)rssOrange {
-	return [NSColor colorWithCalibratedRed:251/255.0 green:163/255.0 blue:58/255.0 alpha:1.0];
-}
-@end
+#import "UserPrefs.h"
 
 
 @implementation DrawSeparator
@@ -278,14 +265,14 @@ static void DrawRSSIcon(CGRect r, CGColorRef color, BOOL background, BOOL connec
 }
 
 /// Draw RSS icon (with orange gradient, corner @c 0.4, white radio waves)
-static void DrawRSSGradientIcon(CGRect r) {
+static void DrawRSSGradientIcon(CGRect r, NSColor *color) {
 	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	DrawRoundedFrame(c, r, NSColor.whiteColor.CGColor, YES, 0.4, 1.0, 0.7);
 	// Gradient
 	CGContextSaveGState(c);
 	CGContextClip(c);
-	DrawGradient(c, size, [NSColor rssOrange]);
+	DrawGradient(c, size, color);
 	CGContextRestoreGState(c);
 	// Bars
 	AddRSSIconPath(c, size, YES);
@@ -297,7 +284,8 @@ static void DrawUnreadIcon(CGRect r, NSColor *color) {
 	CGFloat size = ShorterSide(r.size) / 2.0;
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGMutablePathRef path = CGPathCreateMutable();
-	SetContentScale(c, r.size, 0.8);
+	SetContentScale(c, r.size, 0.7);
+	CGContextTranslateCTM(c, 0, size * -0.15); // align with baseline of menu item text
 	
 	CGContextSetFillColorWithColor(c, color.CGColor);
 	PathAddRing(path, size, size * 0.7);
@@ -325,12 +313,17 @@ static void Register(CGFloat size, NSImageName name, NSString *description, BOOL
 /// Register all icons that require custom drawing in @c ImageNamed cache
 void RegisterImageViewNames(void) {
 	const CGColorRef black = [NSColor controlTextColor].CGColor;
-	Register(16, RSSImageDefaultRSSIcon, NSLocalizedString(@"RSS icon", nil), ^(NSRect r) { DrawRSSGradientIcon(r); return YES; });
+	NSColor* const orange = [NSColor colorWithCalibratedRed:251/255.f green:163/255.f blue:58/255.f alpha:1.f]; // #FBA33A
+	
+	Register(16, RSSImageDefaultRSSIcon, NSLocalizedString(@"RSS icon", nil), ^(NSRect r) { DrawRSSGradientIcon(r, orange); return YES; });
 	Register(16, RSSImageSettingsGlobal, NSLocalizedString(@"Global settings", nil), ^(NSRect r) { DrawGlobalIcon(r, black, NO); return YES; });
 	Register(16, RSSImageSettingsGroup, NSLocalizedString(@"Group settings", nil), ^(NSRect r) { DrawGroupIcon(r, black, NO); return YES; });
 	Register(16, RSSImageSettingsFeed, NSLocalizedString(@"Feed settings", nil), ^(NSRect r) { DrawRSSIcon(r, black, NO, YES); return YES; });
-	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"RSS menu bar icon", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor rssOrange].CGColor, YES, YES); return YES; });
-	Register(16, RSSImageMenuBarIconPaused, NSLocalizedString(@"RSS menu bar icon, paused", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor rssOrange].CGColor, YES, NO); return YES; });
-	Register(12, RSSImageMenuItemUnread, NSLocalizedString(@"Unread icon", nil), ^(NSRect r) { DrawUnreadIcon(r, [NSColor systemBlueColor]); return YES; });
-	// TODO: user selected color for rss bar icon & unread dot
+	
+	NSColor *c1 = [UserPrefs defaultColor:orange forKey:@"colorStatusIconTint"];
+	NSColor *c2 = [UserPrefs defaultColor:[NSColor systemBlueColor] forKey:@"colorUnreadTickMark"];
+	
+	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"RSS menu bar icon", nil), ^(NSRect r) { DrawRSSIcon(r, c1.CGColor, YES, YES); return YES; });
+	Register(16, RSSImageMenuBarIconPaused, NSLocalizedString(@"RSS menu bar icon, paused", nil), ^(NSRect r) { DrawRSSIcon(r, c1.CGColor, YES, NO); return YES; });
+	Register(14, RSSImageMenuItemUnread, NSLocalizedString(@"Unread icon", nil), ^(NSRect r) { DrawUnreadIcon(r, c2); return YES; });
 }

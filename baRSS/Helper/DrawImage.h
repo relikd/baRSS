@@ -22,14 +22,6 @@
 
 @import Cocoa;
 
-@interface NSColor (RandomColor)
-/// just for testing purposes
-+ (NSColor*)randomColor;
-/// RGB color with (251, 163, 58)
-+ (NSColor*)rssOrange;
-@end
-
-
 /// Draw separator line in @c NSOutlineView
 IB_DESIGNABLE
 @interface DrawSeparator : NSView

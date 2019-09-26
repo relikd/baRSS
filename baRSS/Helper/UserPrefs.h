@@ -33,9 +33,10 @@
 + (BOOL)openURLsWithPreferredBrowser:(NSArray<NSURL*>*)urls;
 
 // Hidden Plist Properties
-+ (NSUInteger)openFewLinksLimit; // Change with: 'defaults write de.relikd.baRSS openFewLinksLimit -int 10'
-+ (NSUInteger)shortArticleNamesLimit; // Change with: 'defaults write de.relikd.baRSS shortArticleNamesLimit -int 50'
-+ (NSUInteger)articlesInMenuLimit; // Change with: 'defaults write de.relikd.baRSS articlesInMenuLimit -int 40'
++ (NSUInteger)openFewLinksLimit; // Change with:  defaults write de.relikd.baRSS openFewLinksLimit -int 10
++ (NSUInteger)shortArticleNamesLimit; // Change with:  defaults write de.relikd.baRSS shortArticleNamesLimit -int 50
++ (NSUInteger)articlesInMenuLimit; // Change with:  defaults write de.relikd.baRSS articlesInMenuLimit -int 40
++ (NSColor*)defaultColor:(NSColor*)defaultColor forKey:(NSString*)key; // Change with:  defaults write de.relikd.baRSS {KEY} -string "#FBA33A"
 
 // Application Info Plist
 + (NSString*)appName;

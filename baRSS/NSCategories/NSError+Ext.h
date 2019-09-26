@@ -28,8 +28,9 @@
 @interface NSError (Ext)
 // Generators
 + (instancetype)statusCode:(NSInteger)code reason:(nullable NSString*)reason;
-+ (instancetype)canceledByUser;
 + (instancetype)feedURLNotFound:(NSURL*)url;
++ (instancetype)canceledByUser;
+//+ (instancetype)formattingError:(NSString*)description;
 // User notification
 - (BOOL)inCaseLog:(nullable const char*)title;
 - (BOOL)inCasePresent:(NSApplication*)app;
