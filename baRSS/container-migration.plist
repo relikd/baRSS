@@ -4,7 +4,22 @@
 <dict>
 	<key>Move</key>
 	<array>
-		<string>${ApplicationSupport}/$(PRODUCT_NAME)</string>
+		<array>
+			<string>${ApplicationSupport}/$(PRODUCT_NAME)/DBv1.sqlite</string>
+			<string>${ApplicationSupport}/$(PRODUCT_NAME)/Library.sqlite</string>
+		</array>
+		<array>
+			<string>${ApplicationSupport}/$(PRODUCT_NAME)/DBv1.sqlite-shm</string>
+			<string>${ApplicationSupport}/$(PRODUCT_NAME)/Library.sqlite-shm</string>
+		</array>
+		<array>
+			<string>${ApplicationSupport}/$(PRODUCT_NAME)/DBv1.sqlite-wal</string>
+			<string>${ApplicationSupport}/$(PRODUCT_NAME)/Library.sqlite-wal</string>
+		</array>
+		<array>
+			<string>${ApplicationSupport}/$(PRODUCT_NAME)</string>
+			<string>${ApplicationSupport}/$(PRODUCT_NAME)/old_data</string>
+		</array>
 	</array>
 </dict>
 </plist>
