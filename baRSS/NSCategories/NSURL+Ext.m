@@ -21,7 +21,6 @@
 //  SOFTWARE.
 
 #import "NSURL+Ext.h"
-#import "UserPrefs.h" // appName in +faviconsCacheURL
 #import "NSError+Ext.h"
 
 @implementation NSURL (Ext)
@@ -36,7 +35,7 @@
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
 		path = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
-		path = [path URLByAppendingPathComponent:[UserPrefs appName] isDirectory:YES];
+		path = [path URLByAppendingPathComponent:APP_NAME isDirectory:YES];
 	});
 	return path;
 }

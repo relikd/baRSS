@@ -21,6 +21,7 @@
 //  SOFTWARE.
 
 #import "ModalSheet.h"
+#import "UserPrefs.h"
 #import "NSView+Ext.h"
 
 @interface ModalSheet()
@@ -35,7 +36,7 @@
 	static NSInteger const maxWidth = 1200;
 	static CGFloat const contentOffsetY = PAD_WIN + HEIGHT_BUTTON + PAD_L;
 	
-	NSInteger w = [[NSUserDefaults standardUserDefaults] integerForKey:@"modalSheetWidth"];
+	NSInteger w = UserPrefsInt(Pref_modalSheetWidth);
 	if      (w < minWidth)  w = minWidth;
 	else if (w > maxWidth)  w = maxWidth;
 	
@@ -90,8 +91,9 @@
 		return;
 	}
 	// Save modal view width for next time
-	CGFloat w = NSWidth(self.contentView.frame) - 2 * PAD_WIN;
-	[[NSUserDefaults standardUserDefaults] setInteger:(NSInteger)w forKey:@"modalSheetWidth"];
+	NSInteger width = (NSInteger)(NSWidth(self.contentView.frame) - 2 * PAD_WIN);
+	if (UserPrefsInt(Pref_modalSheetWidth) != width)
+		UserPrefsSetInt(Pref_modalSheetWidth, width);
 	// Remove subviews to avoid _NSKeyboardFocusClipView issues
 	[self.contentView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
 	[self.sheetParent endSheet:self returnCode:(successful ? NSModalResponseOK : NSModalResponseCancel)];

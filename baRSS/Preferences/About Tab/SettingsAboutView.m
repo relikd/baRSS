@@ -22,25 +22,21 @@
 
 #import "SettingsAboutView.h"
 #import "NSView+Ext.h"
-#import "UserPrefs.h"
 
 @implementation SettingsAboutView
 
 - (instancetype)init {
 	self = [super initWithFrame: NSZeroRect];
-	NSString *name = [UserPrefs appName];
-	NSString *version = [NSString stringWithFormat:NSLocalizedString(@"Version %@", nil),
-#if DEBUG
-						 [UserPrefs appVersionWithBuildNo]
-#else
-						 [UserPrefs appVersion]
+	NSDictionary *info = [[NSBundle mainBundle] infoDictionary];
+	NSString *version = [NSString stringWithFormat:NSLocalizedString(@"Version %@", nil), info[@"CFBundleShortVersionString"]];
+#if DEBUG // append build number, e.g., '0.9.4 (9906)'
+	version = [version stringByAppendingFormat:@" (%@)", info[@"CFBundleVersion"]];
 #endif
-						 ];
 	
 	// Application icon image (top-centered)
 	NSImageView *logo = [[NSView imageView:NSImageNameApplicationIcon size:64] placeIn:self x:CENTER yTop:PAD_M];
 	// Add app name
-	NSTextField *lblN = [[[[NSView label:name] large] bold] placeIn:self x:CENTER yTop: YFromTop(logo) + PAD_M];
+	NSTextField *lblN = [[[[NSView label:APP_NAME] large] bold] placeIn:self x:CENTER yTop: YFromTop(logo) + PAD_M];
 	// Add version info
 	NSTextField *lblV = [[[[NSView label:version] small] selectable] placeIn:self x:CENTER yTop: YFromTop(lblN) + PAD_S];
 	

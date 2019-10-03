@@ -44,7 +44,7 @@
 		[pop addItemWithTitle: [self applicationNameForBundleId:bundleID]];
 		pop.lastItem.representedObject = bundleID;
 	}
-	[pop selectItemAtIndex:[pop indexOfItemWithRepresentedObject:[UserPrefs getHttpApplication]]];
+	[pop selectItemAtIndex:[pop indexOfItemWithRepresentedObject:UserPrefsString(Pref_defaultHttpApplication)]];
 	// Default RSS Reader application
 	NSString *feedBundleId = CFBridgingRelease(LSCopyDefaultHandlerForURLScheme(CFSTR("feed")));
 	self.view.defaultReader.objectValue = [self applicationNameForBundleId:feedBundleId];
@@ -65,7 +65,7 @@
 
 // Callback method fired when user selects a different item from popup list
 - (void)changeHttpApplication:(NSPopUpButton *)sender {
-	[UserPrefs setHttpApplication:sender.selectedItem.representedObject];
+	UserPrefsSet(Pref_defaultHttpApplication, sender.selectedItem.representedObject);
 }
 
 // Callback method from round help button right of default feed reader text

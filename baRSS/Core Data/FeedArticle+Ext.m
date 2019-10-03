@@ -52,20 +52,20 @@
 	NSString *title = self.title;
 	if (!title) return @"";
 	// TODO: It should be enough to get user prefs once per menu build
-	if ([UserPrefs defaultNO:@"feedShortNames"]) {
-		NSUInteger limit = [UserPrefs shortArticleNamesLimit];
+	if (UserPrefsBool(Pref_feedTruncateTitle)) {
+		NSUInteger limit = UserPrefsUInt(Pref_shortArticleNamesLimit);
 		if (title.length > limit)
-			title = [NSString stringWithFormat:@"%@…", [title substringToIndex:limit-1]];
+			title = [[title substringToIndex:limit] stringByAppendingString:@"…"];
 	}
 	return title;
 }
 
-/// @return Fully initialized @c NSMenuItem with @c title, @c tooltip, @c tickmark, and @c action.
+/// @return Fully initialized @c NSMenuItem with @c title, @c tooltip, @c unread-indicator, and @c action.
 - (NSMenuItem*)newMenuItem {
 	NSMenuItem *item = [NSMenuItem new];
 	item.title = [self shortArticleName];
 	item.enabled = (self.link.length > 0);
-	item.state = (self.unread && [UserPrefs defaultYES:@"feedTickMark"] ? NSControlStateValueOn : NSControlStateValueOff);
+	item.state = (self.unread && UserPrefsBool(Pref_feedUnreadIndicator) ? NSControlStateValueOn : NSControlStateValueOff);
 	item.onStateImage = [NSImage imageNamed:RSSImageMenuItemUnread];
 	item.accessibilityLabel = (self.unread ? NSLocalizedString(@"article: unread", @"accessibility label, feed menu item") : NSLocalizedString(@"article: read", @"accessibility label, feed menu item"));
 	item.toolTip = (self.abstract ? self.abstract : self.body); // fall back to body (html)
@@ -83,7 +83,7 @@
 	NSString *url = fa.link;
 	BOOL success = NO;
 	if (url && url.length > 0 && !flipUnread) // flipUnread == change unread state
-		success = [UserPrefs openURLsWithPreferredBrowser:@[[NSURL URLWithString:url]]];
+		success = UserPrefsOpenURL(url);
 	if (flipUnread || (success && fa.unread)) {
 		fa.unread = !fa.unread;
 		[StoreCoordinator saveContext:moc andParent:YES];

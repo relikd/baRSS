@@ -24,6 +24,7 @@
 #import "SettingsAppearanceView.h"
 #import "AppHook.h"
 #import "BarStatusItem.h"
+#import "UserPrefs.h"
 
 @implementation SettingsAppearance
 
@@ -41,10 +42,9 @@
 
 /// Sync new value with UserDefaults and update status bar icon
 - (void)didSelectCheckbox:(NSButton*)sender {
-	BOOL state = (sender.state == NSControlStateValueOn);
-	[[NSUserDefaults standardUserDefaults] setBool:state forKey:sender.identifier];
-	if ([sender.identifier isEqualToString:@"globalUnreadCount"] ||
-		[sender.identifier isEqualToString:@"globalTintMenuBarIcon"]) {
+	NSString *pref = sender.identifier;
+	UserPrefsSetBool(pref, (sender.state == NSControlStateValueOn));
+	if (pref == Pref_globalUnreadCount || pref == Pref_globalTintMenuIcon) { // == because static string
 		[[(AppHook*)NSApp statusItem] updateBarIcon];
 	}
 }
