@@ -44,10 +44,9 @@
 	self = [super init];
 	// Show icon & prefetch unread count
 	self.statusItem = [NSStatusBar.systemStatusBar statusItemWithLength:NSVariableStatusItemLength];
-	self.statusItem.highlightMode = YES;
 	self.unreadCountTotal = 0;
-	self.statusItem.image = [NSImage imageNamed:RSSImageMenuBarIconActive];
-	self.statusItem.image.template = YES;
+	self.statusItem.button.image = [NSImage imageNamed:RSSImageMenuBarIconActive];
+	self.statusItem.button.image.template = YES;
 	// Add empty menu (will be populated once opened)
 	self.statusItem.menu = [[NSMenu alloc] initWithTitle:@"M"];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mainMenuWillOpen) name:NSMenuDidBeginTrackingNotification object:self.statusItem.menu];
@@ -119,11 +118,13 @@
 	dispatch_async(dispatch_get_main_queue(), ^{
 		BOOL hasNet = [UpdateScheduler allowNetworkConnection];
 		BOOL tint = (self.unreadCountTotal > 0 && hasNet && UserPrefsBool(Pref_globalTintMenuIcon));
-		self.statusItem.image = [NSImage imageNamed:(hasNet ? RSSImageMenuBarIconActive : RSSImageMenuBarIconPaused)];
-		self.statusItem.image.template = !tint;
+		self.statusItem.button.image = [NSImage imageNamed:(hasNet ? RSSImageMenuBarIconActive : RSSImageMenuBarIconPaused)];
+		self.statusItem.button.image.template = !tint;
+		// TODO: use macOS 10.14 contentTintColor, if (@available(macOS 10.14, *)) {} else {}
 		
 		BOOL showCount = (self.unreadCountTotal > 0 && UserPrefsBool(Pref_globalUnreadCount));
-		self.statusItem.title = (showCount ? [NSString stringWithFormat:@"%ld", self.unreadCountTotal] : @"");
+		self.statusItem.button.title = (showCount ? [NSString stringWithFormat:@"%ld", self.unreadCountTotal] : @"");
+		self.statusItem.button.imagePosition = (showCount ? NSImageLeft : NSImageOnly);
 	});
 }
 

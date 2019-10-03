@@ -142,7 +142,7 @@
 	NSProgressIndicator *spin = [[NSProgressIndicator alloc] initWithFrame: NSMakeRect(0, 0, HEIGHT_SPINNER, HEIGHT_SPINNER)];
 	spin.indeterminate = YES;
 	spin.displayedWhenStopped = NO;
-	spin.style = NSProgressIndicatorSpinningStyle;
+	spin.style = NSProgressIndicatorStyleSpinning;
 	spin.controlSize = NSControlSizeSmall;
 	return spin;
 }
