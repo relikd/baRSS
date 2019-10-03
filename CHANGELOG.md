@@ -6,6 +6,8 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 
 
 ## [Unreleased]
+
+## [1.0.0] - 2019-10-03
 ### Added
 - App Signing
 - Sandboxing & hardened runtime environment
@@ -21,11 +23,11 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Settings, Feeds:* Drag & Drop feeds from / to OPML file
 - *Settings, Feeds:* Drag & Drop feed titles and urls as text
 - *Settings, Feeds:* OPML export with selected items only
-- *Settings, General*: [Auxiliary application](https://github.com/relikd/URL-Scheme-Defaults) for changing default feed reader
+- *DB*: New table for key-value options (app version, etc.)
 - *UI:* Accessibility hints for most UI elements
-- *UI*: Show welcome message upon first usage (empty db)
 - *UI*: Custom colors via user defaults plist (bar icon tint & unread indicator)
 - *UI:* Unread indicator for groups
+- *UI*: Show welcome message upon first usage (empty db)
 - Welcome message also adds Github releases feed
 - Config URL scheme `barss:` with `open/preferences`, `config/fixcache`, and `backup/show`
 
@@ -54,12 +56,12 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Settings, Feeds:* Always append new items at the end
 - *Settings, General*: Moved `Fix cache` button to `About` text section
 - *Settings, General*: Changing default feed reader is prohibited within sandbox
+- *Settings, General*: [Auxiliary application](https://github.com/relikd/URL-Scheme-Defaults) for changing default feed reader
 - *Status Bar Menu*: Show `(no title)` instead of `(error)`
-- *Status Bar Menu*: `Update all feeds` will show error alerts for broken URLs
+- *Status Bar Menu*: `Update all feeds` will show error alert for broken URLs
+- *DB*: Dropping table `FeedIcon` in favor of image files cache
 - *UI:* Interface builder files replaced with code equivalent
 - *UI:* Mark unread articles with blue dot, instead of tick mark
-- *DB*: New table for options. E.g., what app version modified the database
-- Dropping database table `FeedIcon` in favor of image files cache
 
 
 ## [0.9.4] - 2019-04-02
@@ -113,7 +115,8 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
-[Unreleased]: https://github.com/relikd/baRSS/compare/v0.9.4...HEAD
+[Unreleased]: https://github.com/relikd/baRSS/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/relikd/baRSS/compare/v0.9.4...v1.0.0
 [0.9.4]: https://github.com/relikd/baRSS/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/relikd/baRSS/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/relikd/baRSS/compare/v0.9.1...v0.9.2

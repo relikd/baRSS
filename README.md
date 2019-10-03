@@ -14,7 +14,7 @@ What is it?
 -----------
 
 A RSS & Atom feed reader that lives in the system status bar.  
-Very much inspired by [RSS Menu]; go ahead and check that out.
+Very much inspired by [RSS Menu](https://itunes.apple.com/us/app/rss-menu/id423069534); go ahead and check that out.
 
 *baRSS* will automatically update feeds for you, and inform you when new content is available.
 The new articles are just a menu away.
@@ -76,7 +76,7 @@ Go to [releases](https://github.com/relikd/baRSS/releases) and downloaded the la
 ### Build from source
 
 You'll need Xcode and [Carthage](https://github.com/Carthage/Carthage#installing-carthage). 
-The latter is optional, you can build the [RSXML](https://github.com/relikd/RSXML) library from source instead. 
+The latter is optional, you can build the [RSXML2](https://github.com/relikd/RSXML2) library from source instead. 
 Carthage just makes it more convenient.
 Download and unzip this project, navigate to the root folder and run `carthage bootstrap --platform macOS`. 
 
@@ -108,7 +108,8 @@ This number can be changed with the following Terminal command (default: 10):
 defaults write de.relikd.baRSS openFewLinksLimit -int 10
 ```
 
-3. In preferences you can choose to show 'Short article names'. This will limit the number of displayed characters to 60 (default). 
+3. In preferences you can choose to show 'Short article names'. 
+This will limit the number of displayed characters to 60 (default). 
 With this Terminal command you can customize this limit:
 ```
 defaults write de.relikd.baRSS shortArticleNamesLimit -int 50
@@ -120,10 +121,16 @@ defaults write de.relikd.baRSS shortArticleNamesLimit -int 50
 defaults write de.relikd.baRSS articlesInMenuLimit -int 40
 ```
 
-5. You can change the appearance of colors throughout the application. E.g., The tint color of the menu bar icon and the color of the blue dot of unread articles.
+5. You can change the appearance of colors throughout the application. 
+E.g., The tint color of the menu bar icon and the color of the blue dot of unread articles.
 ```
 defaults write de.relikd.baRSS colorStatusIconTint -string "#37F"
 defaults write de.relikd.baRSS colorUnreadIndicator -string "#FBA33A"
+```
+
+6. To backup your list of subscribed feeds, here is a one-liner:
+```
+open barss:backup && cp "$HOME/Library/Containers/de.relikd.baRSS/Data/Library/Application Support/baRSS/backup/feeds_latest.opml" "$HOME/Desktop/baRSS_backup_$(date "+%Y-%m-%d").opml"
 ```
 
 
@@ -156,8 +163,6 @@ I may postpone some until demand increases …
 ##### Trivia
 
 - Start of project: __July 19, 2018__
-- Estimated development time: __1774h+__
+- Estimated development time: __1940h+__
 - First prototype used __feedparser python__ library
 
-
-[RSS Menu]: https://itunes.apple.com/us/app/rss-menu/id423069534
