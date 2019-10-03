@@ -320,8 +320,8 @@ void RegisterImageViewNames(void) {
 	Register(16, RSSImageSettingsGroup, NSLocalizedString(@"Group settings", nil), ^(NSRect r) { DrawGroupIcon(r, black, NO); return YES; });
 	Register(16, RSSImageSettingsFeed, NSLocalizedString(@"Feed settings", nil), ^(NSRect r) { DrawRSSIcon(r, black, NO, YES); return YES; });
 	
-	NSColor *c1 = [UserPrefs defaultColor:orange forKey:@"colorStatusIconTint"];
-	NSColor *c2 = [UserPrefs defaultColor:[NSColor systemBlueColor] forKey:@"colorUnreadTickMark"];
+	NSColor *c1 = UserPrefsColor(Pref_colorStatusIconTint, orange);
+	NSColor *c2 = UserPrefsColor(Pref_colorUnreadIndicator, [NSColor systemBlueColor]);
 	
 	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"RSS menu bar icon", nil), ^(NSRect r) { DrawRSSIcon(r, c1.CGColor, YES, YES); return YES; });
 	Register(16, RSSImageMenuBarIconPaused, NSLocalizedString(@"RSS menu bar icon, paused", nil), ^(NSRect r) { DrawRSSIcon(r, c1.CGColor, YES, NO); return YES; });

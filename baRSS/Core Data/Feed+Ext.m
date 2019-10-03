@@ -63,7 +63,7 @@
 + (void)didClickOnMenuItem:(NSMenuItem*)sender {
 	NSString *url = [StoreCoordinator urlForFeedWithIndexPath:sender.representedObject];
 	if (url && url.length > 0)
-		[UserPrefs openURLsWithPreferredBrowser:@[[NSURL URLWithString:url]]];
+		UserPrefsOpenURL(url);
 }
 
 

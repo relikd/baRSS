@@ -88,7 +88,8 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	self.autoenablesItems = NO;
 	NSMenuItem *itm = [self addItemIfAllowed:TagOpenAllUnread title:NSLocalizedString(@"Open all unread", nil)];
 	if (itm) {
-		[self addItem:[itm alternateWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Open a few unread (%lu)", nil), [UserPrefs openFewLinksLimit]]]];
+		NSString *altTitle = [NSString stringWithFormat:NSLocalizedString(@"Open a few unread (%lu)", nil), UserPrefsUInt(Pref_openFewLinksLimit)];
+		[self addItem:[itm alternateWithTitle:altTitle]];
 	}
 	[self addItemIfAllowed:TagMarkAllRead title:NSLocalizedString(@"Mark all read", nil)];
 	[self addItemIfAllowed:TagMarkAllUnread title:NSLocalizedString(@"Mark all unread", nil)];
@@ -151,10 +152,16 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 
 /// Check user preferences for preferred display style.
 - (BOOL)allowDisplayOfHeaderItem:(MenuItemTag)tag {
-	static char* const A[] = {"", "global", "feed", "group"};
-	static char* const B[] = {"", "MarkRead", "MarkUnread", "OpenUnread"};
-	int idx = (self.isMainMenu ? 1 : (self.isFeedMenu ? 2 : 3));
-	return [UserPrefs defaultYES:[NSString stringWithFormat:@"%s%s", A[idx], B[tag & 3]]]; // first 2 bits
+	static NSString* const mr[] = {Pref_globalMarkRead,   Pref_groupMarkRead,   Pref_feedMarkRead};
+	static NSString* const mu[] = {Pref_globalMarkUnread, Pref_groupMarkUnread, Pref_feedMarkUnread};
+	static NSString* const ou[] = {Pref_globalOpenUnread, Pref_groupOpenUnread, Pref_feedOpenUnread};
+	int i = (self.isMainMenu ? 0 : (self.isFeedMenu ? 2 : 1));
+	switch (tag) {
+		case TagMarkAllRead:   return UserPrefsBool(mr[i]);
+		case TagMarkAllUnread: return UserPrefsBool(mu[i]);
+		case TagOpenAllUnread: return UserPrefsBool(ou[i]);
+		default: return NO;
+	}
 }
 
 /// Check user preferences if item should be displayed in menu. If so, add it to the menu and set callback to @c self.
@@ -176,7 +183,7 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	NSUInteger limit = 0;
 	if (sender.tag == TagOpenAllUnread) {
 		if (sender.isAlternate)
-			limit = [UserPrefs openFewLinksLimit];
+			limit = UserPrefsUInt(Pref_openFewLinksLimit);
 		openLinks = YES;
 	} else if (sender.tag != TagMarkAllRead && sender.tag != TagMarkAllUnread) {
 		return; // other menu item clicked. abort and return.
@@ -200,7 +207,8 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 			if (fa.link.length > 0)
 				[urls addObject:[NSURL URLWithString:fa.link]];
 		}
-		success = [UserPrefs openURLsWithPreferredBrowser:urls];
+		if (urls.count > 0)
+			success = UserPrefsOpenURLs(urls);
 	}
 	// if success == NO, do not modify unread state
 	if (!openLinks || success) {
@@ -242,7 +250,7 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 		if (loc != NSNotFound)
 			self.title = [self.title substringToIndex:loc];
 	}
-	if (count > 0 && [UserPrefs defaultYES:(self.submenu.isFeedMenu ? @"feedUnreadCount" : @"groupUnreadCount")]) {
+	if (count > 0 && UserPrefsBool(self.submenu.isFeedMenu ? Pref_feedUnreadCount : Pref_groupUnreadCount)) {
 		self.tag = TagTitleCountVisible; // apply new mask
 		self.title = [self.title stringByAppendingFormat:@" (%ld)", count];
 	}

@@ -105,14 +105,14 @@
 /// Generate items for @c FeedArticles menu.
 - (void)setArticles:(NSArray<FeedArticle*>*)sortedList forMenu:(NSMenu*)menu {
 	[menu insertDefaultHeader];
-	NSUInteger mc = 0;
-	if ([UserPrefs defaultNO:@"feedLimitArticles"]) {
-		mc = [UserPrefs articlesInMenuLimit];
-	}
+	NSInteger mc = NSIntegerMax;
+	if (UserPrefsBool(Pref_feedLimitArticles))
+		mc = UserPrefsInt(Pref_articlesInMenuLimit);
+	
 	for (FeedArticle *fa in sortedList) {
-		[menu addItem:[fa newMenuItem]];
-		if (--mc == 0) // if mc==0 then unsigned int will underflow and turn into INT_MAX
+		if (--mc < 0) // mc == 0 will first decrement to -1, then evaluate
 			break;
+		[menu addItem:[fa newMenuItem]];
 	}
 	UnreadTotal *uct = self.unreadMap[menu.titleIndexPath];
 	[menu setHeaderHasUnread:(uct.unread > 0) hasRead:(uct.unread < uct.total)];

@@ -45,6 +45,7 @@
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
+	UserPrefsInit();
 	RegisterImageViewNames();
 	_statusItem = [BarStatusItem new];
 	NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
@@ -70,11 +71,10 @@
 	[UpdateScheduler unregisterNetworkChangeNotification];
 }
 
-/// Called during application start. Perform any version dependent updates here
+/// Called during application start. Perform any version migration updates here.
 - (void)migrateVersionUpdate {
-	// Currently unused, but you'll be thankful to know the previous version number in the future
-	[UserPrefs dbUpdateFileVersion];
-	[UserPrefs dbUpdateAppVersion];
+	// Currently unused, but you'll be thankful in the future for a previously saved version number
+	[StoreCoordinator setOption:@"app-version" value: UserPrefsAppVersion()];
 }
 
 

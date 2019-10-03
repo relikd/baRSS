@@ -49,13 +49,13 @@
 			flexibleWidth,
 			TabItem(NSImageNameInfo, NSLocalizedString(@"About", nil), [SettingsAbout class]),
 		];
-		[self switchToTab:[UserPrefs defaultUInt:0 forKey:@"preferencesTab"]];
+		[self switchToTab: UserPrefsUInt(Pref_prefSelectedTab)];
 	}
 	return self;
 }
 
 /// Helper method to generate tab item with image, label, and controller.
-static NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Class class) {
+static inline NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Class class) {
 	NSTabViewItem *item = [NSTabViewItem tabViewItemWithViewController: [class new]];
 	item.image = [NSImage imageNamed:imageName];
 	item.label = text;
@@ -76,10 +76,9 @@ static NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Class class
 /// Delegate method, store last selected tab to user preferences
 - (void)tabView:(NSTabView*)tabView didSelectTabViewItem:(nullable NSTabViewItem*)tabViewItem {
 	[super tabView:tabView didSelectTabViewItem:tabViewItem];
-	NSInteger prevIndex = [[NSUserDefaults standardUserDefaults] integerForKey:@"preferencesTab"];
 	NSInteger newIndex = self.selectedTabViewItemIndex;
-	if (prevIndex != newIndex)
-		[[NSUserDefaults standardUserDefaults] setInteger:newIndex forKey:@"preferencesTab"];
+	if (UserPrefsInt(Pref_prefSelectedTab) != newIndex)
+		UserPrefsSetInt(Pref_prefSelectedTab, newIndex);
 }
 
 @end
@@ -95,7 +94,7 @@ static NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Class class
 	w.title = [NSString stringWithFormat:NSLocalizedString(@"%@ Preferences", nil), NSProcessInfo.processInfo.processName];
 	w.contentViewController = [PrefTabs new];
 	w.delegate = w;
-	NSWindowPersistableFrameDescriptor prevFrame = [[NSUserDefaults standardUserDefaults] stringForKey:@"prefWindow"];
+	NSWindowPersistableFrameDescriptor prevFrame = UserPrefsString(Pref_prefWindowFrame);
 	if (!prevFrame) {
 		[w setContentSize:NSMakeSize(320, 327)];
 		[w center];
@@ -111,7 +110,7 @@ static NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Class class
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
-	[[NSUserDefaults standardUserDefaults] setObject:self.stringWithSavedFrame forKey:@"prefWindow"];
+	UserPrefsSet(Pref_prefWindowFrame, self.stringWithSavedFrame);
 }
 
 /// Do not respond to Cmd-Z and Cmd-Shift-Z. Will be handled in subview controllers.

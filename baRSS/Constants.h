@@ -64,6 +64,7 @@ static NSImageName const RSSImageMenuItemUnread    = @"RSSImageMenuItemUnread";
 
 /// Helper method calls @c (defaultCenter)postNotification:
 static inline void PostNotification(NSNotificationName name, id obj) { [[NSNotificationCenter defaultCenter] postNotificationName:name object:obj]; }
+/// Helper method calls @c (defaultCenter)addObserver:
 static inline void RegisterNotification(NSNotificationName name, SEL action, id observer) { [[NSNotificationCenter defaultCenter] addObserver:observer selector:action name:name object:nil]; }
 /**
  @c notification.object is @c NSNumber of type @c NSUInteger.

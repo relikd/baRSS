@@ -21,72 +21,36 @@
 //  SOFTWARE.
 
 #import "UserPrefs.h"
-#import "StoreCoordinator.h"
-#import "NSString+Ext.h"
+#import "NSString+Ext.h" // hexColor
 
-@implementation UserPrefs
-
-#pragma mark - User Preferences Plist
-
-/// @return @c YES if key is not set. Otherwise, return user defaults property from plist.
-+ (BOOL)defaultYES:(NSString*)key {
-	if ([[NSUserDefaults standardUserDefaults] objectForKey:key] == NULL) {
-		return YES;
-	}
-	return [[NSUserDefaults standardUserDefaults] boolForKey:key];
+/// Helper method for @c UserPrefsInit()
+static inline void defaultsAppend(NSMutableDictionary *defs, id value, NSArray<NSString*>* keys) {
+	for (NSString *key in keys)
+		[defs setObject:value forKey:key];
 }
 
-/// @return @c NO if key is not set. Otherwise, return user defaults property from plist.
-+ (BOOL)defaultNO:(NSString*)key {
-	return [[NSUserDefaults standardUserDefaults] boolForKey:key];
+/// Helper method calls @c (standardUserDefaults)registerDefaults:
+void UserPrefsInit(void) {
+	NSMutableDictionary *defs = [NSMutableDictionary dictionary];
+	defaultsAppend(defs, @YES, @[Pref_globalTintMenuIcon,
+								 Pref_globalUpdateAll,
+								 Pref_globalOpenUnread,  Pref_groupOpenUnread,  Pref_feedOpenUnread,
+								 Pref_globalMarkRead,    Pref_groupMarkRead,    Pref_feedMarkRead,
+								 Pref_globalMarkUnread,  Pref_groupMarkUnread,  Pref_feedMarkUnread,
+								 Pref_globalUnreadCount, Pref_groupUnreadCount, Pref_feedUnreadCount,
+								 Pref_feedUnreadIndicator]);
+	defaultsAppend(defs, @NO, @[Pref_feedTruncateTitle,
+								Pref_feedLimitArticles]);
+	// Display limits & truncation  ( defaults write de.relikd.baRSS {KEY} -int 10 )
+	[defs setObject:[NSNumber numberWithUnsignedInteger:10] forKey:Pref_openFewLinksLimit];
+	[defs setObject:[NSNumber numberWithUnsignedInteger:60] forKey:Pref_shortArticleNamesLimit];
+	[defs setObject:[NSNumber numberWithUnsignedInteger:40] forKey:Pref_articlesInMenuLimit];
+	[defs setObject:[NSNumber numberWithUnsignedInteger:1] forKey:Pref_prefSelectedTab]; // feed tab
+	[[NSUserDefaults standardUserDefaults] registerDefaults:defs];
 }
 
-/// @return Return @c defaultInt if key is not set. Otherwise, return user defaults property from plist.
-+ (NSUInteger)defaultUInt:(NSUInteger)defaultInt forKey:(NSString*)key {
-	NSInteger ret = [[NSUserDefaults standardUserDefaults] integerForKey:key];
-	if (ret > 0) return (NSUInteger)ret;
-	return defaultInt;
-}
-
-/// @return User configured custom browser. Or @c nil if not set yet. (which will fallback to default browser)
-+ (NSString*)getHttpApplication {
-	return [[NSUserDefaults standardUserDefaults] stringForKey:@"defaultHttpApplication"];
-}
-
-/// Store custom browser bundle id to user defaults.
-+ (void)setHttpApplication:(NSString*)bundleID {
-	[[NSUserDefaults standardUserDefaults] setObject:bundleID forKey:@"defaultHttpApplication"];
-}
-
-/**
- Open web links in default browser or a browser the user selected in the preferences.
- 
- @param urls A list of @c NSURL objects that will be opened immediatelly in bulk.
- @return @c YES if @c urls are opened successfully. @c NO on error.
- */
-+ (BOOL)openURLsWithPreferredBrowser:(NSArray<NSURL*>*)urls {
-	if (urls.count == 0) return NO;
-	return [[NSWorkspace sharedWorkspace] openURLs:urls withAppBundleIdentifier:[self getHttpApplication] options:NSWorkspaceLaunchDefault additionalEventParamDescriptor:nil launchIdentifiers:nil];
-}
-
-
-#pragma mark - Hidden Plist Properties -
-
-
-/// @return The limit on how many links should be opened at the same time, if user holds the option key.
-/// Default: @c 10
-+ (NSUInteger)openFewLinksLimit { return [self defaultUInt:10 forKey:@"openFewLinksLimit"]; }
-
-/// @return The limit on when to truncate article titles (Short names setting must be active).
-/// Default: @c 60
-+ (NSUInteger)shortArticleNamesLimit { return [self defaultUInt:60 forKey:@"shortArticleNamesLimit"]; }
-
-/// @return The maximum number of articles displayed per feed (Limit articles setting must be active).
-/// Default: @c 40
-+ (NSUInteger)articlesInMenuLimit { return [self defaultUInt:40 forKey:@"articlesInMenuLimit"]; }
-
-/// @return Returns @c defaultColor if defaults value couldn't be parsed or wasn't modified by user.
-+ (NSColor*)defaultColor:(NSColor*)defaultColor forKey:(NSString*)key {
+/// @return User set value. If it wasn't modified or couldn't be parsed return @c defaultColor
+NSColor* UserPrefsColor(NSString *key, NSColor *defaultColor) {
 	NSString *colorStr = [[NSUserDefaults standardUserDefaults] stringForKey:key];
 	if (colorStr) {
 		NSColor *color = [colorStr hexColor];
@@ -96,62 +60,3 @@
 	}
 	return defaultColor;
 }
-
-
-#pragma mark - Application Info Plist
-
-
-/// @return The application name, e.g., 'baRSS' or 'baRSS Beta'
-+ (NSString*)appName {
-	return [[NSBundle mainBundle] infoDictionary][(NSString*)kCFBundleNameKey];
-}
-
-/// @return The application version number, e.g., '0.9.4'
-+ (NSString*)appVersion {
-	return [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"];
-}
-
-/// @return The application version number including build number, e.g., '0.9.4 (9906)'
-+ (NSString*)appVersionWithBuildNo {
-	NSString *buildNo = [[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"];
-	return [[self appVersion] stringByAppendingFormat:@" (%@)", buildNo];
-}
-
-
-#pragma mark - Core Data Properties -
-
-
-/// Helper method that retrieves and transforms option value to int
-+ (int)dbIntForKey:(NSString*)key defaultsTo:(int)otherwise {
-	NSString *str = [StoreCoordinator optionForKey:key];
-	if (!str) return otherwise;
-	int num = [NSDecimalNumber decimalNumberWithString:str].intValue;
-	return isnan(num) ? otherwise : num;
-}
-
-/// Check whether the database was just initialized (first install)
-+ (BOOL)dbIsUnusedInitalState {
-	return [StoreCoordinator optionForKey:@"db-version"] == nil;
-}
-
-/// Check whether the stored database version is up to date
-+ (BOOL)dbIsCurrentFileVersion {
-	return [self dbIntForKey:@"db-version" defaultsTo:-1] == dbFileVersion;
-}
-
-/// Write current database version to core data
-+ (void)dbUpdateFileVersion {
-	[StoreCoordinator setOption:@"db-version" value:[NSString stringWithFormat:@"%d", dbFileVersion]];
-}
-
-/// Check whether the stored application version is up to date
-+ (BOOL)dbIsCurrentAppVersion {
-	return [[StoreCoordinator optionForKey:@"app-version"] isEqualToString:[self appVersion]];
-}
-
-/// Write current application version to core data
-+ (void)dbUpdateAppVersion {
-	[StoreCoordinator setOption:@"app-version" value:[self appVersion]];
-}
-
-@end

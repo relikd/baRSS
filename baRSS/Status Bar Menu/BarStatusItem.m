@@ -118,18 +118,18 @@
 - (void)updateBarIcon {
 	dispatch_async(dispatch_get_main_queue(), ^{
 		BOOL hasNet = [UpdateScheduler allowNetworkConnection];
-		BOOL tint = (self.unreadCountTotal > 0 && hasNet && [UserPrefs defaultYES:@"globalTintMenuBarIcon"]);
+		BOOL tint = (self.unreadCountTotal > 0 && hasNet && UserPrefsBool(Pref_globalTintMenuIcon));
 		self.statusItem.image = [NSImage imageNamed:(hasNet ? RSSImageMenuBarIconActive : RSSImageMenuBarIconPaused)];
 		self.statusItem.image.template = !tint;
 		
-		BOOL showCount = (self.unreadCountTotal > 0 && [UserPrefs defaultYES:@"globalUnreadCount"]);
+		BOOL showCount = (self.unreadCountTotal > 0 && UserPrefsBool(Pref_globalUnreadCount));
 		self.statusItem.title = (showCount ? [NSString stringWithFormat:@"%ld", self.unreadCountTotal] : @"");
 	});
 }
 
 /// Show popover with a brief notice that baRSS is running in the menu bar
 - (void)showWelcomeMessage {
-	NSString *title = [NSString stringWithFormat:NSLocalizedString(@"Welcome to %@", nil), [UserPrefs appName]];
+	NSString *title = [NSString stringWithFormat:NSLocalizedString(@"Welcome to %@", nil), APP_NAME];
 	NSString *message = NSLocalizedString(@"There's no application window.\nEverything is up there.", nil);
 	NSTextField *head = [[NSView label:title] bold];
 	NSTextField *body = [[NSView label:message] small];
@@ -172,7 +172,7 @@
 	if ([UpdateScheduler isPaused])
 		pause.title = NSLocalizedString(@"Resume Updates", nil);
 	// 'Update all feeds' item
-	if ([UserPrefs defaultYES:@"globalUpdateAll"]) {
+	if (UserPrefsBool(Pref_globalUpdateAll)) {
 		NSMenuItem *updateAll = [menu addItemWithTitle:NSLocalizedString(@"Update all feeds", nil) action:@selector(updateAllFeeds) keyEquivalent:@""];
 		updateAll.target = self;
 		updateAll.enabled = [UpdateScheduler allowNetworkConnection];

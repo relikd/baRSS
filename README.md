@@ -123,7 +123,7 @@ defaults write de.relikd.baRSS articlesInMenuLimit -int 40
 5. You can change the appearance of colors throughout the application. E.g., The tint color of the menu bar icon and the color of the blue dot of unread articles.
 ```
 defaults write de.relikd.baRSS colorStatusIconTint -string "#37F"
-defaults write de.relikd.baRSS colorUnreadTickMark -string "#FBA33A"
+defaults write de.relikd.baRSS colorUnreadIndicator -string "#FBA33A"
 ```
 
 
