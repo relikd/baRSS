@@ -36,23 +36,24 @@
 // ------ General settings ------ (Preferences > General Tab) ------
 /** default: @c nil */ static NSString* const Pref_defaultHttpApplication = @"defaultHttpApplication";
 // ------ Appearance matrix ------ (Preferences > Appearance Tab) ------
-/** default: @c YES */ static NSString* const Pref_globalTintMenuIcon  = @"globalTintMenuBarIcon";
-/** default: @c YES */ static NSString* const Pref_globalUpdateAll     = @"globalUpdateAll";
-/** default: @c YES */ static NSString* const Pref_globalOpenUnread    = @"globalOpenUnread";
-/** default: @c YES */ static NSString* const Pref_globalMarkRead      = @"globalMarkRead";
-/** default: @c YES */ static NSString* const Pref_globalMarkUnread    = @"globalMarkUnread";
-/** default: @c YES */ static NSString* const Pref_globalUnreadCount   = @"globalUnreadCount";
-/** default: @c YES */ static NSString* const Pref_groupOpenUnread     = @"groupOpenUnread";
-/** default: @c YES */ static NSString* const Pref_groupMarkRead       = @"groupMarkRead";
-/** default: @c YES */ static NSString* const Pref_groupMarkUnread     = @"groupMarkUnread";
-/** default: @c YES */ static NSString* const Pref_groupUnreadCount    = @"groupUnreadCount";
-/** default: @c YES */ static NSString* const Pref_feedOpenUnread      = @"feedOpenUnread";
-/** default: @c YES */ static NSString* const Pref_feedMarkRead        = @"feedMarkRead";
-/** default: @c YES */ static NSString* const Pref_feedMarkUnread      = @"feedMarkUnread";
-/** default: @c YES */ static NSString* const Pref_feedUnreadCount     = @"feedUnreadCount";
-/** default: @c YES */ static NSString* const Pref_feedUnreadIndicator = @"feedUnreadIndicator";
-/** default: @c  NO */ static NSString* const Pref_feedTruncateTitle   = @"feedTruncateTitle";
-/** default: @c  NO */ static NSString* const Pref_feedLimitArticles   = @"feedLimitArticles";
+/** default: @c YES */ static NSString* const Pref_globalTintMenuIcon   = @"globalTintMenuBarIcon";
+/** default: @c YES */ static NSString* const Pref_globalUpdateAll      = @"globalUpdateAll";
+/** default: @c YES */ static NSString* const Pref_globalOpenUnread     = @"globalOpenUnread";
+/** default: @c YES */ static NSString* const Pref_globalMarkRead       = @"globalMarkRead";
+/** default: @c YES */ static NSString* const Pref_globalMarkUnread     = @"globalMarkUnread";
+/** default: @c YES */ static NSString* const Pref_globalUnreadCount    = @"globalUnreadCount";
+/** default: @c YES */ static NSString* const Pref_groupOpenUnread      = @"groupOpenUnread";
+/** default: @c YES */ static NSString* const Pref_groupMarkRead        = @"groupMarkRead";
+/** default: @c YES */ static NSString* const Pref_groupMarkUnread      = @"groupMarkUnread";
+/** default: @c YES */ static NSString* const Pref_groupUnreadCount     = @"groupUnreadCount";
+/** default: @c  NO */ static NSString* const Pref_groupUnreadIndicator = @"groupUnreadIndicator";
+/** default: @c YES */ static NSString* const Pref_feedOpenUnread       = @"feedOpenUnread";
+/** default: @c YES */ static NSString* const Pref_feedMarkRead         = @"feedMarkRead";
+/** default: @c YES */ static NSString* const Pref_feedMarkUnread       = @"feedMarkUnread";
+/** default: @c YES */ static NSString* const Pref_feedUnreadCount      = @"feedUnreadCount";
+/** default: @c YES */ static NSString* const Pref_feedUnreadIndicator  = @"feedUnreadIndicator";
+/** default: @c  NO */ static NSString* const Pref_feedTruncateTitle    = @"feedTruncateTitle";
+/** default: @c  NO */ static NSString* const Pref_feedLimitArticles    = @"feedLimitArticles";
 // ------ Hidden preferences ------ only modifiable via `defaults write de.relikd.baRSS {KEY}` ------
 /** default: @c  10 */ static NSString* const Pref_openFewLinksLimit      = @"openFewLinksLimit";
 /** default: @c  60 */ static NSString* const Pref_shortArticleNamesLimit = @"shortArticleNamesLimit";

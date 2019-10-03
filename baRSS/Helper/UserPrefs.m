@@ -39,7 +39,8 @@ void UserPrefsInit(void) {
 								 Pref_globalMarkUnread,  Pref_groupMarkUnread,  Pref_feedMarkUnread,
 								 Pref_globalUnreadCount, Pref_groupUnreadCount, Pref_feedUnreadCount,
 								 Pref_feedUnreadIndicator]);
-	defaultsAppend(defs, @NO, @[Pref_feedTruncateTitle,
+	defaultsAppend(defs, @NO, @[Pref_groupUnreadIndicator,
+								Pref_feedTruncateTitle,
 								Pref_feedLimitArticles]);
 	// Display limits & truncation  ( defaults write de.relikd.baRSS {KEY} -int 10 )
 	[defs setObject:[NSNumber numberWithUnsignedInteger:10] forKey:Pref_openFewLinksLimit];

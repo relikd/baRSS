@@ -246,6 +246,7 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 - (void)setTitleCount:(NSUInteger)count {
 	if (self.tag == TagTitleCountVisible) {
 		self.tag = 0; // clear mask
+		self.state = NSControlStateValueOff;
 		NSUInteger loc = [self.title rangeOfString:@" (" options:NSLiteralSearch | NSBackwardsSearch].location;
 		if (loc != NSNotFound)
 			self.title = [self.title substringToIndex:loc];
@@ -253,6 +254,9 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	if (count > 0 && UserPrefsBool(self.submenu.isFeedMenu ? Pref_feedUnreadCount : Pref_groupUnreadCount)) {
 		self.tag = TagTitleCountVisible; // apply new mask
 		self.title = [self.title stringByAppendingFormat:@" (%ld)", count];
+		self.onStateImage = [NSImage imageNamed:RSSImageMenuItemUnread];
+		if (UserPrefsBool(Pref_groupUnreadIndicator))
+			self.state = NSControlStateValueOn;
 	}
 }
 

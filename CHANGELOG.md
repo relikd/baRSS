@@ -25,6 +25,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *UI:* Accessibility hints for most UI elements
 - *UI*: Show welcome message upon first usage (empty db)
 - *UI*: Custom colors via user defaults plist (bar icon tint & unread indicator)
+- *UI:* Unread indicator for groups
 - Welcome message also adds Github releases feed
 - Config URL scheme `barss:` with `open/preferences`, `config/fixcache`, and `backup/show`
 
