@@ -109,7 +109,8 @@
 - (NSPersistentContainer *)persistentContainer {
 	@synchronized (self) {
 		if (_persistentContainer == nil) {
-			_persistentContainer = [[NSPersistentContainer alloc] initWithName:@"DBv1"];
+			NSManagedObjectModel *mom = [NSManagedObjectModel mergedModelFromBundles:nil];
+			_persistentContainer = [[NSPersistentContainer alloc] initWithName:@"Library" managedObjectModel:mom];
 			[_persistentContainer loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription *storeDescription, NSError *error) {
 				if ([error inCaseLog:"Couldn't read NSPersistentContainer"])
 					abort();
