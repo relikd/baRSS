@@ -7,6 +7,11 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 
 ## [Unreleased]
 
+## [1.0.1] - 2019-10-04
+### Fixed
+- Crash on macOS 10.14 due to a `CGColorRef` null pointer
+
+
 ## [1.0.0] - 2019-10-03
 ### Added
 - App Signing
@@ -115,7 +120,8 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
-[Unreleased]: https://github.com/relikd/baRSS/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/relikd/baRSS/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/relikd/baRSS/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/relikd/baRSS/compare/v0.9.4...v1.0.0
 [0.9.4]: https://github.com/relikd/baRSS/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/relikd/baRSS/compare/v0.9.2...v0.9.3
