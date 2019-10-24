@@ -24,20 +24,20 @@
 @class ModalFeedEdit;
 
 @interface ModalFeedEditView : NSView
-@property (weak) IBOutlet NSTextField *url;
-@property (weak) IBOutlet NSProgressIndicator *spinnerURL;
-@property (weak) IBOutlet NSImageView *favicon;
+@property (strong) IBOutlet NSTextField *url;
+@property (strong) IBOutlet NSProgressIndicator *spinnerURL;
+@property (strong) IBOutlet NSImageView *favicon;
 
-@property (weak) IBOutlet NSTextField *name;
-@property (weak) IBOutlet NSProgressIndicator *spinnerName;
+@property (strong) IBOutlet NSTextField *name;
+@property (strong) IBOutlet NSProgressIndicator *spinnerName;
 
-@property (weak) IBOutlet NSTextField *refreshNum;
-@property (weak) IBOutlet NSPopUpButton *refreshUnit;
+@property (strong) IBOutlet NSTextField *refreshNum;
+@property (strong) IBOutlet NSPopUpButton *refreshUnit;
 
-@property (weak) IBOutlet NSButton *warningButton;
+@property (strong) IBOutlet NSButton *warningButton;
 @property NSPopover *warningPopover;
-@property (weak) IBOutlet NSTextField *warningText;
-@property (weak) IBOutlet NSButton *warningReload;
+@property (strong) IBOutlet NSTextField *warningText;
+@property (strong) IBOutlet NSButton *warningReload;
 
 - (instancetype)initWithController:(ModalFeedEdit*)controller NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithFrame:(NSRect)frameRect NS_UNAVAILABLE;

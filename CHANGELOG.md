@@ -6,6 +6,8 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 
 
 ## [Unreleased]
+### Fixed
+- Preferences could not be opened on Catalina
 
 ## [1.0.1] - 2019-10-04
 ### Fixed

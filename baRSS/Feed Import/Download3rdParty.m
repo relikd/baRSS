@@ -80,5 +80,10 @@
 	return [NSString stringWithFormat:@"http://i.ytimg.com/vi/%@/hqdefault.jpg", videoid];
 }
 
+/// @return @c http://i.ytimg.com/vi/<videoid>/maxresdefault.jpg
++ (NSString*)videoImage4k:(NSString*)videoid {
+	return [NSString stringWithFormat:@"http://i.ytimg.com/vi/%@/maxresdefault.jpg", videoid];
+}
+
 @end
 

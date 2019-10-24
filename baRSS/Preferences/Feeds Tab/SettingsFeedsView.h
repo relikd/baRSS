@@ -24,9 +24,9 @@
 @class SettingsFeeds;
 
 @interface SettingsFeedsView : NSView
-@property (weak) IBOutlet NSOutlineView *outline;
-@property (weak) IBOutlet NSTextField *status;
-@property (weak) IBOutlet NSProgressIndicator *spinner;
+@property (strong) IBOutlet NSOutlineView *outline;
+@property (strong) IBOutlet NSTextField *status;
+@property (strong) IBOutlet NSProgressIndicator *spinner;
 
 - (instancetype)initWithController:(SettingsFeeds*)delegate NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithFrame:(NSRect)frameRect NS_UNAVAILABLE;
