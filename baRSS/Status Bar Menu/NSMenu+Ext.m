@@ -104,12 +104,6 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 
 #pragma mark - Update Menu
 
-/// Replace this menu with a clean @c NSMenu. Copy old @c title and @c delegate to new menu. @b Won't work without supermenu!
-- (void)cleanup {
-	NSMenu *m = [[NSMenu alloc] initWithTitle:self.title];
-	m.delegate = self.delegate;
-	self.parentItem.submenu = m;
-}
 
 /// Loop over default header and enable 'OpenAllUnread' and 'TagMarkAllRead' based on unread count.
 - (void)setHeaderHasUnread:(BOOL)hasUnread hasRead:(BOOL)hasRead {

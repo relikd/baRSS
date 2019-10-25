@@ -7,7 +7,8 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 
 ## [Unreleased]
 ### Fixed
-- Preferences could not be opened on Catalina
+- Preferences could not be opened on macOS 10.15
+- Menu flickering resulting in a hang on macOS 10.15 
 
 ## [1.0.1] - 2019-10-04
 ### Fixed

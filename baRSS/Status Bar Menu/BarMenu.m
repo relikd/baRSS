@@ -82,11 +82,6 @@
 	}
 }
 
-/// Get rid of everything that is not needed.
-- (void)menuDidClose:(NSMenu*)menu {
-	[menu cleanup];
-}
-
 /// Generate items for @c FeedGroup menu.
 - (void)setFeedGroups:(NSArray<FeedGroup*>*)sortedList forMenu:(NSMenu*)menu {
 	[menu insertDefaultHeader];
@@ -125,17 +120,21 @@
  Fetch @c Feed from core data and find deepest visible @c NSMenuItem.
  @warning @c item and @c feed will often mismatch.
  */
-- (void)updateFeedMenuItem:(NSManagedObjectID*)oid withBlock:(void(^)(Feed *feed, NSMenuItem *item))block {
-	Feed *feed = [[StoreCoordinator getMainContext] objectWithID:oid];
-	if ([feed isKindOfClass:[Feed class]]) {
-		NSMenuItem *item = [self.statusItem.mainMenu deepestItemWithPath:feed.indexPath];
-		if (item) block(feed, item);
-	}
+- (BOOL)findDeepest:(NSManagedObjectID*)oid feed:(Feed*__autoreleasing*)feed menuItem:(NSMenuItem*__autoreleasing*)item {
+	Feed *f = [[StoreCoordinator getMainContext] objectWithID:oid];
+	if (![f isKindOfClass:[Feed class]]) return NO;
+	NSMenuItem *mi = [self.statusItem.mainMenu deepestItemWithPath:f.indexPath];
+	if (!mi) return NO;
+	*feed = f;
+	*item = mi;
+	return YES;
 }
 
 /// Callback method fired when feed has been updated in the background.
 - (void)articlesUpdated:(NSNotification*)notify {
-	[self updateFeedMenuItem:notify.object withBlock:^(Feed *feed, NSMenuItem *item) {
+	Feed *feed;
+	NSMenuItem *item;
+	if ([self findDeepest:notify.object feed:&feed menuItem:&item]) {
 		// 1. update in-memory unread count
 		UnreadTotal *updated = [UnreadTotal new];
 		updated.total = feed.articles.count;
@@ -160,15 +159,17 @@
 			[item setTitleCount:uct.unread];
 			item = item.parentItem;
 		}
-	}];
+	}
 }
 
 /// Callback method fired when feed icon has changed.
 - (void)feedIconUpdated:(NSNotification*)notify {
-	[self updateFeedMenuItem:notify.object withBlock:^(Feed *feed, NSMenuItem *item) {
+	Feed *feed;
+	NSMenuItem *item;
+	if ([self findDeepest:notify.object feed:&feed menuItem:&item]) {
 		if (item.submenu.isFeedMenu)
 			item.image = [feed iconImage16];
-	}];
+	}
 }
 
 @end

@@ -33,7 +33,6 @@
 - (NSMenuItem*)insertFeedGroupItem:(FeedGroup*)fg;
 - (void)insertDefaultHeader;
 // Update menu
-- (void)cleanup;
 - (void)setHeaderHasUnread:(BOOL)hasUnread hasRead:(BOOL)hasRead;
 - (NSMenuItem*)deepestItemWithPath:(nonnull NSString*)path;
 @end
