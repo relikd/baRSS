@@ -31,39 +31,6 @@ But it will reuse `ETag` and `Last-Modified` headers to avoid unnecessary transm
 Further, tuning the update frequently will decrease the traffic even more.
 
 
-### Why create something that already existed?
-
-First, open source is awesome!
-Secondly, RSS Menu made some design decisions I didn't like.
-For example, the new integrated browser window.
-
-One thing I liked most, was the fact that feeds were opened in the default browser.
-Not like 99% of the other feed readers on the market that show a separate HTML viewer window.
-No rendering issues, no broken links, no content that is different from the actual news article.
-
-I know, the whole purpose of RSS is to deliver content without the need of opening a webpage.
-But for me RSS is more about being informed whenever a blog or news feed has some updated content.
-E.g, subscribing to video channels without having to have an account.
-
-
-### Why is this project not written in Swift?!
-
-Actually, I started this project with Swift.
-Even without adding much functionality, the app was exceeding the 10 Mb file size.
-The working alpha version, written in Objective-C, had only 500 Kb.
-The reason being that Swift frameworks are always packed into the final application.
-
-Sadly, this was before Swift 5 and ABI stability.
-Had I only started the project a year later…
-But on the other hand, now it is macOS 10.12 compatible.
-
-
-### 3rd Party Libraries
-
-This project uses a modified version of Brent Simmons [RSXML](https://github.com/brentsimmons/RSXML) for feed parsing. 
-RSXML is licensed under a MIT license (same as this project).
-
-
 
 Download & Install
 ------------------
@@ -71,19 +38,19 @@ Download & Install
 Requires macOS Sierra (10.12) or higher.
 
 ### Easy way
-Go to [releases](https://github.com/relikd/baRSS/releases) and downloaded the latest version.
+Go to [releases](https://github.com/relikd/baRSS/releases) and downloaded the latest version.  
+Searching for the App Store release? Read this [notice](#app-store-notice).
 
 ### Build from source
-
 You'll need Xcode and [Carthage](https://github.com/Carthage/Carthage#installing-carthage). 
-The latter is optional, you can build the [RSXML2](https://github.com/relikd/RSXML2) library from source instead. 
+The latter is optional, you can build the [RSXML2] library from source instead. 
 Carthage just makes it more convenient.
 Download and unzip this project, navigate to the root folder and run `carthage bootstrap --platform macOS`. 
 
 Next, you need to clone [QLOPML](https://github.com/relikd/QLOPML) in the same folder where this project is.
 Alternatively, you can simply delete the `QLOPML` project reference without much harm.
 `QLOPML` is a Quick Look plugin for `.opml` files.
-It will display the file contents whenever you hit space.
+It will display the file contents whenever you hit spacebar.
 
 That's it. 
 Open Xcode and build the project. 
@@ -160,9 +127,61 @@ I may postpone some until demand increases …
 
 
 
+FAQ / Q&A
+---------
+
+### App Store Notice
+
+In the last couple of months I prepared baRSS to be released on the App Store.
+With sandboxing enabled and hardened runtime environment, etc.
+
+But, for the time being, I decided to not publish this app for political reasons.
+I was not happy about some decisions made in the last weeks.
+Decisions that were evaluated on monetary aspects and not on ethical considerations.
+I won't support this conduct with my own money. 
+
+If you find this app somewhere on the App Store, you can be sure that it is a counterfeit.
+As long as you can read this very notice, I am not responsible for the publication.
+Further, I can't guarantee the App Store version wasn't modified by a malicious actor to spy on you.
+
+
+### Why create something that already existed?
+
+First, open source is awesome!
+Secondly, RSS Menu made some design decisions I didn't like.
+For example, the new integrated browser window.
+
+One thing I liked most, was the fact that feeds were opened in the default browser.
+Not like 99% of the other feed readers on the market that show a separate HTML viewer window.
+No rendering issues, no broken links, no content that is different from the actual news article.
+
+I know, the whole purpose of RSS is to deliver content without the need of opening a webpage.
+But for me RSS is more about being informed whenever a blog or news feed has some updated content.
+E.g, subscribing to video channels without having to have an account.
+
+
+### Why is this project not written in Swift?!
+
+Actually, I started this project with Swift.
+Even without adding much functionality, the app was exceeding the 10 Mb file size.
+The working alpha version, written in Objective-C, had only 500 Kb.
+The reason being that Swift frameworks are always packed into the final application.
+
+Sadly, this was before Swift 5 and ABI stability.
+Had I only started the project a year later…
+But on the other hand, now it is macOS 10.12 compatible.
+
+### 3rd Party Libraries
+
+This project uses a modified version of Brent Simmons' [RSXML](https://github.com/brentsimmons/RSXML) for feed parsing. 
+[RSXML2] is licensed under a MIT license (same as this project).
+
+
 ##### Trivia
 
 - Start of project: __July 19, 2018__
-- Estimated development time: __1940h+__
+- Estimated development time: __1953h+__
 - First prototype used __feedparser python__ library
 
+
+[RSXML2]: https://github.com/relikd/RSXML2

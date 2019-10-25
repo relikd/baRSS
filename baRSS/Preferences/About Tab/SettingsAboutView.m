@@ -74,7 +74,8 @@
 /// Helper method to insert attributed (bold) text
 - (void)str:(NSMutableAttributedString*)parent add:(NSString*)text bold:(BOOL)flag {
 	NSFont *font = [NSFont systemFontOfSize:NSFont.systemFontSize weight:(flag ? NSFontWeightMedium : NSFontWeightLight)];
-	[parent appendAttributedString:[[NSAttributedString alloc] initWithString:NonLocalized(text) attributes:@{ NSFontAttributeName : font }]];
+	NSDictionary *style = @{ NSFontAttributeName: font, NSForegroundColorAttributeName: [NSColor controlTextColor] };
+	[parent appendAttributedString:[[NSAttributedString alloc] initWithString:NonLocalized(text) attributes:style]];
 }
 
 /// Helper method to insert attributed hyperlink text
