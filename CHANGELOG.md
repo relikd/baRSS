@@ -6,9 +6,14 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 
 
 ## [Unreleased]
+
+
+## [1.0.2] - 2019-10-25
 ### Fixed
-- Preferences could not be opened on macOS 10.15
-- Menu flickering resulting in a hang on macOS 10.15 
+- *Status Bar Menu*: Preferences could not be opened on macOS 10.15
+- *Status Bar Menu*: Menu flickering resulting in a hang on macOS 10.15
+- *UI*: Text color in `About` tab
+
 
 ## [1.0.1] - 2019-10-04
 ### Fixed
@@ -123,7 +128,8 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
-[Unreleased]: https://github.com/relikd/baRSS/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/relikd/baRSS/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/relikd/baRSS/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/relikd/baRSS/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/relikd/baRSS/compare/v0.9.4...v1.0.0
 [0.9.4]: https://github.com/relikd/baRSS/compare/v0.9.3...v0.9.4
