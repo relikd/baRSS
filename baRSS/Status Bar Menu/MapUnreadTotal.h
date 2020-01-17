@@ -22,6 +22,8 @@
 
 @import Cocoa;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface UnreadTotal : NSObject
 @property (nonatomic, assign) NSUInteger unread;
 @property (nonatomic, assign) NSUInteger total;
@@ -39,3 +41,5 @@
 - (UnreadTotal*)objectForKeyedSubscript:(NSString*)key;
 - (void)setObject:(UnreadTotal*)obj forKeyedSubscript:(NSString*)key;
 @end
+
+NS_ASSUME_NONNULL_END

@@ -22,6 +22,8 @@
 
 @import Cocoa;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ModalSheet : NSPanel
 @property (readonly) BOOL didTapCancel;
 
@@ -31,3 +33,5 @@
 - (void)setDoneEnabled:(BOOL)accept;
 - (void)extendContentViewBy:(CGFloat)dy;
 @end
+
+NS_ASSUME_NONNULL_END

@@ -23,6 +23,8 @@
 @import Cocoa;
 @class ModalFeedEdit;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface ModalFeedEditView : NSView
 @property (strong) IBOutlet NSTextField *url;
 @property (strong) IBOutlet NSProgressIndicator *spinnerURL;
@@ -43,3 +45,5 @@
 - (instancetype)initWithFrame:(NSRect)frameRect NS_UNAVAILABLE;
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder NS_UNAVAILABLE;
 @end
+
+NS_ASSUME_NONNULL_END

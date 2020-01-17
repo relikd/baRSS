@@ -28,6 +28,8 @@ typedef NS_OPTIONS(NSUInteger, OpmlFileExportOptions) {
 	OpmlFileExportOptionFullBackup = 1 << 2,
 };
 
+NS_ASSUME_NONNULL_BEGIN
+
 #pragma mark - Protocols
 
 @protocol OpmlFileImportDelegate <NSObject>
@@ -61,3 +63,5 @@ typedef NS_OPTIONS(NSUInteger, OpmlFileExportOptions) {
 - (void)showExportDialog:(NSWindow*)window;
 - (nullable NSError*)writeOPMLFile:(NSURL*)url withOptions:(OpmlFileExportOptions)opt;
 @end
+
+NS_ASSUME_NONNULL_END

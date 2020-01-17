@@ -24,6 +24,8 @@
 @class Feed, RSHTMLMetadata, FeedDownload;
 @protocol FaviconDownloadDelegate;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface FaviconDownload : NSObject
 /// @c img and @c path are @c nil if image is not valid or couldn't be downloaded.
 typedef void(^FaviconDownloadBlock)(NSImage * _Nullable img, NSURL * _Nullable path);
@@ -45,3 +47,5 @@ typedef void(^FaviconDownloadBlock)(NSImage * _Nullable img, NSURL * _Nullable p
 /// Called after image download. Called on error, but not if download is cancled.
 - (void)faviconDownload:(FaviconDownload*)sender didFinish:(nullable NSURL*)path;
 @end
+
+NS_ASSUME_NONNULL_END
