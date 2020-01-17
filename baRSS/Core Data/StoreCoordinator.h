@@ -23,6 +23,8 @@
 @import Cocoa;
 #import "DBv1+CoreDataModel.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface StoreCoordinator : NSObject
 // Managing contexts
 + (NSManagedObjectContext*)getMainContext;
@@ -44,7 +46,7 @@
 + (NSArray<NSDictionary*>*)countAggregatedUnread;
 
 // Get List Of Elements
-+ (NSArray<FeedGroup*>*)sortedFeedGroupsWithParent:(id)parent inContext:(nullable NSManagedObjectContext*)moc;
++ (NSArray<FeedGroup*>*)sortedFeedGroupsWithParent:(nullable id)parent inContext:(nullable NSManagedObjectContext*)moc;
 + (Feed*)feedWithIndexPath:(nonnull NSString*)path inContext:(nullable NSManagedObjectContext*)moc;
 + (NSString*)urlForFeedWithIndexPath:(nonnull NSString*)path;
 
@@ -55,3 +57,5 @@
 + (void)cleanupAndShowAlert:(BOOL)flag;
 + (NSUInteger)cleanupFavicons;
 @end
+
+NS_ASSUME_NONNULL_END

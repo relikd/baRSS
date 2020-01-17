@@ -23,6 +23,8 @@
 @import Cocoa;
 @class FeedGroup;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface NSMenu (Ext)
 @property (nonnull, copy, readonly) NSString *titleIndexPath;
 @property (nullable, readonly) NSMenuItem* parentItem;
@@ -42,3 +44,5 @@
 - (instancetype)alternateWithTitle:(NSString*)title;
 - (void)setTitleCount:(NSUInteger)count;
 @end
+
+NS_ASSUME_NONNULL_END

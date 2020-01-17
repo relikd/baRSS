@@ -144,7 +144,7 @@
  @param moc If @c nil perform requests on main context (ok for reading).
  @return Sorted list of @c FeedGroup items where @c FeedGroup.parent @c = @c parent.
  */
-+ (NSArray<FeedGroup*>*)sortedFeedGroupsWithParent:(id)parent inContext:(nullable NSManagedObjectContext*)moc {
++ (NSArray<FeedGroup*>*)sortedFeedGroupsWithParent:(nullable id)parent inContext:(nullable NSManagedObjectContext*)moc {
 	return [[[[FeedGroup fetchRequest] where:@"parent = %@", parent] sortASC:@"sortIndex"] fetchAllRows:moc ? moc : [self getMainContext]];
 }
 

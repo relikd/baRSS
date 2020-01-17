@@ -32,6 +32,8 @@ typedef NS_ENUM(int32_t, TimeUnitType) {
 	TimeUnitYears = 365 * 24 * 60 * 60
 };
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface NSDate (Ext)
 + (NSString*)timeStringISO8601;
 + (NSString*)dayStringISO8601;
@@ -57,3 +59,5 @@ typedef NS_ENUM(int32_t, TimeUnitType) {
 @interface NSDate (Statistics)
 + (NSDictionary*)refreshIntervalStatistics:(NSArray<NSDate*> *)list;
 @end
+
+NS_ASSUME_NONNULL_END

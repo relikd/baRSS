@@ -122,7 +122,7 @@
 
 
 /// Create @c ImageView with square @c size
-+ (NSImageView*)imageView:(NSImageName)name size:(CGFloat)size {
++ (NSImageView*)imageView:(nullable NSImageName)name size:(CGFloat)size {
 	NSImageView *imgView = [[NSImageView alloc] initWithFrame: NSMakeRect(0, 0, size, size)];
 	if (name) imgView.image = [NSImage imageNamed:name];
 	return imgView;
@@ -328,7 +328,7 @@ static inline void SetFrameWidth(NSView *view, CGFloat w) {
 @implementation NSControl (Ext)
 
 /// Set @c target and @c action simultaneously
-- (instancetype)action:(SEL)selector target:(id)target {
+- (instancetype)action:(SEL)selector target:(nullable id)target {
 	self.action = selector;
 	self.target = target;
 	return self;

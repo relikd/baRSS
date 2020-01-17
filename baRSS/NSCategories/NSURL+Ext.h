@@ -24,6 +24,8 @@
 
 #define ENV_LOG_FILES 0
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface NSURL (Ext)
 // Generators
 + (NSURL*)applicationSupportURL;
@@ -38,3 +40,5 @@
 - (void)remove;
 - (void)moveTo:(NSURL*)destination;
 @end
+
+NS_ASSUME_NONNULL_END

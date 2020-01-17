@@ -24,6 +24,8 @@
 
 @class Feed;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface UpdateScheduler : NSObject
 @property (class, readonly) NSUInteger feedsInQueue;
 @property (class, readonly) NSDate *dateScheduled;
@@ -46,3 +48,5 @@
 + (void)registerNetworkChangeNotification;
 + (void)unregisterNetworkChangeNotification;
 @end
+
+NS_ASSUME_NONNULL_END

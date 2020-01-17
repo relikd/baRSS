@@ -78,7 +78,7 @@
 }
 
 /// Set @c parent and @c sortIndex. Also if type is @c FEED calculate and set @c indexPath string.
-- (void)setParent:(FeedGroup *)parent andSortIndex:(int32_t)sortIndex {
+- (void)setParent:(nullable FeedGroup *)parent andSortIndex:(int32_t)sortIndex {
 	self.parent = parent;
 	self.sortIndex = sortIndex;
 	if (self.type == FEED)

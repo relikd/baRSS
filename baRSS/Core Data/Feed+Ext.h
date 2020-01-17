@@ -24,6 +24,8 @@
 #import "Feed+CoreDataClass.h"
 @class RSParsedFeed;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface Feed (Ext)
 @property (readonly) BOOL hasIcon;
 @property (nonnull, readonly) NSImage* iconImage16;
@@ -38,3 +40,5 @@
 // Article properties
 - (NSArray<FeedArticle*>*)sortedArticles;
 @end
+
+NS_ASSUME_NONNULL_END

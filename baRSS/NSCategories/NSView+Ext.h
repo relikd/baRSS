@@ -40,6 +40,8 @@
 /// Static variable to calculate origin center coordinate in its @c superview. The value of this var isn't used.
 static CGFloat const CENTER = -0.015625;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /// Calculate @c origin.y going down from the top border of its @c superview
 static inline CGFloat YFromTop(NSView *view) { return NSHeight(view.superview.frame) - NSMinY(view.frame) - view.alignmentRectInsets.bottom; }
 /// @c MAX()
@@ -65,7 +67,7 @@ static inline CGFloat NSMaxWidth(NSView *a, NSView *b) { return Max(NSWidth(a.fr
 + (NSButton*)inlineButton:(NSString*)text;
 + (NSPopUpButton*)popupButton:(CGFloat)w;
 // UI: Others
-+ (NSImageView*)imageView:(NSImageName)name size:(CGFloat)size;
++ (NSImageView*)imageView:(nullable NSImageName)name size:(CGFloat)size;
 + (NSButton*)checkbox:(BOOL)flag;
 + (NSProgressIndicator*)activitySpinner;
 + (NSView*)radioGroup:(NSArray<NSString*>*)entries target:(id)target action:(nonnull SEL)action;
@@ -91,7 +93,7 @@ static inline CGFloat NSMaxWidth(NSView *a, NSView *b) { return Max(NSWidth(a.fr
 
 
 @interface NSControl (Ext)
-- (instancetype)action:(SEL)selector target:(id)target;
+- (instancetype)action:(SEL)selector target:(nullable id)target;
 - (instancetype)large;
 - (instancetype)small;
 - (instancetype)tiny;
@@ -106,3 +108,5 @@ static inline CGFloat NSMaxWidth(NSView *a, NSView *b) { return Max(NSWidth(a.fr
 - (instancetype)selectable;
 - (instancetype)multiline:(NSSize)size;
 @end
+
+NS_ASSUME_NONNULL_END

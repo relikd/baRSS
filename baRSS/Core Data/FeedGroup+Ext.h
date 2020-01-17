@@ -29,6 +29,7 @@ typedef NS_ENUM(int16_t, FeedGroupType) {
 	GROUP = 0, FEED = 1, SEPARATOR = 2
 };
 
+NS_ASSUME_NONNULL_BEGIN
 
 @interface FeedGroup (Ext)
 /// Overwrites @c type attribute with enum. Use one of: @c GROUP, @c FEED, @c SEPARATOR.
@@ -39,7 +40,7 @@ typedef NS_ENUM(int16_t, FeedGroupType) {
 
 + (instancetype)newGroup:(FeedGroupType)type inContext:(NSManagedObjectContext*)context;
 + (instancetype)appendToRoot:(FeedGroupType)type inContext:(NSManagedObjectContext*)moc;
-- (void)setParent:(FeedGroup *)parent andSortIndex:(int32_t)sortIndex;
+- (void)setParent:(nullable FeedGroup *)parent andSortIndex:(int32_t)sortIndex;
 - (void)setSortIndexIfChanged:(int32_t)sortIndex;
 - (void)setNameIfChanged:(nullable NSString*)name;
 - (NSMenuItem*)newMenuItem;
@@ -50,3 +51,5 @@ typedef NS_ENUM(int16_t, FeedGroupType) {
 // Printing
 - (NSString*)readableDescription;
 @end
+
+NS_ASSUME_NONNULL_END

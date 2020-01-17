@@ -22,6 +22,8 @@
 
 @import Cocoa;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol RefreshIntervalButtonDelegate <NSObject>
 @required
 /// @c sender.tag is refresh interval in seconds
@@ -34,3 +36,5 @@
 - (instancetype)initWithFrame:(NSRect)frameRect NS_UNAVAILABLE;
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder NS_UNAVAILABLE;
 @end
+
+NS_ASSUME_NONNULL_END

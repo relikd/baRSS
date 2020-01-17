@@ -23,6 +23,8 @@
 @import Cocoa;
 @class SettingsFeeds;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface SettingsFeedsView : NSView
 @property (strong) IBOutlet NSOutlineView *outline;
 @property (strong) IBOutlet NSTextField *status;
@@ -45,3 +47,5 @@ extern NSUserInterfaceItemIdentifier const CustomCellRefresh;
 @interface SeparatorColumnCell : NSTableCellView
 extern NSUserInterfaceItemIdentifier const CustomCellSeparator;
 @end
+
+NS_ASSUME_NONNULL_END

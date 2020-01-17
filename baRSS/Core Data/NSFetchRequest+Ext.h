@@ -22,6 +22,8 @@
 
 @import Cocoa;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface NSFetchRequest<ResultType> (Ext)
 // Perform core data request and fetch data
 - (NSArray<ResultType>*)fetchAllRows:(NSManagedObjectContext*)moc;
@@ -37,3 +39,5 @@
 - (instancetype)sortDESC:(NSString*)key; // add .sortDescriptors -> ascending:NO
 - (instancetype)addFunctionExpression:(NSString*)fn onKeyPath:(NSString*)keyPath name:(NSString*)name type:(NSAttributeType)type; // add .propertiesToFetch -> (expressionForFunction:@[expressionForKeyPath:])
 @end
+
+NS_ASSUME_NONNULL_END

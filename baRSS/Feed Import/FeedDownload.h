@@ -24,6 +24,8 @@
 @class RSParsedFeed, RSHTMLMetadataFeedLink, Feed, FaviconDownload;
 @protocol FeedDownloadDelegate;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  All properties will be parsed and stored in local variables.
  This will avoid unnecessary core data operations if user decides to cancel the edit.
@@ -61,3 +63,5 @@ typedef void (^FeedDownloadBlock)(FeedDownload *sender);
 /// Called after xml data is loaded and parsed. Called on error, but not if download is cancled.
 - (void)feedDownloadDidFinish:(FeedDownload*)sender;
 @end
+
+NS_ASSUME_NONNULL_END
