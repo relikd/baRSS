@@ -11,9 +11,9 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 ## [1.1.0] - 2020-01-17
 ### Added
 - *QuickLook*: Thumbnail previews for OPML files (QLOPML v1.3)
+- *Status Bar Menu*: Tint menu bar icon with Accent color (macOS 10.14+)
 
 ### Fixed
-- *Status Bar Menu*: Tint menu bar icon on macOS 10.14+
 - Resolved Xcode warnings in Xcode 11
 
 
