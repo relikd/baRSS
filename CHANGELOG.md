@@ -8,6 +8,15 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 ## [Unreleased]
 
 
+## [1.1.0] - 2020-01-17
+### Added
+- *QuickLook*: Thumbnail previews for OPML files (QLOPML v1.3)
+
+### Fixed
+- *Status Bar Menu*: Tint menu bar icon on macOS 10.14+
+- Resolved Xcode warnings in Xcode 11
+
+
 ## [1.0.2] - 2019-10-25
 ### Fixed
 - *Status Bar Menu*: Preferences could not be opened on macOS 10.15
@@ -128,7 +137,8 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
-[Unreleased]: https://github.com/relikd/baRSS/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/relikd/baRSS/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/relikd/baRSS/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/relikd/baRSS/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/relikd/baRSS/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/relikd/baRSS/compare/v0.9.4...v1.0.0
