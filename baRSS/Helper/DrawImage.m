@@ -22,7 +22,7 @@
 
 #import "DrawImage.h"
 #import "Constants.h"
-#import "UserPrefs.h"
+#import "NSColor+Ext.h"
 
 
 @implementation DrawSeparator
@@ -312,15 +312,11 @@ static void Register(CGFloat size, NSImageName name, NSString *description, BOOL
 
 /// Register all icons that require custom drawing in @c ImageNamed cache
 void RegisterImageViewNames(void) {
-	NSColor *orange = [NSColor colorWithCalibratedRed:251/255.f green:163/255.f blue:58/255.f alpha:1.f]; // #FBA33A
-	NSColor *c1 = UserPrefsColor(Pref_colorStatusIconTint, orange);
-	NSColor *c2 = UserPrefsColor(Pref_colorUnreadIndicator, [NSColor systemBlueColor]);
-	
-	Register(16, RSSImageDefaultRSSIcon, NSLocalizedString(@"RSS icon", nil), ^(NSRect r) { DrawRSSGradientIcon(r, orange); return YES; });
+	Register(16, RSSImageDefaultRSSIcon, NSLocalizedString(@"RSS icon", nil), ^(NSRect r) { DrawRSSGradientIcon(r, [NSColor rssOrange]); return YES; });
 	Register(16, RSSImageSettingsGlobal, NSLocalizedString(@"Global settings", nil), ^(NSRect r) { DrawGlobalIcon(r, [NSColor controlTextColor].CGColor, NO); return YES; });
 	Register(16, RSSImageSettingsGroup, NSLocalizedString(@"Group settings", nil), ^(NSRect r) { DrawGroupIcon(r, [NSColor controlTextColor].CGColor, NO); return YES; });
 	Register(16, RSSImageSettingsFeed, NSLocalizedString(@"Feed settings", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor controlTextColor].CGColor, NO, YES); return YES; });
-	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"RSS menu bar icon", nil), ^(NSRect r) { DrawRSSIcon(r, c1.CGColor, YES, YES); return YES; });
-	Register(16, RSSImageMenuBarIconPaused, NSLocalizedString(@"RSS menu bar icon, paused", nil), ^(NSRect r) { DrawRSSIcon(r, c1.CGColor, YES, NO); return YES; });
-	Register(14, RSSImageMenuItemUnread, NSLocalizedString(@"Unread icon", nil), ^(NSRect r) { DrawUnreadIcon(r, c2); return YES; });
+	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"RSS menu bar icon", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor menuBarIconColor].CGColor, YES, YES); return YES; });
+	Register(16, RSSImageMenuBarIconPaused, NSLocalizedString(@"RSS menu bar icon, paused", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor menuBarIconColor].CGColor, YES, NO); return YES; });
+	Register(14, RSSImageMenuItemUnread, NSLocalizedString(@"Unread icon", nil), ^(NSRect r) { DrawUnreadIcon(r, [NSColor unreadIndicatorColor]); return YES; });
 }

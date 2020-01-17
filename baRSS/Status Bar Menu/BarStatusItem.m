@@ -28,6 +28,7 @@
 #import "BarMenu.h"
 #import "AppHook.h"
 #import "NSView+Ext.h"
+#import "NSColor+Ext.h"
 
 @interface BarStatusItem()
 @property (strong) BarMenu *barMenu;
@@ -119,8 +120,20 @@
 		BOOL hasNet = [UpdateScheduler allowNetworkConnection];
 		BOOL tint = (self.unreadCountTotal > 0 && hasNet && UserPrefsBool(Pref_globalTintMenuIcon));
 		self.statusItem.button.image = [NSImage imageNamed:(hasNet ? RSSImageMenuBarIconActive : RSSImageMenuBarIconPaused)];
-		self.statusItem.button.image.template = !tint;
-		// TODO: use macOS 10.14 contentTintColor, if (@available(macOS 10.14, *)) {} else {}
+		
+		if (@available(macOS 10.14, *)) {
+//			There is no proper way to display tinted icon WITHOUT tinted text!
+//			- using alternate image instead of tint:
+//				icon & text stays black on highlight (but only in light mode)
+//			- using tint and attributed titles:
+//				with controlTextColor the tint is applied regardless
+//				with controlColor the color doesnt match (either normal or on highlight)
+//				also, setting attributed title kills tint on icon
+			self.statusItem.button.image.template = YES;
+			self.statusItem.button.contentTintColor = tint ? [NSColor menuBarIconColor] : nil;
+		} else {
+			self.statusItem.button.image.template = !tint;
+		}
 		
 		BOOL showCount = (self.unreadCountTotal > 0 && UserPrefsBool(Pref_globalUnreadCount));
 		self.statusItem.button.title = (showCount ? [NSString stringWithFormat:@"%ld", self.unreadCountTotal] : @"");
