@@ -38,7 +38,11 @@
 	static NSColor *color;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		color = UserPrefsColor(Pref_colorStatusIconTint, [self rssOrange]);
+		if (@available(macOS 10.14, *)) {
+			color = UserPrefsColor(Pref_colorStatusIconTint, [NSColor controlAccentColor]);
+		} else {
+			color = UserPrefsColor(Pref_colorStatusIconTint, [self rssOrange]);
+		}
 	});
 	return color;
 }
@@ -47,7 +51,11 @@
 	static NSColor *color;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		color = UserPrefsColor(Pref_colorUnreadIndicator, [NSColor systemBlueColor]);
+		if (@available(macOS 10.14, *)) {
+			color = UserPrefsColor(Pref_colorStatusIconTint, [NSColor controlAccentColor]);
+		} else {
+			color = UserPrefsColor(Pref_colorStatusIconTint, [NSColor systemBlueColor]);
+		}
 	});
 	return color;
 }
