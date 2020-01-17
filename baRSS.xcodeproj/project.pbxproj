@@ -47,6 +47,7 @@
 		54BF444A22D0F4F300660096 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 54BF444922D0F4F300660096 /* AppIcon.icns */; };
 		54D55D7322E624CD00057B98 /* SettingsFeeds+DragDrop.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D55D7222E624CD00057B98 /* SettingsFeeds+DragDrop.m */; };
 		54D857CE227C5785001BA1C8 /* RefreshStatisticsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D857CD227C5785001BA1C8 /* RefreshStatisticsView.m */; };
+		54DD9F1323D1D6B000B1EAA6 /* NSColor+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54DD9F1223D1D6B000B1EAA6 /* NSColor+Ext.m */; };
 		54E3C02122EE076D006E2E24 /* opml-icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 54E3C02022EE076D006E2E24 /* opml-icon.icns */; };
 		54E4446C2329AE0600BBF481 /* NSError+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E4446B2329AE0600BBF481 /* NSError+Ext.m */; };
 		54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */ = {isa = PBXBuildFile; fileRef = 54E8831E211B509D00064188 /* ModalFeedEdit.m */; };
@@ -181,6 +182,8 @@
 		54D857CD227C5785001BA1C8 /* RefreshStatisticsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RefreshStatisticsView.m; sourceTree = "<group>"; };
 		54D857D022802309001BA1C8 /* SettingsGeneralView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsGeneralView.h; sourceTree = "<group>"; };
 		54D857D122802309001BA1C8 /* SettingsGeneralView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsGeneralView.m; sourceTree = "<group>"; };
+		54DD9F1123D1D6B000B1EAA6 /* NSColor+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSColor+Ext.h"; sourceTree = "<group>"; };
+		54DD9F1223D1D6B000B1EAA6 /* NSColor+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSColor+Ext.m"; sourceTree = "<group>"; };
 		54E3C02022EE076D006E2E24 /* opml-icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "opml-icon.icns"; sourceTree = "<group>"; };
 		54E4446A2329AE0600BBF481 /* NSError+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSError+Ext.h"; sourceTree = "<group>"; };
 		54E4446B2329AE0600BBF481 /* NSError+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSError+Ext.m"; sourceTree = "<group>"; };
@@ -226,10 +229,8 @@
 		544936F721F1E51E00DEE9AA /* NSCategories */ = {
 			isa = PBXGroup;
 			children = (
-				54B517052270E8C6006C1B29 /* NSView+Ext.h */,
-				54B517062270E92A006C1B29 /* NSView+Ext.m */,
-				54AD4E0A2301853D000AE386 /* NSString+Ext.h */,
-				54AD4E0B2301853D000AE386 /* NSString+Ext.m */,
+				54DD9F1123D1D6B000B1EAA6 /* NSColor+Ext.h */,
+				54DD9F1223D1D6B000B1EAA6 /* NSColor+Ext.m */,
 				54BB048721FD2AB500C303A5 /* NSDate+Ext.h */,
 				54BB048821FD2AB500C303A5 /* NSDate+Ext.m */,
 				54E4446A2329AE0600BBF481 /* NSError+Ext.h */,
@@ -238,6 +239,10 @@
 				548C6D09230C33DE003A1AAF /* NSURL+Ext.m */,
 				54B6F14C23155E1A002C94C9 /* NSURLRequest+Ext.h */,
 				54B6F14D23155E1A002C94C9 /* NSURLRequest+Ext.m */,
+				54AD4E0A2301853D000AE386 /* NSString+Ext.h */,
+				54AD4E0B2301853D000AE386 /* NSString+Ext.m */,
+				54B517052270E8C6006C1B29 /* NSView+Ext.h */,
+				54B517062270E92A006C1B29 /* NSView+Ext.m */,
 			);
 			path = NSCategories;
 			sourceTree = "<group>";
@@ -577,6 +582,7 @@
 				544B011D2114EE9100386E5C /* AppHook.m in Sources */,
 				546FC44321189975007CC3A3 /* SettingsGeneral.m in Sources */,
 				546A6A2922C583390034E806 /* SettingsGeneralView.m in Sources */,
+				54DD9F1323D1D6B000B1EAA6 /* NSColor+Ext.m in Sources */,
 				54ACC29521061E270020715F /* UpdateScheduler.m in Sources */,
 				54BB048921FD2AB500C303A5 /* NSDate+Ext.m in Sources */,
 				5477D34E21233C62002BA27F /* FeedGroup+Ext.m in Sources */,
