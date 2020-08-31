@@ -216,7 +216,13 @@
  */
 - (void)faviconDownload:(FaviconDownload*)sender didFinish:(nullable NSURL*)path {
 	// Create image from favicon temporary file location or default icon if no favicon exists.
-	NSImage *img = path ? [[NSImage alloc] initByReferencingURL:path] : [NSImage imageNamed:RSSImageDefaultRSSIcon];
+	NSImage *img;
+	if (path) {
+		NSData* data = [[NSData alloc] initWithContentsOfURL:path];
+		img = [[NSImage alloc] initWithData:data];
+	} else {
+		img = [NSImage imageNamed:RSSImageDefaultRSSIcon];
+	}
 	self.view.favicon.image = img;
 	self.faviconFile = path;
 	[self downloadComplete];

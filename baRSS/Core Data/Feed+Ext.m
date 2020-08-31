@@ -196,7 +196,8 @@
 	if (self.articles.count == 0) {
 		img = [NSImage imageNamed:NSImageNameCaution];
 	} else if (self.hasIcon) {
-		img = [[NSImage alloc] initByReferencingURL:[self iconPath]];
+		NSData* data = [[NSData alloc] initWithContentsOfURL:[self iconPath]];
+		img = [[NSImage alloc] initWithData:data];
 	} else {
 		img = [NSImage imageNamed:RSSImageDefaultRSSIcon];
 	}
