@@ -44,7 +44,7 @@
 	[content setFrameSize: NSMakeSize(w, h)];
 	
 	// after content size, increase to window size
-	w += 2 * PAD_WIN;
+	w += 2 * (NSInteger)PAD_WIN;
 	h += PAD_WIN + contentOffsetY; // the second PAD_WIN is already in contentOffsetY
 	
 	NSWindowStyleMask style = NSWindowStyleMaskTitled | NSWindowStyleMaskResizable | NSWindowStyleMaskFullSizeContentView;

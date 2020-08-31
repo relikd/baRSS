@@ -147,7 +147,13 @@
 		return;
 	self.currentDownload = [[NSURLRequest requestWithURL:self.remoteURL] downloadTask:^(NSURL * _Nullable path, NSError * _Nullable error) {
 		if (error) path = nil; // will also nullify img
-		NSImage *img = path ? [[NSImage alloc] initByReferencingURL:path] : nil;
+		NSImage *img;
+		if (path) {
+			NSData* data = [[NSData alloc] initWithContentsOfURL:path];
+			img = [[NSImage alloc] initWithData:data];
+		} else {
+			img = nil;
+		}
 		if (img.valid) {
 			// move image to temporary destination, otherwise dataTask: will delete it.
 			NSString *tmpFile = NSProcessInfo.processInfo.globallyUniqueString;
@@ -166,7 +172,8 @@
 	if (self.canceled)
 		return;
 	NSURL *path = self.fileURL;
-	NSImage *img = [[NSImage alloc] initByReferencingURL:path];
+	NSData* data = [[NSData alloc] initWithContentsOfURL:path];
+	NSImage* img = [[NSImage alloc] initWithData:data];
 	if (!img.valid) { path = nil; img = nil; }
 #if DEBUG && ENV_LOG_DOWNLOAD
 	printf("ICON %1.0fx%1.0f %s\n", img.size.width, img.size.height, self.remoteURL.absoluteString.UTF8String);
