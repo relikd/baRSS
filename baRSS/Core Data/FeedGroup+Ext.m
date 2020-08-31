@@ -89,10 +89,11 @@
 - (void)setSortIndexIfChanged:(int32_t)sortIndex {
 	if (self.sortIndex != sortIndex) {
 		self.sortIndex = sortIndex;
-		[self iterateSorted:NO overDescendantFeeds:^(Feed *feed, BOOL *cancel) {
-			[feed calculateAndSetIndexPathString];
-		}];
 	}
+	// Otherwise move from 0.0 -> 0 will not trigger index path update
+	[self iterateSorted:NO overDescendantFeeds:^(Feed *feed, BOOL *cancel) {
+		[feed calculateAndSetIndexPathString];
+	}];
 }
 
 /// Set @c name attribute but only if value differs.
