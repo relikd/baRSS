@@ -8,7 +8,12 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 ## [Unreleased]
 
 
-## [1.1.0] - 2020-01-17
+## [1.1.1] – 2020-08-31
+### Fixed
+- Feed indices weren't updated properly which resulted in empty feed menus (issue: #6)
+
+
+## [1.1.0] – 2020-01-17
 ### Added
 - *QuickLook*: Thumbnail previews for OPML files (QLOPML v1.3)
 - *Status Bar Menu*: Tint menu bar icon with Accent color (macOS 10.14+)
@@ -17,19 +22,19 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - Resolved Xcode warnings in Xcode 11
 
 
-## [1.0.2] - 2019-10-25
+## [1.0.2] – 2019-10-25
 ### Fixed
 - *Status Bar Menu*: Preferences could not be opened on macOS 10.15
 - *Status Bar Menu*: Menu flickering resulting in a hang on macOS 10.15
 - *UI*: Text color in `About` tab
 
 
-## [1.0.1] - 2019-10-04
+## [1.0.1] – 2019-10-04
 ### Fixed
 - Crash on macOS 10.14 due to a `CGColorRef` null pointer
 
 
-## [1.0.0] - 2019-10-03
+## [1.0.0] – 2019-10-03
 ### Added
 - App Signing
 - Sandboxing & hardened runtime environment
@@ -86,7 +91,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *UI:* Mark unread articles with blue dot, instead of tick mark
 
 
-## [0.9.4] - 2019-04-02
+## [0.9.4] – 2019-04-02
 ### Fixed
 - Article order got mixed up for some feeds (issue: #4)
 - If multiple consecutive items reappear in the middle of the feed mark them read
@@ -95,7 +100,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *UI:* Removed checkbox `Start on login`. Use Preferences > Users > Login Items instead.
 
 
-## [0.9.3] - 2019-03-14
+## [0.9.3] – 2019-03-14
 ### Added
 - Changelog
 - *UI:* Show body tag in article tooltip if abstract tag is empty
@@ -105,7 +110,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - Fixed update for feeds where all article URLs point to the same resource (issue: #3)
 
 
-## [0.9.2] - 2019-03-07
+## [0.9.2] – 2019-03-07
 ### Added
 - Limit number of articles that are displayed in feed menu (issue: #2)
 
@@ -115,7 +120,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - libxml2 will ignore lower ascii characters (`0x00`–`0x1F`)
 
 
-## [0.9.1] - 2019-02-14
+## [0.9.1] – 2019-02-14
 ### Added
 - Mark single article as un/read (hold down option key and click on article)
 
@@ -133,11 +138,12 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - Remove html tags from abstract on save (not on display)
 
 
-## [0.9] - 2019-02-11
+## [0.9] – 2019-02-11
 Initial release
 
 
-[Unreleased]: https://github.com/relikd/baRSS/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/relikd/baRSS/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/relikd/baRSS/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/relikd/baRSS/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/relikd/baRSS/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/relikd/baRSS/compare/v1.0.0...v1.0.1
