@@ -52,9 +52,9 @@
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
 		if (@available(macOS 10.14, *)) {
-			color = UserPrefsColor(Pref_colorStatusIconTint, [NSColor controlAccentColor]);
+			color = UserPrefsColor(Pref_colorUnreadIndicator, [NSColor controlAccentColor]);
 		} else {
-			color = UserPrefsColor(Pref_colorStatusIconTint, [NSColor systemBlueColor]);
+			color = UserPrefsColor(Pref_colorUnreadIndicator, [NSColor systemBlueColor]);
 		}
 	});
 	return color;
