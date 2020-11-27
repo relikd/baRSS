@@ -121,7 +121,9 @@
 		BOOL tint = (self.unreadCountTotal > 0 && hasNet && UserPrefsBool(Pref_globalTintMenuIcon));
 		self.statusItem.button.image = [NSImage imageNamed:(hasNet ? RSSImageMenuBarIconActive : RSSImageMenuBarIconPaused)];
 		
-		if (@available(macOS 10.14, *)) {
+		if (@available(macOS 11, *)) {
+			self.statusItem.button.image.template = !tint;
+		} else if (@available(macOS 10.14, *)) {
 //			There is no proper way to display tinted icon WITHOUT tinted text!
 //			- using alternate image instead of tint:
 //				icon & text stays black on highlight (but only in light mode)

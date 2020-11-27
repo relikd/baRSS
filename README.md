@@ -108,7 +108,7 @@ ToDo
 The following list is not exhaustive but rather a collection of nice things that will be added eventually.
 I may postpone some until demand increases …
 
-- [ ] Localizations
+- [ ] Localizations
 - [ ] Feed generator for websites without feeds
 - [ ] Automatically choose best update interval (e.g., avg)
 - [ ] Sync with online services
@@ -180,7 +180,7 @@ This project uses a modified version of Brent Simmons' [RSXML](https://github.co
 ##### Trivia
 
 - Start of project: __July 19, 2018__
-- Estimated development time: __1953h+__
+- Estimated development time: __1963h+__
 - First prototype used __feedparser python__ library
 
 
