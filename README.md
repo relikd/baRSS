@@ -180,7 +180,7 @@ This project uses a modified version of Brent Simmons' [RSXML](https://github.co
 ##### Trivia
 
 - Start of project: __July 19, 2018__
-- Estimated development time: __1963h+__
+- Estimated development time: __1965h+__
 - First prototype used __feedparser python__ library
 
 
