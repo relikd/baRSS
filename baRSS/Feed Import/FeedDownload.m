@@ -178,7 +178,7 @@
 		}
 		else if (!meta || meta.feedLinks.count == 0) {
 			if ([xml.url.host hasSuffix:@"youtube.com"])
-				feedURL = [YouTubePlugin feedURL:xml.url];
+				feedURL = [YouTubePlugin feedURL:xml.url data:xml.data];
 			if (feedURL.length == 0)
 				self.error = [NSError feedURLNotFound:xml.url];
 		}
