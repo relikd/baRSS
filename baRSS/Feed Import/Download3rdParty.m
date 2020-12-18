@@ -64,11 +64,11 @@
 				}
 			}
 		} else if ([type isEqualToString:@"c"]) {
-			NSData *m_json = [@"\"channelId\":\"" dataUsingEncoding:NSUTF8StringEncoding];
-			NSRange tmp = [html rangeOfData:m_json options:0 range:NSMakeRange(0, html.length)];
+			NSData *m_head = [@"<meta itemprop=\"channelId\" content=\"" dataUsingEncoding:NSUTF8StringEncoding];
+			NSRange tmp = [html rangeOfData:m_head options:0 range:NSMakeRange(0, html.length)];
 			if (tmp.location == NSNotFound) {
-				NSData *m_head = [@"<meta itemprop=\"channelId\" content=\"" dataUsingEncoding:NSUTF8StringEncoding];
-				tmp = [html rangeOfData:m_head options:0 range:NSMakeRange(0, html.length)];
+				NSData *m_json = [@"\"channelId\":\"" dataUsingEncoding:NSUTF8StringEncoding];
+				tmp = [html rangeOfData:m_json options:0 range:NSMakeRange(0, html.length)];
 			}
 			NSUInteger start = tmp.location + tmp.length;
 			NSUInteger end = html.length - start;
