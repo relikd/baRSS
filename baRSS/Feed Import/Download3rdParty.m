@@ -33,12 +33,13 @@
 
  @return @c nil if @c url is not properly formatted, YouTube feed URL otherwise.
  */
-+ (NSString*)feedURL:(NSURL*)url {
++ (NSString*)feedURL:(NSURL*)url data:(NSData*)html {
 	if (![url.host hasSuffix:@"youtube.com"]) // 'youtu.be' & 'youtube-nocookie.com' will redirect
 		return nil;
 	// https://www.youtube.com/channel/[channel-id]
 	// https://www.youtube.com/user/[user-name]
 	// https://www.youtube.com/playlist?list=[playlist-id]
+	// https://www.youtube.com/c/[channel-name]
 #if DEBUG && ENV_LOG_YOUTUBE
 	printf("resolving YouTube url:\n");
 	printf(" ↳ %s\n", url.absoluteString.UTF8String);
@@ -60,6 +61,23 @@
 				if ([q.name isEqualToString:@"list"]) {
 					found = [ytBase stringByAppendingFormat:@"?playlist_id=%@", q.value];
 					break;
+				}
+			}
+		} else if ([type isEqualToString:@"c"]) {
+			NSData *m_json = [@"\"channelId\":\"" dataUsingEncoding:NSUTF8StringEncoding];
+			NSRange tmp = [html rangeOfData:m_json options:0 range:NSMakeRange(0, html.length)];
+			if (tmp.location == NSNotFound) {
+				NSData *m_head = [@"<meta itemprop=\"channelId\" content=\"" dataUsingEncoding:NSUTF8StringEncoding];
+				tmp = [html rangeOfData:m_head options:0 range:NSMakeRange(0, html.length)];
+			}
+			NSUInteger start = tmp.location + tmp.length;
+			NSUInteger end = html.length - start;
+			if (end > 50) end = 50; // no need to search till the end
+			NSString *substr = [[NSString alloc] initWithData:[html subdataWithRange:NSMakeRange(start, end)] encoding:NSUTF8StringEncoding];
+			if (substr) {
+				NSUInteger to = [substr rangeOfString:@"\""].location;
+				if (to != NSNotFound) {
+					found = [ytBase stringByAppendingFormat:@"?channel_id=%@", [substr substringToIndex:to]];
 				}
 			}
 		}
