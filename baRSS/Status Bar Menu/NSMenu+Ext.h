@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)insertDefaultHeader;
 // Update menu
 - (void)setHeaderHasUnread:(BOOL)hasUnread hasRead:(BOOL)hasRead;
-- (NSMenuItem*)deepestItemWithPath:(nonnull NSString*)path;
+- (nullable NSMenuItem*)deepestItemWithPath:(nonnull NSString*)path;
 @end
 
 

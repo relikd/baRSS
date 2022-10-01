@@ -126,7 +126,7 @@
 }
 
 /// Create grouping view with vertically, left-aligned radio buttons. Action is identical for all buttons (grouping).
-+ (NSView*)radioGroup:(NSArray<NSString*>*)entries target:(id)target action:(nonnull SEL)action {
++ (nullable NSView*)radioGroup:(NSArray<NSString*>*)entries target:(id)target action:(nonnull SEL)action {
 	if (entries.count == 0)
 		return nil;
 	CGFloat w = 0, h = 0;
@@ -145,7 +145,7 @@
 }
 
 /// Same as @c radioGroup:target:action: but using dummy action to ignore radio button click events.
-+ (NSView*)radioGroup:(NSArray<NSString*>*)entries {
++ (nullable NSView*)radioGroup:(NSArray<NSString*>*)entries {
 	return [self radioGroup:entries target:self action:@selector(donothing)];
 }
 

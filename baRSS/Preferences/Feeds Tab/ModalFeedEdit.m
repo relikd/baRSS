@@ -140,7 +140,7 @@
  
  @return Either URL string or @c nil if user canceled the selection.
  */
-- (NSString*)feedDownload:(FeedDownload*)sender selectFeedFromList:(NSArray<RSHTMLMetadataFeedLink*>*)list {
+- (nullable NSString*)feedDownload:(FeedDownload*)sender selectFeedFromList:(NSArray<RSHTMLMetadataFeedLink*>*)list {
 	NSMenu *menu = [[NSMenu alloc] initWithTitle:NSLocalizedString(@"Choose feed menu", nil)];
 	menu.autoenablesItems = NO;
 	for (RSHTMLMetadataFeedLink *fl in list) {

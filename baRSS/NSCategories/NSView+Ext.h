@@ -48,8 +48,8 @@ static inline CGFloat NSMaxWidth(NSView *a, NSView *b) { return Max(NSWidth(a.fr
 + (NSImageView*)imageView:(nullable NSImageName)name size:(CGFloat)size;
 + (NSButton*)checkbox:(BOOL)flag;
 + (NSProgressIndicator*)activitySpinner;
-+ (NSView*)radioGroup:(NSArray<NSString*>*)entries target:(id)target action:(nonnull SEL)action;
-+ (NSView*)radioGroup:(NSArray<NSString*>*)entries;
++ (nullable NSView*)radioGroup:(NSArray<NSString*>*)entries target:(id)target action:(nonnull SEL)action;
++ (nullable NSView*)radioGroup:(NSArray<NSString*>*)entries;
 // UI: Enclosing Container
 + (NSPopover*)popover:(NSSize)size;
 - (NSScrollView*)wrapContent:(NSView*)content inScrollView:(NSRect)rect;

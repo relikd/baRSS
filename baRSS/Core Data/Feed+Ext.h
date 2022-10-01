@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)calculateAndSetIndexPathString;
 - (void)setNewIcon:(NSURL*)location;
 // Article properties
-- (NSArray<FeedArticle*>*)sortedArticles;
+- (nullable NSArray<FeedArticle*>*)sortedArticles;
 @end
 
 NS_ASSUME_NONNULL_END

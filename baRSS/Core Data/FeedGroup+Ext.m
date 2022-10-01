@@ -106,7 +106,7 @@
 }
 
 /// @return Children sorted by attribute @c sortIndex (same order as in preferences).
-- (NSArray<FeedGroup*>*)sortedChildren {
+- (nullable NSArray<FeedGroup*>*)sortedChildren {
 	if (self.children.count == 0)
 		return nil;
 	return [self.children sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:YES]]];

@@ -168,7 +168,7 @@
 //  ---------------------------------------------------------------
 
 /// Extract favicon URL from parsed HTML metadata.
-+ (nullable NSString*)urlForMetadata:(RSHTMLMetadata*)meta {
++ (nullable NSString*)urlForMetadata:(nullable RSHTMLMetadata*)meta {
 	if (!meta) return nil;
 	
 	double bestScore = DBL_MAX;

@@ -124,7 +124,7 @@
 /**
  @return Articles sorted by attribute @c sortIndex with descending order (newest items first).
  */
-- (NSArray<FeedArticle*>*)sortedArticles {
+- (nullable NSArray<FeedArticle*>*)sortedArticles {
 	if (self.articles.count == 0)
 		return nil;
 	return [self.articles sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"sortIndex" ascending:NO]]];

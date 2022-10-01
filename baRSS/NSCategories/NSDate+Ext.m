@@ -140,7 +140,7 @@ static TimeUnitType const _values[] = {
 /**
  @return @c nil if list contains less than 2 entries. Otherwise: @{min, max, avg, median, earliest, latest}
  */
-+ (NSDictionary*)refreshIntervalStatistics:(NSArray<NSDate*> *)list {
++ (nullable NSDictionary*)refreshIntervalStatistics:(NSArray<NSDate*> *)list {
 	if (!list || list.count == 0)
 		return nil;
 	

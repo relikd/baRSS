@@ -35,7 +35,7 @@ typedef void (^FeedDownloadBlock)(FeedDownload *sender);
 @protocol FeedDownloadDelegate <NSObject>
 @optional
 /// Delegate must return chosen URL. If not implemented, the first URL will be used.
-- (NSString*)feedDownload:(FeedDownload*)sender selectFeedFromList:(NSArray<RSHTMLMetadataFeedLink*>*)list;
+- (nullable NSString*)feedDownload:(FeedDownload*)sender selectFeedFromList:(NSArray<RSHTMLMetadataFeedLink*>*)list;
 /// Only called if an URL redirect occured.
 - (void)feedDownload:(FeedDownload*)sender urlRedirected:(NSString*)newURL;
 /// Called after xml data is loaded and parsed. Called on error, but not if download is cancled.

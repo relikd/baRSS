@@ -16,7 +16,7 @@ typedef void(^FaviconDownloadBlock)(NSImage * _Nullable img, NSURL * _Nullable p
 - (instancetype)startWithBlock:(nonnull FaviconDownloadBlock)block;
 - (void)cancel;
 // Extract from HTML metadata
-+ (nullable NSString*)urlForMetadata:(RSHTMLMetadata*)meta;
++ (nullable NSString*)urlForMetadata:(nullable RSHTMLMetadata*)meta;
 @end
 
 

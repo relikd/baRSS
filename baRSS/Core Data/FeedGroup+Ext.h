@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSMenuItem*)newMenuItem;
 // Handle children and parents
 - (NSString*)indexPathString;
-- (NSArray<FeedGroup*>*)sortedChildren;
+- (nullable NSArray<FeedGroup*>*)sortedChildren;
 - (NSMutableArray<FeedGroup*>*)allParents;
 // Printing
 - (NSString*)readableDescription;

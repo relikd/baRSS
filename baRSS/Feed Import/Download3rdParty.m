@@ -11,7 +11,7 @@
 
  @return @c nil if @c url is not properly formatted, YouTube feed URL otherwise.
  */
-+ (NSString*)feedURL:(NSURL*)url data:(NSData*)html {
++ (nullable NSString*)feedURL:(NSURL*)url data:(NSData*)html {
 	if (![url.host hasSuffix:@"youtube.com"]) // 'youtu.be' & 'youtube-nocookie.com' will redirect
 		return nil;
 	// https://www.youtube.com/channel/[channel-id]

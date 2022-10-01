@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @interface NSDate (Statistics)
-+ (NSDictionary*)refreshIntervalStatistics:(NSArray<NSDate*> *)list;
++ (nullable NSDictionary*)refreshIntervalStatistics:(NSArray<NSDate*> *)list;
 @end
 
 NS_ASSUME_NONNULL_END

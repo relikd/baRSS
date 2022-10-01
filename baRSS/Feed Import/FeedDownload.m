@@ -168,7 +168,7 @@
 				self.error = [NSError canceledByUser];
 		}
 		// finalize HTML parsing
-		if (self.error) {
+		if (self.error || !feedURL) {
 			[self finishAndNotify];
 		} else {
 			self.assertIsFeedURL = YES;

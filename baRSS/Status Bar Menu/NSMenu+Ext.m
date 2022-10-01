@@ -116,7 +116,7 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
  @param path Dot separated list of @c sortIndex. E.g., @c Feed.indexPath.
  @return Either @c NSMenuItem that exactly matches @c path or one of the parent @c NSMenuItem if a submenu isn't open.
  */
-- (NSMenuItem*)deepestItemWithPath:(nonnull NSString*)path {
+- (nullable NSMenuItem*)deepestItemWithPath:(nonnull NSString*)path {
 	NSUInteger loc = [path rangeOfString:@"."].location;
 	BOOL isLast = (loc == NSNotFound);
 	NSString *indexStr = (isLast ? path : [path substringToIndex:loc]);
