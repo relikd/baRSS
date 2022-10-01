@@ -8,6 +8,11 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 ## [Unreleased]
 
 
+## [1.2.0] – 2022-10-01
+### Added
+- *UI*: Add option to hide read articles (show only unread)
+
+
 ## [1.1.3] – 2020-12-18
 ### Fixed
 - Recognize YouTube channel URLs in the format `/c/channel-name` 

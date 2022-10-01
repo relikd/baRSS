@@ -62,12 +62,12 @@ If you prefer the optimized release version go to `Product > Archive`.
 Hidden options
 --------------
 
-This listing contains of options that have no UI that can be configured. 
-Most likely, you wouldn't ever stumble upon these if not reading this chapter.
+The following options have no UI equivalent and must be configured in Terminal. 
+Most likely, you will never stumble upon these if not reading this chapter.
 **Note:** To reset an option run `defaults delete de.relikd.baRSS {KEY}`, where `{KEY}` is an option from below.
 
 
-1. If you hold down the option key and click on an article item, you can mark a single item (un-)read.
+1. If you hold down the option key and click on an article item, you can mark a single item (un-)read without opening it.
 
 2. When holding down the option key, the menu will show an item to open only a few unread items at a time. 
 This number can be changed with the following Terminal command (default: 10):
@@ -83,13 +83,13 @@ defaults write de.relikd.baRSS shortArticleNamesLimit -int 50
 ```
 
 4. Limit the number of displayed articles per feed menu.
-**Note:** displayed unread count may be different than the unread items inside ('Open unread' will open hidden items too).
+**Note:** displayed unread count may be different than the unread items inside. 'Open all unread' will open hidden items too.
 ```
 defaults write de.relikd.baRSS articlesInMenuLimit -int 40
 ```
 
 5. You can change the appearance of colors throughout the application. 
-E.g., The tint color of the menu bar icon and the color of the blue dot of unread articles.
+E.g., The tint color of the menu bar icon and the color of the blue unread articles dot.
 ```
 defaults write de.relikd.baRSS colorStatusIconTint -string "#37F"
 defaults write de.relikd.baRSS colorUnreadIndicator -string "#FBA33A"
@@ -106,7 +106,7 @@ ToDo
 ----
 
 The following list is not exhaustive but rather a collection of nice things that will be added eventually.
-I may postpone some until demand increases …
+I will postpone the development until demand increases …
 
 - [ ] Localizations
 - [ ] Feed generator for websites without feeds
@@ -132,14 +132,6 @@ FAQ / Q&A
 
 ### App Store Notice
 
-In the last couple of months I prepared baRSS to be released on the App Store.
-With sandboxing enabled and hardened runtime environment, etc.
-
-But, for the time being, I decided to not publish this app for political reasons.
-I was not happy about some decisions made in the last weeks.
-Decisions that were evaluated on monetary aspects and not on ethical considerations.
-I won't support this conduct with my own money. 
-
 If you find this app somewhere on the App Store, you can be sure that it is a counterfeit.
 As long as you can read this very notice, I am not responsible for the publication.
 Further, I can't guarantee the App Store version wasn't modified by a malicious actor to spy on you.
@@ -148,7 +140,7 @@ Further, I can't guarantee the App Store version wasn't modified by a malicious 
 ### Why create something that already existed?
 
 First, open source is awesome!
-Secondly, RSS Menu made some design decisions I didn't like.
+Second, RSS Menu made some design decisions I didn't like.
 For example, the new integrated browser window.
 
 One thing I liked most, was the fact that feeds were opened in the default browser.
@@ -156,7 +148,7 @@ Not like 99% of the other feed readers on the market that show a separate HTML v
 No rendering issues, no broken links, no content that is different from the actual news article.
 
 I know, the whole purpose of RSS is to deliver content without the need of opening a webpage.
-But for me RSS is more about being informed whenever a blog or news feed has some updated content.
+But for me RSS is more about being informed whenever a blog or news feed has updated content.
 E.g, subscribing to video channels without having to have an account.
 
 
@@ -180,7 +172,7 @@ This project uses a modified version of Brent Simmons' [RSXML](https://github.co
 ##### Trivia
 
 - Start of project: __July 19, 2018__
-- Estimated development time: __1965h+__
+- Estimated development time: __1970h+__
 - First prototype used __feedparser python__ library
 
 
