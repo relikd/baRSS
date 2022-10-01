@@ -10,16 +10,21 @@ static inline void defaultsAppend(NSMutableDictionary *defs, id value, NSArray<N
 /// Helper method calls @c (standardUserDefaults)registerDefaults:
 void UserPrefsInit(void) {
 	NSMutableDictionary *defs = [NSMutableDictionary dictionary];
-	defaultsAppend(defs, @YES, @[Pref_globalTintMenuIcon,
-								 Pref_globalUpdateAll,
-								 Pref_globalOpenUnread,  Pref_groupOpenUnread,  Pref_feedOpenUnread,
-								 Pref_globalMarkRead,    Pref_groupMarkRead,    Pref_feedMarkRead,
-								 Pref_globalMarkUnread,  Pref_groupMarkUnread,  Pref_feedMarkUnread,
-								 Pref_globalUnreadCount, Pref_groupUnreadCount, Pref_feedUnreadCount,
-								 Pref_feedUnreadIndicator]);
-	defaultsAppend(defs, @NO, @[Pref_groupUnreadIndicator,
-								Pref_feedTruncateTitle,
-								Pref_feedLimitArticles]);
+	defaultsAppend(defs, @YES, @[
+		Pref_globalTintMenuIcon,
+		Pref_globalUpdateAll,
+		Pref_globalOpenUnread,  Pref_groupOpenUnread,  Pref_feedOpenUnread,
+		Pref_globalMarkRead,    Pref_groupMarkRead,    Pref_feedMarkRead,
+		Pref_globalMarkUnread,  Pref_groupMarkUnread,  Pref_feedMarkUnread,
+		Pref_globalUnreadCount, Pref_groupUnreadCount, Pref_feedUnreadCount,
+		Pref_feedUnreadIndicator
+	]);
+	defaultsAppend(defs, @NO, @[
+		Pref_globalUnreadOnly,  Pref_groupUnreadOnly,  Pref_feedUnreadOnly,
+		Pref_groupUnreadIndicator,
+		Pref_feedTruncateTitle,
+		Pref_feedLimitArticles
+	]);
 	// Display limits & truncation  ( defaults write de.relikd.baRSS {KEY} -int 10 )
 	[defs setObject:[NSNumber numberWithUnsignedInteger:10] forKey:Pref_openFewLinksLimit];
 	[defs setObject:[NSNumber numberWithUnsignedInteger:60] forKey:Pref_shortArticleNamesLimit];

@@ -64,15 +64,10 @@
 - (void)setFeedGroups:(NSArray<FeedGroup*>*)sortedList forMenu:(NSMenu*)menu {
 	[menu insertDefaultHeader];
 	for (FeedGroup *fg in sortedList) {
-		[menu insertFeedGroupItem:fg].submenu.delegate = self;
+		[menu insertFeedGroupItem:fg withUnread:self.unreadMap].submenu.delegate = self;
 	}
 	UnreadTotal *uct = self.unreadMap[menu.titleIndexPath];
 	[menu setHeaderHasUnread:(uct.unread > 0) hasRead:(uct.unread < uct.total)];
-	// set unread counts
-	for (NSMenuItem *item in menu.itemArray) {
-		if (item.hasSubmenu)
-			[item setTitleCount:self.unreadMap[item.submenu.titleIndexPath].unread];
-	}
 }
 
 /// Generate items for @c FeedArticles menu.
@@ -81,8 +76,11 @@
 	NSInteger mc = NSIntegerMax;
 	if (UserPrefsBool(Pref_feedLimitArticles))
 		mc = UserPrefsInt(Pref_articlesInMenuLimit);
+	BOOL onlyUnread = UserPrefsBool(Pref_feedUnreadOnly);
 	
 	for (FeedArticle *fa in sortedList) {
+		if (onlyUnread && !fa.unread)
+			continue;
 		if (--mc < 0) // mc == 0 will first decrement to -1, then evaluate
 			break;
 		[menu addItem:[fa newMenuItem]];
@@ -137,6 +135,7 @@
 			[item setTitleCount:uct.unread];
 			item = item.parentItem;
 		}
+		// TODO: need to re-create groups if user chose to hide already read articles
 	}
 }
 

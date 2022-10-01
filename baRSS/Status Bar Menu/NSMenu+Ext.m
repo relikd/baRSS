@@ -4,6 +4,7 @@
 #import "Feed+Ext.h"
 #import "FeedGroup+Ext.h"
 #import "Constants.h"
+#import "MapUnreadTotal.h"
 
 typedef NS_ENUM(NSInteger, MenuItemTag) {
 	/// Used in @c allowDisplayOfHeaderItem: to identify and enable items
@@ -45,7 +46,7 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 #pragma mark - Generator -
 
 /// Create new @c NSMenuItem with empty submenu and append it to the menu. @return Inserted item.
-- (NSMenuItem*)insertFeedGroupItem:(FeedGroup*)fg {
+- (nullable NSMenuItem*)insertFeedGroupItem:(FeedGroup*)fg withUnread:(MapUnreadTotal*)unreadMap {
 	unichar chr = '-';
 	NSMenuItem *item = nil;
 	switch (fg.type) {
@@ -55,7 +56,17 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	}
 	if (!item.isSeparatorItem) {
 		NSString *t = [NSString stringWithFormat:@"%c%@.%d", chr, [self.title substringFromIndex:1], fg.sortIndex];
+		NSUInteger unread = unreadMap[[t substringFromIndex:2]].unread;
+		
+		// Check user preferences to show only unread entries
+		if (unread == 0 &&
+			((fg.type == FEED && UserPrefsBool(Pref_groupUnreadOnly)) ||
+			 (fg.type == GROUP && UserPrefsBool(Pref_globalUnreadOnly)))) {
+			return nil;
+		}
+		
 		item.submenu = [[NSMenu alloc] initWithTitle:t];
+		[item setTitleCount:unread];
 	}
 	[self addItem:item];
 	return item;
