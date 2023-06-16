@@ -14,9 +14,6 @@
 		54209E942117325100F3B5EF /* DrawImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 54209E932117325100F3B5EF /* DrawImage.m */; };
 		544B011A2114B41200386E5C /* ModalSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* ModalSheet.m */; };
 		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
-		544DCCB9212A2B4D002DBC46 /* RSXML2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML2.framework */; };
-		544DCCBA212A2B4D002DBC46 /* RSXML2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 544DCCB8212A2B4D002DBC46 /* RSXML2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		544DCCBE212A2B6F002DBC46 /* RSXML2.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = 544DCCBD212A2B6F002DBC46 /* RSXML2.framework.dSYM */; };
 		54501010230E9C8600F0B165 /* FeedDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 5450100F230E9C8600F0B165 /* FeedDownload.m */; };
 		546A6A2922C583390034E806 /* SettingsGeneralView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D857D122802309001BA1C8 /* SettingsGeneralView.m */; };
 		546A6A2C22C584AF0034E806 /* SettingsAppearanceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 546A6A2A22C584AF0034E806 /* SettingsAppearanceView.m */; };
@@ -25,6 +22,8 @@
 		546FC44321189975007CC3A3 /* SettingsGeneral.m in Sources */ = {isa = PBXBuildFile; fileRef = 546FC44121189975007CC3A3 /* SettingsGeneral.m */; };
 		5477D34E21233C62002BA27F /* FeedGroup+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 5477D34D21233C62002BA27F /* FeedGroup+Ext.m */; };
 		5478DF04225A7AE200D30C64 /* SettingsFeedsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5478DF03225A7AE200D30C64 /* SettingsFeedsView.m */; };
+		5483296C2A3CDC38000688B9 /* RSXML2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 548329652A3CDB22000688B9 /* RSXML2.framework */; };
+		5483296D2A3CDC38000688B9 /* RSXML2.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 548329652A3CDB22000688B9 /* RSXML2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		548C6D0A230C33DE003A1AAF /* NSURL+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 548C6D09230C33DE003A1AAF /* NSURL+Ext.m */; };
 		5491005D2331435E00858AE2 /* Download3rdParty.m in Sources */ = {isa = PBXBuildFile; fileRef = 5491005C2331435E00858AE2 /* Download3rdParty.m */; };
 		54910067233A4D4000858AE2 /* URLScheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 54910066233A4D4000858AE2 /* URLScheme.m */; };
@@ -59,6 +58,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		548329642A3CDB22000688B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5483295E2A3CDB22000688B9 /* RSXML2.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 84F22C0D1B52DDEA000060CE;
+			remoteInfo = RSXML2;
+		};
+		548329662A3CDB22000688B9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5483295E2A3CDB22000688B9 /* RSXML2.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 84F22C171B52DDEA000060CE;
+			remoteInfo = RSXML2Tests;
+		};
 		54A2D63722EF8193007C61F3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 54A2D62E22EF8183007C61F3 /* QLOPML.xcodeproj */;
@@ -75,7 +88,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				544DCCBA212A2B4D002DBC46 /* RSXML2.framework in Embed Frameworks */,
+				5483296D2A3CDC38000688B9 /* RSXML2.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -86,7 +99,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				544DCCBE212A2B6F002DBC46 /* RSXML2.framework.dSYM in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,8 +131,6 @@
 		544B01192114B41200386E5C /* ModalSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalSheet.m; sourceTree = "<group>"; };
 		544B011B2114EE9100386E5C /* AppHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppHook.h; sourceTree = "<group>"; };
 		544B011C2114EE9100386E5C /* AppHook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppHook.m; sourceTree = "<group>"; };
-		544DCCB8212A2B4D002DBC46 /* RSXML2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RSXML2.framework; path = Carthage/Build/Mac/RSXML2.framework; sourceTree = "<group>"; };
-		544DCCBD212A2B6F002DBC46 /* RSXML2.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = RSXML2.framework.dSYM; path = Carthage/Build/Mac/RSXML2.framework.dSYM; sourceTree = "<group>"; };
 		5450100E230E9C8600F0B165 /* FeedDownload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FeedDownload.h; sourceTree = "<group>"; };
 		5450100F230E9C8600F0B165 /* FeedDownload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeedDownload.m; sourceTree = "<group>"; };
 		546A6A2A22C584AF0034E806 /* SettingsAppearanceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsAppearanceView.m; sourceTree = "<group>"; };
@@ -135,6 +145,7 @@
 		5477D34D21233C62002BA27F /* FeedGroup+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "FeedGroup+Ext.m"; sourceTree = "<group>"; };
 		5478DF02225A7AE200D30C64 /* SettingsFeedsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsFeedsView.h; sourceTree = "<group>"; };
 		5478DF03225A7AE200D30C64 /* SettingsFeedsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsFeedsView.m; sourceTree = "<group>"; };
+		5483295E2A3CDB22000688B9 /* RSXML2.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RSXML2.xcodeproj; path = ../RSXML2/RSXML2.xcodeproj; sourceTree = "<group>"; };
 		54892F1D2235285700271CBA /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		548C6D08230C33DE003A1AAF /* NSURL+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSURL+Ext.h"; sourceTree = "<group>"; };
 		548C6D09230C33DE003A1AAF /* NSURL+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSURL+Ext.m"; sourceTree = "<group>"; };
@@ -204,7 +215,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				544DCCB9212A2B4D002DBC46 /* RSXML2.framework in Frameworks */,
+				5483296C2A3CDC38000688B9 /* RSXML2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,15 +258,6 @@
 			path = NSCategories;
 			sourceTree = "<group>";
 		};
-		544FBD4321064AEB008A260C /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				544DCCB8212A2B4D002DBC46 /* RSXML2.framework */,
-				544DCCBD212A2B6F002DBC46 /* RSXML2.framework.dSYM */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		546FC44D2118B357007CC3A3 /* Preferences */ = {
 			isa = PBXGroup;
 			children = (
@@ -269,6 +271,15 @@
 				54D857D72280C367001BA1C8 /* About Tab */,
 			);
 			path = Preferences;
+			sourceTree = "<group>";
+		};
+		5483295F2A3CDB22000688B9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				548329652A3CDB22000688B9 /* RSXML2.framework */,
+				548329672A3CDB22000688B9 /* RSXML2Tests.xctest */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		54A07A8322105E0800082C51 /* Core Data */ = {
@@ -305,8 +316,8 @@
 				54892F1D2235285700271CBA /* CHANGELOG.md */,
 				54ACC27E21061B3B0020715F /* baRSS */,
 				54A2D62E22EF8183007C61F3 /* QLOPML.xcodeproj */,
+				5483295E2A3CDB22000688B9 /* RSXML2.xcodeproj */,
 				54ACC27D21061B3B0020715F /* Products */,
-				544FBD4321064AEB008A260C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -498,6 +509,10 @@
 					ProductGroup = 54A2D63422EF8193007C61F3 /* Products */;
 					ProjectRef = 54A2D62E22EF8183007C61F3 /* QLOPML.xcodeproj */;
 				},
+				{
+					ProductGroup = 5483295F2A3CDB22000688B9 /* Products */;
+					ProjectRef = 5483295E2A3CDB22000688B9 /* RSXML2.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -507,6 +522,20 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		548329652A3CDB22000688B9 /* RSXML2.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = RSXML2.framework;
+			remoteRef = 548329642A3CDB22000688B9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		548329672A3CDB22000688B9 /* RSXML2Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = RSXML2Tests.xctest;
+			remoteRef = 548329662A3CDB22000688B9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		54A2D63822EF8193007C61F3 /* QLOPML.qlgenerator */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
@@ -754,7 +783,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"APP_NAME=\"\\@\\\"$(PRODUCT_NAME)\\\"\"",
@@ -809,7 +837,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/Carthage/Build/Mac",
 				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"APP_NAME=\"\\@\\\"$(PRODUCT_NAME)\\\"\"",

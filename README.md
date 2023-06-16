@@ -42,18 +42,20 @@ Go to [releases](https://github.com/relikd/baRSS/releases) and downloaded the la
 Searching for the App Store release? Read this [notice](#app-store-notice).
 
 ### Build from source
-You'll need Xcode and [Carthage](https://github.com/Carthage/Carthage#installing-carthage). 
-The latter is optional, you can build the [RSXML2] library from source instead. 
-Carthage just makes it more convenient.
-Download and unzip this project, navigate to the root folder and run `carthage bootstrap --platform macOS`. 
+You'll need Xcode, [RSXML2] \(required), and [QLOPML] \(optional).
 
-Next, you need to clone [QLOPML](https://github.com/relikd/QLOPML) in the same folder where this project is.
+```sh
+git clone https://github.com/relikd/baRSS
+git clone https://github.com/relikd/RSXML2
+git clone https://github.com/relikd/QLOPML
+```
+
 Alternatively, you can simply delete the `QLOPML` project reference without much harm.
 `QLOPML` is a Quick Look plugin for `.opml` files.
 It will display the file contents whenever you hit spacebar.
 
 That's it. 
-Open Xcode and build the project. 
+Open `baRSS/baRSS.xcodeproj` and build the project. 
 Note, there are some compiler flags that append 'beta' to the development release. 
 If you prefer the optimized release version go to `Product > Archive`.
 
@@ -165,7 +167,7 @@ But on the other hand, now it is macOS 10.12 compatible.
 
 ### 3rd Party Libraries
 
-This project uses a modified version of Brent Simmons' [RSXML](https://github.com/brentsimmons/RSXML) for feed parsing. 
+This project uses a modified version of Brent Simmons' [RSXML] for feed parsing. 
 [RSXML2] is licensed under a MIT license (same as this project).
 
 
@@ -176,4 +178,6 @@ This project uses a modified version of Brent Simmons' [RSXML](https://github.co
 - First prototype used __feedparser python__ library
 
 
+[QLOPML]: https://github.com/relikd/QLOPML
 [RSXML2]: https://github.com/relikd/RSXML2
+[RSXML]: https://github.com/brentsimmons/RSXML
