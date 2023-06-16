@@ -13,7 +13,7 @@
 @implementation SettingsFeedsView
 
 - (instancetype)initWithController:(SettingsFeeds*)delegate {
-	self = [super initWithFrame:NSZeroRect];
+	self = [super initWithFrame:NSMakeRect(0, 0, 1000, 1000)];
 	if (self) {
 		self.controller = delegate; // make sure its first
 		self.outline = [self generateOutlineView]; // uses self.controller

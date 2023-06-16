@@ -14,7 +14,7 @@
 	NSView *labels = [NSView labelColumn:lbls rowHeight:HEIGHT_INPUTFIELD padding:PAD_S];
 	
 	
-	self = [super initWithFrame:NSMakeRect(0, 0, 0, NSHeight(labels.frame))];
+	self = [super initWithFrame:NSMakeRect(0, 0, 1000, NSHeight(labels.frame))];
 	self.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
 	
 	CGFloat x = NSWidth(labels.frame) + PAD_S;
