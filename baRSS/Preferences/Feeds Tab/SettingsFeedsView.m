@@ -13,7 +13,7 @@
 @implementation SettingsFeedsView
 
 - (instancetype)initWithController:(SettingsFeeds*)delegate {
-	self = [super initWithFrame:NSMakeRect(0, 0, 1000, 1000)];
+	self = [super initWithFrame:NSMakeRect(0, 0, 100, 100)];
 	if (self) {
 		self.controller = delegate; // make sure its first
 		self.outline = [self generateOutlineView]; // uses self.controller
@@ -60,7 +60,7 @@
 - (void)setOutlineColumns:(NSOutlineView*)outline {
 	NSTableColumn *colName = [[NSTableColumn alloc] initWithIdentifier:CustomCellName];
 	colName.title = NSLocalizedString(@"Name", nil);
-	colName.width = 10000;
+	colName.width = 100;
 	colName.maxWidth = 10000;
 	colName.resizingMask = NSTableColumnAutoresizingMask;
 	[outline addTableColumn:colName];
