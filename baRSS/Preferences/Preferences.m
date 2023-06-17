@@ -22,7 +22,7 @@
 			TabItem(NSImageNameFontPanel, NSLocalizedString(@"Appearance", nil), [SettingsAppearance class]),
 			TabItem(NSImageNameInfo, NSLocalizedString(@"About", nil), [SettingsAbout class]),
 		];
-		[self switchToTab: UserPrefsUInt(Pref_prefSelectedTab)];
+		self.selectedTabViewItemIndex = -1;
 	}
 	return self;
 }
@@ -38,19 +38,16 @@ static inline NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Clas
 /// Safely set selected index without out of bounds exception
 - (__kindof NSViewController*)switchToTab:(NSUInteger)index {
 	if (index < 0 || index >= self.tabViewItems.count)
-		return nil;
-	NSTabViewItem *tab = self.tabViewItems[index];
-	if (tab.identifier == NSToolbarFlexibleSpaceItemIdentifier)
-		return nil;
+		index = 0;
 	self.selectedTabViewItemIndex = (NSInteger)index;
-	return [tab viewController];
+	return [self.tabViewItems[index] viewController];
 }
 
 /// Delegate method, store last selected tab to user preferences
 - (void)tabView:(NSTabView*)tabView didSelectTabViewItem:(nullable NSTabViewItem*)tabViewItem {
 	[super tabView:tabView didSelectTabViewItem:tabViewItem];
 	NSInteger newIndex = self.selectedTabViewItemIndex;
-	if (UserPrefsInt(Pref_prefSelectedTab) != newIndex)
+	if (newIndex != -1 && UserPrefsInt(Pref_prefSelectedTab) != newIndex)
 		UserPrefsSetInt(Pref_prefSelectedTab, newIndex);
 }
 
@@ -65,7 +62,8 @@ static inline NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Clas
 	w.contentMinSize = NSMakeSize(320, 327);
 	w.windowController.shouldCascadeWindows = YES;
 	w.title = [NSString stringWithFormat:NSLocalizedString(@"%@ Preferences", nil), NSProcessInfo.processInfo.processName];
-	w.contentViewController = [PrefTabs new];
+	PrefTabs *tabController = [PrefTabs new];
+	w.contentViewController = tabController;
 	[w.toolbar insertItemWithItemIdentifier:NSToolbarSpaceItemIdentifier atIndex:3];
 	[w.toolbar insertItemWithItemIdentifier:NSToolbarFlexibleSpaceItemIdentifier atIndex:4];
 	w.delegate = w;
@@ -76,6 +74,7 @@ static inline NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Clas
 	} else {
 		[w setFrameFromString:prevFrame];
 	}
+	[tabController switchToTab:UserPrefsUInt(Pref_prefSelectedTab)];
 	return w;
 }
 
