@@ -16,15 +16,10 @@
 	if (self) {
 		self.tabStyle = NSTabViewControllerTabStyleToolbar;
 		self.transitionOptions = NSViewControllerTransitionNone;
-		
-		NSTabViewItem *flexibleWidth = [[NSTabViewItem alloc] initWithIdentifier:NSToolbarFlexibleSpaceItemIdentifier];
-		flexibleWidth.viewController = [NSViewController new];
-		
 		self.tabViewItems = @[
 			TabItem(NSImageNamePreferencesGeneral, NSLocalizedString(@"General", nil), [SettingsGeneral class]),
 			TabItem(NSImageNameUserAccounts, NSLocalizedString(@"Feeds", nil), [SettingsFeeds class]),
 			TabItem(NSImageNameFontPanel, NSLocalizedString(@"Appearance", nil), [SettingsAppearance class]),
-			flexibleWidth,
 			TabItem(NSImageNameInfo, NSLocalizedString(@"About", nil), [SettingsAbout class]),
 		];
 		[self switchToTab: UserPrefsUInt(Pref_prefSelectedTab)];
@@ -71,6 +66,8 @@ static inline NSTabViewItem* TabItem(NSImageName imageName, NSString *text, Clas
 	w.windowController.shouldCascadeWindows = YES;
 	w.title = [NSString stringWithFormat:NSLocalizedString(@"%@ Preferences", nil), NSProcessInfo.processInfo.processName];
 	w.contentViewController = [PrefTabs new];
+	[w.toolbar insertItemWithItemIdentifier:NSToolbarSpaceItemIdentifier atIndex:3];
+	[w.toolbar insertItemWithItemIdentifier:NSToolbarFlexibleSpaceItemIdentifier atIndex:4];
 	w.delegate = w;
 	NSWindowPersistableFrameDescriptor prevFrame = UserPrefsString(Pref_prefWindowFrame);
 	if (!prevFrame) {
