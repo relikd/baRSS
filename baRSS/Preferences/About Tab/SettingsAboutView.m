@@ -4,7 +4,7 @@
 @implementation SettingsAboutView
 
 - (instancetype)init {
-	self = [super initWithFrame:NSMakeRect(0, 0, 1000, 1000)];
+	self = [super initWithFrame:NSMakeRect(0, 0, 320, 327)];
 	NSDictionary *info = [[NSBundle mainBundle] infoDictionary];
 	NSString *version = [NSString stringWithFormat:NSLocalizedString(@"Version %@", nil), info[@"CFBundleShortVersionString"]];
 #if DEBUG // append build number, e.g., '0.9.4 (9906)'

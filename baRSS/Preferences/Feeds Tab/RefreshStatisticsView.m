@@ -14,7 +14,7 @@
  @return Centered view without autoresizing.
  */
 - (instancetype)initWithRefreshInterval:(NSDictionary*)info articleCount:(NSUInteger)count callback:(nullable id<RefreshIntervalButtonDelegate>)callback {
-	self = [super initWithFrame:NSMakeRect(0, 0, 1000, 1000)];
+	self = [super initWithFrame:NSMakeRect(0, 0, 320, 327)];
 	self.autoresizesSubviews = NO;
 	
 	NSTextField *dateView = [self viewForArticlesCount:count latest:info];

@@ -5,7 +5,7 @@
 @implementation SettingsGeneralView
 
 - (instancetype)initWithController:(SettingsGeneral*)controller {
-	self = [super initWithFrame:NSMakeRect(0, 0, 1000, 1000)];
+	self = [super initWithFrame:NSMakeRect(0, 0, 320, 327)];
 	// Change default feed reader application
 	NSTextField *l1 = [[NSView label:NSLocalizedString(@"Default feed reader:", nil)] placeIn:self x:PAD_WIN yTop:PAD_WIN + 3];
 	NSButton *help = [[[NSView helpButton] action:@selector(clickHowToDefaults:) target:controller] placeIn:self xRight:PAD_WIN yTop:PAD_WIN];

@@ -16,7 +16,7 @@
 @implementation SettingsAppearanceView
 
 - (instancetype)init {
-	self = [super initWithFrame:NSMakeRect(0, 0, 1000, 1000)];
+	self = [super initWithFrame:NSMakeRect(0, 0, 320, 327)];
 	// Insert matrix header (icons above checkbox matrix)
 	ColumnIcon(self, X__, RSSImageSettingsGlobal, NSLocalizedString(@"Show in menu bar", nil));
 	ColumnIcon(self, _X_, RSSImageSettingsGroup, NSLocalizedString(@"Show in group menu", nil));
