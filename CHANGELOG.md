@@ -8,6 +8,11 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 ## [Unreleased]
 
 
+## [1.2.2] – 2023-06-18
+### Fixed
+- Feed menu sporadically not opening
+
+
 ## [1.2.1] – 2023-06-17
 ### Added
 - Universal binary (Intel+AppleSilicon)
@@ -168,7 +173,8 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
-[Unreleased]: https://github.com/relikd/baRSS/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/relikd/baRSS/compare/v1.2.2...HEAD
+[1.2.2]: https://github.com/relikd/baRSS/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/relikd/baRSS/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/relikd/baRSS/compare/v1.1.3...v1.2.0
 [1.1.3]: https://github.com/relikd/baRSS/compare/v1.1.2...v1.1.3

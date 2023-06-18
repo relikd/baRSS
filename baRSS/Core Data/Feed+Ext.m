@@ -28,7 +28,13 @@
 - (NSMenuItem*)newMenuItem {
 	NSMenuItem *item = [NSMenuItem new];
 	item.title = self.group.anyName;
-	item.toolTip = self.subtitle;
+	// Tooltip disabled (feed-group only) because it causes issues on macOS Ventura.
+	// Menu opens invisibly (OrderNSWindow: unsupported window ordering op -1)
+	// steps to reproduce:
+	//  1. hover over a feed-group menu item until tooltip pops up
+	//  2. hover over another feed with tooltip
+	//  3. go back to previous feed.
+//	item.toolTip = self.subtitle;
 	item.enabled = (self.articles.count > 0);
 	item.image = self.iconImage16;
 	item.representedObject = self.indexPath;
