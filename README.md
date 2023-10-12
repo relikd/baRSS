@@ -64,6 +64,16 @@ If you prefer the optimized release version go to `Product > Archive`.
 Hidden options
 --------------
 
+### Launch on start / reboot
+
+baRSS has no option to launch it on start.
+However, you can still add the application to auto boot by adding it to the system login items:
+
+`System Preferences > User > Login Items`
+
+
+### CLI options
+
 The following options have no UI equivalent and must be configured in Terminal. 
 Most likely, you will never stumble upon these if not reading this chapter.
 **Note:** To reset an option run `defaults delete de.relikd.baRSS {KEY}`, where `{KEY}` is an option from below.
@@ -107,8 +117,7 @@ open barss:backup && cp "$HOME/Library/Containers/de.relikd.baRSS/Data/Library/A
 ToDo
 ----
 
-The following list is not exhaustive but rather a collection of nice things that will be added eventually.
-I will postpone the development until demand increases …
+The following list is a collection of ideas that may be added if people request it.
 
 - [ ] Localizations
 - [ ] Feed generator for websites without feeds
