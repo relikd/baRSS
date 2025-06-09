@@ -142,11 +142,13 @@
 - (FeedArticle*)findRemoteArticle:(RSParsedArticle*)remote inLocalSet:(NSSet<FeedArticle*>*)localSet {
 	NSString *searchLink = remote.link;
 	NSString *searchGuid = remote.guid;
-	BOOL linkIsNil = (searchLink == nil);
-	BOOL guidIsNil = (searchGuid == nil);
 	for (FeedArticle *art in localSet) {
-		if ((linkIsNil && art.link == nil) || (!linkIsNil && [art.link isEqualToString:searchLink])) {
-			if ((guidIsNil && art.guid == nil) || (!guidIsNil && [art.guid isEqualToString:searchGuid]))
+		// assuming if a guid is set, it will always be unique
+		if (searchGuid != nil) {
+			if ([art.guid isEqualToString:searchGuid])
+				return art;
+		} else if (searchLink != nil) {
+			if ([art.link isEqualToString:searchLink])
 				return art;
 		}
 	}
@@ -159,11 +161,13 @@
 - (RSParsedArticle*)findLocalArticle:(FeedArticle*)local inRemoteSet:(NSArray<RSParsedArticle*>*)remoteSet {
 	NSString *searchLink = local.link;
 	NSString *searchGuid = local.guid;
-	BOOL linkIsNil = (searchLink == nil);
-	BOOL guidIsNil = (searchGuid == nil);
 	for (RSParsedArticle *art in remoteSet) {
-		if ((linkIsNil && art.link == nil) || (!linkIsNil && [art.link isEqualToString:searchLink])) {
-			if ((guidIsNil && art.guid == nil) || (!guidIsNil && [art.guid isEqualToString:searchGuid]))
+		// assuming if a guid is set, it will always be unique
+		if (searchGuid != nil) {
+			if ([art.guid isEqualToString:searchGuid])
+				return art;
+		} else if (searchLink != nil) {
+			if ([art.link isEqualToString:searchLink])
 				return art;
 		}
 	}
