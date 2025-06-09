@@ -69,6 +69,8 @@
 	btn.bezelStyle = NSBezelStyleRounded;
 	btn.bordered = NO;
 	btn.image = [NSImage imageNamed:name];
+	[btn.image setSize:NSMakeSize(size, size)];
+//	[btn.image setResizingMode:NSImageResizingModeTile];
 	return btn;
 }
 
