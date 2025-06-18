@@ -35,6 +35,8 @@ static NSImageName const RSSImageMenuBarIconActive = @"RSSImageMenuBarIconActive
 static NSImageName const RSSImageMenuBarIconPaused = @"RSSImageMenuBarIconPaused";
 /// Menu item, unread state icon (blue dot)
 static NSImageName const RSSImageMenuItemUnread    = @"RSSImageMenuItemUnread";
+/// Feed edit, regex editor icon @c "(.*)"
+static NSImageName const RSSImageRegexIcon         = @"RSSImageRegexIcon";
 
 
 #pragma mark - NSNotificationName constants

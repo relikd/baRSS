@@ -1,6 +1,7 @@
 #import "DrawImage.h"
 #import "Constants.h"
 #import "NSColor+Ext.h"
+#import "TinySVG.h"
 
 
 @implementation DrawSeparator
@@ -125,7 +126,6 @@ static inline void AddGroupIconPath(CGContextRef c, CGFloat size, BOOL showBackg
 	CGPathRelease(lower);
 }
 
-
 /**
  Create @c CGPath for RSS icon; a circle in the lower left bottom and two radio waves going outwards.
  @param connection If @c NO, draw only one radio wave and a pause icon in the upper right
@@ -146,21 +146,8 @@ static inline void AddRSSIconPath(CGContextRef c, CGFloat size, BOOL connection)
 }
 
 
-#pragma mark - Icon Background Generators
+#pragma mark - Icon Background
 
-
-/// Create @c CGPath with rounded corners (optional). @param roundness Value between @c 0.0 and @c 1.0
-static void AddRoundedBackgroundPath(CGContextRef c, CGRect r, CGFloat roundness) {
-	const CGFloat corner = ShorterSide(r.size) * (roundness / 2.0);
-	if (corner > 0) {
-		CGMutablePathRef pth = CGPathCreateMutable();
-		CGPathAddRoundedRect(pth, NULL, r, corner, corner);
-		CGContextAddPath(c, pth);
-		CGPathRelease(pth);
-	} else {
-		CGContextAddRect(c, r);
-	}
-}
 
 /// Insert and draw linear gradient with @c color saturation @c ±0.3
 static void DrawGradient(CGContextRef c, CGFloat size, NSColor *color) {
@@ -190,6 +177,12 @@ static void DrawGradient(CGContextRef c, CGFloat size, NSColor *color) {
 #pragma mark - CGContext Drawing & Manipulation
 
 
+/// Flip coordinate system
+static void FlipCoordinateSystem(CGContextRef c, CGFloat height) {
+	CGContextTranslateCTM(c, 0, height);
+	CGContextScaleCTM(c, 1, -1);
+}
+
 /// Scale and translate context to the center with respect to the new scale. If @c width @c != @c length align top left.
 static void SetContentScale(CGContextRef c, CGSize size, CGFloat scale) {
 	const CGFloat s = ShorterSide(size);
@@ -204,7 +197,7 @@ static void DrawRoundedFrame(CGContextRef c, CGRect r, CGColorRef color, BOOL ba
 	CGContextSetStrokeColorWithColor(c, color);
 	CGFloat contentScale = defaultScale;
 	if (background) {
-		AddRoundedBackgroundPath(c, r, corner);
+		svgAddRect(c, 1, r, ShorterSide(r.size) * corner/2);
 		if (scaling != 0.0)
 			contentScale *= scaling;
 	}
@@ -277,6 +270,31 @@ static void DrawUnreadIcon(CGRect r, NSColor *color) {
 	CGPathRelease(path);
 }
 
+/// Draw "(.*)" as vector path
+static void DrawRegexIcon(CGRect r) {
+	const CGFloat size = ShorterSide(r.size);
+	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
+	
+	svgAddRect(c, 1, r, .2 * size);
+	CGContextSetFillColorWithColor(c, NSColor.redColor.CGColor);
+	CGContextFillPath(c);
+	
+	// SVG files use bottom-left corner coordinate system. Quartz uses top-left.
+	FlipCoordinateSystem(c, r.size.height);
+	SetContentScale(c, r.size, 0.8);
+	// "("
+	svgAddPath(c, size/1000, "m184 187c-140 205-134 432-1 622l-66 44c-159-221-151-499 0-708z");
+	// "."
+	svgAddCircle(c, size/1000, 315, 675, 70, NO);
+	// "*"
+	svgAddPath(c, size/1000, "m652 277 107-35 21 63-109 36 68 92-54 39-68-93-66 91-52-41 67-88-109-37 21-63 108 37v-113h66v112z");
+	// ")"
+	svgAddPath(c, size/1000, "m816 813c140-205 134-430 1-621l66-45c159 221 151 499 0 708z");
+	
+	CGContextSetFillColorWithColor(c, NSColor.whiteColor.CGColor);
+	CGContextFillPath(c);
+}
+
 
 #pragma mark - NSImage Name Registration
 
@@ -297,4 +315,5 @@ void RegisterImageViewNames(void) {
 	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"RSS menu bar icon", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor menuBarIconColor].CGColor, YES, YES); return YES; });
 	Register(16, RSSImageMenuBarIconPaused, NSLocalizedString(@"RSS menu bar icon, paused", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor menuBarIconColor].CGColor, YES, NO); return YES; });
 	Register(14, RSSImageMenuItemUnread, NSLocalizedString(@"Unread icon", nil), ^(NSRect r) { DrawUnreadIcon(r, [NSColor unreadIndicatorColor]); return YES; });
+	Register(32, RSSImageRegexIcon, NSLocalizedString(@"Regex icon", nil), ^(NSRect r) { DrawRegexIcon(r); return YES; });
 }

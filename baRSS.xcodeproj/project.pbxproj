@@ -12,6 +12,7 @@
 		54195886218E1BDB00581B79 /* NSMenu+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54195885218E1BDB00581B79 /* NSMenu+Ext.m */; };
 		541C67C32255470B004D2CE6 /* SettingsAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = 541C67C22255470B004D2CE6 /* SettingsAppearance.m */; };
 		54209E942117325100F3B5EF /* DrawImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 54209E932117325100F3B5EF /* DrawImage.m */; };
+		54229F552E02491A0019ACB0 /* TinySVG.m in Sources */ = {isa = PBXBuildFile; fileRef = 54229F542E02491A0019ACB0 /* TinySVG.m */; };
 		544B011A2114B41200386E5C /* ModalSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* ModalSheet.m */; };
 		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
 		54501010230E9C8600F0B165 /* FeedDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 5450100F230E9C8600F0B165 /* FeedDownload.m */; };
@@ -127,6 +128,8 @@
 		541C67C22255470B004D2CE6 /* SettingsAppearance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsAppearance.m; sourceTree = "<group>"; };
 		54209E922117325100F3B5EF /* DrawImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawImage.h; sourceTree = "<group>"; };
 		54209E932117325100F3B5EF /* DrawImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawImage.m; sourceTree = "<group>"; };
+		54229F532E02491A0019ACB0 /* TinySVG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TinySVG.h; sourceTree = "<group>"; };
+		54229F542E02491A0019ACB0 /* TinySVG.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TinySVG.m; sourceTree = "<group>"; };
 		544B01182114B41200386E5C /* ModalSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSheet.h; sourceTree = "<group>"; };
 		544B01192114B41200386E5C /* ModalSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalSheet.m; sourceTree = "<group>"; };
 		544B011B2114EE9100386E5C /* AppHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppHook.h; sourceTree = "<group>"; };
@@ -429,6 +432,8 @@
 				54209E932117325100F3B5EF /* DrawImage.m */,
 				54910065233A4D4000858AE2 /* URLScheme.h */,
 				54910066233A4D4000858AE2 /* URLScheme.m */,
+				54229F532E02491A0019ACB0 /* TinySVG.h */,
+				54229F542E02491A0019ACB0 /* TinySVG.m */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -628,6 +633,7 @@
 				54195886218E1BDB00581B79 /* NSMenu+Ext.m in Sources */,
 				54910067233A4D4000858AE2 /* URLScheme.m in Sources */,
 				54F6025D21C1D4170006D338 /* OpmlFile.m in Sources */,
+				54229F552E02491A0019ACB0 /* TinySVG.m in Sources */,
 				5496B511214D6275003ED4ED /* UserPrefs.m in Sources */,
 				546A6A2F22C585580034E806 /* SettingsAboutView.m in Sources */,
 				54B517072270E990006C1B29 /* NSView+Ext.m in Sources */,
