@@ -8,6 +8,20 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 ## [Unreleased]
 
 
+## [1.3.0] – 2025-06-24
+### Added
+- *Adding feed:* Regex Converter for websites without RSS feed (hold down option key during edit)
+
+### Fixed
+- *Adding feed:* Keep aspect ratio of favicon inside button (related to fix in v1.2.3)
+
+
+## [1.2.3] – 2025-06-09
+### Fixed
+- *Adding feed:* Favicon size inside button
+- *DB:* Feeds with changing urls -> use guid for unique check
+
+
 ## [1.2.2] – 2023-06-18
 ### Fixed
 - Feed menu sporadically not opening
@@ -25,7 +39,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 
 ## [1.2.0] – 2022-10-01
 ### Added
-- *UI*: Add option to hide read articles (show only unread)
+- *UI:* Add option to hide read articles (show only unread)
 
 
 ## [1.1.3] – 2020-12-18
@@ -46,8 +60,8 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 
 ## [1.1.0] – 2020-01-17
 ### Added
-- *QuickLook*: Thumbnail previews for OPML files (QLOPML v1.3)
-- *Status Bar Menu*: Tint menu bar icon with Accent color (macOS 10.14+)
+- *QuickLook:* Thumbnail previews for OPML files (QLOPML v1.3)
+- *Status Bar Menu:* Tint menu bar icon with Accent color (macOS 10.14+)
 
 ### Fixed
 - Resolved Xcode warnings in Xcode 11
@@ -55,9 +69,9 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 
 ## [1.0.2] – 2019-10-25
 ### Fixed
-- *Status Bar Menu*: Preferences could not be opened on macOS 10.15
-- *Status Bar Menu*: Menu flickering resulting in a hang on macOS 10.15
-- *UI*: Text color in `About` tab
+- *Status Bar Menu:* Preferences could not be opened on macOS 10.15
+- *Status Bar Menu:* Menu flickering resulting in a hang on macOS 10.15
+- *UI:* Text color in `About` tab
 
 
 ## [1.0.1] – 2019-10-04
@@ -100,7 +114,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Settings, Feeds:* Status info with accurate download count (instead of `Updating feeds …`)
 - *Settings, Feeds:* Status info shows `No network connection` and `Updates paused`
 - *Settings, Feeds:* After feed edit, run update scheduler immediately
-- *Status Bar Menu*: Feed title is updated properly
+- *Status Bar Menu:* Feed title is updated properly
 - *UI:* If an error occurs, show document URL (path to file or web url)
 - Comparison of existing articles with nonexistent guid and link
 - Don't mark articles read if opening URLs failed
@@ -112,12 +126,12 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Adding feed:* Refresh interval hotkeys set to: `⌘1` … `⌘6`
 - *Settings, Feeds:* Single add button for feeds, groups, and separators
 - *Settings, Feeds:* Always append new items at the end
-- *Settings, General*: Moved `Fix cache` button to `About` text section
-- *Settings, General*: Changing default feed reader is prohibited within sandbox
-- *Settings, General*: [Auxiliary application](https://github.com/relikd/URL-Scheme-Defaults) for changing default feed reader
-- *Status Bar Menu*: Show `(no title)` instead of `(error)`
-- *Status Bar Menu*: `Update all feeds` will show error alert for broken URLs
-- *DB*: Dropping table `FeedIcon` in favor of image files cache
+- *Settings, General:* Moved `Fix cache` button to `About` text section
+- *Settings, General:* Changing default feed reader is prohibited within sandbox
+- *Settings, General:* [Auxiliary application](https://github.com/relikd/URL-Scheme-Defaults) for changing default feed reader
+- *Status Bar Menu:* Show `(no title)` instead of `(error)`
+- *Status Bar Menu:* `Update all feeds` will show error alert for broken URLs
+- *DB:* Dropping table `FeedIcon` in favor of image files cache
 - *UI:* Interface builder files replaced with code equivalent
 - *UI:* Mark unread articles with blue dot, instead of tick mark
 
@@ -173,7 +187,9 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
-[Unreleased]: https://github.com/relikd/baRSS/compare/v1.2.2...HEAD
+[Unreleased]: https://github.com/relikd/baRSS/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/relikd/baRSS/compare/v1.2.3...v1.3.0
+[1.2.3]: https://github.com/relikd/baRSS/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/relikd/baRSS/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/relikd/baRSS/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/relikd/baRSS/compare/v1.1.3...v1.2.0

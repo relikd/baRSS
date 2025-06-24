@@ -72,6 +72,16 @@ However, you can still add the application to auto boot by adding it to the syst
 `System Preferences > User > Login Items`
 
 
+### UI options
+
+1. If you hold down the option key and click on an article item, you can mark a single item (un-)read without opening it.
+
+2. To add websites without RSS feed you can use the regex converter.
+Hold down the option key in the feed edit modal and click the red regex button.
+Though, admittedly, this is for experts only.
+I still have to find a nice user-friendly way to achieve this.
+
+
 ### CLI options
 
 The following options have no UI equivalent and must be configured in Terminal. 
@@ -79,35 +89,33 @@ Most likely, you will never stumble upon these if not reading this chapter.
 **Note:** To reset an option run `defaults delete de.relikd.baRSS {KEY}`, where `{KEY}` is an option from below.
 
 
-1. If you hold down the option key and click on an article item, you can mark a single item (un-)read without opening it.
-
-2. When holding down the option key, the menu will show an item to open only a few unread items at a time. 
+1. When holding down the option key, the menu will show an item to open only a few unread items at a time. 
 This number can be changed with the following Terminal command (default: 10):
 ```
 defaults write de.relikd.baRSS openFewLinksLimit -int 10
 ```
 
-3. In preferences you can choose to show 'Short article names'. 
+2. In preferences you can choose to show 'Short article names'. 
 This will limit the number of displayed characters to 60 (default). 
 With this Terminal command you can customize this limit:
 ```
 defaults write de.relikd.baRSS shortArticleNamesLimit -int 50
 ```
 
-4. Limit the number of displayed articles per feed menu.
+3. Limit the number of displayed articles per feed menu.
 **Note:** displayed unread count may be different than the unread items inside. 'Open all unread' will open hidden items too.
 ```
 defaults write de.relikd.baRSS articlesInMenuLimit -int 40
 ```
 
-5. You can change the appearance of colors throughout the application. 
+4. You can change the appearance of colors throughout the application. 
 E.g., The tint color of the menu bar icon and the color of the blue unread articles dot.
 ```
 defaults write de.relikd.baRSS colorStatusIconTint -string "#37F"
 defaults write de.relikd.baRSS colorUnreadIndicator -string "#FBA33A"
 ```
 
-6. To backup your list of subscribed feeds, here is a one-liner:
+5. To backup your list of subscribed feeds, here is a one-liner:
 ```
 open barss:backup && cp "$HOME/Library/Containers/de.relikd.baRSS/Data/Library/Application Support/baRSS/backup/feeds_latest.opml" "$HOME/Desktop/baRSS_backup_$(date "+%Y-%m-%d").opml"
 ```
@@ -120,7 +128,7 @@ ToDo
 The following list is a collection of ideas that may be added if people request it.
 
 - [ ] Localizations
-- [ ] Feed generator for websites without feeds
+- [x] Feed generator for websites without feeds
 - [ ] Automatically choose best update interval (e.g., avg)
 - [ ] Sync with online services
 - [ ] Feeds with authentication
@@ -183,7 +191,7 @@ This project uses a modified version of Brent Simmons' [RSXML] for feed parsing.
 ##### Trivia
 
 - Start of project: __July 19, 2018__
-- Estimated development time: __1970h+__
+- Estimated development time: __2020h+__
 - First prototype used __feedparser python__ library
 
 
