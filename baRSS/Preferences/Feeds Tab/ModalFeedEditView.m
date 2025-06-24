@@ -1,6 +1,7 @@
 #import "ModalFeedEditView.h"
 #import "ModalFeedEdit.h"
 #import "NSView+Ext.h"
+#import "Constants.h"
 
 @interface StrictUIntFormatter : NSFormatter
 @end
@@ -25,7 +26,8 @@
 	self.url = [[[NSView inputField:@"https://example.org/feed.rss" width:0] placeIn:self x:x yTop:0] sizeToRight:PAD_S + 18];
 	self.spinnerURL = [[NSView activitySpinner] placeIn:self xRight:1 yTop:2.5];
 	self.favicon = [[[NSView imageView:nil size:18] tooltip:NSLocalizedString(@"Favicon", nil)] placeIn:self xRight:0 yTop:1.5];
-	self.warningButton = [[[[NSView buttonIcon:NSImageNameCaution size:18] action:@selector(didClickWarningButton:) target:nil] // up the responder chain
+	self.warningButton = [[[[NSView buttonIcon:NSImageNameCaution size:18]
+							action:@selector(didClickWarningButton:) target:nil] // up the responder chain
 						   tooltip:NSLocalizedString(@"Click here to show failure reason", nil)]
 						  placeIn:self xRight:0 yTop:1.5];
 	// 2. row
@@ -34,6 +36,10 @@
 	// 3. row
 	self.refreshNum = [[NSView inputField:@"30" width:85] placeIn:self x:x yTop:2*rowHeight];
 	self.refreshUnit = [[NSView popupButton:120] placeIn:self x:NSMaxX(self.refreshNum.frame) + PAD_M yTop:2*rowHeight];
+	self.regexConverterButton = [[[[NSView buttonIcon:RSSImageRegexIcon size:19]
+								   action:@selector(openRegexConverter) target:controller]
+								  tooltip:NSLocalizedString(@"Regex converter", nil)]
+								 placeIn:self xRight:0 yTop:2*rowHeight + 1];
 	
 	// initial state
 	self.url.accessibilityLabel = lbls[0];
@@ -41,6 +47,7 @@
 	self.refreshNum.accessibilityLabel = NSLocalizedString(@"Refresh interval", nil);
 	self.url.delegate = controller;
 	self.warningButton.hidden = YES;
+	self.regexConverterButton.hidden = YES;
 	self.refreshNum.formatter = [StrictUIntFormatter new]; // see below ...
 	[self prepareWarningPopover];
 	return self;

@@ -1,5 +1,5 @@
 @import Cocoa;
-@class RSParsedFeed, RSHTMLMetadataFeedLink, Feed, FaviconDownload;
+@class RSParsedFeed, RSHTMLMetadataFeedLink, Feed, FaviconDownload, RegexConverter;
 @protocol FeedDownloadDelegate;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) RSParsedFeed *xmlfeed;
 @property (readonly, nullable) NSError *error;
 @property (readonly, nullable) NSString *faviconURL;
+@property (readonly, nullable) NSData *rawData;
 
 typedef void (^FeedDownloadBlock)(FeedDownload *sender);
 
@@ -21,6 +22,7 @@ typedef void (^FeedDownloadBlock)(FeedDownload *sender);
 + (instancetype)withURL:(NSString*)url;
 + (instancetype)withFeed:(Feed*)feed forced:(BOOL)flag;
 // Actions
+- (instancetype)withRegex:(nullable RegexConverter *)converter enforce:(BOOL)flag;
 - (instancetype)startWithDelegate:(id<FeedDownloadDelegate>)delegate;
 - (instancetype)startWithBlock:(nonnull FeedDownloadBlock)block;
 - (void)cancel;

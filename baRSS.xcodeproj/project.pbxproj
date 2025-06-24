@@ -13,6 +13,10 @@
 		541C67C32255470B004D2CE6 /* SettingsAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = 541C67C22255470B004D2CE6 /* SettingsAppearance.m */; };
 		54209E942117325100F3B5EF /* DrawImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 54209E932117325100F3B5EF /* DrawImage.m */; };
 		54229F552E02491A0019ACB0 /* TinySVG.m in Sources */ = {isa = PBXBuildFile; fileRef = 54229F542E02491A0019ACB0 /* TinySVG.m */; };
+		54253C7F2C47303A00742695 /* RegexConverter+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54253C7E2C47303A00742695 /* RegexConverter+Ext.m */; };
+		54253C932C49BFCD00742695 /* RegexConverterModal.m in Sources */ = {isa = PBXBuildFile; fileRef = 54253C8A2C49A92400742695 /* RegexConverterModal.m */; };
+		54253C942C49BFDC00742695 /* RegexConverterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 54253C872C49A6A800742695 /* RegexConverterController.m */; };
+		54253C952C49BFE400742695 /* RegexConverterView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54253C842C47369000742695 /* RegexConverterView.m */; };
 		544B011A2114B41200386E5C /* ModalSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* ModalSheet.m */; };
 		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
 		54501010230E9C8600F0B165 /* FeedDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 5450100F230E9C8600F0B165 /* FeedDownload.m */; };
@@ -45,6 +49,7 @@
 		54B749E0220636200022CC6D /* FeedArticle+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B749DF220635CD0022CC6D /* FeedArticle+Ext.m */; };
 		54BB048921FD2AB500C303A5 /* NSDate+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54BB048821FD2AB500C303A5 /* NSDate+Ext.m */; };
 		54BF444A22D0F4F300660096 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 54BF444922D0F4F300660096 /* AppIcon.icns */; };
+		54D10DDB2C6E930F0008F621 /* RegexFeed.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D10DDA2C6E930F0008F621 /* RegexFeed.m */; };
 		54D55D7322E624CD00057B98 /* SettingsFeeds+DragDrop.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D55D7222E624CD00057B98 /* SettingsFeeds+DragDrop.m */; };
 		54D857CE227C5785001BA1C8 /* RefreshStatisticsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D857CD227C5785001BA1C8 /* RefreshStatisticsView.m */; };
 		54DD9F1323D1D6B000B1EAA6 /* NSColor+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54DD9F1223D1D6B000B1EAA6 /* NSColor+Ext.m */; };
@@ -130,6 +135,14 @@
 		54209E932117325100F3B5EF /* DrawImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawImage.m; sourceTree = "<group>"; };
 		54229F532E02491A0019ACB0 /* TinySVG.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TinySVG.h; sourceTree = "<group>"; };
 		54229F542E02491A0019ACB0 /* TinySVG.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TinySVG.m; sourceTree = "<group>"; };
+		54253C7A2C47303A00742695 /* RegexConverter+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RegexConverter+Ext.h"; sourceTree = "<group>"; };
+		54253C7E2C47303A00742695 /* RegexConverter+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "RegexConverter+Ext.m"; sourceTree = "<group>"; };
+		54253C832C47368F00742695 /* RegexConverterView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RegexConverterView.h; sourceTree = "<group>"; };
+		54253C842C47369000742695 /* RegexConverterView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RegexConverterView.m; sourceTree = "<group>"; };
+		54253C872C49A6A800742695 /* RegexConverterController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RegexConverterController.m; sourceTree = "<group>"; };
+		54253C882C49A6A800742695 /* RegexConverterController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RegexConverterController.h; sourceTree = "<group>"; };
+		54253C8A2C49A92400742695 /* RegexConverterModal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RegexConverterModal.m; sourceTree = "<group>"; };
+		54253C8B2C49A92400742695 /* RegexConverterModal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RegexConverterModal.h; sourceTree = "<group>"; };
 		544B01182114B41200386E5C /* ModalSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalSheet.h; sourceTree = "<group>"; };
 		544B01192114B41200386E5C /* ModalSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalSheet.m; sourceTree = "<group>"; };
 		544B011B2114EE9100386E5C /* AppHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppHook.h; sourceTree = "<group>"; };
@@ -190,6 +203,8 @@
 		54BB048721FD2AB500C303A5 /* NSDate+Ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Ext.h"; sourceTree = "<group>"; };
 		54BB048821FD2AB500C303A5 /* NSDate+Ext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Ext.m"; sourceTree = "<group>"; };
 		54BF444922D0F4F300660096 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+		54D10DD92C6E930F0008F621 /* RegexFeed.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RegexFeed.h; sourceTree = "<group>"; };
+		54D10DDA2C6E930F0008F621 /* RegexFeed.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RegexFeed.m; sourceTree = "<group>"; };
 		54D55D7122E624CD00057B98 /* SettingsFeeds+DragDrop.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SettingsFeeds+DragDrop.h"; sourceTree = "<group>"; };
 		54D55D7222E624CD00057B98 /* SettingsFeeds+DragDrop.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SettingsFeeds+DragDrop.m"; sourceTree = "<group>"; };
 		54D857CC227C5785001BA1C8 /* RefreshStatisticsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RefreshStatisticsView.h; sourceTree = "<group>"; };
@@ -238,6 +253,21 @@
 				54195885218E1BDB00581B79 /* NSMenu+Ext.m */,
 			);
 			path = "Status Bar Menu";
+			sourceTree = "<group>";
+		};
+		54253C862C49A5A900742695 /* Regex Editor */ = {
+			isa = PBXGroup;
+			children = (
+				54253C8B2C49A92400742695 /* RegexConverterModal.h */,
+				54253C8A2C49A92400742695 /* RegexConverterModal.m */,
+				54253C882C49A6A800742695 /* RegexConverterController.h */,
+				54253C872C49A6A800742695 /* RegexConverterController.m */,
+				54253C832C47368F00742695 /* RegexConverterView.h */,
+				54253C842C47369000742695 /* RegexConverterView.m */,
+				54D10DD92C6E930F0008F621 /* RegexFeed.h */,
+				54D10DDA2C6E930F0008F621 /* RegexFeed.m */,
+			);
+			path = "Regex Editor";
 			sourceTree = "<group>";
 		};
 		544936F721F1E51E00DEE9AA /* NSCategories */ = {
@@ -298,6 +328,8 @@
 				5477D34D21233C62002BA27F /* FeedGroup+Ext.m */,
 				540F704321B6C16C0022E69D /* FeedMeta+Ext.h */,
 				540F704421B6C16C0022E69D /* FeedMeta+Ext.m */,
+				54253C7A2C47303A00742695 /* RegexConverter+Ext.h */,
+				54253C7E2C47303A00742695 /* RegexConverter+Ext.m */,
 				54B749DE220635BE0022CC6D /* FeedArticle+Ext.h */,
 				54B749DF220635CD0022CC6D /* FeedArticle+Ext.m */,
 			);
@@ -344,6 +376,7 @@
 				541A90EF21257D4F002680A6 /* Status Bar Menu */,
 				54A07A8322105E0800082C51 /* Core Data */,
 				54AD4E04230084FD000AE386 /* Feed Import */,
+				54253C862C49A5A900742695 /* Regex Editor */,
 				546FC44D2118B357007CC3A3 /* Preferences */,
 				54ACC28A21061B3C0020715F /* Info.plist */,
 				54F7101322EE0DDA006985D1 /* Artwork */,
@@ -606,8 +639,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				54253C932C49BFCD00742695 /* RegexConverterModal.m in Sources */,
 				54B51704226DC339006C1B29 /* ModalFeedEditView.m in Sources */,
 				54AD4E0C2301853D000AE386 /* NSString+Ext.m in Sources */,
+				54D10DDB2C6E930F0008F621 /* RegexFeed.m in Sources */,
 				546A6A2C22C584AF0034E806 /* SettingsAppearanceView.m in Sources */,
 				54E9CF32225914300023696F /* SettingsAbout.m in Sources */,
 				54B749E0220636200022CC6D /* FeedArticle+Ext.m in Sources */,
@@ -619,6 +654,7 @@
 				54DD9F1323D1D6B000B1EAA6 /* NSColor+Ext.m in Sources */,
 				54ACC29521061E270020715F /* UpdateScheduler.m in Sources */,
 				54BB048921FD2AB500C303A5 /* NSDate+Ext.m in Sources */,
+				54253C7F2C47303A00742695 /* RegexConverter+Ext.m in Sources */,
 				5477D34E21233C62002BA27F /* FeedGroup+Ext.m in Sources */,
 				54B6F14A231551B3002C94C9 /* FaviconDownload.m in Sources */,
 				54E4446C2329AE0600BBF481 /* NSError+Ext.m in Sources */,
@@ -642,11 +678,13 @@
 				541C67C32255470B004D2CE6 /* SettingsAppearance.m in Sources */,
 				54B749DA2204A85C0022CC6D /* BarStatusItem.m in Sources */,
 				546FC43D21188AD5007CC3A3 /* SettingsFeeds.m in Sources */,
+				54253C952C49BFE400742695 /* RegexConverterView.m in Sources */,
 				548C6D0A230C33DE003A1AAF /* NSURL+Ext.m in Sources */,
 				54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */,
 				54195883218A061100581B79 /* Feed+Ext.m in Sources */,
 				54501010230E9C8600F0B165 /* FeedDownload.m in Sources */,
 				54209E942117325100F3B5EF /* DrawImage.m in Sources */,
+				54253C942C49BFDC00742695 /* RegexConverterController.m in Sources */,
 				54FE73D021220DEC003EAC65 /* StoreCoordinator.m in Sources */,
 				54A07A7F220E04CF00082C51 /* NSFetchRequest+Ext.m in Sources */,
 			);

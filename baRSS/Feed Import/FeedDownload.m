@@ -6,6 +6,9 @@
 #import "FeedMeta+Ext.h"
 #import "NSError+Ext.h"
 #import "NSURLRequest+Ext.h"
+#import "RegexFeed.h"
+#import "RegexConverter+Ext.h"
+
 
 @interface FeedDownload()
 @property (nonatomic, assign) BOOL respondToSelectFeed, respondToRedirect, respondToEnd;
@@ -20,6 +23,9 @@
 @property (nonatomic, strong) RSParsedFeed *xmlfeed;
 @property (nonatomic, strong) NSError *error;
 @property (nonatomic, strong) NSString *faviconURL;
+@property (nonatomic, strong) NSData *rawData;
+@property (nonatomic, strong) RegexConverter *regexConverter;
+@property (nonatomic, assign) BOOL regexEnforce;
 @end
 
 @implementation FeedDownload
@@ -51,12 +57,19 @@
 	FeedDownload *this = [FeedDownload new];
 	this.assertIsFeedURL = YES;
 	this.request = req;
-	return this;
+	return [this withRegex:feed.regex enforce:false];
 }
 
 //  ---------------------------------------------------------------
 // |  MARK: - Getter & Setter
 //  ---------------------------------------------------------------
+
+/// Set @c .regexConverter for html-processed feeds.
+- (instancetype)withRegex:(RegexConverter *)converter enforce:(BOOL)flag {
+	self.regexConverter = converter;
+	self.regexEnforce = flag;
+	return self;
+}
 
 /// Set delegate and check what methods are implemented.
 - (void)setDelegate:(id<FeedDownloadDelegate>)observer {
@@ -134,8 +147,14 @@
 	self.currentDownload = [request dataTask:^(NSData * _Nullable data, NSError * _Nullable error, NSHTTPURLResponse *response) {
 		self.error = error;
 		self.response = response;
+		self.rawData = data;
 		if (!data) { // data = nil if (error || 304)
 			[self performSelectorOnMainThread:@selector(finishAndNotify) withObject:nil waitUntilDone:NO];
+			return;
+		}
+		// if regex is used, no further processing
+		if (self.regexConverter || self.regexEnforce) {
+			[self processWithRegexConverter:self.regexConverter data:data];
 			return;
 		}
 		RSXMLData *xml = [[RSXMLData alloc] initWithData:data url:response.URL];
@@ -144,6 +163,30 @@
 		else
 			[self processXMLDataFeed:xml]; // XML source handling
 	}];
+}
+
+/// The downloaded source is HTML data and will be parsed with @c RegexConverter
+- (void)processWithRegexConverter:(RegexConverter *)converter data:(NSData *)rawData {
+	NSError *err = nil;
+	if (converter) {
+		NSString *theData = [[NSString alloc] initWithData:rawData encoding:NSUTF8StringEncoding];
+		NSArray<RegexFeedEntry*> *matches = [[RegexFeed from:converter] process:theData error:&err];
+		
+		RSParsedFeed *feed = [[RSParsedFeed alloc] initWithURL:self.request.URL];
+		feed.link = self.request.URL.absoluteString; // needed for group-menu-item-open
+		for (RegexFeedEntry *rxEntry in matches) {
+			RSParsedArticle *article = [feed appendNewArticle];
+			article.link = rxEntry.href;
+			article.title = rxEntry.title;
+			article.body = rxEntry.desc;
+			article.datePublished = rxEntry.date;
+		}
+		self.xmlfeed = feed;
+	} else {
+		self.xmlfeed = nil;
+	}
+	self.error = err;
+	[self performSelectorOnMainThread:@selector(finishAndNotify) withObject:nil waitUntilDone:NO];
 }
 
 /// The downloaded source seems to be HTML data, lets parse it with @c RSXML @c RSHTMLMetadataParser

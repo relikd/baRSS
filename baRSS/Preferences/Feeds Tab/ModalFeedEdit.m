@@ -11,6 +11,9 @@
 #import "NSView+Ext.h"
 #import "NSDate+Ext.h"
 #import "NSURL+Ext.h"
+#import "RegexConverterController.h"
+#import "RegexConverterModal.h"
+#import "RegexConverter+Ext.h"
 
 // ################################################################
 // #
@@ -59,6 +62,8 @@
 @property (strong) FeedDownload *memFeed;
 @property (weak) FaviconDownload *memIcon;
 @property (strong) RefreshStatisticsView *statisticsView;
+@property (nonatomic, assign) BOOL openRegexAfterDownload;
+@property (weak) id eventMonitor;
 @end
 
 @implementation ModalFeedEdit
@@ -71,6 +76,13 @@
 	self.view.refreshNum.intValue = 30;
 	[NSDate populateUnitsMenu:self.view.refreshUnit selected:TimeUnitMinutes];
 	[self populateTextFields:self.feedGroup];
+	
+	// removed in windowShouldClose:
+	self.eventMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskFlagsChanged handler:^(NSEvent *event) {
+		BOOL optionKeyActive = ((event.modifierFlags & NSEventModifierFlagOption) != 0);
+		self.view.regexConverterButton.hidden = !self.feedGroup.feed.regex && !optionKeyActive;
+		return event;
+	}];
 }
 
 /// Pre-fill UI control field values with @c FeedGroup properties.
@@ -81,6 +93,7 @@
 	self.view.url.objectValue = fg.feed.meta.url;
 	self.previousURL = self.view.url.stringValue;
 	self.view.favicon.image = [fg.feed iconImage16];
+	self.view.regexConverterButton.hidden = !fg.feed.regex;
 	[NSDate setInterval:fg.feed.meta.refresh forPopup:self.view.refreshUnit andField:self.view.refreshNum animate:NO];
 	[self statsForCoreDataObject];
 }
@@ -131,7 +144,9 @@
 		self.view.name.placeholderString = NSLocalizedString(@"Loading …", nil);
 	}
 	self.previousURL = self.view.url.stringValue;
-	self.memFeed = [[FeedDownload withURL:self.previousURL] startWithDelegate:self];
+	self.memFeed = [[[FeedDownload withURL:self.previousURL]
+					 withRegex:self.feedGroup.feed.regex enforce:self.openRegexAfterDownload]
+					startWithDelegate:self];
 }
 
 /**
@@ -210,7 +225,42 @@
 - (void)downloadComplete {
 	[self.view.spinnerURL stopAnimation:nil];
 	[self.modalSheet setDoneEnabled:YES];
+	
+	if (self.openRegexAfterDownload) {
+		[self openRegexConverter];
+	}
 }
+
+
+#pragma mark - Regex Converter
+
+- (void)openRegexConverter {
+	if (!self.openRegexAfterDownload) {
+		self.openRegexAfterDownload = YES;
+		[self downloadRSS];
+		return;
+	}
+	self.openRegexAfterDownload = NO;
+	
+	// shrink FeedEdit modal size to effectively hide it behind new modal
+	NSRect previous = self.modalSheet.frame;
+	CGFloat minWidthDiff = previous.size.width - self.modalSheet.minSize.width;
+	[self.modalSheet setFrame:NSInsetRect(previous, minWidthDiff / 2.0, 0) display:NO];
+	
+	Feed *feed = self.feedGroup.feed;
+	RegexConverterController *c = [RegexConverterController withData:self.memFeed.rawData andConverter:feed.regex];
+	[self.modalSheet.sheetParent beginCriticalSheet:[c getModalSheet] completionHandler:^(NSModalResponse returnCode) {
+		// reset previous size
+		[self.modalSheet setFrame:previous display:NO];
+		
+		if (returnCode == NSModalResponseOK) {
+			[c applyChanges:feed];
+			self.view.regexConverterButton.hidden = !feed.regex;
+			[self downloadRSS];
+		}
+	}];
+}
+
 
 #pragma mark - Feed Statistics
 
@@ -264,6 +314,7 @@
 		[[NSNotificationCenter defaultCenter] postNotificationName:NSControlTextDidEndEditingNotification object:self.view.url];
 		return NO;
 	}
+	[NSEvent removeMonitor:self.eventMonitor];
 	return YES;
 }
 

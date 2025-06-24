@@ -2,6 +2,7 @@
 #import "OpmlFile.h"
 #import "FeedMeta+Ext.h"
 #import "FeedGroup+Ext.h"
+#import "RegexConverter+Ext.h"
 #import "StoreCoordinator.h"
 #import "Constants.h"
 #import "NSDate+Ext.h"
@@ -120,6 +121,24 @@ static NSInteger RadioGroupSelection(NSView *view) {
 		
 		newFeed.feed.meta.url = [item attributeForKey:OPMLXMLURLKey];
 		newFeed.feed.meta.refresh = interval;
+		
+		// baRSS specific
+		NSString *rxEntry = [item attributeForKey:@"rxEntry"];
+		NSString *rxHref = [item attributeForKey:@"rxHref"];
+		NSString *rxTitle = [item attributeForKey:@"rxTitle"];
+		NSString *rxDesc = [item attributeForKey:@"rxDesc"];
+		NSString *rxDate = [item attributeForKey:@"rxDate"];
+		NSString *rxDateFormat = [item attributeForKey:@"rxDateFormat"];
+		if (rxEntry || rxHref || rxTitle || rxDesc || rxDate || rxDateFormat) {
+			RegexConverter *rx = [RegexConverter newInContext:moc];
+			rx.entry = rxEntry;
+			rx.href = rxHref;
+			rx.title = rxTitle;
+			rx.desc = rxDesc;
+			rx.date = rxDate;
+			rx.dateFormat = rxDateFormat;
+			newFeed.feed.regex = rx;
+		}
 	} else { // GROUP
 		for (NSUInteger i = 0; i < item.children.count; i++) {
 			[self importFeed:item.children[i] parent:newFeed index:(int32_t)i inContext:moc];
@@ -279,6 +298,21 @@ static NSInteger RadioGroupSelection(NSView *view) {
 			[outline addAttribute:[NSXMLNode attributeWithName:OPMLTypeKey stringValue:@"rss"]];
 			NSString *intervalStr = [NSString stringWithFormat:@"%d", item.feed.meta.refresh];
 			[outline addAttribute:[NSXMLNode attributeWithName:@"refreshInterval" stringValue:intervalStr]]; // baRSS specific
+			RegexConverter *rx = item.feed.regex;
+			if (rx) { // baRSS specific
+				if (rx.entry)
+					[outline addAttribute:[NSXMLNode attributeWithName:@"rxEntry" stringValue:rx.entry]];
+				if (rx.href)
+					[outline addAttribute:[NSXMLNode attributeWithName:@"rxHref" stringValue:rx.href]];
+				if (rx.title)
+					[outline addAttribute:[NSXMLNode attributeWithName:@"rxTitle" stringValue:rx.title]];
+				if (rx.desc)
+					[outline addAttribute:[NSXMLNode attributeWithName:@"rxDesc" stringValue:rx.desc]];
+				if (rx.date)
+					[outline addAttribute:[NSXMLNode attributeWithName:@"rxDate" stringValue:rx.date]];
+				if (rx.dateFormat)
+					[outline addAttribute:[NSXMLNode attributeWithName:@"rxDateFormat" stringValue:rx.dateFormat]];
+			}
 			// TODO: option to export unread state?
 		}
 		parent = outline;

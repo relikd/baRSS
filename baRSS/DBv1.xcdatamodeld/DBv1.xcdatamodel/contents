@@ -1,52 +1,63 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14460.32" systemVersion="17G8030" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="v1.0.0">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="19H2026" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="v1.0.0">
     <entity name="Feed" representedClassName="Feed" syncable="YES" codeGenerationType="class">
-        <attribute name="indexPath" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="link" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="subtitle" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="articles" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FeedArticle" inverseName="feed" inverseEntity="FeedArticle" syncable="YES"/>
-        <relationship name="group" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedGroup" inverseName="feed" inverseEntity="FeedGroup" syncable="YES"/>
-        <relationship name="meta" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FeedMeta" inverseName="feed" inverseEntity="FeedMeta" syncable="YES"/>
+        <attribute name="indexPath" optional="YES" attributeType="String"/>
+        <attribute name="link" optional="YES" attributeType="String"/>
+        <attribute name="subtitle" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="articles" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FeedArticle" inverseName="feed" inverseEntity="FeedArticle"/>
+        <relationship name="group" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedGroup" inverseName="feed" inverseEntity="FeedGroup"/>
+        <relationship name="meta" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FeedMeta" inverseName="feed" inverseEntity="FeedMeta"/>
+        <relationship name="regex" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="RegexConverter" inverseName="feed" inverseEntity="RegexConverter"/>
     </entity>
     <entity name="FeedArticle" representedClassName="FeedArticle" syncable="YES" codeGenerationType="class">
-        <attribute name="abstract" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="author" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="guid" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="link" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="published" optional="YES" attributeType="Date" usesScalarValueType="NO" customClassName="NSArray" syncable="YES"/>
-        <attribute name="sortIndex" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="unread" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
-        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="articles" inverseEntity="Feed" syncable="YES"/>
+        <attribute name="abstract" optional="YES" attributeType="String"/>
+        <attribute name="author" optional="YES" attributeType="String"/>
+        <attribute name="body" optional="YES" attributeType="String"/>
+        <attribute name="guid" optional="YES" attributeType="String"/>
+        <attribute name="link" optional="YES" attributeType="String"/>
+        <attribute name="published" optional="YES" attributeType="Date" usesScalarValueType="NO" customClassName="NSArray"/>
+        <attribute name="sortIndex" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <attribute name="unread" optional="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="articles" inverseEntity="Feed"/>
     </entity>
     <entity name="FeedGroup" representedClassName="FeedGroup" syncable="YES" codeGenerationType="class">
-        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="sortIndex" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="type" optional="YES" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
-        <relationship name="children" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FeedGroup" inverseName="parent" inverseEntity="FeedGroup" syncable="YES"/>
-        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Feed" inverseName="group" inverseEntity="Feed" syncable="YES"/>
-        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedGroup" inverseName="children" inverseEntity="FeedGroup" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="sortIndex" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="type" optional="YES" attributeType="Integer 16" defaultValueString="-1" usesScalarValueType="YES"/>
+        <relationship name="children" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FeedGroup" inverseName="parent" inverseEntity="FeedGroup"/>
+        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Feed" inverseName="group" inverseEntity="Feed"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FeedGroup" inverseName="children" inverseEntity="FeedGroup"/>
     </entity>
     <entity name="FeedMeta" representedClassName="FeedMeta" syncable="YES" codeGenerationType="class">
-        <attribute name="errorCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="etag" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="modified" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="refresh" optional="YES" attributeType="Integer 32" defaultValueString="-1" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="scheduled" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="meta" inverseEntity="Feed" syncable="YES"/>
+        <attribute name="errorCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="etag" optional="YES" attributeType="String"/>
+        <attribute name="modified" optional="YES" attributeType="String"/>
+        <attribute name="refresh" optional="YES" attributeType="Integer 32" defaultValueString="-1" usesScalarValueType="YES"/>
+        <attribute name="scheduled" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="url" optional="YES" attributeType="String"/>
+        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="meta" inverseEntity="Feed"/>
     </entity>
     <entity name="Options" representedClassName="Options" syncable="YES" codeGenerationType="class">
-        <attribute name="key" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="value" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="key" optional="YES" attributeType="String"/>
+        <attribute name="value" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="RegexConverter" representedClassName="RegexConverter" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="String"/>
+        <attribute name="dateFormat" optional="YES" attributeType="String"/>
+        <attribute name="desc" optional="YES" attributeType="String"/>
+        <attribute name="entry" optional="YES" attributeType="String"/>
+        <attribute name="href" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="feed" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Feed" inverseName="regex" inverseEntity="Feed"/>
     </entity>
     <elements>
-        <element name="Feed" positionX="-278.84765625" positionY="-112.953125" width="128" height="150"/>
+        <element name="Feed" positionX="-278.84765625" positionY="-112.953125" width="128" height="163"/>
         <element name="FeedArticle" positionX="-96.77734375" positionY="-113.83984375" width="128" height="195"/>
         <element name="FeedGroup" positionX="-460.37890625" positionY="-111.62890625" width="130.52734375" height="135"/>
-        <element name="FeedMeta" positionX="-348.02734375" positionY="136.89453125" width="128" height="150"/>
-        <element name="Options" positionX="-279" positionY="36" width="128" height="75"/>
+        <element name="FeedMeta" positionX="-456.265625" positionY="62.41015625" width="128" height="150"/>
+        <element name="Options" positionX="-279.09375" positionY="91.4609375" width="128" height="75"/>
+        <element name="RegexConverter" positionX="-115.984375" positionY="93.1796875" width="128" height="148"/>
     </elements>
 </model>

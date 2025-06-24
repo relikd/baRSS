@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ModalFeedEdit : ModalEditDialog <NSTextFieldDelegate>
 - (void)didClickWarningButton:(NSButton*)sender;
+- (void)openRegexConverter;
 @end
 
 @interface ModalGroupEdit : ModalEditDialog

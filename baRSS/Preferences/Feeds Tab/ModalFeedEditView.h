@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSPopover *warningPopover;
 @property (strong) IBOutlet NSTextField *warningText;
 @property (strong) IBOutlet NSButton *warningReload;
+@property (strong) IBOutlet NSButton *regexConverterButton;
 
 - (instancetype)initWithController:(ModalFeedEdit*)controller NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithFrame:(NSRect)frameRect NS_UNAVAILABLE;

@@ -25,6 +25,16 @@
 	return fa;
 }
 
+- (void)updateArticleIfChanged:(RSParsedArticle*)entry {
+	[self setGuidIfChanged:entry.guid];
+	[self setTitleIfChanged:entry.title];
+	[self setAuthorIfChanged:entry.author];
+	[self setAbstractIfChanged:(entry.abstract.length > 0) ? [entry.abstract htmlToPlainText] : nil];
+	[self setBodyIfChanged:(entry.body.length > 0) ? [entry.body htmlToPlainText] : nil];
+	[self setLinkIfChanged:(entry.link.length > 0) ? entry.link : entry.guid];
+	[self setPublishedIfChanged:entry.datePublished ? entry.datePublished : entry.dateModified];
+}
+
 /// @return Full or truncated article title, based on user preference in settings.
 - (NSString*)shortArticleName {
 	NSString *title = self.title;
@@ -69,6 +79,80 @@
 		PostNotification(kNotificationTotalUnreadCountChanged, num);
 	}
 	[moc reset];
+}
+
+
+#pragma mark - Setter -
+
+
+/// Set @c guid attribute but only if value differs.
+- (void)setGuidIfChanged:(nullable NSString*)guid {
+	if (guid.length == 0) {
+		if (self.guid.length > 0)
+			self.guid = nil; // nullify empty strings
+	} else if (![self.guid isEqualToString: guid]) {
+		self.guid = guid;
+	}
+}
+
+/// Set @c link attribute but only if value differs.
+- (void)setLinkIfChanged:(nullable NSString*)link {
+	if (link.length == 0) {
+		if (self.link.length > 0)
+			self.link = nil; // nullify empty strings
+	} else if (![self.link isEqualToString: link]) {
+		self.link = link;
+	}
+}
+
+/// Set @c title attribute but only if value differs.
+- (void)setTitleIfChanged:(nullable NSString*)title {
+	if (title.length == 0) {
+		if (self.title.length > 0)
+			self.title = nil; // nullify empty strings
+	} else if (![self.title isEqualToString: title]) {
+		self.title = title;
+	}
+}
+
+/// Set @c abstract attribute but only if value differs.
+- (void)setAbstractIfChanged:(nullable NSString*)abstract {
+	if (abstract.length == 0) {
+		if (self.abstract.length > 0)
+			self.abstract = nil; // nullify empty strings
+	} else if (![self.abstract isEqualToString: abstract]) {
+		self.abstract = abstract;
+	}
+}
+
+/// Set @c body attribute but only if value differs.
+- (void)setBodyIfChanged:(nullable NSString*)body {
+	if (body.length == 0) {
+		if (self.body.length > 0)
+			self.body = nil; // nullify empty strings
+	} else if (![self.body isEqualToString: body]) {
+		self.body = body;
+	}
+}
+
+/// Set @c author attribute but only if value differs.
+- (void)setAuthorIfChanged:(nullable NSString*)author {
+	if (author.length == 0) {
+		if (self.author.length > 0)
+			self.author = nil; // nullify empty strings
+	} else if (![self.author isEqualToString: author]) {
+		self.author = author;
+	}
+}
+
+/// Set @c published attribute but only if value differs.
+- (void)setPublishedIfChanged:(nullable NSDate*)published {
+	if (!published) {
+		if (self.published)
+			self.published = nil; // nullify empty date
+	} else if (![self.published isEqualToDate: published]) {
+		self.published = published;
+	}
 }
 
 @end

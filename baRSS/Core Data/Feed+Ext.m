@@ -89,6 +89,8 @@
 			[localSet removeObject:stored];
 			if (stored.sortIndex != currentIndex)
 				stored.sortIndex = currentIndex; // Ensures block of ascending indices
+			// replace local values with remote changes (if any)
+			[stored updateArticleIfChanged:article];
 		} else {
 			FeedArticle *newArticle = [FeedArticle newArticle:article inContext:self.managedObjectContext];
 			newArticle.sortIndex = currentIndex;
