@@ -62,6 +62,7 @@
 @property (strong) FeedDownload *memFeed;
 @property (weak) FaviconDownload *memIcon;
 @property (strong) RefreshStatisticsView *statisticsView;
+@property (nonatomic, assign) BOOL skipIconDownload;
 @property (nonatomic, assign) BOOL openRegexAfterDownload;
 @property (weak) id eventMonitor;
 @end
@@ -115,7 +116,8 @@
 	[f.meta setRefreshIfChanged:intv];
 	if (self.memFeed) {
 		[self.memFeed copyValuesTo:f ignoreError:YES];
-		[f setNewIcon:self.faviconFile]; // only if downloaded anything (nil deletes icon!)
+		if (self.faviconFile) // only if downloaded anything (nil deletes icon!)
+			[f setNewIcon:self.faviconFile];
 		self.faviconFile = nil;
 	}
 }
@@ -134,9 +136,11 @@
 - (void)downloadRSS {
 	[self cancelDownloads];
 	[self.modalSheet setDoneEnabled:NO]; // prevent user from closing the dialog during download
-	[self.view.spinnerURL startAnimation:nil];
 	[self.view.spinnerName startAnimation:nil];
-	self.view.favicon.image = nil;
+	if (!self.skipIconDownload) {
+		[self.view.spinnerURL startAnimation:nil];
+		self.view.favicon.image = nil;
+	}
 	self.view.warningButton.hidden = YES;
 	// User didn't change title since last fetch. Will be pre-filled with new title after download
 	if ([self.view.name.stringValue isEqualToString:self.view.name.placeholderString]) {
@@ -197,7 +201,7 @@
 	self.view.favicon.hidden = hasError;
 	self.view.warningButton.hidden = !hasError;
 	// Start favicon download
-	if (hasError)
+	if (hasError || self.skipIconDownload)
 		[self downloadComplete];
 	else
 		self.memIcon = [[sender faviconDownload] startWithDelegate:self];
@@ -225,6 +229,7 @@
 - (void)downloadComplete {
 	[self.view.spinnerURL stopAnimation:nil];
 	[self.modalSheet setDoneEnabled:YES];
+	self.skipIconDownload = NO;
 	
 	if (self.openRegexAfterDownload) {
 		[self openRegexConverter];
@@ -237,6 +242,7 @@
 - (void)openRegexConverter {
 	if (!self.openRegexAfterDownload) {
 		self.openRegexAfterDownload = YES;
+		self.skipIconDownload = self.feedGroup.feed.hasIcon;
 		[self downloadRSS];
 		return;
 	}
@@ -247,16 +253,18 @@
 	CGFloat minWidthDiff = previous.size.width - self.modalSheet.minSize.width;
 	[self.modalSheet setFrame:NSInsetRect(previous, minWidthDiff / 2.0, 0) display:NO];
 	
-	Feed *feed = self.feedGroup.feed;
-	RegexConverterController *c = [RegexConverterController withData:self.memFeed.rawData andConverter:feed.regex];
+	RegexConverterController *c = [RegexConverterController withData:self.memFeed.rawData andConverter:self.feedGroup.feed.regex];
 	[self.modalSheet.sheetParent beginCriticalSheet:[c getModalSheet] completionHandler:^(NSModalResponse returnCode) {
 		// reset previous size
 		[self.modalSheet setFrame:previous display:NO];
 		
 		if (returnCode == NSModalResponseOK) {
-			[c applyChanges:feed];
-			self.view.regexConverterButton.hidden = !feed.regex;
+			[c applyChanges:self.feedGroup.feed];
+			self.skipIconDownload = self.feedGroup.feed.hasIcon;
+			self.view.regexConverterButton.hidden = !self.feedGroup.feed.regex;
 			[self downloadRSS];
+		} else {
+			[self populateTextFields:self.feedGroup];
 		}
 	}];
 }
