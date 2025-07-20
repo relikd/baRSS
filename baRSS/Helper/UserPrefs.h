@@ -71,7 +71,7 @@ static inline void UserPrefsSetBool(NSString* const key, BOOL value) { [[NSUserD
 //  ---------------------------------------------------------------
 
 /// Helper method calls @c (mainBundle)CFBundleShortVersionString
-static inline NSString* UserPrefsAppVersion() { return [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"]; }
+static inline NSString* UserPrefsAppVersion(void) { return [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"]; }
 
 //  ---------------------------------------------------------------
 // |  MARK: - Open URLs
