@@ -218,10 +218,7 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	NSMenuItem *alt = [self copy];
 	alt.title = title;
 	alt.keyEquivalentModifierMask = NSEventModifierFlagOption;
-	if (!alt.hidden) { // hidden will be ignored if alternate is YES
-		alt.hidden = YES; // force hidden to hide if menu is already open (background update)
-		alt.alternate = YES;
-	}
+	alt.alternate = YES;
 	return alt;
 }
 
