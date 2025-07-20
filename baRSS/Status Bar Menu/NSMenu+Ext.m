@@ -36,9 +36,6 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	return [self.supermenu itemAtIndex:[self.supermenu indexOfItemWithSubmenu:self]];
 }
 
-/// @return @c YES if menu is status bar menu.
-- (BOOL)isMainMenu { return (self.supermenu == nil); }
-
 /// @return @c YES if menu contains feed articles only.
 - (BOOL)isFeedMenu { return ([self.title characterAtIndex:0] == 'F'); }
 
@@ -138,7 +135,7 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	static NSString* const mr[] = {Pref_globalMarkRead,   Pref_groupMarkRead,   Pref_feedMarkRead};
 	static NSString* const mu[] = {Pref_globalMarkUnread, Pref_groupMarkUnread, Pref_feedMarkUnread};
 	static NSString* const ou[] = {Pref_globalOpenUnread, Pref_groupOpenUnread, Pref_feedOpenUnread};
-	int i = (self.isMainMenu ? 0 : (self.isFeedMenu ? 2 : 1));
+	int i = (self.supermenu == nil ? 0 : (self.isFeedMenu ? 2 : 1));
 	switch (tag) {
 		case TagMarkAllRead:   return UserPrefsBool(mr[i]);
 		case TagMarkAllUnread: return UserPrefsBool(mu[i]);

@@ -6,7 +6,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSMenu (Ext)
 @property (nonnull, copy, readonly) NSString *titleIndexPath;
 @property (nullable, readonly) NSMenuItem* parentItem;
-@property (readonly) BOOL isMainMenu;
 @property (readonly) BOOL isFeedMenu;
 
 // Generator
