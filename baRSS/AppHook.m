@@ -37,7 +37,9 @@
 	[_statusItem asyncReloadUnreadCount];
 	[UpdateScheduler registerNetworkChangeNotification]; // will call update scheduler
 	if ([StoreCoordinator isEmpty]) {
-		[_statusItem showWelcomeMessage];
+		// stupid macOS bugs ... status-bar-menu-item frame is zero without delay
+		// [_statusItem showWelcomeMessage];
+		[_statusItem performSelector:@selector(showWelcomeMessage) withObject:nil afterDelay:.2];
 		[UpdateScheduler autoDownloadAndParseUpdateURL];
 	} else {
 		// mostly for version migration 0.9.4 ~> 1.0 (favicon storage)
