@@ -2,7 +2,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BarStatusItem : NSObject
+@interface BarStatusItem : NSObject <NSMenuDelegate>
 @property (weak, readonly) NSMenu *mainMenu;
 
 - (void)setUnreadCountAbsolute:(NSUInteger)count;
