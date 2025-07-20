@@ -8,6 +8,15 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 ## [Unreleased]
 
 
+## [1.3.1] – 2025-07-21
+### Fixed
+- *Status Bar Menu:* Always recreate main menu (hopefully fixes #13) 
+- *Status Bar Menu:* Keyboard navigation over alternate items ("Open a few") (fixes #15)
+- *Status Bar Menu:* Alternate item ("Open a few") was displayed as normal menu item
+- *UI:* Welcome message was displayed at the bottom left corner
+- Update Xcode build flags
+
+
 ## [1.3.0] – 2025-06-24
 ### Added
 - *Adding feed:* Regex Converter for websites without RSS feed (hold down option key during edit)
@@ -187,7 +196,8 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
-[Unreleased]: https://github.com/relikd/baRSS/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/relikd/baRSS/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/relikd/baRSS/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/relikd/baRSS/compare/v1.2.3...v1.3.0
 [1.2.3]: https://github.com/relikd/baRSS/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/relikd/baRSS/compare/v1.2.1...v1.2.2

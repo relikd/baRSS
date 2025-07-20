@@ -1,4 +1,4 @@
-[![macOS 10.12+](https://img.shields.io/badge/macOS-10.12+-888)](#download--install)
+[![macOS 10.13+](https://img.shields.io/badge/macOS-10.13+-888)](#download--install)
 [![Current release](https://img.shields.io/github/release/relikd/baRSS)](https://github.com/relikd/baRSS/releases)
 [![All downloads](https://img.shields.io/github/downloads/relikd/baRSS/total)](https://github.com/relikd/baRSS/releases)
 [![GitHub license](https://img.shields.io/github/license/relikd/baRSS)](LICENSE)
@@ -35,7 +35,7 @@ Further, tuning the update frequently will decrease the traffic even more.
 Download & Install
 ------------------
 
-Requires macOS Sierra (10.12) or higher.
+Requires macOS High Sierra (10.13) or higher.
 
 ### Easy way
 Go to [releases](https://github.com/relikd/baRSS/releases) and downloaded the latest version.  
@@ -69,7 +69,8 @@ Hidden options
 baRSS has no option to launch it on start.
 However, you can still add the application to auto boot by adding it to the system login items:
 
-`System Preferences > User > Login Items`
+`System Preferences > User > Login Items` (macOS 10-12)  
+`System Preferences > General > Login Items & Extensions` (macOS 13+)
 
 
 ### UI options
