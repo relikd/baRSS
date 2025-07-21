@@ -66,8 +66,7 @@
 	for (FeedGroup *fg in sortedList) {
 		[menu insertFeedGroupItem:fg withUnread:self.unreadMap].submenu.delegate = self;
 	}
-	UnreadTotal *uct = self.unreadMap[menu.titleIndexPath];
-	[menu setHeaderHasUnread:(uct.unread > 0) hasRead:(uct.unread < uct.total)];
+	[menu setHeaderHasUnread:self.unreadMap[menu.titleIndexPath]];
 }
 
 /// Generate items for @c FeedArticles menu.
@@ -85,8 +84,7 @@
 			break;
 		[menu addItem:[fa newMenuItem]];
 	}
-	UnreadTotal *uct = self.unreadMap[menu.titleIndexPath];
-	[menu setHeaderHasUnread:(uct.unread > 0) hasRead:(uct.unread < uct.total)];
+	[menu setHeaderHasUnread:self.unreadMap[menu.titleIndexPath]];
 }
 
 
@@ -131,7 +129,7 @@
 		// 3. set unread count & enabled header for all parents
 		NSArray<UnreadTotal*> *itms = [self.unreadMap itemsForPath:item.submenu.titleIndexPath create:NO];
 		for (UnreadTotal *uct in itms.reverseObjectEnumerator) {
-			[item.submenu setHeaderHasUnread:(uct.unread > 0) hasRead:(uct.unread < uct.total)];
+			[item.submenu setHeaderHasUnread:uct];
 			[item setTitleCount:uct.unread];
 			item = item.parentItem;
 		}

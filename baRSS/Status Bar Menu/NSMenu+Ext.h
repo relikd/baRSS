@@ -1,5 +1,5 @@
 @import Cocoa;
-@class FeedGroup, MapUnreadTotal;
+@class FeedGroup, MapUnreadTotal, UnreadTotal;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSMenuItem*)insertFeedGroupItem:(FeedGroup*)fg withUnread:(MapUnreadTotal*)unreadMap;
 - (void)insertDefaultHeader;
 // Update menu
-- (void)setHeaderHasUnread:(BOOL)hasUnread hasRead:(BOOL)hasRead;
+- (void)setHeaderHasUnread:(UnreadTotal*)count;
 - (nullable NSMenuItem*)deepestItemWithPath:(nonnull NSString*)path;
 @end
 

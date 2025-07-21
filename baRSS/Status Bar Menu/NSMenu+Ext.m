@@ -92,7 +92,9 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 
 
 /// Loop over default header and enable 'OpenAllUnread' and 'TagMarkAllRead' based on unread count.
-- (void)setHeaderHasUnread:(BOOL)hasUnread hasRead:(BOOL)hasRead {
+- (void)setHeaderHasUnread:(UnreadTotal*)count {
+	BOOL hasUnread = count.unread > 0;
+	BOOL hasRead = count.unread < count.total;
 	NSInteger i = [self indexOfItemWithTag:TagHeaderDelimiter] - 1;
 	for (; i >= 0; i--) {
 		NSMenuItem *item = [self itemAtIndex:i];
