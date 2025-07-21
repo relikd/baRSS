@@ -51,8 +51,8 @@
 					if (last != '\n') {
 						[result appendString:@"\n"];
 					}
-					if (order > 0) [result appendFormat:@" %d. ", order++];
-					else           [result appendString:@" • "];
+					if (order > 0) [result appendFormat:@" %d. ", order++];
+					else           [result appendString:@" • "];
 				}
 			} else {
 				// append text inbetween tags
@@ -74,7 +74,10 @@
 	// collapsing multiple horizontal whitespaces (\h) into one (the first one)
 	[[NSRegularExpression regularExpressionWithPattern:@"(\\h)[\\h]+" options:0 error:nil]
 	 replaceMatchesInString:result options:0 range:NSMakeRange(0, result.length) withTemplate:@"$1"];
-	return [result stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+	
+	NSMutableCharacterSet *cs = NSMutableCharacterSet.whitespaceAndNewlineCharacterSet;
+	[cs removeCharactersInString:@" "]; // used for "li"
+	return [result stringByTrimmingCharactersInSet:cs];
 }
 
 
