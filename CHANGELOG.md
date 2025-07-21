@@ -13,8 +13,9 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 - *Status Bar Menu:* Always recreate main menu (hopefully fixes #13) 
 - *Status Bar Menu:* Enable global mark read menu items on background update
 - *Status Bar Menu:* Keyboard navigation over alternate items ("Open a few") (fixes #15)
-- *Status Bar Menu:* Alternate item ("Open a few") was displayed as normal menu item
+- *Status Bar Menu:* Alternate item ("Open a few") was displayed as normal menu item in macOS 15
 - *UI:* Welcome message was displayed at the bottom left corner
+- *UI:* Tooltip will not remove preceding whitespace if html starts with a list
 - Update Xcode build flags
 
 

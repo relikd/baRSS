@@ -6,7 +6,6 @@
 // TODO: Add support for media player? image feed?
 // <enclosure url="https://url.mp3" length="63274022" type="audio/mpeg" />
 // TODO: Disable 'update all' menu item during update?
-// TODO: HTML to Feed Generator.  https://github.com/RSS-Bridge/rss-bridge
 // TODO: SQlite instead of CoreData?  https://www.objc.io/issues/4-core-data/SQLite-instead-of-core-data/
 
 
