@@ -24,7 +24,9 @@
 	self.unreadCountTotal = 0;
 	self.statusItem.button.image = [NSImage imageNamed:RSSImageMenuBarIconActive];
 	self.statusItem.button.image.template = YES;
-	[self.statusItem.button action:@selector(openMainMenu) target:self];
+	// Add empty menu (will be populated once opened)
+	self.statusItem.menu = [[NSMenu alloc] initWithTitle:@"M"];
+	self.statusItem.menu.delegate = self;
 	// Some icon unread count notification callback methods
 	RegisterNotification(kNotificationNetworkStatusChanged, @selector(networkChanged:), self);
 	RegisterNotification(kNotificationTotalUnreadCountChanged, @selector(unreadCountChanged:), self);
@@ -139,24 +141,22 @@
 
 #pragma mark - Main Menu Handling
 
-- (void)openMainMenu {
+-(void)menuWillOpen:(NSMenu *)menu {
+	_mainMenu = menu; // autoreleased once closed
 	self.barMenu = [[BarMenu alloc] initWithStatusItem:self];
 	
-	NSMenu *m = [[NSMenu alloc] initWithTitle:@"M"];
-	m.delegate = self;
-	[self insertMainMenuHeader:m];
-	[self.barMenu menuNeedsUpdate:m];
+	[self insertMainMenuHeader:menu];
+	[self.barMenu menuNeedsUpdate:menu];
 	// Add main menu items 'Preferences' and 'Quit'.
-	[m addItem:[NSMenuItem separatorItem]];
-	[m addItemWithTitle:NSLocalizedString(@"Preferences", nil) action:@selector(openPreferences) keyEquivalent:@","];
-	[m addItemWithTitle:NSLocalizedString(@"Quit", nil) action:@selector(terminate:) keyEquivalent:@"q"];
-	
-	_mainMenu = m; // autoreleased once closed
-	[m popUpMenuPositioningItem:nil atLocation:NSZeroPoint inView:self.statusItem.button];
+	[menu addItem:[NSMenuItem separatorItem]];
+	[menu addItemWithTitle:NSLocalizedString(@"Preferences", nil) action:@selector(openPreferences) keyEquivalent:@","];
+	[menu addItemWithTitle:NSLocalizedString(@"Quit", nil) action:@selector(terminate:) keyEquivalent:@"q"];
 }
 
 -(void)menuDidClose:(NSMenu *)menu {
 	self.barMenu = nil;
+	self.statusItem.menu = [[NSMenu alloc] initWithTitle:@"M"];
+	self.statusItem.menu.delegate = self;
 }
 
 - (void)insertMainMenuHeader:(NSMenu*)menu {
