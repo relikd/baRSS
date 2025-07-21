@@ -14,15 +14,12 @@
 - (instancetype)initWithCoreData:(NSArray<NSDictionary*>*)data {
 	self = [super init];
 	if (self) {
-		UnreadTotal *sum = [UnreadTotal new];
-		_map = [NSMutableDictionary dictionaryWithCapacity:data.count];
-		_map[@""] = sum;
+		_map = [NSMutableDictionary dictionaryWithCapacity:data.count + 1];
+		_map[@""] = [UnreadTotal new];
 		
 		for (NSDictionary *d in data) {
 			NSUInteger u = [d[@"unread"] unsignedIntegerValue];
 			NSUInteger t = [d[@"total"] unsignedIntegerValue];
-			sum.unread += u;
-			sum.total += t;
 			
 			for (UnreadTotal *uct in [self itemsForPath:d[@"indexPath"] create:YES]) {
 				uct.unread += u;
@@ -37,6 +34,7 @@
 - (NSArray<UnreadTotal*>*)itemsForPath:(NSString*)path create:(BOOL)flag {
 	NSMutableArray<UnreadTotal*> *arr = [NSMutableArray array];
 	NSMutableString *key = [NSMutableString string];
+	[arr addObject:_map[@""]];
 	for (NSString *idx in [path componentsSeparatedByString:@"."]) {
 		if (key.length > 0)
 			[key appendString:@"."];

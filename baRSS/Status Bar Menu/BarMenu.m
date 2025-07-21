@@ -129,10 +129,14 @@
 		// 3. set unread count & enabled header for all parents
 		NSArray<UnreadTotal*> *itms = [self.unreadMap itemsForPath:item.submenu.titleIndexPath create:NO];
 		for (UnreadTotal *uct in itms.reverseObjectEnumerator) {
-			[item.submenu setHeaderHasUnread:uct];
-			[item setTitleCount:uct.unread];
-			item = item.parentItem;
+			if (item) { // nil on last loop (aka main menu, see below)
+				[item.submenu setHeaderHasUnread:uct];
+				[item setTitleCount:uct.unread];
+				item = item.parentItem;
+			}
 		}
+		// call on main menu
+		[self.statusItem.mainMenu setHeaderHasUnread:itms.firstObject];
 		// TODO: need to re-create groups if user chose to hide already read articles
 	}
 }
