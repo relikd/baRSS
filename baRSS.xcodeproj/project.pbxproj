@@ -19,6 +19,8 @@
 		54253C952C49BFE400742695 /* RegexConverterView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54253C842C47369000742695 /* RegexConverterView.m */; };
 		544B011A2114B41200386E5C /* ModalSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B01192114B41200386E5C /* ModalSheet.m */; };
 		544B011D2114EE9100386E5C /* AppHook.m in Sources */ = {isa = PBXBuildFile; fileRef = 544B011C2114EE9100386E5C /* AppHook.m */; };
+		544F5A752E30EFC700674F81 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = 544F5A722E30EFC700674F81 /* style.css */; };
+		544F5A762E30EFC700674F81 /* opml-lib.m in Sources */ = {isa = PBXBuildFile; fileRef = 544F5A702E30EFC700674F81 /* opml-lib.m */; };
 		54501010230E9C8600F0B165 /* FeedDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 5450100F230E9C8600F0B165 /* FeedDownload.m */; };
 		546A6A2922C583390034E806 /* SettingsGeneralView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D857D122802309001BA1C8 /* SettingsGeneralView.m */; };
 		546A6A2C22C584AF0034E806 /* SettingsAppearanceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 546A6A2A22C584AF0034E806 /* SettingsAppearanceView.m */; };
@@ -40,6 +42,10 @@
 		54ACC29821061FBA0020715F /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 54ACC29721061FBA0020715F /* Preferences.m */; };
 		54AD4E0C2301853D000AE386 /* NSString+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54AD4E0B2301853D000AE386 /* NSString+Ext.m */; };
 		54AD4EE72305B17D000AE386 /* container-migration.plist in Resources */ = {isa = PBXBuildFile; fileRef = 54AD4EE62305B17D000AE386 /* container-migration.plist */; };
+		54AD90EA2E30C48400160925 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54AD90E92E30C48400160925 /* Quartz.framework */; };
+		54AD90EE2E30C48400160925 /* PreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 54AD90ED2E30C48400160925 /* PreviewViewController.m */; };
+		54AD90F12E30C48400160925 /* PreviewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 54AD90EF2E30C48400160925 /* PreviewViewController.xib */; };
+		54AD90F72E30C48400160925 /* QLOPML.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 54AD90E72E30C48400160925 /* QLOPML.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		54B51704226DC339006C1B29 /* ModalFeedEditView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B51703226DC339006C1B29 /* ModalFeedEditView.m */; };
 		54B517072270E990006C1B29 /* NSView+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B517062270E92A006C1B29 /* NSView+Ext.m */; };
 		54B6F14A231551B3002C94C9 /* FaviconDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B6F149231551B3002C94C9 /* FaviconDownload.m */; };
@@ -77,6 +83,13 @@
 			remoteGlobalIDString = 84F22C171B52DDEA000060CE;
 			remoteInfo = RSXML2Tests;
 		};
+		54AD90F42E30C48400160925 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 54ACC27421061B3B0020715F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 54AD90E62E30C48400160925;
+			remoteInfo = QLOPML;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -89,6 +102,17 @@
 				5483296D2A3CDC38000688B9 /* RSXML2.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		54AD90F62E30C48400160925 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				54AD90F72E30C48400160925 /* QLOPML.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -120,6 +144,9 @@
 		544B01192114B41200386E5C /* ModalSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalSheet.m; sourceTree = "<group>"; };
 		544B011B2114EE9100386E5C /* AppHook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppHook.h; sourceTree = "<group>"; };
 		544B011C2114EE9100386E5C /* AppHook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppHook.m; sourceTree = "<group>"; };
+		544F5A6F2E30EFC700674F81 /* opml-lib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "opml-lib.h"; sourceTree = "<group>"; };
+		544F5A702E30EFC700674F81 /* opml-lib.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "opml-lib.m"; sourceTree = "<group>"; };
+		544F5A722E30EFC700674F81 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = style.css; sourceTree = "<group>"; };
 		5450100E230E9C8600F0B165 /* FeedDownload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FeedDownload.h; sourceTree = "<group>"; };
 		5450100F230E9C8600F0B165 /* FeedDownload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeedDownload.m; sourceTree = "<group>"; };
 		546A6A2A22C584AF0034E806 /* SettingsAppearanceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsAppearanceView.m; sourceTree = "<group>"; };
@@ -160,6 +187,13 @@
 		54AD4E0B2301853D000AE386 /* NSString+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+Ext.m"; sourceTree = "<group>"; };
 		54AD4EE42305AF60000AE386 /* baRSS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = baRSS.entitlements; sourceTree = "<group>"; };
 		54AD4EE62305B17D000AE386 /* container-migration.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "container-migration.plist"; sourceTree = "<group>"; };
+		54AD90E72E30C48400160925 /* QLOPML.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = QLOPML.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		54AD90E92E30C48400160925 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		54AD90EC2E30C48400160925 /* PreviewViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PreviewViewController.h; sourceTree = "<group>"; };
+		54AD90ED2E30C48400160925 /* PreviewViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreviewViewController.m; sourceTree = "<group>"; };
+		54AD90F02E30C48400160925 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreviewViewController.xib; sourceTree = "<group>"; };
+		54AD90F22E30C48400160925 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		54AD90F32E30C48400160925 /* QLOPML.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QLOPML.entitlements; sourceTree = "<group>"; };
 		54B51702226DC339006C1B29 /* ModalFeedEditView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModalFeedEditView.h; sourceTree = "<group>"; };
 		54B51703226DC339006C1B29 /* ModalFeedEditView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ModalFeedEditView.m; sourceTree = "<group>"; };
 		54B517052270E8C6006C1B29 /* NSView+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSView+Ext.h"; sourceTree = "<group>"; };
@@ -206,6 +240,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				5483296C2A3CDC38000688B9 /* RSXML2.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		54AD90E42E30C48400160925 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				54AD90EA2E30C48400160925 /* Quartz.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,6 +357,8 @@
 				54892F1D2235285700271CBA /* CHANGELOG.md */,
 				54ACC27E21061B3B0020715F /* baRSS */,
 				5483295E2A3CDB22000688B9 /* RSXML2.xcodeproj */,
+				54AD90EB2E30C48400160925 /* QLOPML */,
+				54AD90E82E30C48400160925 /* Frameworks */,
 				54ACC27D21061B3B0020715F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -323,6 +367,7 @@
 			isa = PBXGroup;
 			children = (
 				54ACC27C21061B3B0020715F /* baRSS Beta.app */,
+				54AD90E72E30C48400160925 /* QLOPML.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -365,6 +410,29 @@
 				54F6025C21C1D4170006D338 /* OpmlFile.m */,
 			);
 			path = "Feed Import";
+			sourceTree = "<group>";
+		};
+		54AD90E82E30C48400160925 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				54AD90E92E30C48400160925 /* Quartz.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		54AD90EB2E30C48400160925 /* QLOPML */ = {
+			isa = PBXGroup;
+			children = (
+				544F5A6F2E30EFC700674F81 /* opml-lib.h */,
+				544F5A702E30EFC700674F81 /* opml-lib.m */,
+				54AD90EC2E30C48400160925 /* PreviewViewController.h */,
+				54AD90ED2E30C48400160925 /* PreviewViewController.m */,
+				54AD90EF2E30C48400160925 /* PreviewViewController.xib */,
+				54AD90F22E30C48400160925 /* Info.plist */,
+				54AD90F32E30C48400160925 /* QLOPML.entitlements */,
+				544F5A722E30EFC700674F81 /* style.css */,
+			);
+			path = QLOPML;
 			sourceTree = "<group>";
 		};
 		54D857CF228022AB001BA1C8 /* General Tab */ = {
@@ -455,15 +523,34 @@
 				54ACC27A21061B3B0020715F /* Resources */,
 				544DCCBB212A2B4D002DBC46 /* Embed Frameworks */,
 				54FB05D12305BFAB00A088AD /* dynamic app name in db migration */,
+				54AD90F62E30C48400160925 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				54AD90F52E30C48400160925 /* PBXTargetDependency */,
 			);
 			name = baRSS;
 			productName = baRRS;
 			productReference = 54ACC27C21061B3B0020715F /* baRSS Beta.app */;
 			productType = "com.apple.product-type.application";
+		};
+		54AD90E62E30C48400160925 /* QLOPML */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 54AD90F82E30C48400160925 /* Build configuration list for PBXNativeTarget "QLOPML" */;
+			buildPhases = (
+				54AD90E32E30C48400160925 /* Sources */,
+				54AD90E42E30C48400160925 /* Frameworks */,
+				54AD90E52E30C48400160925 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = QLOPML;
+			productName = QLOPML;
+			productReference = 54AD90E72E30C48400160925 /* QLOPML.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -490,6 +577,9 @@
 							};
 						};
 					};
+					54AD90E62E30C48400160925 = {
+						CreatedOnToolsVersion = 12.4;
+					};
 				};
 			};
 			buildConfigurationList = 54ACC27721061B3B0020715F /* Build configuration list for PBXProject "baRSS" */;
@@ -512,6 +602,7 @@
 			projectRoot = "";
 			targets = (
 				54ACC27B21061B3B0020715F /* baRSS */,
+				54AD90E62E30C48400160925 /* QLOPML */,
 			);
 		};
 /* End PBXProject section */
@@ -541,6 +632,15 @@
 				54BF444A22D0F4F300660096 /* AppIcon.icns in Resources */,
 				54AD4EE72305B17D000AE386 /* container-migration.plist in Resources */,
 				54E3C02122EE076D006E2E24 /* opml-icon.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		54AD90E52E30C48400160925 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				54AD90F12E30C48400160925 /* PreviewViewController.xib in Resources */,
+				544F5A752E30EFC700674F81 /* style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -625,7 +725,35 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		54AD90E32E30C48400160925 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				544F5A762E30EFC700674F81 /* opml-lib.m in Sources */,
+				54AD90EE2E30C48400160925 /* PreviewViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		54AD90F52E30C48400160925 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 54AD90E62E30C48400160925 /* QLOPML */;
+			targetProxy = 54AD90F42E30C48400160925 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		54AD90EF2E30C48400160925 /* PreviewViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				54AD90F02E30C48400160925 /* Base */,
+			);
+			name = PreviewViewController.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		54ACC28E21061B3C0020715F /* Debug */ = {
@@ -791,7 +919,6 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = de.relikd.baRSS.beta;
 				PRODUCT_NAME = "$(TARGET_NAME) Beta";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -842,7 +969,47 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = de.relikd.baRSS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+			};
+			name = Release;
+		};
+		54AD90F92E30C48400160925 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = QLOPML/QLOPML.entitlements;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = QLOPML/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = de.relikd.baRSS.beta.QLOPML;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		54AD90FA2E30C48400160925 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = QLOPML/QLOPML.entitlements;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = QLOPML/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = de.relikd.baRSS.QLOPML;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
@@ -863,6 +1030,15 @@
 			buildConfigurations = (
 				54ACC29121061B3C0020715F /* Debug */,
 				54ACC29221061B3C0020715F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		54AD90F82E30C48400160925 /* Build configuration list for PBXNativeTarget "QLOPML" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				54AD90F92E30C48400160925 /* Debug */,
+				54AD90FA2E30C48400160925 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -1,0 +1,12 @@
+
+* { font-family: Courier; }
+body { padding: 30px; background-color: #AAA; color: black; }
+dd, li, hr { font-weight: bold; line-height: 1.5em; }
+ul { list-style-type: none; padding-bottom: 1em; }
+a { font-size: 0.75em; color: #FBA43A; }
+.section { padding: 1em 1.5em; border-radius: 7px; background-color: #EEE; }
+
+@media (prefers-color-scheme: dark) {
+body { background-color: #555; color: white; }
+.section { background-color: #222; }
+}
