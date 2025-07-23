@@ -8,6 +8,11 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 ## [Unreleased]
 
 
+## [1.3.2] – 2025-07-23
+### Fixed
+- previous version did not run on macOS 10.15
+
+
 ## [1.3.1] – 2025-07-21
 ### Fixed
 - *Status Bar Menu:* Always recreate main menu (hopefully fixes #13) 
@@ -198,7 +203,8 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
-[Unreleased]: https://github.com/relikd/baRSS/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/relikd/baRSS/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/relikd/baRSS/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/relikd/baRSS/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/relikd/baRSS/compare/v1.2.3...v1.3.0
 [1.2.3]: https://github.com/relikd/baRSS/compare/v1.2.2...v1.2.3
