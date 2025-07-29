@@ -8,6 +8,11 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 ## [Unreleased]
 
 
+## [1.4.1] – 2025-07-29
+### Fixed
+- Re-compiled because previous certificate was revoked (again!)
+
+
 ## [1.4.0] – 2025-07-23
 ### Added
 - *QuickLook:* Updated to new extension framework
@@ -15,7 +20,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 
 ## [1.3.2] – 2025-07-23
 ### Fixed
-- previous version did not run on macOS 10.15
+- Previous version did not run on macOS 10.15
 
 
 ## [1.3.1] – 2025-07-21
@@ -208,7 +213,8 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
-[Unreleased]: https://github.com/relikd/baRSS/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/relikd/baRSS/compare/v1.4.1...HEAD
+[1.4.0]: https://github.com/relikd/baRSS/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/relikd/baRSS/compare/v1.3.2...v1.4.0
 [1.3.2]: https://github.com/relikd/baRSS/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/relikd/baRSS/compare/v1.3.0...v1.3.1
