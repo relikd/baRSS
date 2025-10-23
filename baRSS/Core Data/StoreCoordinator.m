@@ -57,7 +57,9 @@
 		opt = [[Options alloc] initWithEntity:Options.entity insertIntoManagedObjectContext:moc];
 		opt.key = key;
 	}
-	opt.value = value;
+	if (opt.value != value) {
+		opt.value = value;
+	}
 	[self saveContext:moc andParent:YES];
 	[moc reset];
 }
