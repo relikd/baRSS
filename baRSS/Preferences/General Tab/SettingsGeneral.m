@@ -13,19 +13,21 @@
 
 - (void)loadView {
 	self.view = [[SettingsGeneralView alloc] initWithController:self];
-	// Default http application for opening the feed urls
-	NSPopUpButton *pop = self.view.popupHttpApplication;
-	[pop removeAllItems];
-	[pop addItemWithTitle:NSLocalizedString(@"System Default", @"Default web browser application")];
-	NSArray<NSString*> *browsers = CFBridgingRelease(LSCopyAllHandlersForURLScheme(CFSTR("https")));
-	for (NSString *bundleID in browsers) {
-		[pop addItemWithTitle: [self applicationNameForBundleId:bundleID]];
-		pop.lastItem.representedObject = bundleID;
-	}
-	[pop selectItemAtIndex:[pop indexOfItemWithRepresentedObject:UserPrefsString(Pref_defaultHttpApplication)]];
+	
 	// Default RSS Reader application
 	NSString *feedBundleId = CFBridgingRelease(LSCopyDefaultHandlerForURLScheme(CFSTR("feed")));
 	self.view.defaultReader.objectValue = [self applicationNameForBundleId:feedBundleId];
+	
+	// Default http application for opening the feed urls
+	NSPopUpButton *defaultApp = self.view.popupHttpApplication;
+	[defaultApp removeAllItems];
+	[defaultApp addItemWithTitle:NSLocalizedString(@"System Default", @"Default web browser application")];
+	NSArray<NSString*> *browsers = CFBridgingRelease(LSCopyAllHandlersForURLScheme(CFSTR("https")));
+	for (NSString *bundleID in browsers) {
+		[defaultApp addItemWithTitle: [self applicationNameForBundleId:bundleID]];
+		defaultApp.lastItem.representedObject = bundleID;
+	}
+	[defaultApp selectItemAtIndex:[defaultApp indexOfItemWithRepresentedObject:UserPrefsString(Pref_defaultHttpApplication)]];
 }
 
 /// Get human readable application name such as 'Safari' or 'baRSS'
@@ -40,11 +42,6 @@
 }
 
 #pragma mark - User interaction
-
-// Callback method fired when user selects a different item from popup list
-- (void)changeHttpApplication:(NSPopUpButton *)sender {
-	UserPrefsSet(Pref_defaultHttpApplication, sender.selectedItem.representedObject);
-}
 
 // Callback method from round help button right of default feed reader text
 - (void)clickHowToDefaults:(NSButton *)sender {
@@ -62,5 +59,10 @@
 }
 
 // x-apple.systempreferences:com.apple.preferences.users?startupItemsPref
+
+// Callback method fired when user selects a different item from popup list
+- (void)changeHttpApplication:(NSPopUpButton *)sender {
+	UserPrefsSet(Pref_defaultHttpApplication, sender.selectedItem.representedObject);
+}
 
 @end
