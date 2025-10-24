@@ -181,27 +181,7 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	}
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	NSArray<FeedArticle*> *list = [StoreCoordinator articlesAtPath:path isFeed:isFeedMenu sorted:openLinks unread:markRead inContext:moc limit:limit];
-	
-	BOOL success = NO;
-	if (openLinks) {
-		NSMutableArray<NSURL*> *urls = [NSMutableArray arrayWithCapacity:list.count];
-		for (FeedArticle *fa in list) {
-			if (fa.link.length > 0)
-				[urls addObject:[NSURL URLWithString:fa.link]];
-		}
-		if (urls.count > 0)
-			success = UserPrefsOpenURLs(urls);
-	}
-	// if success == NO, do not modify unread state
-	if (!openLinks || success) {
-		for (FeedArticle *fa in list) {
-			fa.unread = !markRead;
-		}
-		[StoreCoordinator saveContext:moc andParent:YES];
-		[moc reset];
-		NSNumber *num = [NSNumber numberWithInteger: (markRead ? -1 : +1) * (NSInteger)list.count ];
-		PostNotification(kNotificationTotalUnreadCountChanged, num);
-	}
+	[StoreCoordinator updateArticles:list markRead:markRead andOpen:openLinks inContext:moc];
 }
 
 @end

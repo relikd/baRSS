@@ -2,6 +2,7 @@
 #import "AppHook.h"
 #import "Constants.h"
 #import "FaviconDownload.h"
+#import "UserPrefs.h"
 #import "Feed+Ext.h"
 #import "NSURL+Ext.h"
 #import "NSError+Ext.h"
@@ -200,6 +201,37 @@
 	if (feedFilter)
 		fr.predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[fr.predicate, feedFilter]];
 	return [fr fetchAllRows:moc];
+}
+
+/**
+ For provided articles, pen link, mark read, and save changes.
+ @warning Will invalidate context.
+ 
+ @param list Should only contain @c FeedArticle
+ @param markRead Whether the articles should be marked read or unread.
+ @param openLinks Whether to open the link or mark read without opening
+ */
++ (void)updateArticles:(NSArray<FeedArticle*>*)list markRead:(BOOL)markRead andOpen:(BOOL)openLinks inContext:(NSManagedObjectContext*)moc {
+	BOOL success = NO;
+	if (openLinks) {
+		NSMutableArray<NSURL*> *urls = [NSMutableArray arrayWithCapacity:list.count];
+		for (FeedArticle *fa in list) {
+			if (fa.link.length > 0)
+				[urls addObject:[NSURL URLWithString:fa.link]];
+		}
+		if (urls.count > 0)
+			success = UserPrefsOpenURLs(urls);
+	}
+	// if success == NO, do not modify unread state
+	if (!openLinks || success) {
+		for (FeedArticle *fa in list) {
+			fa.unread = !markRead;
+		}
+		[self saveContext:moc andParent:YES];
+		[moc reset];
+		NSNumber *num = [NSNumber numberWithInteger: (markRead ? -1 : +1) * (NSInteger)list.count ];
+		PostNotification(kNotificationTotalUnreadCountChanged, num);
+	}
 }
 
 
