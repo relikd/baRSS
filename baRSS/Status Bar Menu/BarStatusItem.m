@@ -70,7 +70,7 @@
 
 /// Assign total unread count value directly.
 - (void)setUnreadCountAbsolute:(NSUInteger)count {
-	_unreadCountTotal = (NSInteger)count;
+	_unreadCountTotal = count > 0 ? (NSInteger)count : 0;
 	[self updateBarIcon];
 	[NotifyEndpoint setGlobalCount:count];
 }
@@ -78,6 +78,9 @@
 /// Assign new value by adding @c count to total unread count (may be negative).
 - (void)setUnreadCountRelative:(NSInteger)count {
 	_unreadCountTotal += count;
+	if (_unreadCountTotal < 0) {
+		_unreadCountTotal = 0;
+	}
 	[self updateBarIcon];
 	[NotifyEndpoint setGlobalCount:(NSUInteger)_unreadCountTotal];
 }
