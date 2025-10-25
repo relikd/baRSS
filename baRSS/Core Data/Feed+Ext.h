@@ -10,6 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Generator methods / Feed update
 + (instancetype)newFeedAndMetaInContext:(NSManagedObjectContext*)context;
+- (NSString*)notificationID;
 - (void)updateWithRSS:(RSParsedFeed*)obj postUnreadCountChange:(BOOL)flag;
 - (NSMenuItem*)newMenuItem;
 // Getter & Setter
@@ -17,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setNewIcon:(NSURL*)location;
 // Article properties
 - (nullable NSArray<FeedArticle*>*)sortedArticles;
+- (NSUInteger)countUnread;
 @end
 
 NS_ASSUME_NONNULL_END

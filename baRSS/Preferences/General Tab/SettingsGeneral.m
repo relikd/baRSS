@@ -3,6 +3,7 @@
 #import "StoreCoordinator.h"
 #import "Constants.h"
 #import "SettingsGeneralView.h"
+#import "NotifyEndpoint.h"
 
 @interface SettingsGeneral()
 @property (strong) IBOutlet SettingsGeneralView *view; // override
@@ -28,6 +29,23 @@
 		defaultApp.lastItem.representedObject = bundleID;
 	}
 	[defaultApp selectItemAtIndex:[defaultApp indexOfItemWithRepresentedObject:UserPrefsString(Pref_defaultHttpApplication)]];
+	
+	// Notification settings (disabled, per article, per feed, total)
+	NSPopUpButton *notify = self.view.popupNotificationType;
+	[notify removeAllItems];
+	[notify addItemWithTitle:NSLocalizedString(@"Disabled", @"Disable notifications")];
+	notify.lastItem.representedObject = @"";
+	[notify addItemsWithTitles:@[
+		NSLocalizedString(@"Disabled", @"Disable notifications"),
+		NSLocalizedString(@"Article title (per article)", @"Show article title in notification"),
+		NSLocalizedString(@"Number of articles (per feed)", @"Show “feed X: N new articles”"),
+		NSLocalizedString(@"Generic “new articles” (over all)", @"Show total “N new article”"),
+	]];
+	notify.itemArray[0].representedObject = NotificationTypeToString(NotificationTypeDisabled);
+	notify.itemArray[1].representedObject = NotificationTypeToString(NotificationTypePerArticle);
+	notify.itemArray[2].representedObject = NotificationTypeToString(NotificationTypePerFeed);
+	notify.itemArray[3].representedObject = NotificationTypeToString(NotificationTypeGlobal);
+	[notify selectItemAtIndex:[notify indexOfItemWithRepresentedObject:NotificationTypeToString(UserPrefsNotificationType())]];
 }
 
 /// Get human readable application name such as 'Safari' or 'baRSS'
@@ -63,6 +81,11 @@
 // Callback method fired when user selects a different item from popup list
 - (void)changeHttpApplication:(NSPopUpButton *)sender {
 	UserPrefsSet(Pref_defaultHttpApplication, sender.selectedItem.representedObject);
+}
+
+- (void)changeNotificationType:(NSPopUpButton *)sender {
+	UserPrefsSet(Pref_notificationType, sender.selectedItem.representedObject);
+	[NotifyEndpoint activate];
 }
 
 @end

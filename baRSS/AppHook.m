@@ -7,6 +7,7 @@
 #import "StoreCoordinator.h"
 #import "SettingsFeeds+DragDrop.h"
 #import "URLScheme.h"
+#import "NotifyEndpoint.h"
 #import "NSURL+Ext.h"
 #import "NSError+Ext.h"
 
@@ -45,6 +46,10 @@
 		// mostly for version migration 0.9.4 ~> 1.0 (favicon storage)
 		if (initial) [UpdateScheduler updateAllFavicons];
 	}
+	
+	// Notifications are disabled by default so this wont trigger for first app launch.
+	// Also, this will register the notification delegate and respond to click & open feed.
+	[NotifyEndpoint activate];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {

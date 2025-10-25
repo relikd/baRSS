@@ -5,6 +5,7 @@
 #import "FeedGroup+Ext.h"
 #import "Constants.h"
 #import "MapUnreadTotal.h"
+#import "NotifyEndpoint.h"
 
 typedef NS_ENUM(NSInteger, MenuItemTag) {
 	/// Used in @c allowDisplayOfHeaderItem: to identify and enable items
@@ -181,7 +182,8 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	}
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	NSArray<FeedArticle*> *list = [StoreCoordinator articlesAtPath:path isFeed:isFeedMenu sorted:openLinks unread:markRead inContext:moc limit:limit];
-	[StoreCoordinator updateArticles:list markRead:markRead andOpen:openLinks inContext:moc];
+	[NotifyEndpoint dismiss:
+	 [StoreCoordinator updateArticles:list markRead:markRead andOpen:openLinks inContext:moc]];
 }
 
 @end

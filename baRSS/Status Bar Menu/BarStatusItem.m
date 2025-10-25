@@ -5,6 +5,7 @@
 #import "UserPrefs.h"
 #import "BarMenu.h"
 #import "AppHook.h"
+#import "NotifyEndpoint.h"
 #import "NSView+Ext.h"
 #import "NSColor+Ext.h"
 
@@ -71,12 +72,14 @@
 - (void)setUnreadCountAbsolute:(NSUInteger)count {
 	_unreadCountTotal = (NSInteger)count;
 	[self updateBarIcon];
+	[NotifyEndpoint setGlobalCount:count];
 }
 
 /// Assign new value by adding @c count to total unread count (may be negative).
 - (void)setUnreadCountRelative:(NSInteger)count {
 	_unreadCountTotal += count;
 	[self updateBarIcon];
+	[NotifyEndpoint setGlobalCount:(NSUInteger)_unreadCountTotal];
 }
 
 /// Fetch new total unread count from core data and assign it as new value (dispatch async on main thread).

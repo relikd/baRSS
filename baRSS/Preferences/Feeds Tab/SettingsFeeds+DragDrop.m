@@ -138,7 +138,7 @@ const NSPasteboardType dragReorder = @"de.relikd.baRSS.drag-reorder";
 	if (selection.count > 0)
 		[self.dataStore setSelectionIndexPaths:[selection sortedArrayUsingSelector:@selector(compare:)]];
 	
-	[UpdateScheduler downloadList:feedsList userInitiated:YES finally:^{
+	[UpdateScheduler downloadList:feedsList userInitiated:YES notifications:NO finally:^{
 		[self endCoreDataChangeUndoEmpty:NO forceUndo:NO];
 		for (Feed *f in feedsList)
 			[moc refreshObject:f.group mergeChanges:NO]; // fixes blank icon if imported with no inet conn

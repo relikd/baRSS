@@ -4,6 +4,7 @@
 #import "FaviconDownload.h"
 #import "UserPrefs.h"
 #import "Feed+Ext.h"
+#import "FeedArticle+Ext.h"
 #import "NSURL+Ext.h"
 #import "NSError+Ext.h"
 #import "NSFetchRequest+Ext.h"
@@ -210,28 +211,40 @@
  @param list Should only contain @c FeedArticle
  @param markRead Whether the articles should be marked read or unread.
  @param openLinks Whether to open the link or mark read without opening
+ 
+ @return @c notificationID for all articles that were opened (empty if @c openLinks=NO or open failed).
  */
-+ (void)updateArticles:(NSArray<FeedArticle*>*)list markRead:(BOOL)markRead andOpen:(BOOL)openLinks inContext:(NSManagedObjectContext*)moc {
-	BOOL success = NO;
++ (NSArray<NSString*>*)updateArticles:(NSArray<FeedArticle*>*)list markRead:(BOOL)markRead andOpen:(BOOL)openLinks inContext:(NSManagedObjectContext*)moc {
 	if (openLinks) {
 		NSMutableArray<NSURL*> *urls = [NSMutableArray arrayWithCapacity:list.count];
 		for (FeedArticle *fa in list) {
 			if (fa.link.length > 0)
 				[urls addObject:[NSURL URLWithString:fa.link]];
 		}
-		if (urls.count > 0)
-			success = UserPrefsOpenURLs(urls);
+		if (urls.count > 0 && !UserPrefsOpenURLs(urls))
+			return nil; // if success == NO, do not modify unread state & exit
 	}
-	// if success == NO, do not modify unread state
-	if (!openLinks || success) {
-		for (FeedArticle *fa in list) {
+	
+	for (FeedArticle *fa in list) {
+		if (fa.unread == markRead) { // only if differs
 			fa.unread = !markRead;
 		}
-		[self saveContext:moc andParent:YES];
-		[moc reset];
-		NSNumber *num = [NSNumber numberWithInteger: (markRead ? -1 : +1) * (NSInteger)list.count ];
-		PostNotification(kNotificationTotalUnreadCountChanged, num);
 	}
+	[self saveContext:moc andParent:YES];
+	
+	// gather uri-ids for notification dismiss
+	NSMutableArray<NSString*> *dbRefs = [NSMutableArray array];
+	if (markRead) {
+		for (FeedArticle *fa in list) {
+			[dbRefs addObject:fa.notificationID];
+			[dbRefs addObject:fa.feed.notificationID];
+		}
+	}
+	
+	[moc reset];
+	NSNumber *num = [NSNumber numberWithInteger: (markRead ? -1 : +1) * (NSInteger)list.count ];
+	PostNotification(kNotificationTotalUnreadCountChanged, num);
+	return dbRefs;
 }
 
 

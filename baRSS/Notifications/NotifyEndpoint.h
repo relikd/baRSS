@@ -1,0 +1,18 @@
+@import Cocoa;
+@import UserNotifications;
+
+@class Feed, FeedArticle;
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface NotifyEndpoint : NSObject <UNUserNotificationCenterDelegate>
++ (void)activate;
+
++ (void)setGlobalCount:(NSUInteger)count;
++ (void)postFeed:(Feed*)feed;
++ (void)postArticle:(FeedArticle*)article;
+
++ (void)dismiss:(nullable NSArray<NSString*>*)list;
+@end
+
+NS_ASSUME_NONNULL_END

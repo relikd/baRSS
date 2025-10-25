@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Scheduling
 + (void)scheduleNextFeed;
 + (void)forceUpdateAllFeeds;
-+ (void)downloadList:(NSArray<Feed*>*)list userInitiated:(BOOL)flag finally:(nullable os_block_t)block;
++ (void)downloadList:(NSArray<Feed*>*)list userInitiated:(BOOL)flag notifications:(BOOL)notify finally:(nullable os_block_t)block;
 + (void)updateAllFavicons;
 // Auto Download & Parse Feed URL
 + (void)autoDownloadAndParseURL:(NSString*)url;

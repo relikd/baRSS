@@ -2,11 +2,13 @@
 #import "UpdateScheduler.h"
 #import "Constants.h"
 #import "StoreCoordinator.h"
+#import "NotifyEndpoint.h"
 #import "NSDate+Ext.h"
 
 #import "FeedDownload.h"
 #import "FaviconDownload.h"
 #import "Feed+Ext.h"
+#import "FeedArticle+Ext.h"
 #import "FeedMeta+Ext.h"
 #import "FeedGroup+Ext.h"
 
@@ -129,7 +131,7 @@ static _Atomic(NSUInteger) _queueSize = 0;
 	NSArray<Feed*> *list = [StoreCoordinator listOfFeedsThatNeedUpdate:updateAll inContext:moc];
 	//NSAssert(list.count > 0, @"ERROR: Something went wrong, timer fired too early.");
 	
-	[self downloadList:list userInitiated:updateAll finally:^{
+	[self downloadList:list userInitiated:updateAll notifications:YES finally:^{
 		[StoreCoordinator saveContext:moc andParent:YES]; // save parents too ...
 		[moc reset];
 		[self scheduleNextFeed]; // always reset the timer
@@ -147,7 +149,7 @@ static _Atomic(NSUInteger) _queueSize = 0;
 }
 
 /// Download list of feeds. Either silently in background or with alerts in foreground.
-+ (void)downloadList:(NSArray<Feed*>*)list userInitiated:(BOOL)flag finally:(nullable os_block_t)block {
++ (void)downloadList:(NSArray<Feed*>*)list userInitiated:(BOOL)flag notifications:(BOOL)notify finally:(nullable os_block_t)block {
 	if (![self allowNetworkConnection]) {
 		if (block) block();
 		return;
@@ -158,7 +160,7 @@ static _Atomic(NSUInteger) _queueSize = 0;
 	dispatch_group_t group = dispatch_group_create();
 	for (Feed *f in list) {
 		dispatch_group_enter(group);
-		[self updateFeed:f alert:flag isForced:flag finally:^{
+		[self updateFeed:f alert:flag isForced:flag notifications:notify finally:^{
 			atomic_fetch_sub_explicit(&_queueSize, 1, memory_order_relaxed);
 			PostNotification(kNotificationBackgroundUpdateInProgress, @(_queueSize));
 			dispatch_group_leave(group);
@@ -178,7 +180,7 @@ static inline void AlertDownloadError(NSError *err, NSString *url) {
  Start download request with existing @c Feed object. Reuses etag and modified headers (unless articles count is 0).
  @note Will post a @c kNotificationArticlesUpdated notification if download was successful and status code is @b not 304.
  */
-+ (void)updateFeed:(Feed*)feed alert:(BOOL)alert isForced:(BOOL)forced finally:(nullable os_block_t)block {
++ (void)updateFeed:(Feed*)feed alert:(BOOL)alert isForced:(BOOL)forced notifications:(BOOL)notify finally:(nullable os_block_t)block {
 	NSManagedObjectContext *moc = feed.managedObjectContext;
 	NSManagedObjectID *oid = feed.objectID;
 	[[FeedDownload withFeed:feed forced:forced] startWithBlock:^(FeedDownload *mem) {
@@ -188,7 +190,37 @@ static inline void AlertDownloadError(NSError *err, NSString *url) {
 		BOOL recentlyAdded = (f.articles.count == 0); // before copy values
 		BOOL downloadIcon = (!f.hasIcon && (recentlyAdded || forced));
 		BOOL needsNotification = [mem copyValuesTo:f ignoreError:NO];
+		
+		// need to gather object before save, because afterwards list will be empty
+		NSArray *inserted = notify ? moc.insertedObjects.allObjects : nil;
+		NSArray *deleted = moc.deletedObjects.allObjects;
+		
 		[StoreCoordinator saveContext:moc andParent:YES];
+		
+		// after save, update notifications
+		// dismiss previously delivered notifications
+		if (deleted) {
+			NSMutableArray *ids = [NSMutableArray array];
+			for (FeedArticle *article in deleted) { // will contain non-articles too
+				if ([article isKindOfClass:[FeedArticle class]] || [article isKindOfClass:[Feed class]]) {
+					[ids addObject:article.notificationID];
+				}
+			}
+			[NotifyEndpoint dismiss:ids]; // no-op if empty
+		}
+		// post new notification (if needed)
+		if (notify && inserted) {
+			BOOL didAddAny = NO;
+			for (FeedArticle *article in inserted) { // will contain non-articles too
+				if ([article isKindOfClass:[FeedArticle class]]) {
+					[NotifyEndpoint postArticle:article];
+					didAddAny = YES;
+				}
+			}
+			if (didAddAny)
+				[NotifyEndpoint postFeed:f];
+		}
+		
 		if (needsNotification)
 			PostNotification(kNotificationArticlesUpdated, oid);
 		if (downloadIcon && !mem.error) {

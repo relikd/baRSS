@@ -44,3 +44,22 @@ NSColor* UserPrefsColor(NSString *key, NSColor *defaultColor) {
 	}
 	return defaultColor;
 }
+
+/// Convert stored notification type string into enum
+NotificationType UserPrefsNotificationType(void) {
+	NSString *typ = UserPrefsString(Pref_notificationType);
+	if ([typ isEqualToString:@"article"]) return NotificationTypePerArticle;
+	if ([typ isEqualToString:@"feed"])    return NotificationTypePerFeed;
+	if ([typ isEqualToString:@"global"])  return NotificationTypeGlobal;
+	return NotificationTypeDisabled;
+}
+
+/// Convert enum type to storable string
+NSString* NotificationTypeToString(NotificationType typ) {
+	switch (typ) {
+		case NotificationTypePerArticle: return @"article";
+		case NotificationTypePerFeed:    return @"feed";
+		case NotificationTypeGlobal:     return @"global";
+		default: return nil;
+	}
+}

@@ -1,8 +1,10 @@
 @import RSXML2.RSParsedArticle;
 #import "FeedArticle+Ext.h"
+#import "Feed+Ext.h"
 #import "Constants.h"
 #import "UserPrefs.h"
 #import "StoreCoordinator.h"
+#import "NotifyEndpoint.h"
 #import "NSString+Ext.h"
 
 @implementation FeedArticle (Ext)
@@ -23,6 +25,11 @@
 	if (!fa.link)      fa.link = entry.guid;  // may be wrong, but better than returning nothing.
 	if (!fa.published) fa.published = entry.dateModified;
 	return fa;
+}
+
+/// unique ID used for notifications. returns @c objectID.URIRepresentation.absoluteString
+- (NSString*)notificationID {
+	return self.objectID.URIRepresentation.absoluteString;
 }
 
 - (void)updateArticleIfChanged:(RSParsedArticle*)entry {
@@ -77,6 +84,8 @@
 		[StoreCoordinator saveContext:moc andParent:YES];
 		NSNumber *num = (fa.unread ? @+1 : @-1);
 		PostNotification(kNotificationTotalUnreadCountChanged, num);
+		
+		[NotifyEndpoint dismiss:fa.feed.countUnread > 0 ? @[fa.notificationID] : @[fa.notificationID, fa.feed.notificationID]];
 	}
 	[moc reset];
 }

@@ -13,6 +13,7 @@
 /** default: @c nil */ static NSString* const Pref_modalSheetWidth = @"modalSheetWidth";
 // ------ General settings ------ (Preferences > General Tab) ------
 /** default: @c nil */ static NSString* const Pref_defaultHttpApplication = @"defaultHttpApplication";
+/** default: @c nil */ static NSString* const Pref_notificationType = @"notificationType";
 // ------ Appearance matrix ------ (Preferences > Appearance Tab) ------
 /** default: @c YES */ static NSString* const Pref_globalTintMenuIcon   = @"globalTintMenuBarIcon";
 /** default: @c YES */ static NSString* const Pref_globalUpdateAll      = @"globalUpdateAll";
@@ -49,6 +50,16 @@
 
 void UserPrefsInit(void);
 NSColor* UserPrefsColor(NSString *key, NSColor *defaultColor); // Change with:  defaults write de.relikd.baRSS {KEY} -string "#FBA33A"
+
+typedef NS_ENUM(NSInteger, NotificationType) {
+	NotificationTypeDisabled,
+	NotificationTypePerArticle,
+	NotificationTypePerFeed,
+	NotificationTypeGlobal,
+};
+NotificationType UserPrefsNotificationType(void);
+NSString* NotificationTypeToString(NotificationType typ);
+
 // ------ Getter ------
 /// Helper method calls @c (standardUserDefaults)boolForKey:
 static inline BOOL UserPrefsBool(NSString* const key) { return [[NSUserDefaults standardUserDefaults] boolForKey:key]; }

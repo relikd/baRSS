@@ -6,6 +6,7 @@
 #import "FeedGroup+Ext.h"
 #import "FeedArticle+Ext.h"
 #import "StoreCoordinator.h"
+#import "NotifyEndpoint.h"
 #import "NSURL+Ext.h"
 
 @implementation Feed (Ext)
@@ -15,6 +16,11 @@
 	Feed *feed = [[Feed alloc] initWithEntity:Feed.entity insertIntoManagedObjectContext:moc];
 	feed.meta = [FeedMeta newMetaInContext:moc];
 	return feed;
+}
+
+/// unique ID used for notifications. returns @c objectID.URIRepresentation.absoluteString
+- (NSString*)notificationID {
+	return self.objectID.URIRepresentation.absoluteString;
 }
 
 /// Call @c indexPathString on @c .group and update @c .indexPath if current value is different.
@@ -110,10 +116,12 @@
 - (NSUInteger)deleteArticles:(NSMutableSet<FeedArticle*>*)localSet withRemoteSet:(NSArray<RSParsedArticle*>*)remoteSet {
 	NSUInteger c = 0;
 	NSMutableSet<FeedArticle*> *deletingSet = [NSMutableSet setWithCapacity:localSet.count];
+	NSMutableArray *dismissed = [NSMutableArray array];
 	for (FeedArticle *fa in localSet) {
 		if (![self findLocalArticle:fa inRemoteSet:remoteSet]) {
 			if (fa.unread) ++c;
 			// TODO: keep unread articles?
+			[dismissed addObject:fa.notificationID];
 			[self.managedObjectContext deleteObject:fa];
 			[deletingSet addObject:fa];
 		}
@@ -121,6 +129,7 @@
 	if (deletingSet.count > 0) {
 		[localSet minusSet:deletingSet];
 		[self removeArticles:deletingSet];
+		[NotifyEndpoint dismiss:dismissed];
 	}
 	return c;
 }
@@ -174,6 +183,15 @@
 		}
 	}
 	return nil;
+}
+
+/// Number of unread articles
+- (NSUInteger)countUnread {
+	NSUInteger count = 0;
+	for (FeedArticle *article in self.articles) {
+		count += article.unread;
+	}
+	return count;
 }
 
 
