@@ -45,17 +45,19 @@ static NotificationType notifyType;
 }
 
 /// Set (or update) global "X unread articles"
-+ (void)setGlobalCount:(NSUInteger)count {
++ (void)setGlobalCount:(NSInteger)newCount previousCount:(NSInteger)oldCount {
 	if (notifyType != NotificationTypeGlobal) {
 		return;
 	}
-	if (count > 0) {
+	if (newCount > 0) {
 		// TODO: how to handle global count updates?
 		// ignore and keep old count until 0?
 		// or update count and show a new notification banner?
-		[self send:kNotifyIdGlobal
-			 title:nil
-			  body:[NSString stringWithFormat:@"%ld unread articles", count]];
+		if (newCount > oldCount) { // only notify if new feeds (quirk: will also trigger for option-click menu to mark unread)
+			[self send:kNotifyIdGlobal
+				 title:nil
+				  body:[NSString stringWithFormat:@"%ld unread articles", newCount]];
+		}
 	} else {
 		[self dismiss:@[kNotifyIdGlobal]];
 	}

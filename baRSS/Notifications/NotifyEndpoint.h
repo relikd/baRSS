@@ -8,7 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NotifyEndpoint : NSObject <UNUserNotificationCenterDelegate>
 + (void)activate;
 
-+ (void)setGlobalCount:(NSUInteger)count;
++ (void)setGlobalCount:(NSInteger)count previousCount:(NSInteger)count;
 + (void)postFeed:(Feed*)feed;
 + (void)postArticle:(FeedArticle*)article;
 
