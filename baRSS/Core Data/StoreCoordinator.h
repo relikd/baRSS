@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Unread articles list & mark articled read
 + (NSArray<FeedArticle*>*)articlesAtPath:(nullable NSString*)path isFeed:(BOOL)feedFlag sorted:(BOOL)sortFlag unread:(BOOL)readFlag inContext:(NSManagedObjectContext*)moc limit:(NSUInteger)limit;
-+ (NSArray<NSString*>*)updateArticles:(NSArray<FeedArticle*>*)list markRead:(BOOL)markRead andOpen:(BOOL)openLinks inContext:(NSManagedObjectContext*)moc;
++ (nullable NSArray<NSString*>*)updateArticles:(NSArray<FeedArticle*>*)list markRead:(BOOL)markRead andOpen:(BOOL)openLinks inContext:(NSManagedObjectContext*)moc;
 
 // Restore sound state
 + (void)cleanupAndShowAlert:(BOOL)flag;

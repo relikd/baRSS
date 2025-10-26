@@ -83,10 +83,7 @@ inline static void continueNum(char chr, struct SVGState *state) {
 # pragma mark - Parser
 
 /// very basic svg path parser.
-/// @returns @c CGMutablePathRef which must be released with @c CGPathRelease()
-CGMutablePathRef tinySVG_path(CGFloat scale, const char * code) {
-	CGMutablePathRef path = CGPathCreateMutable();
-	
+static void tinySVG_parse(const char * code, CGFloat scale, CGMutablePathRef path) {
 	struct SVGState state = {
 		.scale = scale,
 		.op =  '_',
@@ -139,17 +136,17 @@ CGMutablePathRef tinySVG_path(CGFloat scale, const char * code) {
 			}
 		}
 	}
-	return path;
 }
 
 
 # pragma mark - External API
 
 /// calls @c tinySVG_path and handles @c CGPath creation and release.
-void svgAddPath(CGContextRef context, CGFloat scale, const char * path) {
-	CGMutablePathRef tmp = tinySVG_path(scale, path);
-	CGContextAddPath(context, tmp);
-	CGPathRelease(tmp);
+void svgAddPath(CGContextRef context, CGFloat scale, const char * code) {
+	CGMutablePathRef path = CGPathCreateMutable();
+	tinySVG_parse(code, scale, path);
+	CGContextAddPath(context, path);
+	CGPathRelease(path);
 }
 
 /// calls @c CGPathAddArc with full circle

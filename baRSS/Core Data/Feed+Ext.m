@@ -189,7 +189,8 @@
 - (NSUInteger)countUnread {
 	NSUInteger count = 0;
 	for (FeedArticle *article in self.articles) {
-		count += article.unread;
+		if (article.unread)
+			count += 1;
 	}
 	return count;
 }

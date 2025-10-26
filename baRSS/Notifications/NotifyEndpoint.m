@@ -102,8 +102,8 @@ static NotificationType notifyType;
 /// @param identifier Used to identify a specific instance (and dismiss a previously shown notification).
 + (void)send:(NSString *)identifier title:(nullable NSString *)title body:(nullable NSString *)body {
 	UNMutableNotificationContent *msg = [UNMutableNotificationContent new];
-	msg.title = title;
-	msg.body = body;
+	if (title) msg.title = title;
+	if (body) msg.body = body;
 	// common settings:
 	// TODO: make sound configurable?
 	msg.sound = [UNNotificationSound defaultSound];

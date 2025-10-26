@@ -214,7 +214,7 @@
  
  @return @c notificationID for all articles that were opened (empty if @c openLinks=NO or open failed).
  */
-+ (NSArray<NSString*>*)updateArticles:(NSArray<FeedArticle*>*)list markRead:(BOOL)markRead andOpen:(BOOL)openLinks inContext:(NSManagedObjectContext*)moc {
++ (nullable NSArray<NSString*>*)updateArticles:(NSArray<FeedArticle*>*)list markRead:(BOOL)markRead andOpen:(BOOL)openLinks inContext:(NSManagedObjectContext*)moc {
 	if (openLinks) {
 		NSMutableArray<NSURL*> *urls = [NSMutableArray arrayWithCapacity:list.count];
 		for (FeedArticle *fa in list) {
