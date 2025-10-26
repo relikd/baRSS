@@ -95,7 +95,7 @@
 		case NotificationTypeDisabled:
 			return NSLocalizedString(@"Notifications are disabled. You will not get any notifications even if you enable them in System Settings.", nil);
 		case NotificationTypePerArticle:
-			return NSLocalizedString(@"You will get a notification for each article (“Article Title: Article Content”). A click on the notification banner opens the article link and marks the item as read.", nil);
+			return NSLocalizedString(@"You will get a notification for each article (“Feed Title: Article Title”). A click on the notification banner opens the article link and marks the item as read.", nil);
 		case NotificationTypePerFeed:
 			return NSLocalizedString(@"You will get a notification for each feed whenever one or more new articles are published (“Feed Title: X unread articles”). A click on the notification banner will open all unread articles of that feed.", nil);
 		case NotificationTypeGlobal:

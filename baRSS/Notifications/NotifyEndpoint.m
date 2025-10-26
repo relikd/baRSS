@@ -55,7 +55,7 @@ static NotificationType notifyType;
 		// or update count and show a new notification banner?
 		if (newCount > oldCount) { // only notify if new feeds (quirk: will also trigger for option-click menu to mark unread)
 			[self send:kNotifyIdGlobal
-				 title:nil
+				 title:APP_NAME
 				  body:[NSString stringWithFormat:@"%ld unread articles", newCount]];
 		}
 	} else {
@@ -84,8 +84,8 @@ static NotificationType notifyType;
 	}
 	[article.managedObjectContext obtainPermanentIDsForObjects:@[article] error:nil];
 	[self send:article.notificationID
-		 title:article.title
-		  body:article.abstract ? article.abstract : article.body];
+		 title:article.feed.title
+		  body:article.title];
 }
 
 /// Close already posted notifications because they were opened via menu
@@ -102,8 +102,8 @@ static NotificationType notifyType;
 /// @param identifier Used to identify a specific instance (and dismiss a previously shown notification).
 + (void)send:(NSString *)identifier title:(nullable NSString *)title body:(nullable NSString *)body {
 	UNMutableNotificationContent *msg = [UNMutableNotificationContent new];
-	if (title) msg.title = title;
-	if (body) msg.body = body;
+	if (title != nil) msg.title = title;
+	if (body != nil) msg.body = body;
 	// common settings:
 	// TODO: make sound configurable?
 	msg.sound = [UNNotificationSound defaultSound];
