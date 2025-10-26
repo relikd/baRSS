@@ -133,7 +133,7 @@ The following list is a collection of ideas that may be added if people request 
 - [ ] Automatically choose best update interval (e.g., avg)
 - [ ] Sync with online services
 - [ ] Feeds with authentication
-- [ ] Notification Center
+- [x] Notification Center
 - [ ] Distraction Mode
 	- [ ] Distract less: Sleep timer. (e.g., disable updates during working hours)
 	- [ ] Distract more: Automatically open feed items
