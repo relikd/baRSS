@@ -56,7 +56,7 @@ static NotificationType notifyType;
 		if (newCount > oldCount) { // only notify if new feeds (quirk: will also trigger for option-click menu to mark unread)
 			[self send:kNotifyIdGlobal
 				 title:APP_NAME
-				  body:[NSString stringWithFormat:@"%ld unread articles", newCount]];
+				  body:[NSString stringWithFormat:NSLocalizedString(@"%ld unread articles", nil), newCount]];
 		}
 	} else {
 		[self dismiss:@[kNotifyIdGlobal]];
@@ -73,7 +73,7 @@ static NotificationType notifyType;
 		[feed.managedObjectContext obtainPermanentIDsForObjects:@[feed] error:nil];
 		[self send:feed.notificationID
 			 title:feed.title
-			  body:[NSString stringWithFormat:@"%ld unread articles", count]];
+			  body:[NSString stringWithFormat:NSLocalizedString(@"%ld unread articles", nil), count]];
 	}
 }
 

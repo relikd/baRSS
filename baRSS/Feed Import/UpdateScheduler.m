@@ -172,7 +172,7 @@ static _Atomic(NSUInteger) _queueSize = 0;
 /// Helper method to show modal error alert
 static inline void AlertDownloadError(NSError *err, NSString *url) {
 	NSAlert *alertPopup = [NSAlert alertWithError:err];
-	alertPopup.informativeText = [NSString stringWithFormat:@"Error loading source: %@", url];
+	alertPopup.informativeText = [NSString stringWithFormat:NSLocalizedString(@"Error loading source: %@", nil), url];
 	[alertPopup runModal];
 }
 
