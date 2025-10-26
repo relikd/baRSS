@@ -46,10 +46,10 @@ static NotificationType notifyType;
 
 /// Set (or update) global "X unread articles"
 + (void)setGlobalCount:(NSInteger)newCount previousCount:(NSInteger)oldCount {
-	if (notifyType != NotificationTypeGlobal) {
-		return;
-	}
 	if (newCount > 0) {
+		if (notifyType != NotificationTypeGlobal) {
+			return;
+		}
 		// TODO: how to handle global count updates?
 		// ignore and keep old count until 0?
 		// or update count and show a new notification banner?
