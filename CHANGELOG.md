@@ -11,7 +11,6 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 ## [1.4.1] – 2025-10-26
 ### Added
 - Notifications
-- New app icon
 
 
 ## [1.4.1] – 2025-07-29
