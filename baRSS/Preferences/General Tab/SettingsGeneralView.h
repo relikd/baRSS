@@ -7,6 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong) IBOutlet NSTextField *defaultReader;
 @property (strong) IBOutlet NSPopUpButton* popupHttpApplication;
 @property (strong) IBOutlet NSPopUpButton* popupNotificationType;
+@property (strong) IBOutlet NSTextField* notificationHelp;
 
 - (instancetype)initWithController:(SettingsGeneral*)controller NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithFrame:(NSRect)frameRect NS_UNAVAILABLE;

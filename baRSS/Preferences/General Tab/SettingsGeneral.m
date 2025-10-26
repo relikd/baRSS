@@ -33,19 +33,19 @@
 	// Notification settings (disabled, per article, per feed, total)
 	NSPopUpButton *notify = self.view.popupNotificationType;
 	[notify removeAllItems];
-	[notify addItemWithTitle:NSLocalizedString(@"Disabled", @"Disable notifications")];
-	notify.lastItem.representedObject = @"";
 	[notify addItemsWithTitles:@[
-		NSLocalizedString(@"Disabled", @"Disable notifications"),
-		NSLocalizedString(@"Article title (per article)", @"Show article title in notification"),
-		NSLocalizedString(@"Number of articles (per feed)", @"Show “feed X: N new articles”"),
-		NSLocalizedString(@"Generic “new articles” (over all)", @"Show total “N new article”"),
+		NSLocalizedString(@"Disabled", @"No notifications"),
+		NSLocalizedString(@"Per Article", nil),
+		NSLocalizedString(@"Per Feed", nil),
+		NSLocalizedString(@"Global “X unread articles”", nil),
 	]];
 	notify.itemArray[0].representedObject = NotificationTypeToString(NotificationTypeDisabled);
 	notify.itemArray[1].representedObject = NotificationTypeToString(NotificationTypePerArticle);
 	notify.itemArray[2].representedObject = NotificationTypeToString(NotificationTypePerFeed);
 	notify.itemArray[3].representedObject = NotificationTypeToString(NotificationTypeGlobal);
-	[notify selectItemAtIndex:[notify indexOfItemWithRepresentedObject:NotificationTypeToString(UserPrefsNotificationType())]];
+	NotificationType savedType = UserPrefsNotificationType();
+	[notify selectItemAtIndex:[notify indexOfItemWithRepresentedObject:NotificationTypeToString(savedType)]];
+	self.view.notificationHelp.stringValue = [self notificationHelpString:savedType];
 }
 
 /// Get human readable application name such as 'Safari' or 'baRSS'
@@ -85,7 +85,22 @@
 
 - (void)changeNotificationType:(NSPopUpButton *)sender {
 	UserPrefsSet(Pref_notificationType, sender.selectedItem.representedObject);
+	self.view.notificationHelp.stringValue = [self notificationHelpString:UserPrefsNotificationType()];
 	[NotifyEndpoint activate];
+}
+
+/// Help string explaining the different notification settings (for the current configuration)
+- (NSString*)notificationHelpString:(NotificationType)typ {
+	switch (typ) {
+		case NotificationTypeDisabled:
+			return NSLocalizedString(@"Notifications are disabled. You will not get any notifications even if you enable them in System Settings.", nil);
+		case NotificationTypePerArticle:
+			return NSLocalizedString(@"You will get a notification for each article (“Article Title: Article Content”). A click on the notification banner opens the article link and marks the item as read.", nil);
+		case NotificationTypePerFeed:
+			return NSLocalizedString(@"You will get a notification for each feed whenever one or more new articles are published (“Feed Title: X unread articles”). A click on the notification banner will open all unread articles of that feed.", nil);
+		case NotificationTypeGlobal:
+			return NSLocalizedString(@"You will get a single notification for all feeds combined (“baRSS: X unread articles”). A click on the notification banner will open all unread articles of all feeds.", nil);
+	}
 }
 
 @end

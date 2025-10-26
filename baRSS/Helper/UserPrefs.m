@@ -57,9 +57,9 @@ NotificationType UserPrefsNotificationType(void) {
 /// Convert enum type to storable string
 NSString* NotificationTypeToString(NotificationType typ) {
 	switch (typ) {
+		case NotificationTypeDisabled:   return nil;
 		case NotificationTypePerArticle: return @"article";
 		case NotificationTypePerFeed:    return @"feed";
 		case NotificationTypeGlobal:     return @"global";
-		default: return nil;
 	}
 }

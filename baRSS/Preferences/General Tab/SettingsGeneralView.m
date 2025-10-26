@@ -23,6 +23,12 @@
 	NSTextField *l3 = [[NSView label:NSLocalizedString(@"Notifications:", nil)] placeIn:self x:PAD_WIN yTop:y + 1];
 	self.popupNotificationType = [[[[NSView popupButton:0] placeIn:self x:NSMaxX(l3.frame) + PAD_S yTop:y] sizeToRight:PAD_WIN]
 								  action:@selector(changeNotificationType:) target:controller];
+	
+	// Notification help text
+	y = YFromTop(self.popupNotificationType) + PAD_M;
+	self.notificationHelp = [[[[[NSView label:@""] gray]
+							   multiline:NSMakeSize(320 - 2*PAD_WIN, HEIGHT_LABEL * 5)]
+							  placeIn:self x:PAD_WIN yTop:y] sizeToRight:PAD_WIN];
 	return self;
 }
 
