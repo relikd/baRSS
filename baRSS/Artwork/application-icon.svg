@@ -6,10 +6,12 @@
 </linearGradient>
 <!-- 3 = half stroke width,  28 = 25 + 3,  25 = radius,  44 = 100 - 2*r - 2*3 -->
 <!-- <path fill="url(#orange)" stroke="#FFF" stroke-width="6" d="M3,28v44q0,25,25,25h44q25,0,25,-25v-44q0,-25,-25,-25h-44q-25,0,-25,25z"/> -->
-<path fill="url(#orange)" d="M0,25v50q0,25,25,25h50q25,0,25,-25v-50q0,-25,-25,-25h-50q-25,0,-25,25z"/>
-<g fill="#FFF" transform="translate(12.5 12.5) scale(.75 .75)">
-	<circle cx="87" cy="13" r="13"/>
-	<path d="M35,0q0,65,65,65v-20q-45,0,-45,-45z"/>
-	<path d="M0,0q0,100,100,100v-20q-80,0,-80,-80z"/>
+<g transform="translate(10 10) scale(.8 .8)">
+	<path fill="url(#orange)" d="M0,25v50q0,25,25,25h50q25,0,25,-25v-50q0,-25,-25,-25h-50q-25,0,-25,25z"/>
+	<g fill="#FFF" transform="translate(12.5 12.5) scale(.75 .75)">
+		<circle cx="87" cy="13" r="13"/>
+		<path d="M35,0q0,65,65,65v-20q-45,0,-45,-45z"/>
+		<path d="M0,0q0,100,100,100v-20q-80,0,-80,-80z"/>
+	</g>
 </g>
 </svg>

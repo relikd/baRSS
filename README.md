@@ -192,7 +192,7 @@ This project uses a modified version of Brent Simmons' [RSXML] for feed parsing.
 ##### Trivia
 
 - Start of project: __July 19, 2018__
-- Estimated development time: __2020h+__
+- Estimated development time: __2053h+__
 - First prototype used __feedparser python__ library
 
 

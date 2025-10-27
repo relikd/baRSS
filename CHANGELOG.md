@@ -5,10 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased]
-
-
-## [1.4.1] – 2025-10-26
+## [1.4.1] – 2025-10-27
 ### Added
 - Notifications
 
@@ -218,7 +215,6 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
-[Unreleased]: https://github.com/relikd/baRSS/compare/v1.5.0...HEAD
 [1.5.0]: https://github.com/relikd/baRSS/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/relikd/baRSS/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/relikd/baRSS/compare/v1.3.2...v1.4.0
