@@ -58,8 +58,8 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 		
 		// Check user preferences to show only unread entries
 		if (unread == 0 &&
-			((fg.type == FEED && UserPrefsBool(Pref_groupUnreadOnly)) ||
-			 (fg.type == GROUP && UserPrefsBool(Pref_globalUnreadOnly)))) {
+			((fg.type == FEED && UserPrefsBool(Pref_globalUnreadOnly)) ||
+			 (fg.type == GROUP && UserPrefsBool(Pref_groupUnreadOnly)))) {
 			return nil;
 		}
 		
