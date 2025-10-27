@@ -60,7 +60,7 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 		if (unread == 0 &&
 			((fg.type == FEED && UserPrefsBool(Pref_globalUnreadOnly)) ||
 			 (fg.type == GROUP && UserPrefsBool(Pref_groupUnreadOnly)))) {
-			return nil;
+			item.hidden = YES;
 		}
 		
 		item.submenu = [[NSMenu alloc] initWithTitle:t];

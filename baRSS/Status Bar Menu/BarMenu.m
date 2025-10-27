@@ -132,12 +132,12 @@
 			if (item) { // nil on last loop (aka main menu, see below)
 				[item.submenu setHeaderHasUnread:uct];
 				[item setTitleCount:uct.unread];
+				item.hidden = NO;
 				item = item.parentItem;
 			}
 		}
 		// call on main menu
 		[self.statusItem.mainMenu setHeaderHasUnread:itms.firstObject];
-		// TODO: need to re-create groups if user chose to hide already read articles
 	}
 }
 
