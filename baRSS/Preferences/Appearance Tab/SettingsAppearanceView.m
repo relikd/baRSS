@@ -28,9 +28,9 @@
 	[self entry:NSLocalizedString(@"Open all unread", nil) c1:Pref_globalOpenUnread c2:Pref_groupOpenUnread c3:Pref_feedOpenUnread];
 	[self entry:NSLocalizedString(@"Mark all read", nil) c1:Pref_globalMarkRead c2:Pref_groupMarkRead c3:Pref_feedMarkRead];
 	[self entry:NSLocalizedString(@"Mark all unread", nil) c1:Pref_globalMarkUnread c2:Pref_groupMarkUnread c3:Pref_feedMarkUnread];
-	[self entry:NSLocalizedString(@"Show only unread / hide read", nil) c1:Pref_globalUnreadOnly c2:Pref_groupUnreadOnly c3:Pref_feedUnreadOnly];
 	[self entry:NSLocalizedString(@"Number of unread articles", nil) c1:Pref_globalUnreadCount c2:Pref_groupUnreadCount c3:Pref_feedUnreadCount];
 	[self entry:NSLocalizedString(@"Indicator for unread articles", nil) c1:nil c2:Pref_groupUnreadIndicator c3:Pref_feedUnreadIndicator];
+	[self entry:NSLocalizedString(@"Show only unread / hide read", nil) c1:nil c2:Pref_groupUnreadOnly c3:Pref_feedUnreadOnly];
 	[[self entry:NSLocalizedString(@"Truncate article title", nil) c1:nil c2:nil c3:Pref_feedTruncateTitle]
 	 tooltip:NSLocalizedString(@"Truncate article title after 60 characters", nil)];
 	[[self entry:NSLocalizedString(@"Limit number of articles", nil) c1:nil c2:nil c3:Pref_feedLimitArticles]

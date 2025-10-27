@@ -20,7 +20,7 @@ void UserPrefsInit(void) {
 		Pref_feedUnreadIndicator
 	]);
 	defaultsAppend(defs, @NO, @[
-		Pref_globalUnreadOnly,  Pref_groupUnreadOnly,  Pref_feedUnreadOnly,
+		Pref_groupUnreadOnly,  Pref_feedUnreadOnly,
 		Pref_groupUnreadIndicator,
 		Pref_feedTruncateTitle,
 		Pref_feedLimitArticles

@@ -57,9 +57,9 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 		NSUInteger unread = unreadMap[[t substringFromIndex:2]].unread;
 		
 		// Check user preferences to show only unread entries
-		if (unread == 0 &&
-			((fg.type == FEED && UserPrefsBool(Pref_globalUnreadOnly)) ||
-			 (fg.type == GROUP && UserPrefsBool(Pref_groupUnreadOnly)))) {
+		if (unread == 0
+			&& (fg.type == FEED || fg.type == GROUP)
+			&& UserPrefsBool(Pref_groupUnreadOnly)) {
 			item.hidden = YES;
 		}
 		

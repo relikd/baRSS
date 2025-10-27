@@ -20,7 +20,6 @@
 /** default: @c YES */ static NSString* const Pref_globalOpenUnread     = @"globalOpenUnread";
 /** default: @c YES */ static NSString* const Pref_globalMarkRead       = @"globalMarkRead";
 /** default: @c YES */ static NSString* const Pref_globalMarkUnread     = @"globalMarkUnread";
-/** default: @c  NO */ static NSString* const Pref_globalUnreadOnly     = @"globalUnreadOnly";
 /** default: @c YES */ static NSString* const Pref_globalUnreadCount    = @"globalUnreadCount";
 /** default: @c YES */ static NSString* const Pref_groupOpenUnread      = @"groupOpenUnread";
 /** default: @c YES */ static NSString* const Pref_groupMarkRead        = @"groupMarkRead";
