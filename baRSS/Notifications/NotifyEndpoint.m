@@ -2,6 +2,7 @@
 #import "UserPrefs.h"
 #import "StoreCoordinator.h"
 #import "Feed+Ext.h"
+#import "FeedGroup+Ext.h"
 #import "FeedArticle+Ext.h"
 
 /**
@@ -84,7 +85,7 @@ static NotificationType notifyType;
 	if (count > 0) {
 		[feed.managedObjectContext obtainPermanentIDsForObjects:@[feed] error:nil];
 		[self send:feed.notificationID
-			 title:feed.title
+			 title:feed.group.anyName
 			  body:[NSString stringWithFormat:NSLocalizedString(@"%ld unread articles", nil), count]];
 	}
 }
@@ -96,7 +97,7 @@ static NotificationType notifyType;
 	}
 	[article.managedObjectContext obtainPermanentIDsForObjects:@[article] error:nil];
 	[self send:article.notificationID
-		 title:article.feed.title
+		 title:article.feed.group.anyName
 		  body:article.title];
 }
 

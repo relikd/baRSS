@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.5.3] – 2025-10-29
+### Fixed
+- *Notifications:* Use user-provided feed title instead of server provided title 
+
+
 ## [1.5.2] – 2025-10-29
 ### Added
 - *Notifications:* Reply with "Open in background", "Mark read & dismiss", or "Open but keep unread" 
@@ -225,6 +230,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
+[1.5.3]: https://github.com/relikd/baRSS/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/relikd/baRSS/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/relikd/baRSS/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/relikd/baRSS/compare/v1.4.1...v1.5.0
