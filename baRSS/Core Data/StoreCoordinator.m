@@ -225,9 +225,11 @@
 			return nil; // if success == NO, do not modify unread state & exit
 	}
 	
+	NSInteger countChange = 0;
 	for (FeedArticle *fa in list) {
 		if (fa.unread == markRead) { // only if differs
 			fa.unread = !markRead;
+			countChange += markRead ? -1 : +1;
 		}
 	}
 	[self saveContext:moc andParent:YES];
@@ -242,8 +244,7 @@
 	}
 	
 	[moc reset];
-	NSNumber *num = [NSNumber numberWithInteger: (markRead ? -1 : +1) * (NSInteger)list.count ];
-	PostNotification(kNotificationTotalUnreadCountChanged, num);
+	PostNotification(kNotificationTotalUnreadCountChanged, @(countChange));
 	return dbRefs;
 }
 

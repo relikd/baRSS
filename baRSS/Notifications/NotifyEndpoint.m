@@ -9,6 +9,11 @@
  */
 static NSString* const kNotifyIdGlobal = @"global";
 
+static NSString* const kCategoryDismissable = @"DISMISSIBLE";
+static NSString* const kActionOpenBackground = @"OPEN_IN_BACKGROUND";
+static NSString* const kActionMarkRead = @"MARK_READ_DONT_OPEN";
+static NSString* const kActionOpenOnly = @"OPEN_ONLY_DONT_MARK_READ";
+
 
 @implementation NotifyEndpoint
 
@@ -18,20 +23,27 @@ static NotificationType notifyType;
 /// Ask user for permission to send notifications @b AND register delegate to respond to alert banner clicks.
 /// @note Called every time user changes notification settings
 + (void)activate {
+	UNUserNotificationCenter *center = UNUserNotificationCenter.currentNotificationCenter;
 	notifyType = UserPrefsNotificationType();
 	
 	// even if disabled, register delegate. This allows to open previously sent notifications
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
 		singleton = [NotifyEndpoint new];
-		UNUserNotificationCenter.currentNotificationCenter.delegate = singleton;
+		center.delegate = singleton;
 	});
 	
 	if (notifyType == NotificationTypeDisabled) {
 		return;
 	}
+	// register action types (allow mark read without opening notification)
+	UNNotificationAction *openBackgroundAction = [UNNotificationAction actionWithIdentifier:kActionOpenBackground title:NSLocalizedString(@"Open in background", nil) options:UNNotificationActionOptionNone];
+	UNNotificationAction *dontOpenAction = [UNNotificationAction actionWithIdentifier:kActionMarkRead title:NSLocalizedString(@"Mark read & dismiss", nil) options:UNNotificationActionOptionNone];
+	UNNotificationAction *dontReadAction = [UNNotificationAction actionWithIdentifier:kActionOpenOnly title:NSLocalizedString(@"Open but keep unread", nil) options:UNNotificationActionOptionNone];
+	UNNotificationCategory *category = [UNNotificationCategory categoryWithIdentifier:kCategoryDismissable actions:@[openBackgroundAction, dontOpenAction, dontReadAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone];
+	[center setNotificationCategories:[NSSet setWithObject:category]];
 	
-	[UNUserNotificationCenter.currentNotificationCenter requestAuthorizationWithOptions:UNAuthorizationOptionAlert | UNAuthorizationOptionSound completionHandler:^(BOOL granted, NSError * _Nullable error) {
+	[center requestAuthorizationWithOptions:UNAuthorizationOptionAlert | UNAuthorizationOptionSound completionHandler:^(BOOL granted, NSError * _Nullable error) {
 		if (error) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				NSAlert *alert = [[NSAlert alloc] init];
@@ -105,6 +117,7 @@ static NotificationType notifyType;
 	if (title != nil) msg.title = title;
 	if (body != nil) msg.body = body;
 	// common settings:
+	msg.categoryIdentifier = kCategoryDismissable;
 	// TODO: make sound configurable?
 	msg.sound = [UNNotificationSound defaultSound];
 	[self send:identifier content: msg];
@@ -167,7 +180,12 @@ static NotificationType notifyType;
 			return;
 		}
 	}
-	[StoreCoordinator updateArticles:articles markRead:YES andOpen:YES inContext:moc];
+	
+	// open-in-background performs the same operation as a normal click
+	// the "background" part is triggered by _NOT_ having the UNNotificationActionOptionForeground option
+	BOOL dontOpen = [response.actionIdentifier isEqualToString:kActionMarkRead];
+	BOOL dontMarkRead = [response.actionIdentifier isEqualToString:kActionOpenOnly];
+	[StoreCoordinator updateArticles:articles markRead:!dontMarkRead andOpen:!dontOpen inContext:moc];
 }
 
 @end
