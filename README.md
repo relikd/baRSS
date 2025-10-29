@@ -1,4 +1,4 @@
-[![macOS 10.13+](https://img.shields.io/badge/macOS-10.13+-888)](#download--install)
+[![macOS 10.14+](https://img.shields.io/badge/macOS-10.14+-888)](#download--install)
 [![Current release](https://img.shields.io/github/release/relikd/baRSS)](https://github.com/relikd/baRSS/releases)
 [![All downloads](https://img.shields.io/github/downloads/relikd/baRSS/total)](https://github.com/relikd/baRSS/releases)
 [![GitHub license](https://img.shields.io/github/license/relikd/baRSS)](LICENSE)
@@ -35,7 +35,7 @@ Further, tuning the update frequently will decrease the traffic even more.
 Download & Install
 ------------------
 
-Requires macOS High Sierra (10.13) or higher.
+Requires macOS Mojave (10.14) or higher.
 
 ### Easy way
 Go to [releases](https://github.com/relikd/baRSS/releases) and downloaded the latest version.  
