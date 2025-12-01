@@ -46,7 +46,7 @@
 		54AD90EA2E30C48400160925 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 54AD90E92E30C48400160925 /* Quartz.framework */; };
 		54AD90EE2E30C48400160925 /* PreviewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 54AD90ED2E30C48400160925 /* PreviewViewController.m */; };
 		54AD90F12E30C48400160925 /* PreviewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 54AD90EF2E30C48400160925 /* PreviewViewController.xib */; };
-		54AD90F72E30C48400160925 /* QLOPML.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 54AD90E72E30C48400160925 /* QLOPML.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		54AD90F72E30C48400160925 /* QLOPML.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 54AD90E72E30C48400160925 /* QLOPML.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		54B51704226DC339006C1B29 /* ModalFeedEditView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B51703226DC339006C1B29 /* ModalFeedEditView.m */; };
 		54B517072270E990006C1B29 /* NSView+Ext.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B517062270E92A006C1B29 /* NSView+Ext.m */; };
 		54B6F14A231551B3002C94C9 /* FaviconDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 54B6F149231551B3002C94C9 /* FaviconDownload.m */; };
@@ -105,15 +105,15 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		54AD90F62E30C48400160925 /* Embed App Extensions */ = {
+		54AD90F62E30C48400160925 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				54AD90F72E30C48400160925 /* QLOPML.appex in Embed App Extensions */,
+				54AD90F72E30C48400160925 /* QLOPML.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -156,6 +156,8 @@
 		546A6A2B22C584AF0034E806 /* SettingsAppearanceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsAppearanceView.h; sourceTree = "<group>"; };
 		546A6A2D22C585580034E806 /* SettingsAboutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsAboutView.m; sourceTree = "<group>"; };
 		546A6A2E22C585580034E806 /* SettingsAboutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsAboutView.h; sourceTree = "<group>"; };
+		546BD1882EDE156000943942 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		546BD1892EDE156000943942 /* Config-debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Config-debug.xcconfig"; sourceTree = "<group>"; };
 		546FC43B21188AD5007CC3A3 /* SettingsFeeds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsFeeds.h; sourceTree = "<group>"; };
 		546FC43C21188AD5007CC3A3 /* SettingsFeeds.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsFeeds.m; sourceTree = "<group>"; };
 		546FC44021189975007CC3A3 /* SettingsGeneral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsGeneral.h; sourceTree = "<group>"; };
@@ -188,7 +190,6 @@
 		54ACC29721061FBA0020715F /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		54AD4E0A2301853D000AE386 /* NSString+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Ext.h"; sourceTree = "<group>"; };
 		54AD4E0B2301853D000AE386 /* NSString+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+Ext.m"; sourceTree = "<group>"; };
-		54AD4EE42305AF60000AE386 /* baRSS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = baRSS.entitlements; sourceTree = "<group>"; };
 		54AD4EE62305B17D000AE386 /* container-migration.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "container-migration.plist"; sourceTree = "<group>"; };
 		54AD90E72E30C48400160925 /* QLOPML.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = QLOPML.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		54AD90E92E30C48400160925 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
@@ -196,7 +197,6 @@
 		54AD90ED2E30C48400160925 /* PreviewViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreviewViewController.m; sourceTree = "<group>"; };
 		54AD90F02E30C48400160925 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreviewViewController.xib; sourceTree = "<group>"; };
 		54AD90F22E30C48400160925 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		54AD90F32E30C48400160925 /* QLOPML.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QLOPML.entitlements; sourceTree = "<group>"; };
 		54B51702226DC339006C1B29 /* ModalFeedEditView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModalFeedEditView.h; sourceTree = "<group>"; };
 		54B51703226DC339006C1B29 /* ModalFeedEditView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ModalFeedEditView.m; sourceTree = "<group>"; };
 		54B517052270E8C6006C1B29 /* NSView+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSView+Ext.h"; sourceTree = "<group>"; };
@@ -365,6 +365,8 @@
 		54ACC27321061B3B0020715F = {
 			isa = PBXGroup;
 			children = (
+				546BD1882EDE156000943942 /* Config.xcconfig */,
+				546BD1892EDE156000943942 /* Config-debug.xcconfig */,
 				540CD14821C094A2004AB594 /* README.md */,
 				54892F1D2235285700271CBA /* CHANGELOG.md */,
 				54ACC27E21061B3B0020715F /* baRSS */,
@@ -387,7 +389,6 @@
 		54ACC27E21061B3B0020715F /* baRSS */ = {
 			isa = PBXGroup;
 			children = (
-				54AD4EE42305AF60000AE386 /* baRSS.entitlements */,
 				541958872190FF1200581B79 /* Constants.h */,
 				544B011B2114EE9100386E5C /* AppHook.h */,
 				544B011C2114EE9100386E5C /* AppHook.m */,
@@ -442,7 +443,6 @@
 				54AD90ED2E30C48400160925 /* PreviewViewController.m */,
 				54AD90EF2E30C48400160925 /* PreviewViewController.xib */,
 				54AD90F22E30C48400160925 /* Info.plist */,
-				54AD90F32E30C48400160925 /* QLOPML.entitlements */,
 				544F5A722E30EFC700674F81 /* style.css */,
 			);
 			path = QLOPML;
@@ -536,7 +536,7 @@
 				54ACC27A21061B3B0020715F /* Resources */,
 				544DCCBB212A2B4D002DBC46 /* Embed Frameworks */,
 				54FB05D12305BFAB00A088AD /* dynamic app name in db migration */,
-				54AD90F62E30C48400160925 /* Embed App Extensions */,
+				54AD90F62E30C48400160925 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -572,7 +572,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1640;
+				LastUpgradeCheck = 2600;
 				ORGANIZATIONNAME = relikd;
 				TargetAttributes = {
 					54ACC27B21061B3B0020715F = {
@@ -772,6 +772,7 @@
 /* Begin XCBuildConfiguration section */
 		54ACC28E21061B3C0020715F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 546BD1892EDE156000943942 /* Config-debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -805,7 +806,6 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 16785;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = UY657LKNHJ;
@@ -822,8 +822,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = 1.5.3;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -832,6 +830,7 @@
 		};
 		54ACC28F21061B3C0020715F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 546BD1882EDE156000943942 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -866,7 +865,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 16785;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = UY657LKNHJ;
@@ -880,8 +878,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = 1.5.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
@@ -902,10 +898,12 @@
 				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
-				CODE_SIGN_ENTITLEMENTS = baRSS/baRSS.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -931,8 +929,7 @@
 					"@executable_path/../Frameworks",
 					"$(FRAMEWORK_SEARCH_PATHS)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = de.relikd.baRSS.beta;
-				PRODUCT_NAME = "$(TARGET_NAME) Beta";
+				PRODUCT_NAME = "$(inherited) Beta";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -952,10 +949,12 @@
 				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
-				CODE_SIGN_ENTITLEMENTS = baRSS/baRSS.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -981,16 +980,15 @@
 					"@executable_path/../Frameworks",
 					"$(FRAMEWORK_SEARCH_PATHS)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = de.relikd.baRSS;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
 		54AD90F92E30C48400160925 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = QLOPML/QLOPML.entitlements;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1003,7 +1001,7 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = de.relikd.baRSS.beta.QLOPML;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited).QLOPML";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -1012,8 +1010,9 @@
 		54AD90FA2E30C48400160925 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = QLOPML/QLOPML.entitlements;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				INFOPLIST_FILE = QLOPML/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1021,7 +1020,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = de.relikd.baRSS.QLOPML;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited).QLOPML";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
