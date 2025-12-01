@@ -170,7 +170,7 @@
 NSUserInterfaceItemIdentifier const CustomCellName = @"NameColumnCell";
 
 - (instancetype)initWithFrame:(NSRect)frameRect {
-	self = [super initWithFrame:frameRect];
+	self = [super initWithFrame:NSMakeRect(0, 0, 100, 0)];
 	self.identifier = CustomCellName;
 	self.imageView = [[NSView imageView:nil size:16] placeIn:self x:1 yTop:1];
 	self.imageView.accessibilityLabel = NSLocalizedString(@"Feed icon", nil);
@@ -195,7 +195,7 @@ NSUserInterfaceItemIdentifier const CustomCellName = @"NameColumnCell";
 NSUserInterfaceItemIdentifier const CustomCellRefresh = @"RefreshColumnCell";
 
 - (instancetype)initWithFrame:(NSRect)frameRect {
-	self = [super initWithFrame:frameRect];
+	self = [super initWithFrame:NSMakeRect(0, 0, 100, 0)];
 	self.identifier = CustomCellRefresh;
 	self.textField = [[[[NSView label:@""] textRight] placeIn:self x:0 yTop:0] sizeToRight:0];
 	self.textField.accessibilityTitle = @" "; // otherwise groups and separators will say 'text'
@@ -224,7 +224,7 @@ NSUserInterfaceItemIdentifier const CustomCellRefresh = @"RefreshColumnCell";
 NSUserInterfaceItemIdentifier const CustomCellSeparator = @"SeparatorColumnCell";
 
 - (instancetype)initWithFrame:(NSRect)frameRect {
-	self = [super initWithFrame:frameRect];
+	self = [super initWithFrame:NSMakeRect(0, 0, 100, 0)];
 	self.identifier = CustomCellSeparator;
 	[[[[DrawSeparator alloc] initWithFrame:self.frame] placeIn:self x:0 y:0] sizableWidthAndHeight];
 	return self;
