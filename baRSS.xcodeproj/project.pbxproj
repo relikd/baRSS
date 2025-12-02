@@ -190,6 +190,7 @@
 		54ACC29721061FBA0020715F /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		54AD4E0A2301853D000AE386 /* NSString+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Ext.h"; sourceTree = "<group>"; };
 		54AD4E0B2301853D000AE386 /* NSString+Ext.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+Ext.m"; sourceTree = "<group>"; };
+		54AD4EE42305AF60000AE386 /* baRSS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = baRSS.entitlements; sourceTree = "<group>"; };
 		54AD4EE62305B17D000AE386 /* container-migration.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "container-migration.plist"; sourceTree = "<group>"; };
 		54AD90E72E30C48400160925 /* QLOPML.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = QLOPML.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		54AD90E92E30C48400160925 /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
@@ -197,6 +198,7 @@
 		54AD90ED2E30C48400160925 /* PreviewViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PreviewViewController.m; sourceTree = "<group>"; };
 		54AD90F02E30C48400160925 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreviewViewController.xib; sourceTree = "<group>"; };
 		54AD90F22E30C48400160925 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		54AD90F32E30C48400160925 /* QLOPML.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QLOPML.entitlements; sourceTree = "<group>"; };
 		54B51702226DC339006C1B29 /* ModalFeedEditView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModalFeedEditView.h; sourceTree = "<group>"; };
 		54B51703226DC339006C1B29 /* ModalFeedEditView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ModalFeedEditView.m; sourceTree = "<group>"; };
 		54B517052270E8C6006C1B29 /* NSView+Ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSView+Ext.h"; sourceTree = "<group>"; };
@@ -389,6 +391,7 @@
 		54ACC27E21061B3B0020715F /* baRSS */ = {
 			isa = PBXGroup;
 			children = (
+				54AD4EE42305AF60000AE386 /* baRSS.entitlements */,
 				541958872190FF1200581B79 /* Constants.h */,
 				544B011B2114EE9100386E5C /* AppHook.h */,
 				544B011C2114EE9100386E5C /* AppHook.m */,
@@ -443,6 +446,7 @@
 				54AD90ED2E30C48400160925 /* PreviewViewController.m */,
 				54AD90EF2E30C48400160925 /* PreviewViewController.xib */,
 				54AD90F22E30C48400160925 /* Info.plist */,
+				54AD90F32E30C48400160925 /* QLOPML.entitlements */,
 				544F5A722E30EFC700674F81 /* style.css */,
 			);
 			path = QLOPML;
@@ -898,12 +902,10 @@
 				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CODE_SIGN_ENTITLEMENTS = baRSS/baRSS.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				ENABLE_USER_SELECTED_FILES = readwrite;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -949,12 +951,10 @@
 				CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
+				CODE_SIGN_ENTITLEMENTS = baRSS/baRSS.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				ENABLE_USER_SELECTED_FILES = readwrite;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -986,9 +986,8 @@
 		54AD90F92E30C48400160925 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ENABLE_APP_SANDBOX = YES;
+				CODE_SIGN_ENTITLEMENTS = QLOPML/QLOPML.entitlements;
 				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1010,9 +1009,8 @@
 		54AD90FA2E30C48400160925 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ENABLE_APP_SANDBOX = YES;
+				CODE_SIGN_ENTITLEMENTS = QLOPML/QLOPML.entitlements;
 				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				INFOPLIST_FILE = QLOPML/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
