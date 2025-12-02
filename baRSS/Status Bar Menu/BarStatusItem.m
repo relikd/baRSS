@@ -152,6 +152,7 @@
 -(void)menuWillOpen:(NSMenu *)menu {
 	_mainMenu = menu; // autoreleased once closed
 	self.barMenu = [[BarMenu alloc] initWithStatusItem:self];
+	self.barMenu.showHidden = NSEvent.modifierFlags & NSEventModifierFlagOption;
 	
 	[self insertMainMenuHeader:menu];
 	[self.barMenu menuNeedsUpdate:menu];

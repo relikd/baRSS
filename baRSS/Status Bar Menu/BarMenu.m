@@ -64,7 +64,7 @@
 - (void)setFeedGroups:(NSArray<FeedGroup*>*)sortedList forMenu:(NSMenu*)menu {
 	[menu insertDefaultHeader];
 	for (FeedGroup *fg in sortedList) {
-		[menu insertFeedGroupItem:fg withUnread:self.unreadMap].submenu.delegate = self;
+		[menu insertFeedGroupItem:fg withUnread:self.unreadMap showHidden:_showHidden].submenu.delegate = self;
 	}
 	[menu setHeaderHasUnread:self.unreadMap[menu.titleIndexPath]];
 }
@@ -78,7 +78,7 @@
 	BOOL onlyUnread = UserPrefsBool(Pref_feedUnreadOnly);
 	
 	for (FeedArticle *fa in sortedList) {
-		if (onlyUnread && !fa.unread)
+		if (onlyUnread && !fa.unread && !_showHidden)
 			continue;
 		if (--mc < 0) // mc == 0 will first decrement to -1, then evaluate
 			break;

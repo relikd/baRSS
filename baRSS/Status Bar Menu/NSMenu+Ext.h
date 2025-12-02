@@ -9,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL isFeedMenu;
 
 // Generator
-- (nullable NSMenuItem*)insertFeedGroupItem:(FeedGroup*)fg withUnread:(MapUnreadTotal*)unreadMap;
+- (nullable NSMenuItem*)insertFeedGroupItem:(FeedGroup*)fg withUnread:(MapUnreadTotal*)unreadMap showHidden:(BOOL)showHidden;
 - (void)insertDefaultHeader;
 // Update menu
 - (void)setHeaderHasUnread:(UnreadTotal*)count;

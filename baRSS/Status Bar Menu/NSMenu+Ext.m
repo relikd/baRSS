@@ -44,7 +44,7 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 #pragma mark - Generator -
 
 /// Create new @c NSMenuItem with empty submenu and append it to the menu. @return Inserted item.
-- (nullable NSMenuItem*)insertFeedGroupItem:(FeedGroup*)fg withUnread:(MapUnreadTotal*)unreadMap {
+- (nullable NSMenuItem*)insertFeedGroupItem:(FeedGroup*)fg withUnread:(MapUnreadTotal*)unreadMap showHidden:(BOOL)showHidden {
 	unichar chr = '-';
 	NSMenuItem *item = nil;
 	switch (fg.type) {
@@ -57,7 +57,7 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 		NSUInteger unread = unreadMap[[t substringFromIndex:2]].unread;
 		
 		// Check user preferences to show only unread entries
-		if (unread == 0
+		if (unread == 0 && !showHidden
 			&& (fg.type == FEED || fg.type == GROUP)
 			&& UserPrefsBool(Pref_groupUnreadOnly)) {
 			item.hidden = YES;
