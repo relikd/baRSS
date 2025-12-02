@@ -69,18 +69,23 @@ Hidden options
 baRSS has no option to launch it on start.
 However, you can still add the application to auto boot by adding it to the system login items:
 
-`System Preferences > User > Login Items` (macOS 10-12)  
+`System Preferences > User > Login Items` (macOS 10.x-12)
 `System Preferences > General > Login Items & Extensions` (macOS 13+)
 
 
 ### UI options
 
 1. If you hold down the option key and click on an article item, you can mark a single item (un-)read without opening it.
+I am still searching for a way to keep the menu open after click (if you know of a way, let me know!).
 
 2. To add websites without RSS feed you can use the regex converter.
 Hold down the option key in the feed edit modal and click the red regex button.
 Though, admittedly, this is for experts only.
 I still have to find a nice user-friendly way to achieve this.
+
+3. The option “Show only unread” will hide all items which have been read.
+You can hold down option key before opening the menu bar icon to show hidden articles regardless.
+This is a nice way to quickly lookup a hidden article without going into settings and twiddling with the checkbox.
 
 
 ### CLI options

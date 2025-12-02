@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.5.4] – 2025-12-02
+### Added
+- *UI:* Tooltip explanation for all appearance settings
+- *Status Bar Menu:* Hold down option key before opening the menu bar icon to show hidden articles (if option "Show only unread" is active)
+
+
 ## [1.5.3] – 2025-10-29
 ### Fixed
 - *Notifications:* Use user-provided feed title instead of server provided title 
@@ -230,6 +236,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
+[1.5.4]: https://github.com/relikd/baRSS/compare/v1.5.3...v1.5.4
 [1.5.3]: https://github.com/relikd/baRSS/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/relikd/baRSS/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/relikd/baRSS/compare/v1.5.0...v1.5.1
