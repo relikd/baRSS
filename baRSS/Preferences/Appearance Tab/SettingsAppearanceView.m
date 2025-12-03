@@ -18,9 +18,9 @@
 - (instancetype)init {
 	self = [super initWithFrame:NSMakeRect(0, 0, 320, 327)];
 	// Insert matrix header (icons above checkbox matrix)
-	ColumnIcon(self, X__, RSSImageSettingsGlobal, NSLocalizedString(@"Show in menu bar", nil));
-	ColumnIcon(self, _X_, RSSImageSettingsGroup, NSLocalizedString(@"Show in group menu", nil));
-	ColumnIcon(self, __X, RSSImageSettingsFeed, NSLocalizedString(@"Show in feed menu", nil));
+	ColumnIcon(self, X__, RSSImageSettingsGlobal);
+	ColumnIcon(self, _X_, RSSImageSettingsGroup);
+	ColumnIcon(self, __X, RSSImageSettingsFeed);
 	// Generate checkbox matrix
 	self.y = PAD_WIN + IconSize + PAD_S;
 	[[self entry:NSLocalizedString(@"Tint menu bar icon on unread", nil)
@@ -66,8 +66,8 @@
 }
 
 /// Helper method for matrix table header icons
-static inline void ColumnIcon(id this, CGFloat x, const NSImageName img, NSString *ttip) {
-	[[[NSView imageView:img size:IconSize] placeIn:this x:x yTop:PAD_WIN] tooltip:ttip];
+static inline void ColumnIcon(id this, CGFloat x, const NSImageName img) {
+	[[NSView imageView:img size:IconSize] placeIn:this x:x yTop:PAD_WIN];
 }
 
 /// Helper method for generating a checkbox
