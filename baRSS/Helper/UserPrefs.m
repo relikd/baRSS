@@ -20,6 +20,7 @@ void UserPrefsInit(void) {
 		Pref_feedUnreadIndicator
 	]);
 	defaultsAppend(defs, @NO, @[
+		Pref_globalToggleHidden,
 		Pref_groupUnreadOnly,  Pref_feedUnreadOnly,
 		Pref_groupUnreadIndicator,
 		Pref_feedTruncateTitle,

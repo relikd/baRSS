@@ -29,63 +29,70 @@
 			 c1:Pref_globalTintMenuIcon c1tt:NSLocalizedString(@"menu bar icon", nil)
 			 c2:nil c2tt:nil
 			 c3:nil c3tt:nil];
-
+	
 	[self entry:NSLocalizedString(@"Update all feeds", nil)
-		   help:NSLocalizedString(@"Show button in status bar menu to reload all feeds. This will force fetch new online content regardless of next-update timer.", nil)
+		   help:NSLocalizedString(@"Show button in main menu to reload all feeds. This will force fetch new online content regardless of next-update timer.", nil)
 			tip:nil
 			 c1:Pref_globalUpdateAll c1tt:NSLocalizedString(@"in main menu", nil)
 			 c2:nil c2tt:nil
 			 c3:nil c3tt:nil];
-
+	
+	[self entry:NSLocalizedString(@"Toggle “Show Hidden Articles”", nil)
+		   help:NSLocalizedString(@"Show button in main menu to quickly toggle whether hidden articles should be shown. See option “Show only unread”.", nil)
+			tip:nil
+			 c1:Pref_globalToggleHidden c1tt:NSLocalizedString(@"in main menu", nil)
+			 c2:nil c2tt:nil
+			 c3:nil c3tt:nil];
+	
 	[self entry:NSLocalizedString(@"Open all unread", nil)
 		   help:NSLocalizedString(@"Show button to open unread articles.", nil)
 			tip:NSLocalizedString(@"If you hold down option-key, this will become an “open a few” unread articles button.", nil)
 			 c1:Pref_globalOpenUnread c1tt: NSLocalizedString(@"in main menu", nil)
 			 c2:Pref_groupOpenUnread c2tt: NSLocalizedString(@"in group menu", nil)
 			 c3:Pref_feedOpenUnread c3tt: NSLocalizedString(@"in feed menu", nil)];
-
+	
 	[self entry:NSLocalizedString(@"Mark all read", nil)
 		   help:NSLocalizedString(@"Show button to mark articles read.", nil)
 			tip:nil
 			 c1:Pref_globalMarkRead c1tt: NSLocalizedString(@"in main menu", nil)
 			 c2:Pref_groupMarkRead c2tt: NSLocalizedString(@"in group menu", nil)
 			 c3:Pref_feedMarkRead c3tt: NSLocalizedString(@"in feed menu", nil)];
-
+	
 	[self entry:NSLocalizedString(@"Mark all unread", nil)
 		   help:NSLocalizedString(@"Show button to mark articles unread.", nil)
 			tip:NSLocalizedString(@"You can hold down option-key and click on an article to toggle that item (un-)read.", nil)
 			 c1:Pref_globalMarkUnread c1tt: NSLocalizedString(@"in main menu", nil)
 			 c2:Pref_groupMarkUnread c2tt: NSLocalizedString(@"in group menu", nil)
 			 c3:Pref_feedMarkUnread c3tt: NSLocalizedString(@"in feed menu", nil)];
-
+	
 	[self entry:NSLocalizedString(@"Number of unread articles", nil)
 		   help:NSLocalizedString(@"Show count of unread articles in parenthesis.", nil)
 			tip:nil
 			 c1:Pref_globalUnreadCount c1tt:NSLocalizedString(@"on menu bar icon", nil)
 			 c2:Pref_groupUnreadCount c2tt:NSLocalizedString(@"on group folder", nil)
 			 c3:Pref_feedUnreadCount c3tt:NSLocalizedString(@"on feed folder", nil)];
-
+	
 	[self entry:NSLocalizedString(@"Indicator for unread articles", nil)
 		   help:NSLocalizedString(@"Show blue dot on menu items with unread articles.", nil)
 			tip:nil
 			 c1:nil c1tt:nil
 			 c2:Pref_groupUnreadIndicator c2tt:NSLocalizedString(@"on group & feed folder", nil)
 			 c3:Pref_feedUnreadIndicator c3tt:NSLocalizedString(@"on article entry", nil)];
-
+	
 	[self entry:NSLocalizedString(@"Show only unread", nil)
 		   help:NSLocalizedString(@"Hide articles which have been read.", nil)
-			tip:NSLocalizedString(@"You can hold down option-key before opening the menu bar menu to quickly show hidden articles even if this setting is on.", nil)
+			tip:NSLocalizedString(@"You can hold down option-key before opening the main menu to temporarily disable this setting.", nil)
 			 c1:nil c1tt:nil
 			 c2:Pref_groupUnreadOnly c2tt:NSLocalizedString(@"hide group & feed folders", nil)
 			 c3:Pref_feedUnreadOnly c3tt:NSLocalizedString(@"hide articles inside of feed folder", nil)];
-
+	
 	[self entry:NSLocalizedString(@"Truncate article title", nil)
 		   help:NSLocalizedString(@"Truncate article title after 60 characters. If a title is longer than that, show an ellipsis character “…” instead.", nil)
 			tip:nil
 			 c1:nil c1tt:nil
 			 c2:nil c2tt:nil
 			 c3:Pref_feedTruncateTitle c3tt:NSLocalizedString(@"article title", nil)];
-
+	
 	[self entry:NSLocalizedString(@"Limit number of articles", nil)
 		   help:NSLocalizedString(@"Display at most 40 articles in feed menu. Remaining articles will be hidden from view but are still there. Unread count may be confusing as it will also count unread and hidden articles.", nil)
 			tip:nil

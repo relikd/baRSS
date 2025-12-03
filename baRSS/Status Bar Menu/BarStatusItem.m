@@ -182,14 +182,16 @@
 		pause.title = NSLocalizedString(@"Resume Updates", nil);
 	
 	// 'show hidden articles' item
-	NSMenuItem *toggleHidden = [menu addItemWithTitle:NSLocalizedString(@"Show Hidden Articles", nil) action:@selector(toggleHiddenArticles) keyEquivalent:@"h"];
-	toggleHidden.target = self;
-	toggleHidden.enabled = !self.holdingOptKey && (UserPrefsBool(Pref_groupUnreadOnly) || UserPrefsBool(Pref_feedUnreadOnly));
-	[toggleHidden setState:self.barMenu.showHidden ? NSControlStateValueOn : NSControlStateValueOff];
-	if (!toggleHidden.enabled) {
-		toggleHidden.toolTip = self.holdingOptKey
-		? NSLocalizedString(@"Option disabled because overwritten by holding down option-key.", nil)
-		: NSLocalizedString(@"Option disabled because appearance setting for “Show only unread” is disabled.", nil);
+	if (UserPrefsBool(Pref_globalToggleHidden)) {
+		NSMenuItem *toggleHidden = [menu addItemWithTitle:NSLocalizedString(@"Show Hidden Articles", nil) action:@selector(toggleHiddenArticles) keyEquivalent:@"h"];
+		toggleHidden.target = self;
+		toggleHidden.enabled = !self.holdingOptKey && (UserPrefsBool(Pref_groupUnreadOnly) || UserPrefsBool(Pref_feedUnreadOnly));
+		[toggleHidden setState:self.barMenu.showHidden ? NSControlStateValueOn : NSControlStateValueOff];
+		if (!toggleHidden.enabled) {
+			toggleHidden.toolTip = self.holdingOptKey
+			? NSLocalizedString(@"Option disabled because overwritten by holding down option-key.", nil)
+			: NSLocalizedString(@"Option disabled because appearance setting for “Show only unread” is disabled.", nil);
+		}
 	}
 	
 	// 'Update all feeds' item

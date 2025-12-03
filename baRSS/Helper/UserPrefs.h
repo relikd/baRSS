@@ -17,6 +17,7 @@
 // ------ Appearance matrix ------ (Preferences > Appearance Tab) ------
 /** default: @c YES */ static NSString* const Pref_globalTintMenuIcon   = @"globalTintMenuBarIcon";
 /** default: @c YES */ static NSString* const Pref_globalUpdateAll      = @"globalUpdateAll";
+/** default: @c  NO */ static NSString* const Pref_globalToggleHidden   = @"globalToggleHidden";
 /** default: @c YES */ static NSString* const Pref_globalOpenUnread     = @"globalOpenUnread";
 /** default: @c YES */ static NSString* const Pref_globalMarkRead       = @"globalMarkRead";
 /** default: @c YES */ static NSString* const Pref_globalMarkUnread     = @"globalMarkUnread";
