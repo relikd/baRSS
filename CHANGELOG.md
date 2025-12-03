@@ -5,10 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.5.5] – 2025-12-03
+### Added
+- *Settings, Appearance:* Improved tooltips on individual options
+- *Status Bar Menu:* Toggle button to show hidden articles without holding down option-key.
+
+
 ## [1.5.4] – 2025-12-02
 ### Added
-- *UI:* Tooltip explanation for all appearance settings
+- *Settings, Appearance:* Tooltip explanation for all options
 - *Status Bar Menu:* Hold down option key before opening the menu bar icon to show hidden articles (if option "Show only unread" is active)
+
+### Fixed
+- *UI:* Table cells were rendered slightly off bounds.
 
 
 ## [1.5.3] – 2025-10-29
@@ -236,6 +245,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
+[1.5.5]: https://github.com/relikd/baRSS/compare/v1.5.4...v1.5.5
 [1.5.4]: https://github.com/relikd/baRSS/compare/v1.5.3...v1.5.4
 [1.5.3]: https://github.com/relikd/baRSS/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/relikd/baRSS/compare/v1.5.1...v1.5.2

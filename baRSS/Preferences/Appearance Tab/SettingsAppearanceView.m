@@ -83,7 +83,7 @@
 		   help:NSLocalizedString(@"Hide articles which have been read.", nil)
 			tip:NSLocalizedString(@"You can hold down option-key before opening the main menu to temporarily disable this setting.", nil)
 			 c1:nil c1tt:nil
-			 c2:Pref_groupUnreadOnly c2tt:NSLocalizedString(@"hide group & feed folders", nil)
+			 c2:Pref_groupUnreadOnly c2tt:NSLocalizedString(@"hide group & feed folders with 0 unread articles", nil)
 			 c3:Pref_feedUnreadOnly c3tt:NSLocalizedString(@"hide articles inside of feed folder", nil)];
 	
 	[self entry:NSLocalizedString(@"Truncate article title", nil)
