@@ -108,6 +108,13 @@ With this Terminal command you can customize this limit:
 defaults write de.relikd.baRSS shortArticleNamesLimit -int 50
 ```
 
+3. Each article menu item shows a summary tooltip (if the server provides one).
+By default, the tooltip is limited to 2000 characters.
+You can change the limit with this command:
+```
+defaults write de.relikd.baRSS tooltipCharacterLimit -int 500
+```
+
 3. Limit the number of displayed articles per feed menu.
 **Note:** displayed unread count may be different than the unread items inside. 'Open all unread' will open hidden items too.
 ```

@@ -63,7 +63,14 @@
 	item.state = (self.unread && UserPrefsBool(Pref_feedUnreadIndicator) ? NSControlStateValueOn : NSControlStateValueOff);
 	item.onStateImage = [NSImage imageNamed:RSSImageMenuItemUnread];
 	item.accessibilityLabel = (self.unread ? NSLocalizedString(@"article: unread", @"accessibility label, feed menu item") : NSLocalizedString(@"article: read", @"accessibility label, feed menu item"));
-	item.toolTip = (self.abstract ? self.abstract : self.body); // fall back to body (html)
+	// truncate tooltip
+	NSUInteger limit = UserPrefsUInt(Pref_tooltipCharacterLimit);
+	if (limit > 0) {
+		NSString *tooltip = (self.abstract ? self.abstract : self.body); // fall back to body (html)
+		if (tooltip.length > limit)
+			tooltip = [[tooltip substringToIndex:limit] stringByAppendingString:@"…\n[…]"];
+		item.toolTip = tooltip;
+	}
 	item.representedObject = self.objectID;
 	item.target = [self class];
 	item.action = @selector(didClickOnMenuItem:);
