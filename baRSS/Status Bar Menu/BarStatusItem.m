@@ -176,14 +176,14 @@
 
 - (void)insertMainMenuHeader:(NSMenu*)menu {
 	// 'Pause Updates' item
-	NSMenuItem *pause = [menu addItemWithTitle:NSLocalizedString(@"Pause Updates", nil) action:@selector(pauseUpdates) keyEquivalent:@""];
+	NSMenuItem *pause = [menu addItemWithTitle:NSLocalizedString(@"Pause updates", nil) action:@selector(pauseUpdates) keyEquivalent:@""];
 	pause.target = self;
 	if ([UpdateScheduler isPaused])
-		pause.title = NSLocalizedString(@"Resume Updates", nil);
+		pause.title = NSLocalizedString(@"Resume updates", nil);
 	
 	// 'show hidden articles' item
 	if (UserPrefsBool(Pref_globalToggleHidden)) {
-		NSMenuItem *toggleHidden = [menu addItemWithTitle:NSLocalizedString(@"Show Hidden Articles", nil) action:@selector(toggleHiddenArticles) keyEquivalent:@"h"];
+		NSMenuItem *toggleHidden = [menu addItemWithTitle:NSLocalizedString(@"Show hidden articles", nil) action:@selector(toggleHiddenArticles) keyEquivalent:@"h"];
 		toggleHidden.target = self;
 		toggleHidden.enabled = !self.holdingOptKey && (UserPrefsBool(Pref_groupUnreadOnly) || UserPrefsBool(Pref_feedUnreadOnly));
 		[toggleHidden setState:self.barMenu.showHidden ? NSControlStateValueOn : NSControlStateValueOff];

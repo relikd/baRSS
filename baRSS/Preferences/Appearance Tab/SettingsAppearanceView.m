@@ -37,7 +37,7 @@
 			 c2:nil c2tt:nil
 			 c3:nil c3tt:nil];
 	
-	[self entry:NSLocalizedString(@"Toggle “Show Hidden Articles”", nil)
+	[self entry:NSLocalizedString(@"Toggle “Show hidden articles”", nil)
 		   help:NSLocalizedString(@"Show button in main menu to quickly toggle whether hidden articles should be shown. See option “Show only unread”.", nil)
 			tip:nil
 			 c1:Pref_globalToggleHidden c1tt:NSLocalizedString(@"in main menu", nil)
@@ -132,7 +132,7 @@ static inline NSButton* Checkbox(id this, CGFloat x, CGFloat y, NSString *key) {
 	if (pref3) [Checkbox(self, __X + 2, y + 2, pref3) tooltip:ttip3].accessibilityLabel = [label stringByAppendingString:@" (feed)"];
 	if (extraTip != nil) {
 		label = [label stringByAppendingString:@" *"];
-		ttip = [ttip stringByAppendingFormat:@"\n\nTip: %@", extraTip];
+		ttip = [ttip stringByAppendingFormat:@"\n\n* Tip: %@", extraTip];
 	}
 	return [[[[NSView label:label] placeIn:self x:PAD_WIN + 3 * colWidth yTop:y] sizeToRight:PAD_WIN] tooltip:ttip];
 }
