@@ -46,26 +46,6 @@ static inline void PathAddRing(CGMutablePathRef path, CGFloat radius, CGFloat in
 }
 
 
-
-#pragma mark - Full Icon Path Generators
-
-
-/// Create @c CGPath for global icon; a menu bar and an open menu below
-static inline void AddGlobalIconPath(CGContextRef c, CGFloat size) {
-	CGMutablePathRef menu = CGPathCreateMutable();
-	CGPathAddRect(menu, NULL, CGRectMake(0, 0.8 * size, size, 0.2 * size));
-	CGPathAddRect(menu, NULL, CGRectMake(0.3 * size, 0, 0.55 * size, 0.75 * size));
-	CGPathAddRect(menu, NULL, CGRectMake(0.35 * size, 0.05 * size, 0.45 * size, 0.75 * size));
-	
-	CGFloat entryHeight = 0.1 * size; // 0.075
-	for (int i = 0; i < 3; i++) { // 4
-		//CGPathAddRect(menu, NULL, CGRectMake(0.37 * size, (2 * i + 1) * entryHeight, 0.42 * size, entryHeight)); // uncomment path above
-		CGPathAddRect(menu, NULL, CGRectMake(0.35 * size, (2 * i + 1.5) * entryHeight, 0.4 * size, entryHeight * 0.8));
-	}
-	CGContextAddPath(c, menu);
-	CGPathRelease(menu);
-}
-
 #pragma mark - Icon Background
 
 
@@ -205,9 +185,18 @@ static void Appearance_MenuBarIcon(CGRect r) {
 
 /// Draw icon representing `Main Menu` (menu bar)
 static void Appearance_MainMenu(CGRect r) {
+	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
-	AddGlobalIconPath(c, ShorterSide(r.size));
+	FlipCoordinateSystem(c, r.size.height);
+	// menu
+	svgAddRect(c, size/16, CGRectMake(0, 0, 16, 3), 0);
+	svgAddRect(c, size/16, CGRectMake(5, 4, 9, 12), 0);
+	svgAddRect(c, size/16, CGRectMake(6, 3, 7, 12), 0);
+	// entries
+	svgAddRect(c, size/16, CGRectMake(6, 12, 6, 1), 0);
+	svgAddRect(c, size/16, CGRectMake(6, 9, 6, 1), 0);
+	svgAddRect(c, size/16, CGRectMake(6, 6, 6, 1), 0);
 	CGContextEOFillPath(c);
 }
 
@@ -230,7 +219,7 @@ static void Appearance_Group(CGRect r) {
 static void Appearance_Feed(CGRect r) {
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
-	SetContentScale(c, r.size, 0.9);
+	SetContentScale(c, r.size, 14/16.0);
 	AddRSSIconPath(c, ShorterSide(r.size), YES);
 	CGContextFillPath(c);
 }
