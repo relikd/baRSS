@@ -64,10 +64,16 @@ static void finishOp(CGMutablePathRef path, struct SVGState *state) {
 		state->y = state->num[1];
 		CGPathAddLineToPoint(path, NULL, state->x * state->scale, state->y * state->scale);
 		
+	} else if (op == 'Q' && state->iNum == 4) {
+		state->x = state->num[2];
+		state->y = state->num[3];
+		CGPathAddCurveToPoint(path, NULL, state->num[0] * state->scale, state->num[1] * state->scale, state->num[0] * state->scale, state->num[1] * state->scale, state->x * state->scale, state->y * state->scale);
+		
 	} else if (op == 'C' && state->iNum == 6) {
 		state->x = state->num[4];
 		state->y = state->num[5];
 		CGPathAddCurveToPoint(path, NULL, state->num[0] * state->scale, state->num[1] * state->scale, state->num[2] * state->scale, state->num[3] * state->scale, state->x * state->scale, state->y * state->scale);
+		
 	} else {
 		NSLog(@"Unsupported SVG operation %c %d", state->op, state->iNum);
 	}
@@ -123,6 +129,8 @@ static void tinySVG_parse(const char * code, CGFloat scale, CGMutablePathRef pat
 			if (state.iNum == 1 && strchr("HhVv", state.op) != NULL) {
 				finishOp(path, &state);
 			} else if (state.iNum == 2 && strchr("MmLl", state.op) != NULL) {
+				finishOp(path, &state);
+			} else if (state.iNum == 4 && strchr("Qq", state.op) != NULL) {
 				finishOp(path, &state);
 			} else if (state.iNum == 6 && strchr("Cc", state.op) != NULL) {
 				finishOp(path, &state);
