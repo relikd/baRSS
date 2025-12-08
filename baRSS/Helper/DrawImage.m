@@ -75,9 +75,9 @@ static void DrawGradient(CGContextRef c, CGFloat size, NSColor *color) {
  */
 static inline void AddRSSIconPath(CGContextRef c, CGFloat size, BOOL connection) {
 	svgCircle(c, size/100, 13, 87, 13, NO);
-	svgPath(c, size/100, "M0,55v-20c43,0,65,22,65,65h-20c0-30-15-45-45-45Z");
+	svgPath(c, size/100, "M0,35q65,0,65,65h-20q0,-45,-45,-45z");
 	if (connection) {
-		svgPath(c, size/100, "M0,20V0c67,0,100,33,100,100h-20C80,47,53,20,0,20Z");
+		svgPath(c, size/100, "M0,0q100,0,100,100h-20q0,-80,-80,-80z");
 	} else {
 		// pause icon
 		svgRect(c, size/100, CGRectMake(60, 0, 15, 50));
