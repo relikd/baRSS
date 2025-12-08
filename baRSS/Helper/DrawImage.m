@@ -45,30 +45,6 @@ static inline void PathAddRing(CGMutablePathRef path, CGFloat radius, CGFloat in
 	CGPathAddArc(path, NULL, radius, radius, innerRadius, 0, M_PI * -2, YES);
 }
 
-/// Add a single RSS icon radio wave
-static inline void PathAddRSSArc(CGMutablePathRef path, CGFloat radius, CGFloat thickness) {
-	CGPathMoveToPoint(path, NULL, 0, radius + thickness);
-	CGPathAddArc(path, NULL, 0, 0, radius + thickness, M_PI_2, 0, YES);
-	CGPathAddLineToPoint(path, NULL, radius, 0);
-	CGPathAddArc(path, NULL, 0, 0, radius, 0, M_PI_2, NO);
-	CGPathCloseSubpath(path);
-}
-
-/// Add two vertical bars representing a pause icon
-static inline void PathAddPauseIcon(CGMutablePathRef path, CGAffineTransform at, CGFloat size, CGFloat thickness) {
-	const CGFloat off = (size - 2 * thickness) / 4;
-	CGPathAddRect(path, &at, CGRectMake(off, 0, thickness, size));
-	CGPathAddRect(path, &at, CGRectMake(size/2 + off, 0, thickness, size));
-}
-
-/// Add X icon by applying a rotational affine transform and drawing a plus sign
-// void PathAddXIcon(CGMutablePathRef path, CGAffineTransform at, CGFloat size, CGFloat thickness) {
-//	at = RotateAroundPoint(at, M_PI_4, size/2, size/2);
-//	const CGFloat p = size * 0.5 - thickness / 2;
-//	CGPathAddRect(path, &at, CGRectMake(0, p, size, thickness));
-//	CGPathAddRect(path, &at, CGRectMake(p, 0, thickness, p));
-//	CGPathAddRect(path, &at, CGRectMake(p, p + thickness, thickness, p));
-//}
 
 
 #pragma mark - Full Icon Path Generators
@@ -89,26 +65,6 @@ static inline void AddGlobalIconPath(CGContextRef c, CGFloat size) {
 	CGContextAddPath(c, menu);
 	CGPathRelease(menu);
 }
-
-/**
- Create @c CGPath for RSS icon; a circle in the lower left bottom and two radio waves going outwards.
- @param connection If @c NO, draw only one radio wave and a pause icon in the upper right
- */
-static inline void AddRSSIconPath(CGContextRef c, CGFloat size, BOOL connection) {
-	CGMutablePathRef bars = CGPathCreateMutable(); // the rss bars
-	PathAddCircle(bars, size * 0.125);
-	PathAddRSSArc(bars, size * 0.45, size * 0.2);
-	if (connection) {
-		PathAddRSSArc(bars, size * 0.8, size * 0.2);
-	} else {
-		CGAffineTransform at = CGAffineTransformMake(0.5, 0, 0, 0.5, size/2, size/2);
-		PathAddPauseIcon(bars, at, size, size * 0.3);
-		//PathAddXIcon(bars, at, size, size * 0.3);
-	}
-	CGContextAddPath(c, bars);
-	CGPathRelease(bars);
-}
-
 
 #pragma mark - Icon Background
 
@@ -158,6 +114,23 @@ static void SetContentScale(CGContextRef c, CGSize size, CGFloat scale) {
 
 #pragma mark - RSS Icon (rounded)
 
+
+/**
+ Create @c CGPath for RSS icon; a circle in the lower left bottom and two radio waves going outwards.
+ @param connection If @c NO, draw only one radio wave and a pause icon in the upper right
+ */
+static inline void AddRSSIconPath(CGContextRef c, CGFloat size, BOOL connection) {
+	FlipCoordinateSystem(c, size);
+	svgAddCircle(c, size/100, 13, 87, 13, NO);
+	svgAddPath(c, size/100, "M0,55v-20c43,0,65,22,65,65h-20c0-30-15-45-45-45Z");
+	if (connection) {
+		svgAddPath(c, size/100, "M0,20V0c67,0,100,33,100,100h-20C80,47,53,20,0,20Z");
+	} else {
+		// pause icon
+		svgAddRect(c, size/100, CGRectMake(60, 0, 15, 50), 0);
+		svgAddRect(c, size/100, CGRectMake(85, 0, 15, 50), 0);
+	}
+}
 
 /// Draw monochrome RSS icon with rounded corners
 static void RoundedRSS_Monochrome(CGRect r, BOOL connection) {
