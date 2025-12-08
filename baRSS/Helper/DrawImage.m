@@ -90,42 +90,6 @@ static inline void AddGlobalIconPath(CGContextRef c, CGFloat size) {
 	CGPathRelease(menu);
 }
 
-/// Create @c CGPath for group icon; a folder symbol
-static inline void AddGroupIconPath(CGContextRef c, CGFloat size, BOOL showBackground) {
-	const CGFloat r1 = size * 0.05; // corners
-	const CGFloat r2 = size * 0.08; // upper part, name tag
-	const CGFloat r3 = size * 0.15; // lower part, corners inside
-	const CGFloat posTop = 0.85 * size;
-	const CGFloat posMiddle = 0.6 * size - r3;
-	const CGFloat posBottom = 0.15 * size + r1;
-	const CGFloat posNameTag = 0.3 * size;
-	
-	CGMutablePathRef upper = CGPathCreateMutable();
-	CGPathMoveToPoint(upper, NULL, 0, 0.5 * size);
-	CGPathAddLineToPoint(upper, NULL, 0, posTop - r1);
-	CGPathAddArc(upper, NULL, r1, posTop - r1, r1, M_PI, M_PI_2, YES);
-	CGPathAddArc(upper, NULL, posNameTag, posTop - r2, r2, M_PI_2, M_PI_4, YES);
-	CGPathAddArc(upper, NULL, posNameTag + 1.85 * r2, posTop, r2, M_PI + M_PI_4, -M_PI_2, NO);
-	CGPathAddArc(upper, NULL, size - r1, posTop - r1 - r2, r1, M_PI_2, 0, YES);
-	CGPathAddArc(upper, NULL, size - r1, posBottom, r1, 0, -M_PI_2, YES);
-	CGPathAddArc(upper, NULL, r1, posBottom, r1, -M_PI_2, M_PI, YES);
-	CGPathCloseSubpath(upper);
-	
-	CGMutablePathRef lower = CGPathCreateMutable();
-	CGPathAddArc(lower, NULL, r3, posMiddle, r3, M_PI, M_PI_2, YES);
-	CGPathAddArc(lower, NULL, size - r3, posMiddle, r3, M_PI_2, 0, YES);
-	CGPathAddArc(lower, NULL, size - r1, posBottom, r1, 0, -M_PI_2, YES);
-	CGPathAddArc(lower, NULL, r1, posBottom, r1, -M_PI_2, M_PI, YES);
-	CGPathCloseSubpath(lower);
-	
-	CGContextAddPath(c, upper);
-	if (showBackground)
-		CGContextEOFillPath(c);
-	CGContextAddPath(c, lower);
-	CGPathRelease(upper);
-	CGPathRelease(lower);
-}
-
 /**
  Create @c CGPath for RSS icon; a circle in the lower left bottom and two radio waves going outwards.
  @param connection If @c NO, draw only one radio wave and a pause icon in the upper right
@@ -217,13 +181,17 @@ static void DrawGlobalIcon(CGRect r, CGColorRef color, BOOL background) {
 }
 
 /// Draw group icon (folder)
-static void DrawGroupIcon(CGRect r, CGColorRef color, BOOL background) {
+static void DrawGroupIcon(CGRect r) {
+	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
-	const CGFloat s = ShorterSide(r.size);
-	const CGFloat l = s * 0.08; // line width
-	DrawRoundedFrame(c, r, color, background, 0.4, 1.0 - (l / s), 0.85);
-	CGContextSetLineWidth(c, l * (background ? 0.5 : 1.0));
-	AddGroupIconPath(c, s, background);
+	FlipCoordinateSystem(c, r.size.height);
+	SetContentScale(c, r.size, 0.92);
+	// folder path
+	svgAddPath(c, size/100, "M15,87c-12,0-15-3-15-15V21c0-10,3-13,13-13h11c10,0,8,8,18,8h43c12,0,15,3,15,15v41c0,12-3,15-15,15H15Z");
+	// line
+	svgAddPath(c, size/100, "M7,32h86Z");
+	CGContextSetLineWidth(c, size * 0.08);
+	CGContextSetStrokeColorWithColor(c, [NSColor controlTextColor].CGColor);
 	CGContextStrokePath(c);
 }
 
@@ -310,7 +278,7 @@ static void Register(CGFloat size, NSImageName name, NSString *description, BOOL
 void RegisterImageViewNames(void) {
 	Register(16, RSSImageDefaultRSSIcon, NSLocalizedString(@"RSS icon", nil), ^(NSRect r) { DrawRSSGradientIcon(r, [NSColor rssOrange]); return YES; });
 	Register(16, RSSImageSettingsGlobal, NSLocalizedString(@"Global settings", nil), ^(NSRect r) { DrawGlobalIcon(r, [NSColor controlTextColor].CGColor, NO); return YES; });
-	Register(16, RSSImageSettingsGroup, NSLocalizedString(@"Group settings", nil), ^(NSRect r) { DrawGroupIcon(r, [NSColor controlTextColor].CGColor, NO); return YES; });
+	Register(16, RSSImageSettingsGroup, NSLocalizedString(@"Group settings", nil), ^(NSRect r) { DrawGroupIcon(r); return YES; });
 	Register(16, RSSImageSettingsFeed, NSLocalizedString(@"Feed settings", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor controlTextColor].CGColor, NO, YES); return YES; });
 	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"RSS menu bar icon", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor menuBarIconColor].CGColor, YES, YES); return YES; });
 	Register(16, RSSImageMenuBarIconPaused, NSLocalizedString(@"RSS menu bar icon, paused", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor menuBarIconColor].CGColor, YES, NO); return YES; });
