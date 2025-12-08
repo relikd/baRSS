@@ -146,11 +146,17 @@ static void tinySVG_parse(const char * code, CGFloat scale, CGMutablePathRef pat
 	}
 }
 
+/// Helper method to scale `rect` according to svg size.
+static inline CGRect scaledRect(CGRect rect, CGFloat scale) {
+	if (scale == 1.0) { return rect; }
+	return CGRectMake(rect.origin.x * scale, rect.origin.y * scale, rect.size.width * scale, rect.size.height * scale);
+}
+
 
 # pragma mark - External API
 
 /// calls @c tinySVG_path and handles @c CGPath creation and release.
-void svgAddPath(CGContextRef context, CGFloat scale, const char * code) {
+void svgPath(CGContextRef context, CGFloat scale, const char * code) {
 	CGMutablePathRef path = CGPathCreateMutable();
 	tinySVG_parse(code, scale, path);
 	CGContextAddPath(context, path);
@@ -158,26 +164,24 @@ void svgAddPath(CGContextRef context, CGFloat scale, const char * code) {
 }
 
 /// calls @c CGPathAddArc with full circle
-void svgAddCircle(CGContextRef context, CGFloat scale, CGFloat x, CGFloat y, CGFloat radius, bool clockwise) {
+void svgCircle(CGContextRef context, CGFloat scale, CGFloat x, CGFloat y, CGFloat radius, bool clockwise) {
+	// No `CGContextAddArc` because that doesnt work well with overlapping counter-clockwise
 	CGMutablePathRef tmp = CGPathCreateMutable();
 	CGPathAddArc(tmp, NULL, x * scale, y * scale, radius * scale, 0, M_PI * 2, clockwise);
 	CGContextAddPath(context, tmp);
 	CGPathRelease(tmp);
 }
 
-/// Calls @c CGContextAddRect or @c CGPathAddRoundedRect (optional).
-/// @param cornerRadius Use @c <=0 for no corners. Use half of @c min(w,h) for a full circle.
-void svgAddRect(CGContextRef context, CGFloat scale, CGRect rect, CGFloat cornerRadius) {
-	if (scale != 1.0) {
-		rect = CGRectMake(rect.origin.x * scale, rect.origin.y * scale,
-						  rect.size.width * scale, rect.size.height * scale);
-	}
-	if (cornerRadius > 0) {
-		CGMutablePathRef tmp = CGPathCreateMutable();
-		CGPathAddRoundedRect(tmp, NULL, rect, cornerRadius * scale, cornerRadius * scale);
-		CGContextAddPath(context, tmp);
-		CGPathRelease(tmp);
-	} else {
-		CGContextAddRect(context, rect);
-	}
+/// Calls @c CGPathAddRoundedRect
+/// @param cornerRadius Use half of @c min(w,h) for a full circle.
+void svgRoundedRect(CGContextRef context, CGFloat scale, CGRect rect, CGFloat cornerRadius) {
+	CGMutablePathRef tmp = CGPathCreateMutable();
+	CGPathAddRoundedRect(tmp, NULL, scaledRect(rect, scale), cornerRadius * scale, cornerRadius * scale);
+	CGContextAddPath(context, tmp);
+	CGPathRelease(tmp);
+}
+
+/// Calls @c CGContextAddRect
+void svgRect(CGContextRef context, CGFloat scale, CGRect rect) {
+	CGContextAddRect(context, scaledRect(rect, scale));
 }

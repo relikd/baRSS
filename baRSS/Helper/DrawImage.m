@@ -75,14 +75,14 @@ static void DrawGradient(CGContextRef c, CGFloat size, NSColor *color) {
  */
 static inline void AddRSSIconPath(CGContextRef c, CGFloat size, BOOL connection) {
 	FlipCoordinateSystem(c, size);
-	svgAddCircle(c, size/100, 13, 87, 13, NO);
-	svgAddPath(c, size/100, "M0,55v-20c43,0,65,22,65,65h-20c0-30-15-45-45-45Z");
+	svgCircle(c, size/100, 13, 87, 13, NO);
+	svgPath(c, size/100, "M0,55v-20c43,0,65,22,65,65h-20c0-30-15-45-45-45Z");
 	if (connection) {
-		svgAddPath(c, size/100, "M0,20V0c67,0,100,33,100,100h-20C80,47,53,20,0,20Z");
+		svgPath(c, size/100, "M0,20V0c67,0,100,33,100,100h-20C80,47,53,20,0,20Z");
 	} else {
 		// pause icon
-		svgAddRect(c, size/100, CGRectMake(60, 0, 15, 50), 0);
-		svgAddRect(c, size/100, CGRectMake(85, 0, 15, 50), 0);
+		svgRect(c, size/100, CGRectMake(60, 0, 15, 50));
+		svgRect(c, size/100, CGRectMake(85, 0, 15, 50));
 	}
 }
 
@@ -91,7 +91,7 @@ static void RoundedRSS_Monochrome(CGRect r, BOOL connection) {
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGContextSetFillColorWithColor(c, [NSColor menuBarIconColor].CGColor);
 	// background rounded rect
-	svgAddRect(c, 1, r, ShorterSide(r.size) * 0.4/2);
+	svgRoundedRect(c, 1, r, ShorterSide(r.size) * 0.4/2);
 	// RSS icon
 	SetContentScale(c, r.size, 0.7);
 	AddRSSIconPath(c, ShorterSide(r.size), connection);
@@ -104,7 +104,7 @@ static void RoundedRSS_Gradient(CGRect r, NSColor *color) {
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGContextSetFillColorWithColor(c, NSColor.whiteColor.CGColor);
 	// background rounded rect
-	svgAddRect(c, 1, r, ShorterSide(r.size) * 0.4/2);
+	svgRoundedRect(c, 1, r, ShorterSide(r.size) * 0.4/2);
 	// Gradient
 	CGContextSaveGState(c);
 	CGContextClip(c);
@@ -130,7 +130,7 @@ static void Appearance_MenuBarIcon(CGRect r) {
 	// menu bar
 	CGContextSetAlpha(c, .23);
 	const CGFloat barHeightInset = round(size*.06);
-	svgAddRect(c, 1, CGRectInset(r, 0, barHeightInset), 0);
+	svgRect(c, 1, CGRectInset(r, 0, barHeightInset));
 	CGContextFillPath(c);
 	
 	const CGFloat offset = round(size*.75);
@@ -140,18 +140,18 @@ static void Appearance_MenuBarIcon(CGRect r) {
 	
 	// left neighbor
 	CGContextTranslateCTM(c, -offset, 0);
-	svgAddRect(c, 1, CGRectInset(r, iconInset, iconInset), iconCorner);
+	svgRoundedRect(c, 1, CGRectInset(r, iconInset, iconInset), iconCorner);
 	CGContextFillPath(c);
 	
 	// right neighbor
 	CGContextTranslateCTM(c, +2*offset, 0);
-	svgAddRect(c, 1, CGRectInset(r, iconInset, iconInset), iconCorner);
+	svgRoundedRect(c, 1, CGRectInset(r, iconInset, iconInset), iconCorner);
 	CGContextFillPath(c);
 	
 	// main icon
 	CGContextSetAlpha(c, 1);
 	CGContextTranslateCTM(c, -offset, 0);
-	svgAddRect(c, 1, CGRectInset(r, iconInset, iconInset), iconCorner);
+	svgRoundedRect(c, 1, CGRectInset(r, iconInset, iconInset), iconCorner);
 	SetContentScale(c, r.size, .47);
 	AddRSSIconPath(c, size, YES);
 	CGContextEOFillPath(c);
@@ -164,13 +164,13 @@ static void Appearance_MainMenu(CGRect r) {
 	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
 	FlipCoordinateSystem(c, r.size.height);
 	// menu
-	svgAddRect(c, size/16, CGRectMake(0, 0, 16, 3), 0);
-	svgAddRect(c, size/16, CGRectMake(5, 4, 9, 12), 0);
-	svgAddRect(c, size/16, CGRectMake(6, 3, 7, 12), 0);
+	svgRect(c, size/16, CGRectMake(0, 0, 16, 3));
+	svgRect(c, size/16, CGRectMake(5, 4, 9, 12));
+	svgRect(c, size/16, CGRectMake(6, 3, 7, 12));
 	// entries
-	svgAddRect(c, size/16, CGRectMake(6, 12, 6, 1), 0);
-	svgAddRect(c, size/16, CGRectMake(6, 9, 6, 1), 0);
-	svgAddRect(c, size/16, CGRectMake(6, 6, 6, 1), 0);
+	svgRect(c, size/16, CGRectMake(6, 12, 6, 1));
+	svgRect(c, size/16, CGRectMake(6, 9, 6, 1));
+	svgRect(c, size/16, CGRectMake(6, 6, 6, 1));
 	CGContextEOFillPath(c);
 }
 
@@ -181,9 +181,9 @@ static void Appearance_Group(CGRect r) {
 	FlipCoordinateSystem(c, r.size.height);
 	SetContentScale(c, r.size, 0.92);
 	// folder path
-	svgAddPath(c, size/100, "M15,87c-12,0-15-3-15-15V21c0-10,3-13,13-13h11c10,0,8,8,18,8h43c12,0,15,3,15,15v41c0,12-3,15-15,15H15Z");
+	svgPath(c, size/100, "M15,87c-12,0-15-3-15-15V21c0-10,3-13,13-13h11c10,0,8,8,18,8h43c12,0,15,3,15,15v41c0,12-3,15-15,15H15Z");
 	// line
-	svgAddPath(c, size/100, "M7,32h86Z");
+	svgPath(c, size/100, "M7,32h86Z");
 	CGContextSetLineWidth(c, size * 0.08);
 	CGContextSetStrokeColorWithColor(c, [NSColor controlTextColor].CGColor);
 	CGContextStrokePath(c);
@@ -205,12 +205,12 @@ static void Appearance_Article(CGRect r) {
 	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
 	FlipCoordinateSystem(c, r.size.height);
 	// text lines
-	svgAddRect(c, size/16, CGRectMake(0, 14, 16, 1), 0);
-	svgAddRect(c, size/16, CGRectMake(0, 10, 16, 1), 0);
-	svgAddRect(c, size/16, CGRectMake(9, 6, 7, 1), 0);
-	svgAddRect(c, size/16, CGRectMake(9, 2, 7, 1), 0);
+	svgRect(c, size/16, CGRectMake(0, 14, 16, 1));
+	svgRect(c, size/16, CGRectMake(0, 10, 16, 1));
+	svgRect(c, size/16, CGRectMake(9, 6, 7, 1));
+	svgRect(c, size/16, CGRectMake(9, 2, 7, 1));
 	// picture
-	//svgAddRect(c, size/16, CGRectMake(1, 1, 7, 7), 0);
+	//svgRect(c, size/16, CGRectMake(1, 1, 7, 7));
 	// RSS icon
 	CGContextTranslateCTM(c, size/16 * 1, size/16 * 1);
 	CGContextScaleCTM(c, 7.0/16, 7.0/16);
@@ -251,7 +251,7 @@ static void DrawRegexIcon(CGRect r) {
 	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	
-	svgAddRect(c, 1, r, .2 * size);
+	svgRoundedRect(c, 1, r, .2 * size);
 	CGContextSetFillColorWithColor(c, NSColor.redColor.CGColor);
 	CGContextFillPath(c);
 	
@@ -259,13 +259,13 @@ static void DrawRegexIcon(CGRect r) {
 	FlipCoordinateSystem(c, r.size.height);
 	SetContentScale(c, r.size, 0.8);
 	// "("
-	svgAddPath(c, size/1000, "m184 187c-140 205-134 432-1 622l-66 44c-159-221-151-499 0-708z");
+	svgPath(c, size/1000, "m184 187c-140 205-134 432-1 622l-66 44c-159-221-151-499 0-708z");
 	// "."
-	svgAddCircle(c, size/1000, 315, 675, 70, NO);
+	svgCircle(c, size/1000, 315, 675, 70, NO);
 	// "*"
-	svgAddPath(c, size/1000, "m652 277 107-35 21 63-109 36 68 92-54 39-68-93-66 91-52-41 67-88-109-37 21-63 108 37v-113h66v112z");
+	svgPath(c, size/1000, "m652 277 107-35 21 63-109 36 68 92-54 39-68-93-66 91-52-41 67-88-109-37 21-63 108 37v-113h66v112z");
 	// ")"
-	svgAddPath(c, size/1000, "m816 813c140-205 134-430 1-621l66-45c159 221 151 499 0 708z");
+	svgPath(c, size/1000, "m816 813c140-205 134-430 1-621l66-45c159 221 151 499 0 708z");
 	
 	CGContextSetFillColorWithColor(c, NSColor.whiteColor.CGColor);
 	CGContextFillPath(c);
