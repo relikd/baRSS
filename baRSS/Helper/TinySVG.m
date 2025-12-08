@@ -168,6 +168,10 @@ void svgAddCircle(CGContextRef context, CGFloat scale, CGFloat x, CGFloat y, CGF
 /// Calls @c CGContextAddRect or @c CGPathAddRoundedRect (optional).
 /// @param cornerRadius Use @c <=0 for no corners. Use half of @c min(w,h) for a full circle.
 void svgAddRect(CGContextRef context, CGFloat scale, CGRect rect, CGFloat cornerRadius) {
+	if (scale != 1.0) {
+		rect = CGRectMake(rect.origin.x * scale, rect.origin.y * scale,
+						  rect.size.width * scale, rect.size.height * scale);
+	}
 	if (cornerRadius > 0) {
 		CGMutablePathRef tmp = CGPathCreateMutable();
 		CGPathAddRoundedRect(tmp, NULL, rect, cornerRadius * scale, cornerRadius * scale);
