@@ -21,21 +21,23 @@ static NSString* const auxiliaryAppURL = @"https://github.com/relikd/URL-Scheme-
 
 
 /// Default RSS icon (with border, with gradient, orange)
-static NSImageName const RSSImageDefaultRSSIcon    = @"RSSImageDefaultRSSIcon";
-/// Settings, global icon (menu bar, black)
-static NSImageName const RSSImageSettingsGlobal    = @"RSSImageSettingsGlobal";
+static NSImageName const RSSImageDefaultRSSIcon        = @"RSSImageDefaultRSSIcon";
+/// Settings, global statusbar icon (rss icon with neighbor icons)
+static NSImageName const RSSImageSettingsGlobalIcon    = @"RSSImageSettingsGlobalIcon";
+/// Settings, global menu icon (menu bar, black)
+static NSImageName const RSSImageSettingsGlobalMenu    = @"RSSImageSettingsGlobalMenu";
 /// Settings, group icon (folder, black)
-static NSImageName const RSSImageSettingsGroup     = @"RSSImageSettingsGroup";
+static NSImageName const RSSImageSettingsGroup         = @"RSSImageSettingsGroup";
 /// Settings, feed icon (RSS, no border, no gradient, black)
-static NSImageName const RSSImageSettingsFeed      = @"RSSImageSettingsFeed";
+static NSImageName const RSSImageSettingsFeed          = @"RSSImageSettingsFeed";
 /// Menu bar, bar icon (RSS, with border, no gradient, orange)
-static NSImageName const RSSImageMenuBarIconActive = @"RSSImageMenuBarIconActive";
+static NSImageName const RSSImageMenuBarIconActive     = @"RSSImageMenuBarIconActive";
 /// Menu bar, bar icon (RSS, with border, no gradient, paused, orange)
-static NSImageName const RSSImageMenuBarIconPaused = @"RSSImageMenuBarIconPaused";
+static NSImageName const RSSImageMenuBarIconPaused     = @"RSSImageMenuBarIconPaused";
 /// Menu item, unread state icon (blue dot)
-static NSImageName const RSSImageMenuItemUnread    = @"RSSImageMenuItemUnread";
+static NSImageName const RSSImageMenuItemUnread        = @"RSSImageMenuItemUnread";
 /// Feed edit, regex editor icon @c "(.*)"
-static NSImageName const RSSImageRegexIcon         = @"RSSImageRegexIcon";
+static NSImageName const RSSImageRegexIcon             = @"RSSImageRegexIcon";
 
 
 #pragma mark - NSNotificationName constants

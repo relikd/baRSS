@@ -172,6 +172,42 @@ static void DrawRoundedFrame(CGContextRef c, CGRect r, CGColorRef color, BOOL ba
 #pragma mark - Easy Icon Drawing Methods
 
 
+/// Draw RSS icon in menu bar with neighbors
+static void DrawMenubarIcon(CGRect r) {
+	const CGFloat size = ShorterSide(r.size);
+	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
+	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
+	
+	// menu bar
+	CGContextSetAlpha(c, .23);
+	const CGFloat barHeightInset = round(size*.06);
+	svgAddRect(c, 1, CGRectInset(r, 0, barHeightInset), 0);
+	CGContextFillPath(c);
+	
+	const CGFloat offset = round(size*.75);
+	const CGFloat iconInset = round(size*.2);
+	const CGFloat iconCorner = size*.12;
+	CGContextSetAlpha(c, .66);
+	
+	// left neighbor
+	CGContextTranslateCTM(c, -offset, 0);
+	svgAddRect(c, 1, CGRectInset(r, iconInset, iconInset), iconCorner);
+	CGContextFillPath(c);
+	
+	// right neighbor
+	CGContextTranslateCTM(c, +2*offset, 0);
+	svgAddRect(c, 1, CGRectInset(r, iconInset, iconInset), iconCorner);
+	CGContextFillPath(c);
+	
+	// main icon
+	CGContextSetAlpha(c, 1);
+	CGContextTranslateCTM(c, -offset, 0);
+	svgAddRect(c, 1, CGRectInset(r, iconInset, iconInset), iconCorner);
+	SetContentScale(c, r.size, .47);
+	AddRSSIconPath(c, size, YES);
+	CGContextEOFillPath(c);
+}
+
 /// Draw global icon (menu bar)
 static void DrawGlobalIcon(CGRect r, CGColorRef color, BOOL background) {
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
@@ -277,7 +313,8 @@ static void Register(CGFloat size, NSImageName name, NSString *description, BOOL
 /// Register all icons that require custom drawing in @c ImageNamed cache
 void RegisterImageViewNames(void) {
 	Register(16, RSSImageDefaultRSSIcon, NSLocalizedString(@"RSS icon", nil), ^(NSRect r) { DrawRSSGradientIcon(r, [NSColor rssOrange]); return YES; });
-	Register(16, RSSImageSettingsGlobal, NSLocalizedString(@"Global settings", nil), ^(NSRect r) { DrawGlobalIcon(r, [NSColor controlTextColor].CGColor, NO); return YES; });
+	Register(16, RSSImageSettingsGlobalIcon, NSLocalizedString(@"Global menu icon settings", nil), ^(NSRect r) { DrawMenubarIcon(r); return YES; });
+	Register(16, RSSImageSettingsGlobalMenu, NSLocalizedString(@"Global settings", nil), ^(NSRect r) { DrawGlobalIcon(r, [NSColor controlTextColor].CGColor, NO); return YES; });
 	Register(16, RSSImageSettingsGroup, NSLocalizedString(@"Group settings", nil), ^(NSRect r) { DrawGroupIcon(r); return YES; });
 	Register(16, RSSImageSettingsFeed, NSLocalizedString(@"Feed settings", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor controlTextColor].CGColor, NO, YES); return YES; });
 	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"RSS menu bar icon", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor menuBarIconColor].CGColor, YES, YES); return YES; });

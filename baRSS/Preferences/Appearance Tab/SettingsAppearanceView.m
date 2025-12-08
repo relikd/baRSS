@@ -18,7 +18,7 @@
 - (instancetype)init {
 	self = [super initWithFrame:NSMakeRect(0, 0, 320, 327)];
 	// Insert matrix header (icons above checkbox matrix)
-	ColumnIcon(self, X__, RSSImageSettingsGlobal);
+	ColumnIcon(self, X__, RSSImageSettingsGlobalMenu);
 	ColumnIcon(self, _X_, RSSImageSettingsGroup);
 	ColumnIcon(self, __X, RSSImageSettingsFeed);
 	// Generate checkbox matrix
