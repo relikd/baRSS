@@ -24,10 +24,10 @@ static inline const CGFloat ShorterSide(NSSize s) {
 }
 
 /// Flip coordinate system
-static void FlipCoordinateSystem(CGContextRef c, CGFloat height) {
-	CGContextTranslateCTM(c, 0, height);
-	CGContextScaleCTM(c, 1, -1);
-}
+//static void FlipCoordinateSystem(CGContextRef c, CGFloat height) {
+//	CGContextTranslateCTM(c, 0, height);
+//	CGContextScaleCTM(c, 1, -1);
+//}
 
 /// Scale and translate context to the center with respect to the new scale. If @c width @c != @c length align top left.
 static void SetContentScale(CGContextRef c, CGSize size, CGFloat scale) {
@@ -60,7 +60,7 @@ static void DrawGradient(CGContextRef c, CGFloat size, NSColor *color) {
 	CFArrayRef colors = CFArrayCreate(NULL, cgColors, 3, NULL);
 	CGGradientRef gradient = CGGradientCreateWithColors(NULL, colors, NULL);
 	
-	CGContextDrawLinearGradient(c, gradient, CGPointMake(0, size), CGPointMake(size, 0), kCGGradientDrawsBeforeStartLocation | kCGGradientDrawsAfterEndLocation);
+	CGContextDrawLinearGradient(c, gradient, CGPointMake(0, 0), CGPointMake(size, size), kCGGradientDrawsBeforeStartLocation | kCGGradientDrawsAfterEndLocation);
 	CGGradientRelease(gradient);
 	CFRelease(colors);
 }
@@ -74,7 +74,6 @@ static void DrawGradient(CGContextRef c, CGFloat size, NSColor *color) {
  @param connection If @c NO, draw only one radio wave and a pause icon in the upper right
  */
 static inline void AddRSSIconPath(CGContextRef c, CGFloat size, BOOL connection) {
-	FlipCoordinateSystem(c, size);
 	svgCircle(c, size/100, 13, 87, 13, NO);
 	svgPath(c, size/100, "M0,55v-20c43,0,65,22,65,65h-20c0-30-15-45-45-45Z");
 	if (connection) {
@@ -162,7 +161,6 @@ static void Appearance_MainMenu(CGRect r) {
 	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
-	FlipCoordinateSystem(c, r.size.height);
 	// menu
 	svgRect(c, size/16, CGRectMake(0, 0, 16, 3));
 	svgRect(c, size/16, CGRectMake(5, 4, 9, 12));
@@ -178,7 +176,6 @@ static void Appearance_MainMenu(CGRect r) {
 static void Appearance_Group(CGRect r) {
 	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
-	FlipCoordinateSystem(c, r.size.height);
 	SetContentScale(c, r.size, 0.92);
 	// folder path
 	svgPath(c, size/100, "M15,87c-12,0-15-3-15-15V21c0-10,3-13,13-13h11c10,0,8,8,18,8h43c12,0,15,3,15,15v41c0,12-3,15-15,15H15Z");
@@ -203,7 +200,6 @@ static void Appearance_Article(CGRect r) {
 	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
-	FlipCoordinateSystem(c, r.size.height);
 	// text lines
 	svgRect(c, size/16, CGRectMake(0, 14, 16, 1));
 	svgRect(c, size/16, CGRectMake(0, 10, 16, 1));
@@ -214,7 +210,6 @@ static void Appearance_Article(CGRect r) {
 	// RSS icon
 	CGContextTranslateCTM(c, size/16 * 1, size/16 * 1);
 	CGContextScaleCTM(c, 7.0/16, 7.0/16);
-	FlipCoordinateSystem(c, r.size.height);
 	AddRSSIconPath(c, ShorterSide(r.size), YES);
 	CGContextEOFillPath(c);
 }
@@ -256,7 +251,6 @@ static void DrawRegexIcon(CGRect r) {
 	CGContextFillPath(c);
 	
 	// SVG files use bottom-left corner coordinate system. Quartz uses top-left.
-	FlipCoordinateSystem(c, r.size.height);
 	SetContentScale(c, r.size, 0.8);
 	// "("
 	svgPath(c, size/1000, "m184 187c-140 205-134 432-1 622l-66 44c-159-221-151-499 0-708z");
@@ -277,7 +271,7 @@ static void DrawRegexIcon(CGRect r) {
 
 /// Add single image to @c ImageNamed cache and set accessibility description
 static void Register(CGFloat size, NSImageName name, NSString *description, BOOL (^draw)(NSRect r)) {
-	NSImage *img = [NSImage imageWithSize: NSMakeSize(size, size) flipped:NO drawingHandler:draw];
+	NSImage *img = [NSImage imageWithSize: NSMakeSize(size, size) flipped:YES drawingHandler:draw];
 	img.accessibilityDescription = description;
 	img.name = name;
 }
