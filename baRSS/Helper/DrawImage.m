@@ -23,26 +23,18 @@ static inline const CGFloat ShorterSide(NSSize s) {
 	return (s.width < s.height ? s.width : s.height);
 }
 
-/// Perform @c CGAffineTransform with custom rotation point
-// CGAffineTransform RotateAroundPoint(CGAffineTransform at, CGFloat angle, CGFloat x, CGFloat y) {
-//	at = CGAffineTransformTranslate(at, x, y);
-//	at = CGAffineTransformRotate(at, angle);
-//	return CGAffineTransformTranslate(at, -x, -y);
-//}
-
-
-#pragma mark - CGPath Component Generators
-
-
-/// Add circle with @c radius
-static inline void PathAddCircle(CGMutablePathRef path, CGFloat radius) {
-	CGPathAddArc(path, NULL, radius, radius, radius, 0, M_PI * 2, YES);
+/// Flip coordinate system
+static void FlipCoordinateSystem(CGContextRef c, CGFloat height) {
+	CGContextTranslateCTM(c, 0, height);
+	CGContextScaleCTM(c, 1, -1);
 }
 
-/// Add ring with @c radius and @c innerRadius
-static inline void PathAddRing(CGMutablePathRef path, CGFloat radius, CGFloat innerRadius) {
-	CGPathAddArc(path, NULL, radius, radius, radius, 0, M_PI * 2, YES);
-	CGPathAddArc(path, NULL, radius, radius, innerRadius, 0, M_PI * -2, YES);
+/// Scale and translate context to the center with respect to the new scale. If @c width @c != @c length align top left.
+static void SetContentScale(CGContextRef c, CGSize size, CGFloat scale) {
+	const CGFloat s = ShorterSide(size);
+	CGFloat offset = s * (1 - scale) / 2;
+	CGContextTranslateCTM(c, offset, size.height - s + offset); // top left alignment
+	CGContextScaleCTM(c, scale, scale);
 }
 
 
@@ -74,25 +66,7 @@ static void DrawGradient(CGContextRef c, CGFloat size, NSColor *color) {
 }
 
 
-#pragma mark - CGContext Drawing & Manipulation
-
-
-/// Flip coordinate system
-static void FlipCoordinateSystem(CGContextRef c, CGFloat height) {
-	CGContextTranslateCTM(c, 0, height);
-	CGContextScaleCTM(c, 1, -1);
-}
-
-/// Scale and translate context to the center with respect to the new scale. If @c width @c != @c length align top left.
-static void SetContentScale(CGContextRef c, CGSize size, CGFloat scale) {
-	const CGFloat s = ShorterSide(size);
-	CGFloat offset = s * (1 - scale) / 2;
-	CGContextTranslateCTM(c, offset, size.height - s + offset); // top left alignment
-	CGContextScaleCTM(c, scale, scale);
-}
-
-
-#pragma mark - RSS Icon (rounded)
+#pragma mark - RSS Icon (rounded corners)
 
 
 /**
@@ -251,19 +225,22 @@ static void Appearance_Article(CGRect r) {
 
 /// Draw unread icon (blue dot for unread menu item)
 static void DrawUnreadIcon(CGRect r, NSColor *color) {
-	CGFloat size = ShorterSide(r.size) / 2.0;
+	const CGFloat radius = ShorterSide(r.size) / 2.0;
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGMutablePathRef path = CGPathCreateMutable();
 	SetContentScale(c, r.size, 0.7);
-	CGContextTranslateCTM(c, 0, size * -0.15); // align with baseline of menu item text
+	CGContextTranslateCTM(c, 0, radius * -0.15); // align with baseline of menu item text
 	
+	// outer ring (opaque)
 	CGContextSetFillColorWithColor(c, color.CGColor);
-	PathAddRing(path, size, size * 0.7);
+	CGPathAddArc(path, NULL, radius, radius, radius, 0, M_PI * 2, YES);
+	CGPathAddArc(path, NULL, radius, radius, radius*.7, 0, M_PI * -2, YES);
 	CGContextAddPath(c, path);
 	CGContextEOFillPath(c);
 	
+	// inner circle (translucent)
 	CGContextSetFillColorWithColor(c, [color colorWithAlphaComponent:0.5].CGColor);
-	PathAddCircle(path, size);
+	CGPathAddArc(path, NULL, radius, radius, radius, 0, M_PI * 2, YES);
 	CGContextAddPath(c, path);
 	CGContextFillPath(c);
 	CGPathRelease(path);
