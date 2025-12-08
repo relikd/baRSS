@@ -172,8 +172,8 @@ static void DrawRoundedFrame(CGContextRef c, CGRect r, CGColorRef color, BOOL ba
 #pragma mark - Easy Icon Drawing Methods
 
 
-/// Draw RSS icon in menu bar with neighbors
-static void DrawMenubarIcon(CGRect r) {
+/// Draw icon representing global `status bar icon` (rounded RSS icon with neighbor items)
+static void Appearance_MenuBarIcon(CGRect r) {
 	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
@@ -208,16 +208,16 @@ static void DrawMenubarIcon(CGRect r) {
 	CGContextEOFillPath(c);
 }
 
-/// Draw global icon (menu bar)
-static void DrawGlobalIcon(CGRect r, CGColorRef color, BOOL background) {
+/// Draw icon representing `Main Menu` (menu bar)
+static void Appearance_MainMenu(CGRect r) {
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
-	DrawRoundedFrame(c, r, color, background, 0.4, 1.0, 0.7);
+	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
 	AddGlobalIconPath(c, ShorterSide(r.size));
 	CGContextEOFillPath(c);
 }
 
-/// Draw group icon (folder)
-static void DrawGroupIcon(CGRect r) {
+/// Draw icon representing `FeedGroup` (folder)
+static void Appearance_Group(CGRect r) {
 	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	FlipCoordinateSystem(c, r.size.height);
@@ -229,6 +229,15 @@ static void DrawGroupIcon(CGRect r) {
 	CGContextSetLineWidth(c, size * 0.08);
 	CGContextSetStrokeColorWithColor(c, [NSColor controlTextColor].CGColor);
 	CGContextStrokePath(c);
+}
+
+/// Draw icon representing `Feed` (group + RSS)
+static void Appearance_Feed(CGRect r) {
+	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
+	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
+	SetContentScale(c, r.size, 0.9);
+	AddRSSIconPath(c, ShorterSide(r.size), YES);
+	CGContextFillPath(c);
 }
 
 /// Draw RSS icon (flat without gradient)
@@ -313,12 +322,15 @@ static void Register(CGFloat size, NSImageName name, NSString *description, BOOL
 /// Register all icons that require custom drawing in @c ImageNamed cache
 void RegisterImageViewNames(void) {
 	Register(16, RSSImageDefaultRSSIcon, NSLocalizedString(@"RSS icon", nil), ^(NSRect r) { DrawRSSGradientIcon(r, [NSColor rssOrange]); return YES; });
-	Register(16, RSSImageSettingsGlobalIcon, NSLocalizedString(@"Global menu icon settings", nil), ^(NSRect r) { DrawMenubarIcon(r); return YES; });
-	Register(16, RSSImageSettingsGlobalMenu, NSLocalizedString(@"Global settings", nil), ^(NSRect r) { DrawGlobalIcon(r, [NSColor controlTextColor].CGColor, NO); return YES; });
-	Register(16, RSSImageSettingsGroup, NSLocalizedString(@"Group settings", nil), ^(NSRect r) { DrawGroupIcon(r); return YES; });
-	Register(16, RSSImageSettingsFeed, NSLocalizedString(@"Feed settings", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor controlTextColor].CGColor, NO, YES); return YES; });
+	// Appearance settings icons
+	Register(16, RSSImageSettingsGlobalIcon, NSLocalizedString(@"Global menu icon settings", nil), ^(NSRect r) { Appearance_MenuBarIcon(r); return YES; });
+	Register(16, RSSImageSettingsGlobalMenu, NSLocalizedString(@"Global settings", nil), ^(NSRect r) { Appearance_MainMenu(r); return YES; });
+	Register(16, RSSImageSettingsGroup, NSLocalizedString(@"Group settings", nil), ^(NSRect r) { Appearance_Group(r); return YES; });
+	Register(16, RSSImageSettingsFeed, NSLocalizedString(@"Feed settings", nil), ^(NSRect r) { Appearance_Feed(r); return YES; });
+	// Menu bar icon
 	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"RSS menu bar icon", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor menuBarIconColor].CGColor, YES, YES); return YES; });
 	Register(16, RSSImageMenuBarIconPaused, NSLocalizedString(@"RSS menu bar icon, paused", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor menuBarIconColor].CGColor, YES, NO); return YES; });
 	Register(14, RSSImageMenuItemUnread, NSLocalizedString(@"Unread icon", nil), ^(NSRect r) { DrawUnreadIcon(r, [NSColor unreadIndicatorColor]); return YES; });
+	// Other Settings
 	Register(32, RSSImageRegexIcon, NSLocalizedString(@"Regex icon", nil), ^(NSRect r) { DrawRegexIcon(r); return YES; });
 }
