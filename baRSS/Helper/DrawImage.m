@@ -155,21 +155,43 @@ static void SetContentScale(CGContextRef c, CGSize size, CGFloat scale) {
 	CGContextScaleCTM(c, scale, scale);
 }
 
-/// Helper method; set drawing color, add rounded background and prepare content scale
-static void DrawRoundedFrame(CGContextRef c, CGRect r, CGColorRef color, BOOL background, CGFloat corner, CGFloat defaultScale, CGFloat scaling) {
-	CGContextSetFillColorWithColor(c, color);
-	CGContextSetStrokeColorWithColor(c, color);
-	CGFloat contentScale = defaultScale;
-	if (background) {
-		svgAddRect(c, 1, r, ShorterSide(r.size) * corner/2);
-		if (scaling != 0.0)
-			contentScale *= scaling;
-	}
-	SetContentScale(c, r.size, contentScale);
+
+#pragma mark - RSS Icon (rounded)
+
+
+/// Draw monochrome RSS icon with rounded corners
+static void RoundedRSS_Monochrome(CGRect r, BOOL connection) {
+	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
+	CGContextSetFillColorWithColor(c, [NSColor menuBarIconColor].CGColor);
+	// background rounded rect
+	svgAddRect(c, 1, r, ShorterSide(r.size) * 0.4/2);
+	// RSS icon
+	SetContentScale(c, r.size, 0.7);
+	AddRSSIconPath(c, ShorterSide(r.size), connection);
+	CGContextEOFillPath(c);
+}
+
+/// Draw RSS icon with orange gradient background
+static void RoundedRSS_Gradient(CGRect r, NSColor *color) {
+	const CGFloat size = ShorterSide(r.size);
+	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
+	CGContextSetFillColorWithColor(c, NSColor.whiteColor.CGColor);
+	// background rounded rect
+	svgAddRect(c, 1, r, ShorterSide(r.size) * 0.4/2);
+	// Gradient
+	CGContextSaveGState(c);
+	CGContextClip(c);
+	DrawGradient(c, size, color);
+	CGContextRestoreGState(c);
+	// RSS icon
+	SetContentScale(c, r.size, 0.7);
+	AddRSSIconPath(c, size, YES);
+	CGContextEOFillPath(c);
 }
 
 
-#pragma mark - Easy Icon Drawing Methods
+
+#pragma mark - Appearance Settings
 
 
 /// Draw icon representing global `status bar icon` (rounded RSS icon with neighbor items)
@@ -261,28 +283,9 @@ static void Appearance_Article(CGRect r) {
 	CGContextEOFillPath(c);
 }
 
-/// Draw RSS icon (flat without gradient)
-static void DrawRSSIcon(CGRect r, CGColorRef color, BOOL background, BOOL connection) {
-	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
-	DrawRoundedFrame(c, r, color, background, 0.4, 1.0, 0.7);
-	AddRSSIconPath(c, ShorterSide(r.size), connection);
-	CGContextEOFillPath(c);
-}
 
-/// Draw RSS icon (with orange gradient, corner @c 0.4, white radio waves)
-static void DrawRSSGradientIcon(CGRect r, NSColor *color) {
-	const CGFloat size = ShorterSide(r.size);
-	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
-	DrawRoundedFrame(c, r, NSColor.whiteColor.CGColor, YES, 0.4, 1.0, 0.7);
-	// Gradient
-	CGContextSaveGState(c);
-	CGContextClip(c);
-	DrawGradient(c, size, color);
-	CGContextRestoreGState(c);
-	// Bars
-	AddRSSIconPath(c, size, YES);
-	CGContextEOFillPath(c);
-}
+#pragma mark - Other Icons
+
 
 /// Draw unread icon (blue dot for unread menu item)
 static void DrawUnreadIcon(CGRect r, NSColor *color) {
@@ -342,17 +345,18 @@ static void Register(CGFloat size, NSImageName name, NSString *description, BOOL
 
 /// Register all icons that require custom drawing in @c ImageNamed cache
 void RegisterImageViewNames(void) {
-	Register(16, RSSImageDefaultRSSIcon, NSLocalizedString(@"RSS icon", nil), ^(NSRect r) { DrawRSSGradientIcon(r, [NSColor rssOrange]); return YES; });
-	// Appearance settings icons
-	Register(16, RSSImageSettingsGlobalIcon, NSLocalizedString(@"Global menu icon settings", nil), ^(NSRect r) { Appearance_MenuBarIcon(r); return YES; });
-	Register(16, RSSImageSettingsGlobalMenu, NSLocalizedString(@"Global settings", nil), ^(NSRect r) { Appearance_MainMenu(r); return YES; });
+	// Default feed icon (fallback icon if no favicon found)
+	Register(16, RSSImageDefaultRSSIcon, NSLocalizedString(@"Default feed icon", nil), ^(NSRect r) { RoundedRSS_Gradient(r, [NSColor rssOrange]); return YES; });
+	// Menu bar icon
+	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"Menu bar icon", nil), ^(NSRect r) { RoundedRSS_Monochrome(r, YES); return YES; });
+	Register(16, RSSImageMenuBarIconPaused, NSLocalizedString(@"Menu bar icon, paused", nil), ^(NSRect r) { RoundedRSS_Monochrome(r, NO); return YES; });
+	// Appearance settings
+	Register(16, RSSImageSettingsGlobalIcon, NSLocalizedString(@"Global settings, menu bar icon", nil), ^(NSRect r) { Appearance_MenuBarIcon(r); return YES; });
+	Register(16, RSSImageSettingsGlobalMenu, NSLocalizedString(@"Global settings, main menu", nil), ^(NSRect r) { Appearance_MainMenu(r); return YES; });
 	Register(16, RSSImageSettingsGroup, NSLocalizedString(@"Group settings", nil), ^(NSRect r) { Appearance_Group(r); return YES; });
 	Register(16, RSSImageSettingsFeed, NSLocalizedString(@"Feed settings", nil), ^(NSRect r) { Appearance_Feed(r); return YES; });
 	Register(16, RSSImageSettingsArticle, NSLocalizedString(@"Article settings", nil), ^(NSRect r) { Appearance_Article(r); return YES; });
-	// Menu bar icon
-	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"RSS menu bar icon", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor menuBarIconColor].CGColor, YES, YES); return YES; });
-	Register(16, RSSImageMenuBarIconPaused, NSLocalizedString(@"RSS menu bar icon, paused", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor menuBarIconColor].CGColor, YES, NO); return YES; });
-	Register(14, RSSImageMenuItemUnread, NSLocalizedString(@"Unread icon", nil), ^(NSRect r) { DrawUnreadIcon(r, [NSColor unreadIndicatorColor]); return YES; });
-	// Other Settings
+	// Other settings
+	Register(14, RSSImageMenuItemUnread, NSLocalizedString(@"Unread indicator", nil), ^(NSRect r) { DrawUnreadIcon(r, [NSColor unreadIndicatorColor]); return YES; });
 	Register(32, RSSImageRegexIcon, NSLocalizedString(@"Regex icon", nil), ^(NSRect r) { DrawRegexIcon(r); return YES; });
 }
