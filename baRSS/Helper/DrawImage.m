@@ -173,13 +173,15 @@ static void Appearance_MainMenu(CGRect r) {
 }
 
 /// Draw icon representing `FeedGroup` (folder)
-static void Appearance_Group(CGRect r) {
+static void Appearance_Group(CGRect r, BOOL withLine) {
 	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	// folder path
 	svgPath(c, size/16, "M3,13.5c-1.5,0-2.5-1-2.5-2.5V3.5c0-1.5.5-2,2-2h1.5c1.5,0,1.5,1,3,1h6c1.5,0,2.5,1,2.5,2.5v6c0,1.5-1,2.5-2.5,2.5H3Z");
 	// line
-	svgPath(c, size/16, "M1.5,5h13H1.5Z");
+	if (withLine) {
+		svgPath(c, size/16, "M1.5,5h13Z");
+	}
 	CGContextSetLineWidth(c, size * 1/16);
 	CGContextSetStrokeColorWithColor(c, [NSColor controlTextColor].CGColor);
 	CGContextStrokePath(c);
@@ -189,7 +191,10 @@ static void Appearance_Group(CGRect r) {
 static void Appearance_Feed(CGRect r) {
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
-	SetContentScale(c, r.size, 14/16.0);
+	// folder
+	Appearance_Group(r, NO);
+	// rss icon
+	SetContentScale(c, r.size, 7/16.0);
 	AddRSSIconPath(c, ShorterSide(r.size), YES);
 	CGContextFillPath(c);
 }
@@ -285,7 +290,7 @@ void RegisterImageViewNames(void) {
 	// Appearance settings
 	Register(16, RSSImageSettingsGlobalIcon, NSLocalizedString(@"Global settings, menu bar icon", nil), ^(NSRect r) { Appearance_MenuBarIcon(r); return YES; });
 	Register(16, RSSImageSettingsGlobalMenu, NSLocalizedString(@"Global settings, main menu", nil), ^(NSRect r) { Appearance_MainMenu(r); return YES; });
-	Register(16, RSSImageSettingsGroup, NSLocalizedString(@"Group settings", nil), ^(NSRect r) { Appearance_Group(r); return YES; });
+	Register(16, RSSImageSettingsGroup, NSLocalizedString(@"Group settings", nil), ^(NSRect r) { Appearance_Group(r, YES); return YES; });
 	Register(16, RSSImageSettingsFeed, NSLocalizedString(@"Feed settings", nil), ^(NSRect r) { Appearance_Feed(r); return YES; });
 	Register(16, RSSImageSettingsArticle, NSLocalizedString(@"Article settings", nil), ^(NSRect r) { Appearance_Article(r); return YES; });
 	// Other settings
