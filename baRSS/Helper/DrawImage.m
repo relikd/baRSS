@@ -240,6 +240,27 @@ static void Appearance_Feed(CGRect r) {
 	CGContextFillPath(c);
 }
 
+/// Draw icon representing `Article` (RSS inside text document)
+static void Appearance_Article(CGRect r) {
+	const CGFloat size = ShorterSide(r.size);
+	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
+	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
+	FlipCoordinateSystem(c, r.size.height);
+	// text lines
+	svgAddRect(c, size/16, CGRectMake(0, 14, 16, 1), 0);
+	svgAddRect(c, size/16, CGRectMake(0, 10, 16, 1), 0);
+	svgAddRect(c, size/16, CGRectMake(9, 6, 7, 1), 0);
+	svgAddRect(c, size/16, CGRectMake(9, 2, 7, 1), 0);
+	// picture
+	//svgAddRect(c, size/16, CGRectMake(1, 1, 7, 7), 0);
+	// RSS icon
+	CGContextTranslateCTM(c, size/16 * 1, size/16 * 1);
+	CGContextScaleCTM(c, 7.0/16, 7.0/16);
+	FlipCoordinateSystem(c, r.size.height);
+	AddRSSIconPath(c, ShorterSide(r.size), YES);
+	CGContextEOFillPath(c);
+}
+
 /// Draw RSS icon (flat without gradient)
 static void DrawRSSIcon(CGRect r, CGColorRef color, BOOL background, BOOL connection) {
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
@@ -327,6 +348,7 @@ void RegisterImageViewNames(void) {
 	Register(16, RSSImageSettingsGlobalMenu, NSLocalizedString(@"Global settings", nil), ^(NSRect r) { Appearance_MainMenu(r); return YES; });
 	Register(16, RSSImageSettingsGroup, NSLocalizedString(@"Group settings", nil), ^(NSRect r) { Appearance_Group(r); return YES; });
 	Register(16, RSSImageSettingsFeed, NSLocalizedString(@"Feed settings", nil), ^(NSRect r) { Appearance_Feed(r); return YES; });
+	Register(16, RSSImageSettingsArticle, NSLocalizedString(@"Article settings", nil), ^(NSRect r) { Appearance_Article(r); return YES; });
 	// Menu bar icon
 	Register(16, RSSImageMenuBarIconActive, NSLocalizedString(@"RSS menu bar icon", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor menuBarIconColor].CGColor, YES, YES); return YES; });
 	Register(16, RSSImageMenuBarIconPaused, NSLocalizedString(@"RSS menu bar icon, paused", nil), ^(NSRect r) { DrawRSSIcon(r, [NSColor menuBarIconColor].CGColor, YES, NO); return YES; });

@@ -30,6 +30,8 @@ static NSImageName const RSSImageSettingsGlobalMenu    = @"RSSImageSettingsGloba
 static NSImageName const RSSImageSettingsGroup         = @"RSSImageSettingsGroup";
 /// Settings, feed icon (RSS, no border, no gradient, black)
 static NSImageName const RSSImageSettingsFeed          = @"RSSImageSettingsFeed";
+/// Settings, article icon (RSS surrounded by text lines)
+static NSImageName const RSSImageSettingsArticle       = @"RSSImageSettingsArticle";
 /// Menu bar, bar icon (RSS, with border, no gradient, orange)
 static NSImageName const RSSImageMenuBarIconActive     = @"RSSImageMenuBarIconActive";
 /// Menu bar, bar icon (RSS, with border, no gradient, paused, orange)
