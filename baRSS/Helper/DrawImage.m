@@ -176,12 +176,11 @@ static void Appearance_MainMenu(CGRect r) {
 static void Appearance_Group(CGRect r) {
 	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
-	SetContentScale(c, r.size, 0.92);
 	// folder path
-	svgPath(c, size/100, "M15,87c-12,0-15-3-15-15V21c0-10,3-13,13-13h11c10,0,8,8,18,8h43c12,0,15,3,15,15v41c0,12-3,15-15,15H15Z");
+	svgPath(c, size/16, "M3,13.5c-1.5,0-2.5-1-2.5-2.5V3.5c0-1.5.5-2,2-2h1.5c1.5,0,1.5,1,3,1h6c1.5,0,2.5,1,2.5,2.5v6c0,1.5-1,2.5-2.5,2.5H3Z");
 	// line
-	svgPath(c, size/100, "M7,32h86Z");
-	CGContextSetLineWidth(c, size * 0.08);
+	svgPath(c, size/16, "M1.5,5h13H1.5Z");
+	CGContextSetLineWidth(c, size * 1/16);
 	CGContextSetStrokeColorWithColor(c, [NSColor controlTextColor].CGColor);
 	CGContextStrokePath(c);
 }
