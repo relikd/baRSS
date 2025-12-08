@@ -67,7 +67,7 @@ static void finishOp(CGMutablePathRef path, struct SVGState *state) {
 	} else if (op == 'Q' && state->iNum == 4) {
 		state->x = state->num[2];
 		state->y = state->num[3];
-		CGPathAddCurveToPoint(path, NULL, state->num[0] * state->scale, state->num[1] * state->scale, state->num[0] * state->scale, state->num[1] * state->scale, state->x * state->scale, state->y * state->scale);
+		CGPathAddQuadCurveToPoint(path, NULL, state->num[0] * state->scale, state->num[1] * state->scale, state->x * state->scale, state->y * state->scale);
 		
 	} else if (op == 'C' && state->iNum == 6) {
 		state->x = state->num[4];
