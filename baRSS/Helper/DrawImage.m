@@ -87,13 +87,14 @@ static inline void AddRSSIconPath(CGContextRef c, CGFloat size, BOOL connection)
 
 /// Draw monochrome RSS icon with rounded corners
 static void RoundedRSS_Monochrome(CGRect r, BOOL connection) {
+	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGContextSetFillColorWithColor(c, [NSColor menuBarIconColor].CGColor);
 	// background rounded rect
-	svgRoundedRect(c, 1, r, ShorterSide(r.size) * 0.4/2);
+	svgRoundedRect(c, 1, r, size * 0.4/2);
 	// RSS icon
-	SetContentScale(c, r.size, 0.7);
-	AddRSSIconPath(c, ShorterSide(r.size), connection);
+	SetContentScale(c, r.size, 11/16.0);
+	AddRSSIconPath(c, size, connection);
 	CGContextEOFillPath(c);
 }
 
@@ -103,14 +104,14 @@ static void RoundedRSS_Gradient(CGRect r, NSColor *color) {
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGContextSetFillColorWithColor(c, NSColor.whiteColor.CGColor);
 	// background rounded rect
-	svgRoundedRect(c, 1, r, ShorterSide(r.size) * 0.4/2);
+	svgRoundedRect(c, 1, r, size * 0.4/2);
 	// Gradient
 	CGContextSaveGState(c);
 	CGContextClip(c);
 	DrawGradient(c, size, color);
 	CGContextRestoreGState(c);
 	// RSS icon
-	SetContentScale(c, r.size, 0.7);
+	SetContentScale(c, r.size, 11/16.0);
 	AddRSSIconPath(c, size, YES);
 	CGContextEOFillPath(c);
 }
@@ -151,7 +152,7 @@ static void Appearance_MenuBarIcon(CGRect r) {
 	CGContextSetAlpha(c, 1);
 	CGContextTranslateCTM(c, -offset, 0);
 	svgRoundedRect(c, 1, CGRectInset(r, iconInset, iconInset), iconCorner);
-	SetContentScale(c, r.size, .47);
+	SetContentScale(c, r.size, 7/16.0);
 	AddRSSIconPath(c, size, YES);
 	CGContextEOFillPath(c);
 }
@@ -189,13 +190,14 @@ static void Appearance_Group(CGRect r, BOOL withLine) {
 
 /// Draw icon representing `Feed` (group + RSS)
 static void Appearance_Feed(CGRect r) {
+	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
 	// folder
 	Appearance_Group(r, NO);
 	// rss icon
 	SetContentScale(c, r.size, 7/16.0);
-	AddRSSIconPath(c, ShorterSide(r.size), YES);
+	AddRSSIconPath(c, size, YES);
 	CGContextFillPath(c);
 }
 
@@ -212,9 +214,9 @@ static void Appearance_Article(CGRect r) {
 	// picture
 	//svgRect(c, size/16, CGRectMake(1, 1, 7, 7));
 	// RSS icon
-	CGContextTranslateCTM(c, size/16 * 1, size/16 * 1);
-	CGContextScaleCTM(c, 7.0/16, 7.0/16);
-	AddRSSIconPath(c, ShorterSide(r.size), YES);
+	CGContextTranslateCTM(c, size/16 * 1, size/16 * 1); // same offset as picture
+	CGContextScaleCTM(c, 7/16.0, 7/16.0); // same size as picture
+	AddRSSIconPath(c, size, YES);
 	CGContextEOFillPath(c);
 }
 
@@ -250,11 +252,13 @@ static void DrawRegexIcon(CGRect r) {
 	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
 	
-	svgRoundedRect(c, 1, r, .2 * size);
+	// background
 	CGContextSetFillColorWithColor(c, NSColor.redColor.CGColor);
+	svgRoundedRect(c, 1, r, size * 0.4/2);
 	CGContextFillPath(c);
 	
-	// SVG files use bottom-left corner coordinate system. Quartz uses top-left.
+	// foreground
+	CGContextSetFillColorWithColor(c, NSColor.whiteColor.CGColor);
 	SetContentScale(c, r.size, 0.8);
 	// "("
 	svgPath(c, size/1000, "m184 187c-140 205-134 432-1 622l-66 44c-159-221-151-499 0-708z");
@@ -264,8 +268,6 @@ static void DrawRegexIcon(CGRect r) {
 	svgPath(c, size/1000, "m652 277 107-35 21 63-109 36 68 92-54 39-68-93-66 91-52-41 67-88-109-37 21-63 108 37v-113h66v112z");
 	// ")"
 	svgPath(c, size/1000, "m816 813c140-205 134-430 1-621l66-45c159 221 151 499 0 708z");
-	
-	CGContextSetFillColorWithColor(c, NSColor.whiteColor.CGColor);
 	CGContextFillPath(c);
 }
 
