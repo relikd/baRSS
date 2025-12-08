@@ -247,7 +247,7 @@ static void DrawUnreadIcon(CGRect r, NSColor *color) {
 	CGPathRelease(path);
 }
 
-/// Draw "(.*)" as vector path
+/// Draw `(.*)` as vector path
 static void DrawRegexIcon(CGRect r) {
 	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
@@ -259,15 +259,15 @@ static void DrawRegexIcon(CGRect r) {
 	
 	// foreground
 	CGContextSetFillColorWithColor(c, NSColor.whiteColor.CGColor);
-	SetContentScale(c, r.size, 0.8);
+	SetContentScale(c, r.size, 25/32.0);
 	// "("
-	svgPath(c, size/1000, "m184 187c-140 205-134 432-1 622l-66 44c-159-221-151-499 0-708z");
+	svgPath(c, size/100, "M18,19c-14,21-13,43,0,62l-7,4C-4,63-4,35,12,14l6,5Z");
 	// "."
-	svgCircle(c, size/1000, 315, 675, 70, NO);
+	svgCircle(c, size/100, 31, 67, 7, NO);
 	// "*"
-	svgPath(c, size/1000, "m652 277 107-35 21 63-109 36 68 92-54 39-68-93-66 91-52-41 67-88-109-37 21-63 108 37v-113h66v112z");
+	svgPath(c, size/100, "M65,28l11-4,2,6-11,4,7,9-5,4-7-9-7,9-5-4,7-9-11-4,2-6,11,4v-11h6v11Z");
 	// ")"
-	svgPath(c, size/1000, "m816 813c140-205 134-430 1-621l66-45c159 221 151 499 0 708z");
+	svgPath(c, size/100, "M82,81c14-21,13-43,0-62l7-5c16,22,15,50,0,71l-7-4Z");
 	CGContextFillPath(c);
 }
 
