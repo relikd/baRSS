@@ -7,7 +7,8 @@
 @implementation DrawSeparator
 - (void)drawRect:(NSRect)r {
 	NSColor *color = [NSColor darkGrayColor];
-	NSGradient *grdnt = [[NSGradient alloc] initWithStartingColor:color endingColor:[color colorWithAlphaComponent:0.0]];
+	NSColor *transparent = [color colorWithAlphaComponent:0.0];
+	NSGradient *grdnt = [[NSGradient alloc] initWithStartingColor:self.invert ? transparent : color endingColor:self.invert ? color : transparent];
 	NSRect separatorRect = NSMakeRect(1, NSMidY(self.bounds) - 1, NSWidth(self.bounds) - 2, 2);
 	NSBezierPath *rounded = [NSBezierPath bezierPathWithRoundedRect:separatorRect xRadius:1 yRadius:1];
 	[grdnt drawInBezierPath:rounded angle:0];
