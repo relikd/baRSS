@@ -8,7 +8,7 @@
 - (void)drawRect:(NSRect)r {
 	NSColor *color = [NSColor darkGrayColor];
 	NSGradient *grdnt = [[NSGradient alloc] initWithStartingColor:color endingColor:[color colorWithAlphaComponent:0.0]];
-	NSRect separatorRect = NSMakeRect(1, NSMidY(self.frame) - 1, NSWidth(self.frame) - 2, 2);
+	NSRect separatorRect = NSMakeRect(1, NSMidY(self.bounds) - 1, NSWidth(self.bounds) - 2, 2);
 	NSBezierPath *rounded = [NSBezierPath bezierPathWithRoundedRect:separatorRect xRadius:1 yRadius:1];
 	[grdnt drawInBezierPath:rounded angle:0];
 }
