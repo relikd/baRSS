@@ -3,8 +3,6 @@
 #import "NSView+Ext.h"
 #import "Constants.h"
 
-@interface StrictUIntFormatter : NSFormatter
-@end
 
 @implementation ModalFeedEditView
 
@@ -34,7 +32,7 @@
 	self.name = [[[NSView inputField:NSLocalizedString(@"Example Title", nil) width:0] placeIn:self x:x yTop:rowHeight] sizeToRight:PAD_S + 18];
 	self.spinnerName = [[NSView activitySpinner] placeIn:self xRight:1 yTop:rowHeight + 2.5];
 	// 3. row
-	self.refreshNum = [[NSView inputField:@"30" width:85] placeIn:self x:x yTop:2*rowHeight];
+	self.refreshNum = [[NSView integerField:30 width:85] placeIn:self x:x yTop:2*rowHeight];
 	self.refreshUnit = [[NSView popupButton:120] placeIn:self x:NSMaxX(self.refreshNum.frame) + PAD_M yTop:2*rowHeight];
 	self.regexConverterButton = [[[[NSView buttonIcon:RSSImageRegexIcon size:19]
 								   action:@selector(openRegexConverter) target:controller]
@@ -48,7 +46,6 @@
 	self.url.delegate = controller;
 	self.warningButton.hidden = YES;
 	self.regexConverterButton.hidden = YES;
-	self.refreshNum.formatter = [StrictUIntFormatter new]; // see below ...
 	[self prepareWarningPopover];
 	return self;
 }
@@ -67,29 +64,3 @@
 }
 
 @end
-
-
-#pragma mark - StrictUIntFormatter -
-
-
-@implementation StrictUIntFormatter
-/// Display object as integer formatted string.
-- (NSString *)stringForObjectValue:(id)obj {
-	return [NSString stringWithFormat:@"%d", [[NSString stringWithFormat:@"%@", obj] intValue]];
-}
-/// Parse any pasted input as integer.
-- (BOOL)getObjectValue:(out id  _Nullable __autoreleasing *)obj forString:(NSString *)string errorDescription:(out NSString *__autoreleasing  _Nullable *)error {
-	*obj = [[NSNumber numberWithInt:[string intValue]] stringValue];
-	return YES;
-}
-/// Only digits, no other character allowed
-- (BOOL)isPartialStringValid:(NSString *__autoreleasing  _Nonnull *)partialStringPtr proposedSelectedRange:(NSRangePointer)proposedSelRangePtr originalString:(NSString *)origString originalSelectedRange:(NSRange)origSelRange errorDescription:(NSString *__autoreleasing  _Nullable *)error {
-	for (NSUInteger i = 0; i < [*partialStringPtr length]; i++) {
-		unichar c = [*partialStringPtr characterAtIndex:i];
-		if (c < '0' || c > '9')
-			return NO;
-	}
-	return YES;
-}
-@end
-

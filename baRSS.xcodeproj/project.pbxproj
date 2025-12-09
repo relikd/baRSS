@@ -22,6 +22,7 @@
 		544F5A752E30EFC700674F81 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = 544F5A722E30EFC700674F81 /* style.css */; };
 		544F5A762E30EFC700674F81 /* opml-lib.m in Sources */ = {isa = PBXBuildFile; fileRef = 544F5A702E30EFC700674F81 /* opml-lib.m */; };
 		54501010230E9C8600F0B165 /* FeedDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 5450100F230E9C8600F0B165 /* FeedDownload.m */; };
+		545EB5DA2EE8622200FABBE0 /* StrictUIntFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 545EB5D92EE8622200FABBE0 /* StrictUIntFormatter.m */; };
 		5469E13C2EA90C6C00D46CE7 /* NotifyEndpoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 5469E13B2EA90C6C00D46CE7 /* NotifyEndpoint.m */; };
 		546A6A2922C583390034E806 /* SettingsGeneralView.m in Sources */ = {isa = PBXBuildFile; fileRef = 54D857D122802309001BA1C8 /* SettingsGeneralView.m */; };
 		546A6A2C22C584AF0034E806 /* SettingsAppearanceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 546A6A2A22C584AF0034E806 /* SettingsAppearanceView.m */; };
@@ -150,6 +151,8 @@
 		544F5A722E30EFC700674F81 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = style.css; sourceTree = "<group>"; };
 		5450100E230E9C8600F0B165 /* FeedDownload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FeedDownload.h; sourceTree = "<group>"; };
 		5450100F230E9C8600F0B165 /* FeedDownload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeedDownload.m; sourceTree = "<group>"; };
+		545EB5D62EE8620300FABBE0 /* StrictUIntFormatter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StrictUIntFormatter.h; sourceTree = "<group>"; };
+		545EB5D92EE8622200FABBE0 /* StrictUIntFormatter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StrictUIntFormatter.m; sourceTree = "<group>"; };
 		5469E13A2EA90C6C00D46CE7 /* NotifyEndpoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NotifyEndpoint.h; sourceTree = "<group>"; };
 		5469E13B2EA90C6C00D46CE7 /* NotifyEndpoint.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NotifyEndpoint.m; sourceTree = "<group>"; };
 		546A6A2A22C584AF0034E806 /* SettingsAppearanceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsAppearanceView.m; sourceTree = "<group>"; };
@@ -515,6 +518,8 @@
 				54910066233A4D4000858AE2 /* URLScheme.m */,
 				54229F532E02491A0019ACB0 /* TinySVG.h */,
 				54229F542E02491A0019ACB0 /* TinySVG.m */,
+				545EB5D62EE8620300FABBE0 /* StrictUIntFormatter.h */,
+				545EB5D92EE8622200FABBE0 /* StrictUIntFormatter.m */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -732,6 +737,7 @@
 				546FC43D21188AD5007CC3A3 /* SettingsFeeds.m in Sources */,
 				54253C952C49BFE400742695 /* RegexConverterView.m in Sources */,
 				548C6D0A230C33DE003A1AAF /* NSURL+Ext.m in Sources */,
+				545EB5DA2EE8622200FABBE0 /* StrictUIntFormatter.m in Sources */,
 				54E88320211B509D00064188 /* ModalFeedEdit.m in Sources */,
 				54195883218A061100581B79 /* Feed+Ext.m in Sources */,
 				5469E13C2EA90C6C00D46CE7 /* NotifyEndpoint.m in Sources */,

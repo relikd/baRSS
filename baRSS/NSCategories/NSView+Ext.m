@@ -1,4 +1,5 @@
 #import "NSView+Ext.h"
+#import "StrictUIntFormatter.h"
 
 @implementation NSView (Ext)
 
@@ -24,6 +25,13 @@
 	input.placeholderString = placeholder;
 	input.font = [NSFont systemFontOfSize: NSFont.systemFontSize];
 	input.textColor = [NSColor controlTextColor];
+	return input;
+}
+
+/// Create input text field which only accepts integer values. (calls `inputField`) `21px` height.
++ (NSTextField*)integerField:(NSUInteger)placeholder width:(CGFloat)w {
+	NSTextField *input = [self inputField:[NSString stringWithFormat:@"%ld", placeholder] width:w];
+	input.formatter = [StrictUIntFormatter new];
 	return input;
 }
 
