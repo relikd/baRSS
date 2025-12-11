@@ -8,10 +8,12 @@
 
 - (void)loadView {
 	self.view = [SettingsAppearanceView new];
-	for (NSButton *button in self.view.subviews) {
-		if ([button isKindOfClass:[NSButton class]]) { // for all checkboxes
-			[button setAction:@selector(didSelectCheckbox:)];
-			[button setTarget:self];
+	NSScrollView *scroll = self.view.subviews[0];
+	NSView *contentView = scroll.documentView.subviews[0];
+	for (NSControl *control in contentView.subviews) {
+		if ([control isKindOfClass:[NSButton class]]) { // for all checkboxes
+			[control setAction:@selector(didSelectCheckbox:)];
+			[control setTarget:self];
 		}
 	}
 }

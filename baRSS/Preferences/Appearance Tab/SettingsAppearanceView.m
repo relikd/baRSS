@@ -2,139 +2,253 @@
 #import "NSView+Ext.h"
 #import "Constants.h" // column icons
 #import "UserPrefs.h" // preference constants & UserPrefsBool()
+#import "DrawImage.h" // DrawSeparator
+
+@interface FlippedView : NSView @end
 
 @interface SettingsAppearanceView()
 @property (assign) CGFloat y;
+@property (assign) NSView *content;
+@property (strong) NSMutableArray<NSString*> *columns;
 @end
 
 /***/ static CGFloat const IconSize = 18;
 /***/ static CGFloat const colWidth = (IconSize + PAD_M); // checkbox column width
-/***/ static CGFloat const X__ = PAD_WIN + 0 * colWidth;
-/***/ static CGFloat const _X_ = PAD_WIN + 1 * colWidth;
-/***/ static CGFloat const __X = PAD_WIN + 2 * colWidth;
+/***/ static CGFloat const X___ = PAD_WIN + 0 * colWidth;
+/***/ static CGFloat const _X__ = PAD_WIN + 1 * colWidth;
+/***/ static CGFloat const __X_ = PAD_WIN + 2 * colWidth;
+/***/ static CGFloat const ___X = PAD_WIN + 3 * colWidth;
+/***/ static CGFloat const lbl_start = PAD_WIN + 4 * colWidth;
 
 @implementation SettingsAppearanceView
 
 - (instancetype)init {
 	self = [super initWithFrame:NSMakeRect(0, 0, 320, 327)];
-	// Insert matrix header (icons above checkbox matrix)
-	ColumnIcon(self, X__, RSSImageSettingsGlobalMenu);
-	ColumnIcon(self, _X_, RSSImageSettingsGroup);
-	ColumnIcon(self, __X, RSSImageSettingsFeed);
-	// Generate checkbox matrix
-	self.y = PAD_WIN + IconSize + PAD_S;
-	[self entry:NSLocalizedString(@"Tint menu bar icon on unread", nil)
-		   help:NSLocalizedString(@"If active, a color will indicate if there are unread articles.", nil)
-			tip:nil
-			 c1:Pref_globalTintMenuIcon c1tt:NSLocalizedString(@"menu bar icon", nil)
-			 c2:nil c2tt:nil
-			 c3:nil c3tt:nil];
+	self.y = PAD_WIN;
+	// stupidly complex UI generation just because you cant top-align `.documentView`
+	NSScrollView *scroll = [[[FlippedView new] wrapInScrollView:self.frame.size] placeIn:self x:0 y:0];
+	self.content = [[[NSView alloc] initWithFrame:scroll.documentView.frame] placeIn:scroll.documentView x:0 y:0];
 	
-	[self entry:NSLocalizedString(@"Update all feeds", nil)
-		   help:NSLocalizedString(@"Show button in main menu to reload all feeds. This will force fetch new online content regardless of next-update timer.", nil)
-			tip:nil
-			 c1:Pref_globalUpdateAll c1tt:NSLocalizedString(@"in main menu", nil)
-			 c2:nil c2tt:nil
-			 c3:nil c3tt:nil];
-	
-	[self entry:NSLocalizedString(@"Toggle “Show hidden articles”", nil)
-		   help:NSLocalizedString(@"Show button in main menu to quickly toggle whether hidden articles should be shown. See option “Show only unread”.", nil)
-			tip:nil
-			 c1:Pref_globalToggleHidden c1tt:NSLocalizedString(@"in main menu", nil)
-			 c2:nil c2tt:nil
-			 c3:nil c3tt:nil];
-	
-	[self entry:NSLocalizedString(@"Open all unread", nil)
-		   help:NSLocalizedString(@"Show button to open unread articles.", nil)
-			tip:NSLocalizedString(@"If you hold down option-key, this will become an “open a few” unread articles button.", nil)
-			 c1:Pref_globalOpenUnread c1tt: NSLocalizedString(@"in main menu", nil)
-			 c2:Pref_groupOpenUnread c2tt: NSLocalizedString(@"in group menu", nil)
-			 c3:Pref_feedOpenUnread c3tt: NSLocalizedString(@"in feed menu", nil)];
-	
-	[self entry:NSLocalizedString(@"Mark all read", nil)
-		   help:NSLocalizedString(@"Show button to mark articles read.", nil)
-			tip:nil
-			 c1:Pref_globalMarkRead c1tt: NSLocalizedString(@"in main menu", nil)
-			 c2:Pref_groupMarkRead c2tt: NSLocalizedString(@"in group menu", nil)
-			 c3:Pref_feedMarkRead c3tt: NSLocalizedString(@"in feed menu", nil)];
-	
-	[self entry:NSLocalizedString(@"Mark all unread", nil)
-		   help:NSLocalizedString(@"Show button to mark articles unread.", nil)
-			tip:NSLocalizedString(@"You can hold down option-key and click on an article to toggle that item (un-)read.", nil)
-			 c1:Pref_globalMarkUnread c1tt: NSLocalizedString(@"in main menu", nil)
-			 c2:Pref_groupMarkUnread c2tt: NSLocalizedString(@"in group menu", nil)
-			 c3:Pref_feedMarkUnread c3tt: NSLocalizedString(@"in feed menu", nil)];
+	// repeat with another column header
+//	[self section:NSLocalizedString(@"Modify", nil)];
+	[self columns:@[
+		RSSImageSettingsGlobalIcon, NSLocalizedString(@"Menu bar icon", nil),
+		RSSImageSettingsGroup, NSLocalizedString(@"Group menu item", nil),
+		RSSImageSettingsFeed, NSLocalizedString(@"Feed menu item", nil),
+		RSSImageSettingsArticle, NSLocalizedString(@"Article menu item", nil),
+	]];
 	
 	[self entry:NSLocalizedString(@"Number of unread articles", nil)
 		   help:NSLocalizedString(@"Show count of unread articles in parenthesis.", nil)
 			tip:nil
-			 c1:Pref_globalUnreadCount c1tt:NSLocalizedString(@"on menu bar icon", nil)
-			 c2:Pref_groupUnreadCount c2tt:NSLocalizedString(@"on group folder", nil)
-			 c3:Pref_feedUnreadCount c3tt:NSLocalizedString(@"on feed folder", nil)];
+			 c1:Pref_globalUnreadCount c2:Pref_groupUnreadCount c3:Pref_feedUnreadCount c4:nil];
 	
-	[self entry:NSLocalizedString(@"Indicator for unread articles", nil)
-		   help:NSLocalizedString(@"Show blue dot on menu items with unread articles.", nil)
+	[self entry:NSLocalizedString(@"Color for unread articles", nil)
+		   help:NSLocalizedString(@"Show color marker on menu items with unread articles.", nil)
 			tip:nil
-			 c1:nil c1tt:nil
-			 c2:Pref_groupUnreadIndicator c2tt:NSLocalizedString(@"on group & feed folder", nil)
-			 c3:Pref_feedUnreadIndicator c3tt:NSLocalizedString(@"on article entry", nil)];
+			 c1:Pref_globalTintMenuIcon c2:Pref_groupUnreadIndicator c3:Pref_feedUnreadIndicator c4:Pref_articleUnreadIndicator];
 	
 	[self entry:NSLocalizedString(@"Show only unread", nil)
 		   help:NSLocalizedString(@"Hide articles which have been read.", nil)
 			tip:NSLocalizedString(@"You can hold down option-key before opening the main menu to temporarily disable this setting.", nil)
-			 c1:nil c1tt:nil
-			 c2:Pref_groupUnreadOnly c2tt:NSLocalizedString(@"hide group & feed folders with 0 unread articles", nil)
-			 c3:Pref_feedUnreadOnly c3tt:NSLocalizedString(@"hide articles inside of feed folder", nil)];
+			 c1:nil c2:Pref_groupUnreadOnly c3:Pref_feedUnreadOnly c4:Pref_articleUnreadOnly];
 	
-	[self entry:NSLocalizedString(@"Truncate article title", nil)
-		   help:NSLocalizedString(@"Truncate article title after 60 characters. If a title is longer than that, show an ellipsis character “…” instead.", nil)
+//	self.y += PAD_M;
+//	[self note:NSLocalizedString(@"Hold down option-key before opening the main menu to temporarily show hidden feeds.", nil)];
+	
+	
+	// Menu Buttons
+	
+	[self section:NSLocalizedString(@"Menu buttons", nil)];
+	[self columns:@[
+		RSSImageSettingsGlobalMenu, NSLocalizedString(@"Main menu", nil),
+		RSSImageSettingsGroup, NSLocalizedString(@"Group menu", nil),
+		RSSImageSettingsFeed, NSLocalizedString(@"Feed menu", nil),
+	]];
+	
+	[self entry:NSLocalizedString(@"“Show hidden feeds”", nil)
+		   help:NSLocalizedString(@"Show button to quickly toggle whether hidden articles should be shown. See option “Show only unread”.", nil)
 			tip:nil
-			 c1:nil c1tt:nil
-			 c2:nil c2tt:nil
-			 c3:Pref_feedTruncateTitle c3tt:NSLocalizedString(@"article title", nil)];
+			 c1:Pref_globalToggleHidden c2:nil c3:nil c4:nil];
 	
-	[self entry:NSLocalizedString(@"Limit number of articles", nil)
-		   help:NSLocalizedString(@"Display at most 40 articles in feed menu. Remaining articles will be hidden from view but are still there. Unread count may be confusing as it will also count unread and hidden articles.", nil)
+	[self entry:NSLocalizedString(@"“Update all feeds”", nil)
+		   help:NSLocalizedString(@"Show button to reload all feeds. This will force fetch new online content regardless of next-update timer.", nil)
 			tip:nil
-			 c1:nil c1tt:nil
-			 c2:nil c2tt:nil
-			 c3:Pref_feedLimitArticles c3tt:NSLocalizedString(@"in feed menu", nil)];
+			 c1:Pref_globalUpdateAll c2:nil c3:nil c4:nil];
 	
-	[[[[[NSView label:@"Note: you can hover over all options to display explanatory tooltips."]
-		multiline:NSMakeSize(100, 2 * HEIGHT_LABEL)] gray]
-	  placeIn:self x:PAD_WIN yTop:self.y + PAD_L] sizeToRight:PAD_WIN];
+	[self entry:NSLocalizedString(@"“Open all unread”", nil)
+		   help:NSLocalizedString(@"Show button to open unread articles.", nil)
+			tip:NSLocalizedString(@"If you hold down option-key, this will become an “open a few” unread articles button.", nil)
+			 c1:Pref_globalOpenUnread c2:Pref_groupOpenUnread c3:Pref_feedOpenUnread c4:nil];
+	
+	[self entry:NSLocalizedString(@"“Mark all read”", nil)
+		   help:NSLocalizedString(@"Show button to mark articles read.", nil)
+			tip:nil
+			 c1:Pref_globalMarkRead c2:Pref_groupMarkRead c3:Pref_feedMarkRead c4:nil];
+	
+	[self entry:NSLocalizedString(@"“Mark all unread”", nil)
+		   help:NSLocalizedString(@"Show button to mark articles unread.", nil)
+			tip:NSLocalizedString(@"You can hold down option-key and click on an article to toggle that item (un-)read.", nil)
+			 c1:Pref_globalMarkUnread c2:Pref_groupMarkUnread c3:Pref_feedMarkUnread c4:nil];
+	
+//	self.y += PAD_M;
+//	[self note:NSLocalizedString(@"Hold down option-key and click on an article to toggle that item (un-)read.", nil)];
+	
+	
+	// Other UI elements
+	
+	[self section:NSLocalizedString(@"Text manipulation", nil)];
+	
+	[self intInput:Pref_articlesInMenuLimit // Pref_feedLimitArticles
+			  unit:NSLocalizedString(@"%ld entries", nil)
+			 label:NSLocalizedString(@"Limit number of articles", nil)
+			  help:NSLocalizedString(@"Display at most X articles in feed menu. Remaining articles will be hidden from view but are still there. Unread count may be confusing because hidden articles are counted too.", nil)];
+	
+	[self intInput:Pref_shortArticleNamesLimit // Pref_feedTruncateTitle
+			  unit:NSLocalizedString(@"%ld chars", nil)
+			 label:NSLocalizedString(@"Truncate article title", nil)
+			  help:NSLocalizedString(@"Truncate article title after X characters. If a title is longer than that, show an ellipsis character “…”.", nil)];
+	
+	[self intInput:Pref_articleTooltipLimit
+			  unit:NSLocalizedString(@"%ld chars", nil)
+			 label:NSLocalizedString(@"Truncate article tooltip", nil)
+			  help:NSLocalizedString(@"Truncate article tooltip after X characters. This tooltip shows the whole article content (if provided by the server).", nil)];
+	
+	self.y += PAD_WIN;
+	
+	// sest final view size
+	[[self.content sizableWidth] setFrameSize:NSMakeSize(NSWidth(self.content.frame), self.y)];
+	[[scroll.documentView sizableWidth] setFrame:self.content.frame];
 	return self;
 }
 
-/// Helper method for matrix table header icons
-static inline void ColumnIcon(id this, CGFloat x, const NSImageName img) {
-	[[NSView imageView:img size:IconSize] placeIn:this x:x yTop:PAD_WIN];
+
+// MARK: - Section Header
+
+
+- (void)section:(NSString*)title {
+	self.y += PAD_L;
+	NSTextField *label = [[[NSView label:title] placeIn:self.content x:PAD_WIN yTop:self.y] large];
+//	[[DrawSeparator withSize:NSMakeSize(lbl_start - PAD_S, NSHeight(label.frame))] placeIn:self.content x:0 yTop:self.y]
+//		.invert = YES;
+	[[[DrawSeparator withSize:NSMakeSize(100, NSHeight(label.frame))] placeIn:self.content x:NSMaxX(label.frame) + PAD_S yTop:self.y] sizeToRight:0];
+	self.y += NSHeight(label.frame) + PAD_M;
 }
 
+
+// MARK: - Column Icons
+
+
+/// Helper method for matrix table header icons
+- (void)columns:(NSArray<NSString*>*)columns {
+	self.columns = [NSMutableArray arrayWithCapacity:4];
+	for (NSUInteger i = 0; i < columns.count / 2; i++) {
+		NSString *img = columns[i*2];
+		NSString *ttip = columns[i*2 + 1];
+		[[[NSView imageView:img size:IconSize] tooltip:ttip]
+		 placeIn:self.content x:PAD_WIN + i * colWidth yTop:self.y]
+			.accessibilityLabel = NSLocalizedString(@"Column header:", nil);
+		[self.columns addObject:ttip ? ttip : @""];
+	}
+	self.y += IconSize + PAD_S;
+}
+
+
+// MARK: - Notes
+
+
+- (void)note:(NSString*)text {
+	NSTextField *lbl = [[[NSView label:text] multiline:NSMakeSize(320 - 2*PAD_WIN, 7 * HEIGHT_LABEL)] gray];
+	NSSize bestSize = [lbl sizeThatFits:lbl.frame.size];
+	[lbl setFrameSize:bestSize];
+	[[lbl placeIn:self.content x:PAD_WIN yTop:self.y] sizeToRight:PAD_WIN];
+	self.y += NSHeight(lbl.frame);
+}
+
+
+// MARK: - Checkboxes
+
 /// Helper method for generating a checkbox
-static inline NSButton* Checkbox(id this, CGFloat x, CGFloat y, NSString *key) {
-	NSButton *check = [[NSView checkbox: UserPrefsBool(key)] placeIn:this x:x yTop:y];
+static inline NSButton* Checkbox(SettingsAppearanceView *self, CGFloat x, NSString *key) {
+	NSButton *check = [[NSView checkbox:UserPrefsBool(key)] placeIn:self.content x:x+2 yTop:self.y+2];
 	check.identifier = key;
 	return check;
 }
 
 /// Create new entry with 1-3 checkboxes and a descriptive label
 - (NSTextField*)entry:(NSString*)label help:(NSString*)ttip tip:(NSString*)extraTip
-				   c1:(NSString*)pref1 c1tt:(NSString*)ttip1
-				   c2:(NSString*)pref2 c2tt:(NSString*)ttip2
-				   c3:(NSString*)pref3 c3tt:(NSString*)ttip3
+				   c1:(NSString*)pref1 c2:(NSString*)pref2 c3:(NSString*)pref3 c4:(NSString*)pref4
 {
-	CGFloat y = self.y;
-	self.y += (PAD_S + HEIGHT_LABEL);
-	// TODO: localize: global, group, feed
-	if (pref1) [Checkbox(self, X__ + 2, y + 2, pref1) tooltip:ttip1].accessibilityLabel = [label stringByAppendingString:@" (global)"];
-	if (pref2) [Checkbox(self, _X_ + 2, y + 2, pref2) tooltip:ttip2].accessibilityLabel = [label stringByAppendingString:@" (group)"];
-	if (pref3) [Checkbox(self, __X + 2, y + 2, pref3) tooltip:ttip3].accessibilityLabel = [label stringByAppendingString:@" (feed)"];
+	if (pref1) Checkbox(self, X___, pref1).accessibilityLabel = [NSString stringWithFormat:@"%@: %@", _columns[0], label];
+	if (pref2) Checkbox(self, _X__, pref2).accessibilityLabel = [NSString stringWithFormat:@"%@: %@", _columns[1], label];
+	if (pref3) Checkbox(self, __X_, pref3).accessibilityLabel = [NSString stringWithFormat:@"%@: %@", _columns[2], label];
+	if (pref4) Checkbox(self, ___X, pref4).accessibilityLabel = [NSString stringWithFormat:@"%@: %@", _columns[3], label];
 	if (extraTip != nil) {
-		label = [label stringByAppendingString:@" *"];
+		//label = [label stringByAppendingString:@" *"];
 		ttip = [ttip stringByAppendingFormat:@"\n\n* Tip: %@", extraTip];
 	}
-	return [[[[NSView label:label] placeIn:self x:PAD_WIN + 3 * colWidth yTop:y] sizeToRight:PAD_WIN] tooltip:ttip];
+	NSTextField *lbl = [[[[NSView label:label] tooltip:ttip] placeIn:self.content x:lbl_start yTop:self.y] sizeToRight:PAD_WIN];
+	self.y += (PAD_S + HEIGHT_LABEL);
+	return lbl;
 }
 
+
+// MARK: - Int Input Field
+
+
+/// Create input field for integer numbers
+- (NSTextField*)intInput:(NSString*)pref unit:(NSString*)unit label:(NSString*)label help:(NSString*)ttip {
+	// input field
+	NSTextField *rv = [[NSView integerField:@"" unit:unit width:3 * colWidth + IconSize] placeIn:self.content x:PAD_WIN yTop:self.y];
+	rv.placeholderString = NSLocalizedString(@"no limit", nil);
+	// sadly, setting `accessibilityLabel` will break VoiceOver on empty input.
+	// keep disabled so VoceOver will read the placeholder string if empty.
+	rv.accessibilityLabel = label;
+	rv.identifier = pref;
+	rv.delegate = self;
+	NSInteger val = UserPrefsInt(pref);
+	if (val > 0) {
+		rv.stringValue = [NSString stringWithFormat:@"%ld", val];
+	} else {
+		rv.accessibilityValueDescription = rv.placeholderString;
+	}
+	// label
+	[[[[NSView label:label] tooltip:ttip] placeIn:self.content x:lbl_start yTop:self.y] sizeToRight:PAD_WIN];
+	self.y += HEIGHT_INPUTFIELD + PAD_S;
+	return rv;
+}
+
+- (void)controlTextDidEndEditing:(NSNotification *)obj {
+	NSTextField *sender = obj.object;
+	NSString *pref = sender.identifier;
+	
+	NSInteger newVal = sender.integerValue;
+	if (newVal == 0 && sender.stringValue.length > 0) {
+		sender.stringValue = @""; // clear input to show placeholder text
+	}
+	sender.accessibilityValueDescription = newVal > 0 ? nil : sender.placeholderString;
+	UserPrefsSetInt(pref, newVal > 0 ? newVal : -1);
+	
+	BOOL hitReturn = [[obj.userInfo valueForKey:NSTextMovementUserInfoKey] integerValue] == NSTextMovementReturn;
+	if (hitReturn) {
+		// Allow to deselect NSTextField (when pressing enter to confirm change)
+		[self.window performSelector:@selector(makeFirstResponder:) withObject:nil afterDelay:0];
+	}
+}
+
+// Allow to deselect all NSTextFields (via tab focus cycling)
+// Also: opens view with no NSTextField selected.
+- (BOOL)acceptsFirstResponder {
+	return YES;
+}
+
+@end
+
+@implementation FlippedView
+- (BOOL)isFlipped { return YES; }
+- (void)mouseDown:(NSEvent *)event {
+	// Allow to deselect all NSTextFields (by clicking outside / somewhere on the window)
+	[self.window performSelector:@selector(makeFirstResponder:) withObject:nil afterDelay:0];
+	// perform selector because otherwise it will raise an issue of different QoS levels
+}
 @end
