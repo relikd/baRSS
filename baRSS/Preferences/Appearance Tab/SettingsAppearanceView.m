@@ -29,29 +29,7 @@
 	NSScrollView *scroll = [[[FlippedView new] wrapInScrollView:self.frame.size] placeIn:self x:0 y:0];
 	self.content = [[[NSView alloc] initWithFrame:scroll.documentView.frame] placeIn:scroll.documentView x:0 y:0];
 	
-	// repeat with another column header
-//	[self section:NSLocalizedString(@"Modify", nil)];
-	[self columns:@[
-		RSSImageSettingsGlobalIcon, NSLocalizedString(@"Menu bar icon", nil),
-		RSSImageSettingsGroup, NSLocalizedString(@"Group menu item", nil),
-		RSSImageSettingsFeed, NSLocalizedString(@"Feed menu item", nil),
-		RSSImageSettingsArticle, NSLocalizedString(@"Article menu item", nil),
-	]];
-	
-	[self entry:NSLocalizedString(@"Number of unread articles", nil)
-		   help:NSLocalizedString(@"Show count of unread articles in parenthesis.", nil)
-			tip:nil
-			 c1:Pref_globalUnreadCount c2:Pref_groupUnreadCount c3:Pref_feedUnreadCount c4:nil];
-	
-	[self entry:NSLocalizedString(@"Color for unread articles", nil)
-		   help:NSLocalizedString(@"Show color marker on menu items with unread articles.", nil)
-			tip:nil
-			 c1:Pref_globalTintMenuIcon c2:Pref_groupUnreadIndicator c3:Pref_feedUnreadIndicator c4:Pref_articleUnreadIndicator];
-	
-	[self entry:NSLocalizedString(@"Show only unread", nil)
-		   help:NSLocalizedString(@"Hide articles which have been read.", nil)
-			tip:NSLocalizedString(@"You can hold down option-key before opening the main menu to temporarily disable this setting.", nil)
-			 c1:nil c2:Pref_groupUnreadOnly c3:Pref_feedUnreadOnly c4:Pref_articleUnreadOnly];
+	[self note:NSLocalizedString(@"Hover over the options for additional explanations and usage tips.", nil)];
 	
 //	self.y += PAD_M;
 //	[self note:NSLocalizedString(@"Hold down option-key before opening the main menu to temporarily show hidden feeds.", nil)];
@@ -95,16 +73,42 @@
 //	[self note:NSLocalizedString(@"Hold down option-key and click on an article to toggle that item (un-)read.", nil)];
 	
 	
+	// Display options
+	
+	[self section:NSLocalizedString(@"Display options", nil)];
+	[self columns:@[
+		RSSImageSettingsGlobalIcon, NSLocalizedString(@"Menu bar icon", nil),
+		RSSImageSettingsGroup, NSLocalizedString(@"Group menu item", nil),
+		RSSImageSettingsFeed, NSLocalizedString(@"Feed menu item", nil),
+		RSSImageSettingsArticle, NSLocalizedString(@"Article menu item", nil),
+	]];
+	
+	[self entry:NSLocalizedString(@"Number of unread articles", nil)
+		   help:NSLocalizedString(@"Show count of unread articles in parenthesis.", nil)
+			tip:nil
+			 c1:Pref_globalUnreadCount c2:Pref_groupUnreadCount c3:Pref_feedUnreadCount c4:nil];
+	
+	[self entry:NSLocalizedString(@"Color for unread articles", nil)
+		   help:NSLocalizedString(@"Show color marker on menu items with unread articles.", nil)
+			tip:nil
+			 c1:Pref_globalTintMenuIcon c2:Pref_groupUnreadIndicator c3:Pref_feedUnreadIndicator c4:Pref_articleUnreadIndicator];
+	
+	[self entry:NSLocalizedString(@"Show only unread", nil)
+		   help:NSLocalizedString(@"Hide articles which have been read.", nil)
+			tip:NSLocalizedString(@"You can hold down option-key before opening the main menu to temporarily disable this setting.", nil)
+			 c1:nil c2:Pref_groupUnreadOnly c3:Pref_feedUnreadOnly c4:Pref_articleUnreadOnly];
+	
+	
 	// Other UI elements
 	
-	[self section:NSLocalizedString(@"Text manipulation", nil)];
+	[self section:NSLocalizedString(@"Article display", nil)];
 	
-	[self intInput:Pref_articlesInMenuLimit // Pref_feedLimitArticles
+	[self intInput:Pref_articleCountLimit
 			  unit:NSLocalizedString(@"%ld entries", nil)
 			 label:NSLocalizedString(@"Limit number of articles", nil)
 			  help:NSLocalizedString(@"Display at most X articles in feed menu. Remaining articles will be hidden from view but are still there. Unread count may be confusing because hidden articles are counted too.", nil)];
 	
-	[self intInput:Pref_shortArticleNamesLimit // Pref_feedTruncateTitle
+	[self intInput:Pref_articleTitleLimit
 			  unit:NSLocalizedString(@"%ld chars", nil)
 			 label:NSLocalizedString(@"Truncate article title", nil)
 			  help:NSLocalizedString(@"Truncate article title after X characters. If a title is longer than that, show an ellipsis character “…”.", nil)];
@@ -184,8 +188,8 @@ static inline NSButton* Checkbox(SettingsAppearanceView *self, CGFloat x, NSStri
 	if (pref3) Checkbox(self, __X_, pref3).accessibilityLabel = [NSString stringWithFormat:@"%@: %@", _columns[2], label];
 	if (pref4) Checkbox(self, ___X, pref4).accessibilityLabel = [NSString stringWithFormat:@"%@: %@", _columns[3], label];
 	if (extraTip != nil) {
-		//label = [label stringByAppendingString:@" *"];
-		ttip = [ttip stringByAppendingFormat:@"\n\n* Tip: %@", extraTip];
+		label = [label stringByAppendingString:@" 💡"];
+		ttip = [ttip stringByAppendingFormat:@"\n\n💡 Tip: %@", extraTip];
 	}
 	NSTextField *lbl = [[[[NSView label:label] tooltip:ttip] placeIn:self.content x:lbl_start yTop:self.y] sizeToRight:PAD_WIN];
 	self.y += (PAD_S + HEIGHT_LABEL);
