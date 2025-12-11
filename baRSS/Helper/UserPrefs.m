@@ -17,12 +17,12 @@ void UserPrefsInit(void) {
 		Pref_globalMarkRead,    Pref_groupMarkRead,    Pref_feedMarkRead,
 		Pref_globalMarkUnread,  Pref_groupMarkUnread,  Pref_feedMarkUnread,
 		Pref_globalUnreadCount, Pref_groupUnreadCount, Pref_feedUnreadCount,
-		Pref_feedUnreadIndicator
+		Pref_articleUnreadIndicator
 	]);
 	defaultsAppend(defs, @NO, @[
 		Pref_globalToggleHidden,
-		Pref_groupUnreadOnly,  Pref_feedUnreadOnly,
-		Pref_groupUnreadIndicator,
+		Pref_groupUnreadOnly,      Pref_feedUnreadOnly,      Pref_articleUnreadOnly,
+		Pref_groupUnreadIndicator, Pref_feedUnreadIndicator,
 		Pref_feedTruncateTitle,
 		Pref_feedLimitArticles
 	]);

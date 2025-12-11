@@ -58,8 +58,8 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 		
 		// Check user preferences to show only unread entries
 		if (unread == 0 && !showHidden
-			&& (fg.type == FEED || fg.type == GROUP)
-			&& UserPrefsBool(Pref_groupUnreadOnly)) {
+			&& ((fg.type == GROUP && UserPrefsBool(Pref_groupUnreadOnly))
+				|| (fg.type == FEED && UserPrefsBool(Pref_feedUnreadOnly)))) {
 			item.hidden = YES;
 		}
 		
@@ -212,11 +212,12 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 		if (loc != NSNotFound)
 			self.title = [self.title substringToIndex:loc];
 	}
-	if (count > 0 && UserPrefsBool(self.submenu.isFeedMenu ? Pref_feedUnreadCount : Pref_groupUnreadCount)) {
+	BOOL isFeed = self.submenu.isFeedMenu;
+	if (count > 0 && UserPrefsBool(isFeed ? Pref_feedUnreadCount : Pref_groupUnreadCount)) {
 		self.tag = TagTitleCountVisible; // apply new mask
 		self.title = [self.title stringByAppendingFormat:@" (%ld)", count];
 		self.onStateImage = [NSImage imageNamed:RSSImageMenuItemUnread];
-		if (UserPrefsBool(Pref_groupUnreadIndicator))
+		if (UserPrefsBool(isFeed ? Pref_feedUnreadIndicator : Pref_groupUnreadIndicator))
 			self.state = NSControlStateValueOn;
 	}
 }

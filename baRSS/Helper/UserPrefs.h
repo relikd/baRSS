@@ -33,9 +33,11 @@
 /** default: @c YES */ static NSString* const Pref_feedMarkUnread       = @"feedMarkUnread";
 /** default: @c  NO */ static NSString* const Pref_feedUnreadOnly       = @"feedUnreadOnly";
 /** default: @c YES */ static NSString* const Pref_feedUnreadCount      = @"feedUnreadCount";
-/** default: @c YES */ static NSString* const Pref_feedUnreadIndicator  = @"feedUnreadIndicator";
+/** default: @c  NO */ static NSString* const Pref_feedUnreadIndicator  = @"feedUnreadIndicator";
 /** default: @c  NO */ static NSString* const Pref_feedTruncateTitle    = @"feedTruncateTitle";
 /** default: @c  NO */ static NSString* const Pref_feedLimitArticles    = @"feedLimitArticles";
+/** default: @c  NO */ static NSString* const Pref_articleUnreadOnly      = @"articleUnreadOnly";
+/** default: @c YES */ static NSString* const Pref_articleUnreadIndicator = @"articleUnreadIndicator";
 // ------ Hidden preferences ------ only modifiable via `defaults write de.relikd.baRSS {KEY}` ------
 /** default: @c  10 */ static NSString* const Pref_openFewLinksLimit      = @"openFewLinksLimit";
 /** default: @c  60 */ static NSString* const Pref_shortArticleNamesLimit = @"shortArticleNamesLimit";

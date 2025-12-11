@@ -188,7 +188,7 @@
 	if (UserPrefsBool(Pref_globalToggleHidden)) {
 		NSMenuItem *toggleHidden = [menu addItemWithTitle:NSLocalizedString(@"Show hidden feeds", nil) action:@selector(toggleHiddenArticles) keyEquivalent:@"h"];
 		toggleHidden.target = self;
-		toggleHidden.enabled = !self.holdingOptKey && (UserPrefsBool(Pref_groupUnreadOnly) || UserPrefsBool(Pref_feedUnreadOnly));
+		toggleHidden.enabled = !self.holdingOptKey && (UserPrefsBool(Pref_groupUnreadOnly) || UserPrefsBool(Pref_feedUnreadOnly) || UserPrefsBool(Pref_articleUnreadOnly));
 		[toggleHidden setState:self.barMenu.showHidden ? NSControlStateValueOn : NSControlStateValueOff];
 		if (!toggleHidden.enabled) {
 			toggleHidden.toolTip = self.holdingOptKey

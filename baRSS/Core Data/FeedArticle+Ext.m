@@ -60,7 +60,7 @@
 	NSMenuItem *item = [NSMenuItem new];
 	item.title = [self shortArticleName];
 	item.enabled = (self.link.length > 0);
-	item.state = (self.unread && UserPrefsBool(Pref_feedUnreadIndicator) ? NSControlStateValueOn : NSControlStateValueOff);
+	item.state = (self.unread && UserPrefsBool(Pref_articleUnreadIndicator) ? NSControlStateValueOn : NSControlStateValueOff);
 	item.onStateImage = [NSImage imageNamed:RSSImageMenuItemUnread];
 	item.accessibilityLabel = (self.unread ? NSLocalizedString(@"article: unread", @"accessibility label, feed menu item") : NSLocalizedString(@"article: read", @"accessibility label, feed menu item"));
 	// truncate tooltip

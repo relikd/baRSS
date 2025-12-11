@@ -75,7 +75,7 @@
 	NSInteger mc = NSIntegerMax;
 	if (UserPrefsBool(Pref_feedLimitArticles))
 		mc = UserPrefsInt(Pref_articlesInMenuLimit);
-	BOOL onlyUnread = UserPrefsBool(Pref_feedUnreadOnly);
+	BOOL onlyUnread = UserPrefsBool(Pref_articleUnreadOnly);
 	
 	for (FeedArticle *fa in sortedList) {
 		if (onlyUnread && !fa.unread && !_showHidden)
