@@ -107,6 +107,9 @@
 		BOOL hasNet = [UpdateScheduler allowNetworkConnection];
 		BOOL tint = (self.unreadCountTotal > 0 && hasNet && UserPrefsBool(Pref_globalTintMenuIcon));
 		self.statusItem.button.image = [NSImage imageNamed:(hasNet ? RSSImageMenuBarIconActive : RSSImageMenuBarIconPaused)];
+		self.statusItem.button.accessibilityLabel = hasNet
+		? NSLocalizedString(@"RSS menu bar", nil)
+		: NSLocalizedString(@"RSS menu bar, paused", nil);
 		
 		if (@available(macOS 11, *)) {
 			self.statusItem.button.image.template = !tint;

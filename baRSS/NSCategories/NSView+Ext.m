@@ -285,10 +285,12 @@
 /// Set @c tooltip and @c accessibilityTitle of view and return self
 - (instancetype)tooltip:(NSString*)tt {
 	self.toolTip = tt;
-	if (self.accessibilityLabel.length == 0)
-		self.accessibilityLabel = tt;
-	else
+	if ([self isKindOfClass:[NSTextField class]] && ((NSTextField*)self).editable == NO) {
+		// a label already shows text, so the tooltip will probably be extended information.
+		self.accessibilityHelp = tt;
+	} else {
 		self.accessibilityValueDescription = tt;
+	}
 	return self;
 }
 

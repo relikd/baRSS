@@ -210,7 +210,8 @@ NSUserInterfaceItemIdentifier const CustomCellRefresh = @"RefreshColumnCell";
 	}
 	self.textField.objectValue = str;
 	self.textField.textColor = (str.length > 1 ? [NSColor controlTextColor] : [NSColor disabledControlTextColor]);
-	self.textField.accessibilityLabel = (str.length > 1 ? NSLocalizedString(@"Refresh interval", nil) : nil);
+	self.textField.accessibilityLabel = (str.length > 0 ? NSLocalizedString(@"Refresh interval", nil) : nil);
+	[self.textField tooltip:(str.length == 1 ? NSLocalizedString(@"manually", nil) : nil)];
 }
 
 @end

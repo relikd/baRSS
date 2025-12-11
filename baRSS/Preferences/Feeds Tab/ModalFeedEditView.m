@@ -42,6 +42,7 @@
 	// initial state
 	self.url.accessibilityLabel = lbls[0];
 	self.name.accessibilityLabel = lbls[1];
+	self.favicon.accessibilityLabel = nil; // disable `accessibilityDescription` of `RSSImageDefaultRSSIcon`
 	self.refreshNum.accessibilityLabel = NSLocalizedString(@"Refresh interval", nil);
 	self.url.delegate = controller;
 	self.warningButton.hidden = YES;
