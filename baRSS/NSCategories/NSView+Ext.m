@@ -180,17 +180,19 @@
 	return pop;
 }
 
-/// Insert @c scrollView, remove @c self from current view and set as @c documentView for the newly created scroll view.
-- (NSScrollView*)wrapContent:(NSView*)content inScrollView:(NSRect)rect {
-	NSScrollView *scroll = [[[NSScrollView alloc] initWithFrame:rect] sizableWidthAndHeight];
+/// Removes `self` from current view (if already added) and sets `documentView` content for the newly created scroll view.
+/// You are responsible for adding this scroll view to the view hierarchy.
+- (NSScrollView*)wrapInScrollView:(NSSize)size {
+	NSScrollView *scroll = [[[NSScrollView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)] sizableWidthAndHeight];
 	scroll.borderType = NSBezelBorder;
 	scroll.hasVerticalScroller = YES;
 	scroll.horizontalScrollElasticity = NSScrollElasticityNone;
-	[self addSubview:scroll];
 	
-	if (content.superview) [content removeFromSuperview]; // remove if added already (e.g., helper methods above)
-	content.frame = NSMakeRect(0, 0, scroll.contentSize.width, scroll.contentSize.height);
-	scroll.documentView = content;
+	if (self.superview) [self removeFromSuperview]; // remove if added already (e.g., helper methods above)
+	if (self.frame.size.width == 0 && self.frame.size.height == 0) {
+		self.frame = NSMakeRect(0, 0, scroll.contentSize.width, scroll.contentSize.height);
+	}
+	scroll.documentView = self;
 	return scroll;
 }
 

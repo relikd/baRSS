@@ -59,7 +59,7 @@ static CGFloat const heightRow = PAD_S + HEIGHT_INPUTFIELD;
 	tv.editable = NO; // but selectable
 	tv.drawsBackground = NO;
 	tv.textContainer.textView.string = NSLocalizedString(@"DIY regex converter. Press enter to confirm. For help, refer to online tools (e.g., regex101 with options: global + single-line)", nil);
-	NSScrollView *scroll = [self wrapContent:tv inScrollView:NSMakeRect(-1, NSHeight(self.frame) - heightHowTo, NSWidth(self.frame) + 2, heightHowTo)];
+	NSScrollView *scroll = [[tv wrapInScrollView:NSMakeSize(NSWidth(self.frame) + 2, heightHowTo)] placeIn:self x:-1 y:NSHeight(self.frame) - heightHowTo];
 	scroll.drawsBackground = NO;
 	scroll.borderType = NSNoBorder;
 	scroll.verticalScrollElasticity = NSScrollElasticityNone;
@@ -71,7 +71,7 @@ static CGFloat const heightRow = PAD_S + HEIGHT_INPUTFIELD;
 	NSTextView *tv = [[NSTextView new] sizableWidthAndHeight];
 	tv.editable = NO; // but selectable
 	tv.backgroundColor = NSColor.whiteColor;
-	[self wrapContent:tv inScrollView:NSMakeRect(-1, 0, NSWidth(self.frame) + 2, heightOutput)];
+	[[tv wrapInScrollView:NSMakeSize(NSWidth(self.frame) + 2, heightOutput)] placeIn:self x:-1 y:0];
 	return tv;
 }
 

@@ -53,7 +53,7 @@ static inline CGFloat NSMaxWidth(NSView *a, NSView *b) { return Max(NSWidth(a.fr
 + (nullable NSView*)radioGroup:(NSArray<NSString*>*)entries;
 // UI: Enclosing Container
 + (NSPopover*)popover:(NSSize)size;
-- (NSScrollView*)wrapContent:(NSView*)content inScrollView:(NSRect)rect;
+- (NSScrollView*)wrapInScrollView:(NSSize)size;
 + (NSView*)wrapView:(NSView*)other withLabel:(NSString*)str padding:(CGFloat)pad;
 // Insert UI elements in parent view
 - (instancetype)placeIn:(NSView*)parent x:(CGFloat)x y:(CGFloat)y;

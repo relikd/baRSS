@@ -24,7 +24,7 @@
 	tv.alignment = NSTextAlignmentCenter;
 	tv.editable = NO; // but selectable
 	[tv.textStorage setAttributedString:[self rtfDocument]];
-	[self wrapContent:tv inScrollView:NSMakeRect(-1, 20, NSWidth(self.frame) + 2, NSMinY(lblV.frame) - PAD_M - 20)];
+	[[tv wrapInScrollView:NSMakeSize(NSWidth(self.frame) + 2, NSMinY(lblV.frame) - PAD_M - 20)] placeIn:self x:-1 y:20];
 	return self;
 }
 

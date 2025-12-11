@@ -17,7 +17,7 @@
 	if (self) {
 		self.controller = delegate; // make sure its first
 		self.outline = [self generateOutlineView]; // uses self.controller
-		[self wrapContent:self.outline inScrollView:NSMakeRect(0, 20, NSWidth(self.frame), NSHeight(self.frame) - 20)];
+		[[self.outline wrapInScrollView:NSMakeSize(NSWidth(self.frame), NSHeight(self.frame) - 20)] placeIn:self x:0 y:20];
 		self.outline.menu = [self generateCommandsMenu];
 		[self.outline.menu.itemArray makeObjectsPerformSelector:@selector(setTarget:) withObject:delegate];
 		CGFloat x = [self generateButtons]; // uses self.controller and self.outline
