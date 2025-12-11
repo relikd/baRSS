@@ -36,7 +36,7 @@ static inline CGFloat NSMaxWidth(NSView *a, NSView *b) { return Max(NSWidth(a.fr
 // UI: TextFields
 + (NSTextField*)label:(NSString*)text;
 + (NSTextField*)inputField:(NSString*)placeholder width:(CGFloat)w;
-+ (NSTextField*)integerField:(NSUInteger)placeholder width:(CGFloat)w;
++ (NSTextField*)integerField:(NSString*)placeholder unit:(nullable NSString*)unit width:(CGFloat)w;
 + (NSView*)labelColumn:(NSArray<NSString*>*)labels rowHeight:(CGFloat)h padding:(CGFloat)pad;
 // UI: Buttons
 + (NSButton*)button:(NSString*)text;

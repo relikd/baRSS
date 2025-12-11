@@ -3,11 +3,28 @@
 @implementation StrictUIntFormatter
 /// Display object as integer formatted string.
 - (NSString *)stringForObjectValue:(id)obj {
-	return [NSString stringWithFormat:@"%d", [[NSString stringWithFormat:@"%@", obj] intValue]];
+	NSString *str = [NSString stringWithFormat:@"%@", obj];
+	if (str.length == 0)
+		return @"";
+	if (self.unit)
+		return [NSString stringWithFormat:self.unit, [str integerValue]];
+	return [NSString stringWithFormat:@"%ld", [str integerValue]];
 }
+
+- (NSString *)editingStringForObjectValue:(id)obj {
+	NSString *str = [NSString stringWithFormat:@"%@", obj];
+	if (str.length == 0)
+		return @"";
+	return [NSString stringWithFormat:@"%ld", [str integerValue]];
+}
+
 /// Parse any pasted input as integer.
 - (BOOL)getObjectValue:(out id  _Nullable __autoreleasing *)obj forString:(NSString *)string errorDescription:(out NSString *__autoreleasing  _Nullable *)error {
-	*obj = [[NSNumber numberWithInt:[string intValue]] stringValue];
+	if (string.length == 0) {
+		*obj = @"";
+	} else {
+		*obj = [[NSNumber numberWithInt:[string intValue]] stringValue];
+	}
 	return YES;
 }
 /// Only digits, no other character allowed

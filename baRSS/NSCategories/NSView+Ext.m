@@ -29,9 +29,11 @@
 }
 
 /// Create input text field which only accepts integer values. (calls `inputField`) `21px` height.
-+ (NSTextField*)integerField:(NSUInteger)placeholder width:(CGFloat)w {
-	NSTextField *input = [self inputField:[NSString stringWithFormat:@"%ld", placeholder] width:w];
+/// `field.formatter` is of type `StrictUIntFormatter`.
++ (NSTextField*)integerField:(NSString*)placeholder unit:(nullable NSString*)unit width:(CGFloat)w {
+	NSTextField *input = [self inputField:placeholder width:w];
 	input.formatter = [StrictUIntFormatter new];
+	((StrictUIntFormatter*)input.formatter).unit = unit;
 	return input;
 }
 

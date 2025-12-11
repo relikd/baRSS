@@ -32,7 +32,7 @@
 	self.name = [[[NSView inputField:NSLocalizedString(@"Example Title", nil) width:0] placeIn:self x:x yTop:rowHeight] sizeToRight:PAD_S + 18];
 	self.spinnerName = [[NSView activitySpinner] placeIn:self xRight:1 yTop:rowHeight + 2.5];
 	// 3. row
-	self.refreshNum = [[NSView integerField:30 width:85] placeIn:self x:x yTop:2*rowHeight];
+	self.refreshNum = [[NSView integerField:@"∞" unit:nil width:85] placeIn:self x:x yTop:2*rowHeight];
 	self.refreshUnit = [[NSView popupButton:120] placeIn:self x:NSMaxX(self.refreshNum.frame) + PAD_M yTop:2*rowHeight];
 	self.regexConverterButton = [[[[NSView buttonIcon:RSSImageRegexIcon size:19]
 								   action:@selector(openRegexConverter) target:controller]
