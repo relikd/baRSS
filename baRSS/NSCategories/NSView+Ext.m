@@ -269,6 +269,9 @@
 /// Modify @c .autoresizingMask; Add @c NSViewWidthSizable @c | @c NSViewHeightSizable flags
 - (instancetype)sizableWidthAndHeight { self.autoresizingMask |= NSViewWidthSizable | NSViewHeightSizable; return self; }
 
+/// Modify @c .autoresizingMask; Add @c NSViewWidthSizable flags
+- (instancetype)sizableWidth { self.autoresizingMask |= NSViewWidthSizable; return self; }
+
 /// Extend frame in its @c superview and stick to right with padding. Adds @c NSViewWidthSizable to @c autoresizingMask
 - (instancetype)sizeToRight:(CGFloat)rightPadding  {
 	SetFrameWidth(self, NSWidth(self.superview.frame) - NSMinX(self.frame) - rightPadding + self.alignmentRectInsets.right);

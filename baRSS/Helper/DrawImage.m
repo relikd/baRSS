@@ -5,6 +5,10 @@
 
 
 @implementation DrawSeparator
++ (instancetype)withSize:(NSSize)size {
+	return [[super alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+}
+
 - (void)drawRect:(NSRect)r {
 	NSColor *color = [NSColor darkGrayColor];
 	NSColor *transparent = [color colorWithAlphaComponent:0.0];

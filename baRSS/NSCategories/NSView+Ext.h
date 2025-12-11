@@ -61,7 +61,10 @@ static inline CGFloat NSMaxWidth(NSView *a, NSView *b) { return Max(NSWidth(a.fr
 - (instancetype)placeIn:(NSView*)parent xRight:(CGFloat)x y:(CGFloat)y;
 - (instancetype)placeIn:(NSView*)parent xRight:(CGFloat)x yTop:(CGFloat)y;
 // Modify existing UI elements
+- (instancetype)alignTop;
+- (instancetype)alignRight;
 - (instancetype)sizableWidthAndHeight;
+- (instancetype)sizableWidth;
 - (instancetype)sizeToRight:(CGFloat)rightPadding;
 - (instancetype)sizeWidthToFit;
 - (instancetype)tooltip:(NSString*)tt;

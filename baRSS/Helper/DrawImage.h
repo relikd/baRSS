@@ -4,6 +4,7 @@
 IB_DESIGNABLE
 @interface DrawSeparator : NSView
 @property (assign) BOOL invert;
++ (instancetype)withSize:(NSSize)size;
 @end
 
 
