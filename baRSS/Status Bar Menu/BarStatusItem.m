@@ -14,7 +14,7 @@
 @property (strong) NSStatusItem *statusItem;
 @property (assign) NSInteger unreadCountTotal;
 @property (weak) NSMenuItem *updateAllItem;
-/// Set to `true` if user toggled the `"Show Hidden Articles"` menu option.
+/// Set to `true` if user toggled the `"Show hidden feeds"` menu option.
 @property (assign) BOOL optShowHidden;
 /// Set to `true` if menu bar was opened while holding down option-key.
 @property (assign) BOOL holdingOptKey;
@@ -184,9 +184,9 @@
 	if ([UpdateScheduler isPaused])
 		pause.title = NSLocalizedString(@"Resume updates", nil);
 	
-	// 'show hidden articles' item
+	// 'show hidden feeds' item
 	if (UserPrefsBool(Pref_globalToggleHidden)) {
-		NSMenuItem *toggleHidden = [menu addItemWithTitle:NSLocalizedString(@"Show hidden articles", nil) action:@selector(toggleHiddenArticles) keyEquivalent:@"h"];
+		NSMenuItem *toggleHidden = [menu addItemWithTitle:NSLocalizedString(@"Show hidden feeds", nil) action:@selector(toggleHiddenArticles) keyEquivalent:@"h"];
 		toggleHidden.target = self;
 		toggleHidden.enabled = !self.holdingOptKey && (UserPrefsBool(Pref_groupUnreadOnly) || UserPrefsBool(Pref_feedUnreadOnly));
 		[toggleHidden setState:self.barMenu.showHidden ? NSControlStateValueOn : NSControlStateValueOff];
@@ -214,13 +214,13 @@
 	[self updateBarIcon];
 }
 
-/// Called when user clicks on 'Show Hidden Articles' (main menu only).
+/// Called when user clicks on `Show hidden feeds` (main menu only).
 - (void)toggleHiddenArticles {
 	self.optShowHidden = !self.optShowHidden;
 	self.barMenu.showHidden = self.optShowHidden;
 }
 
-/// Called when user clicks on 'Update all feeds' (main menu only).
+/// Called when user clicks on `Update all feeds` (main menu only).
 - (void)updateAllFeeds {
 //	[self asyncReloadUnreadCount]; // should not be necessary
 	[UpdateScheduler forceUpdateAllFeeds];
