@@ -59,7 +59,44 @@
 /// Called during application start. Perform any version migration updates here.
 - (void)migrateVersionUpdate {
 	// Currently unused, but you'll be thankful in the future for a previously saved version number
-	[StoreCoordinator setOption:@"app-version" value: UserPrefsAppVersion()];
+	// thank you, past-self! but it would have been nice to have easier "<=" comparison
+	NSString *prevVersion = [StoreCoordinator optionForKey:@"app-version"];
+	NSString *curVersion = UserPrefsAppVersion();
+	// migrate if not run for the first time
+	if (prevVersion != nil) {
+		if ([prevVersion isEqualToString:curVersion]) {
+			return; // migration already performed
+		}
+		// else: migrate
+		NSInteger ver = 0;
+		for (NSString *part in [prevVersion componentsSeparatedByString:@"."]) {
+			ver = ver * 100 + [part integerValue];
+		}
+		if (ver <= 10505) { // v1.5.5
+			[self migrate_v1_6_0];
+		}
+	}
+	[StoreCoordinator setOption:@"app-version" value:curVersion];
+}
+
+- (void)migrate_v1_6_0 {
+	NSLog(@"Migrating to v1.6.0");
+	// rename options
+	BOOL shouldLimitCount = UserPrefsBool(@"feedLimitArticles"); // default: NO
+	if (shouldLimitCount) {
+		NSInteger prev = UserPrefsInt(@"articlesInMenuLimit"); // default: 40
+		UserPrefsSetInt(Pref_articleCountLimit, prev == 0 ? 40 : prev);
+	}
+	BOOL shouldLimitTitle = UserPrefsBool(@"feedTruncateTitle"); // default: NO
+	if (shouldLimitTitle) {
+		NSInteger prev = UserPrefsInt(@"shortArticleNamesLimit"); // default: 60
+		UserPrefsSetInt(Pref_articleTitleLimit, prev == 0 ? 60 : prev);
+	}
+	// delete old keys
+	UserPrefsSet(@"feedLimitArticles", nil);
+	UserPrefsSet(@"feedTruncateTitle", nil);
+	UserPrefsSet(@"articlesInMenuLimit", nil);
+	UserPrefsSet(@"shortArticleNamesLimit", nil);
 }
 
 
