@@ -15,34 +15,35 @@
 /** default: @c nil */ static NSString* const Pref_defaultHttpApplication = @"defaultHttpApplication";
 /** default: @c nil */ static NSString* const Pref_notificationType = @"notificationType";
 // ------ Appearance matrix ------ (Preferences > Appearance Tab) ------
-/** default: @c YES */ static NSString* const Pref_globalTintMenuIcon   = @"globalTintMenuBarIcon";
-/** default: @c YES */ static NSString* const Pref_globalUpdateAll      = @"globalUpdateAll";
-/** default: @c  NO */ static NSString* const Pref_globalToggleHidden   = @"globalToggleHidden";
-/** default: @c YES */ static NSString* const Pref_globalOpenUnread     = @"globalOpenUnread";
-/** default: @c YES */ static NSString* const Pref_globalMarkRead       = @"globalMarkRead";
-/** default: @c YES */ static NSString* const Pref_globalMarkUnread     = @"globalMarkUnread";
-/** default: @c YES */ static NSString* const Pref_globalUnreadCount    = @"globalUnreadCount";
-/** default: @c YES */ static NSString* const Pref_groupOpenUnread      = @"groupOpenUnread";
-/** default: @c YES */ static NSString* const Pref_groupMarkRead        = @"groupMarkRead";
-/** default: @c YES */ static NSString* const Pref_groupMarkUnread      = @"groupMarkUnread";
-/** default: @c  NO */ static NSString* const Pref_groupUnreadOnly      = @"groupUnreadOnly";
-/** default: @c YES */ static NSString* const Pref_groupUnreadCount     = @"groupUnreadCount";
-/** default: @c  NO */ static NSString* const Pref_groupUnreadIndicator = @"groupUnreadIndicator";
-/** default: @c YES */ static NSString* const Pref_feedOpenUnread       = @"feedOpenUnread";
-/** default: @c YES */ static NSString* const Pref_feedMarkRead         = @"feedMarkRead";
-/** default: @c YES */ static NSString* const Pref_feedMarkUnread       = @"feedMarkUnread";
-/** default: @c  NO */ static NSString* const Pref_feedUnreadOnly       = @"feedUnreadOnly";
-/** default: @c YES */ static NSString* const Pref_feedUnreadCount      = @"feedUnreadCount";
-/** default: @c  NO */ static NSString* const Pref_feedUnreadIndicator  = @"feedUnreadIndicator";
-/** default: @c  NO */ static NSString* const Pref_feedTruncateTitle    = @"feedTruncateTitle";
-/** default: @c  NO */ static NSString* const Pref_feedLimitArticles    = @"feedLimitArticles";
-/** default: @c  NO */ static NSString* const Pref_articleUnreadOnly      = @"articleUnreadOnly";
+// menu buttons
+/** default: @c  NO */ static NSString* const Pref_globalToggleHidden     = @"globalToggleHidden";
+/** default: @c YES */ static NSString* const Pref_globalUpdateAll        = @"globalUpdateAll";
+/** default: @c YES */ static NSString* const Pref_globalOpenUnread       = @"globalOpenUnread";
+/** default: @c YES */ static NSString* const Pref_groupOpenUnread        = @"groupOpenUnread";
+/** default: @c YES */ static NSString* const Pref_feedOpenUnread         = @"feedOpenUnread";
+/** default: @c YES */ static NSString* const Pref_globalMarkRead         = @"globalMarkRead";
+/** default: @c YES */ static NSString* const Pref_groupMarkRead          = @"groupMarkRead";
+/** default: @c YES */ static NSString* const Pref_feedMarkRead           = @"feedMarkRead";
+/** default: @c YES */ static NSString* const Pref_globalMarkUnread       = @"globalMarkUnread";
+/** default: @c YES */ static NSString* const Pref_groupMarkUnread        = @"groupMarkUnread";
+/** default: @c YES */ static NSString* const Pref_feedMarkUnread         = @"feedMarkUnread";
+// display options
+/** default: @c YES */ static NSString* const Pref_globalUnreadCount      = @"globalUnreadCount";
+/** default: @c YES */ static NSString* const Pref_groupUnreadCount       = @"groupUnreadCount";
+/** default: @c YES */ static NSString* const Pref_feedUnreadCount        = @"feedUnreadCount";
+/** default: @c YES */ static NSString* const Pref_globalTintMenuIcon     = @"globalTintMenuBarIcon";
+/** default: @c  NO */ static NSString* const Pref_groupUnreadIndicator   = @"groupUnreadIndicator";
+/** default: @c  NO */ static NSString* const Pref_feedUnreadIndicator    = @"feedUnreadIndicator";
 /** default: @c YES */ static NSString* const Pref_articleUnreadIndicator = @"articleUnreadIndicator";
+/** default: @c  NO */ static NSString* const Pref_groupUnreadOnly        = @"groupUnreadOnly";
+/** default: @c  NO */ static NSString* const Pref_feedUnreadOnly         = @"feedUnreadOnly";
+/** default: @c  NO */ static NSString* const Pref_articleUnreadOnly      = @"articleUnreadOnly";
+// article display
+/** default: @c  -1 */ static NSString* const Pref_articleCountLimit      = @"articleCountLimit";
+/** default: @c  -1 */ static NSString* const Pref_articleTitleLimit      = @"articleTitleLimit";
+/** default: @c  2k */ static NSString* const Pref_articleTooltipLimit    = @"articleTooltipLimit";
 // ------ Hidden preferences ------ only modifiable via `defaults write de.relikd.baRSS {KEY}` ------
 /** default: @c  10 */ static NSString* const Pref_openFewLinksLimit      = @"openFewLinksLimit";
-/** default: @c  60 */ static NSString* const Pref_shortArticleNamesLimit = @"shortArticleNamesLimit";
-/** default: @c  2k */ static NSString* const Pref_articleTooltipLimit    = @"articleTooltipLimit";
-/** default: @c  40 */ static NSString* const Pref_articlesInMenuLimit    = @"articlesInMenuLimit";
 /** default: @c nil */ static NSString* const Pref_colorStatusIconTint    = @"colorStatusIconTint";
 /** default: @c nil */ static NSString* const Pref_colorUnreadIndicator   = @"colorUnreadIndicator";
 

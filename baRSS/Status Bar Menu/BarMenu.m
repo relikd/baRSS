@@ -72,9 +72,8 @@
 /// Generate items for @c FeedArticles menu.
 - (void)setArticles:(NSArray<FeedArticle*>*)sortedList forMenu:(NSMenu*)menu {
 	[menu insertDefaultHeader];
-	NSInteger mc = NSIntegerMax;
-	if (UserPrefsBool(Pref_feedLimitArticles))
-		mc = UserPrefsInt(Pref_articlesInMenuLimit);
+	NSInteger mc = UserPrefsInt(Pref_articleCountLimit);
+	if (mc < 0) mc = NSIntegerMax;
 	BOOL onlyUnread = UserPrefsBool(Pref_articleUnreadOnly);
 	
 	for (FeedArticle *fa in sortedList) {

@@ -21,15 +21,13 @@ void UserPrefsInit(void) {
 	]);
 	defaultsAppend(defs, @NO, @[
 		Pref_globalToggleHidden,
-		Pref_groupUnreadOnly,      Pref_feedUnreadOnly,      Pref_articleUnreadOnly,
+		Pref_groupUnreadOnly, Pref_feedUnreadOnly, Pref_articleUnreadOnly,
 		Pref_groupUnreadIndicator, Pref_feedUnreadIndicator,
-		Pref_feedTruncateTitle,
-		Pref_feedLimitArticles
 	]);
 	// Display limits & truncation  ( defaults write de.relikd.baRSS {KEY} -int 10 )
 	[defs setObject:[NSNumber numberWithUnsignedInteger:10] forKey:Pref_openFewLinksLimit];
-	[defs setObject:[NSNumber numberWithInteger:-1] forKey:Pref_articlesInMenuLimit];
-	[defs setObject:[NSNumber numberWithInteger:-1] forKey:Pref_shortArticleNamesLimit];
+	[defs setObject:[NSNumber numberWithInteger:-1] forKey:Pref_articleCountLimit];
+	[defs setObject:[NSNumber numberWithInteger:-1] forKey:Pref_articleTitleLimit];
 	[defs setObject:[NSNumber numberWithInteger:2000] forKey:Pref_articleTooltipLimit];
 	[defs setObject:[NSNumber numberWithUnsignedInteger:1] forKey:Pref_prefSelectedTab]; // feed tab
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defs];

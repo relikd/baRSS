@@ -47,10 +47,9 @@
 	NSString *title = self.title;
 	if (!title) return @"";
 	// TODO: It should be enough to get user prefs once per menu build
-	if (UserPrefsBool(Pref_feedTruncateTitle)) {
-		NSUInteger limit = UserPrefsUInt(Pref_shortArticleNamesLimit);
-		if (title.length > limit)
-			title = [[title substringToIndex:limit] stringByAppendingString:@"…"];
+	NSUInteger limit = UserPrefsUInt(Pref_articleTitleLimit); // -1 will become MAX_INT
+	if (limit > 0 && title.length > limit) {
+		title = [[title substringToIndex:limit] stringByAppendingString:@"…"];
 	}
 	return title;
 }
@@ -64,7 +63,7 @@
 	item.onStateImage = [NSImage imageNamed:RSSImageMenuItemUnread];
 	item.accessibilityLabel = (self.unread ? NSLocalizedString(@"article: unread", @"accessibility label, feed menu item") : NSLocalizedString(@"article: read", @"accessibility label, feed menu item"));
 	// truncate tooltip
-	NSUInteger limit = UserPrefsUInt(Pref_articleTooltipLimit);
+	NSUInteger limit = UserPrefsUInt(Pref_articleTooltipLimit); // -1 will become MAX_INT
 	if (limit > 0) {
 		NSString *tooltip = (self.abstract ? self.abstract : self.body); // fall back to body (html)
 		if (tooltip.length > limit)
