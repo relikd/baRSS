@@ -126,18 +126,18 @@ static void RoundedRSS_Gradient(CGRect r, NSColor *color) {
 static void Appearance_MenuBarIcon(CGRect r) {
 	const CGFloat size = ShorterSide(r.size);
 	CGContextRef c = NSGraphicsContext.currentContext.CGContext;
-	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
 	
 	// menu bar
-	CGContextSetAlpha(c, .23);
-	const CGFloat barHeightInset = round(size*.06);
-	svgRect(c, 1, CGRectInset(r, 0, barHeightInset));
+	CGContextSetFillColorWithColor(c, [NSColor controlTextColor].CGColor);
+	svgRect(c, 1, CGRectInset(r, 0, size * 2/16));
 	CGContextFillPath(c);
 	
+	// neighbors
 	const CGFloat offset = round(size*.75);
 	const CGFloat iconInset = round(size*.2);
 	const CGFloat iconCorner = size*.12;
 	CGContextSetAlpha(c, .66);
+	CGContextSetFillColorWithColor(c, [NSColor controlBackgroundColor].CGColor);
 	
 	// left neighbor
 	CGContextTranslateCTM(c, -offset, 0);
