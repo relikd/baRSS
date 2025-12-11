@@ -64,7 +64,7 @@
 	item.onStateImage = [NSImage imageNamed:RSSImageMenuItemUnread];
 	item.accessibilityLabel = (self.unread ? NSLocalizedString(@"article: unread", @"accessibility label, feed menu item") : NSLocalizedString(@"article: read", @"accessibility label, feed menu item"));
 	// truncate tooltip
-	NSUInteger limit = UserPrefsUInt(Pref_tooltipCharacterLimit);
+	NSUInteger limit = UserPrefsUInt(Pref_articleTooltipLimit);
 	if (limit > 0) {
 		NSString *tooltip = (self.abstract ? self.abstract : self.body); // fall back to body (html)
 		if (tooltip.length > limit)

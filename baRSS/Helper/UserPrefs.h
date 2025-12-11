@@ -39,7 +39,7 @@
 // ------ Hidden preferences ------ only modifiable via `defaults write de.relikd.baRSS {KEY}` ------
 /** default: @c  10 */ static NSString* const Pref_openFewLinksLimit      = @"openFewLinksLimit";
 /** default: @c  60 */ static NSString* const Pref_shortArticleNamesLimit = @"shortArticleNamesLimit";
-/** default: @c  2k */ static NSString* const Pref_tooltipCharacterLimit  = @"tooltipCharacterLimit";
+/** default: @c  2k */ static NSString* const Pref_articleTooltipLimit    = @"articleTooltipLimit";
 /** default: @c  40 */ static NSString* const Pref_articlesInMenuLimit    = @"articlesInMenuLimit";
 /** default: @c nil */ static NSString* const Pref_colorStatusIconTint    = @"colorStatusIconTint";
 /** default: @c nil */ static NSString* const Pref_colorUnreadIndicator   = @"colorUnreadIndicator";

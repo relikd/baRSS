@@ -112,7 +112,7 @@ defaults write de.relikd.baRSS shortArticleNamesLimit -int 50
 By default, the tooltip is limited to 2000 characters.
 You can change the limit with this command:
 ```
-defaults write de.relikd.baRSS tooltipCharacterLimit -int 500
+defaults write de.relikd.baRSS articleTooltipLimit -int 500
 ```
 
 3. Limit the number of displayed articles per feed menu.
