@@ -5,6 +5,10 @@
 #import "DrawImage.h" // DrawSeparator
 
 @interface FlippedView : NSView @end
+@implementation FlippedView
+- (BOOL)isFlipped { return YES; }
+@end
+
 
 @interface SettingsAppearanceView()
 @property (assign) CGFloat y;
@@ -246,13 +250,10 @@ static inline NSButton* Checkbox(SettingsAppearanceView *self, CGFloat x, NSStri
 	return YES;
 }
 
-@end
-
-@implementation FlippedView
-- (BOOL)isFlipped { return YES; }
+// Allow to deselect all NSTextFields (by clicking outside / somewhere on the window)
 - (void)mouseDown:(NSEvent *)event {
-	// Allow to deselect all NSTextFields (by clicking outside / somewhere on the window)
 	[self.window performSelector:@selector(makeFirstResponder:) withObject:nil afterDelay:0];
 	// perform selector because otherwise it will raise an issue of different QoS levels
 }
+
 @end
