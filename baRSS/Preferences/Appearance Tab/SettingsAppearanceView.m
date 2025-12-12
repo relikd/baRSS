@@ -35,9 +35,6 @@
 	
 	[self note:NSLocalizedString(@"Hover over the options for additional explanations and usage tips.", nil)];
 	
-//	self.y += PAD_M;
-//	[self note:NSLocalizedString(@"Hold down option-key before opening the main menu to temporarily show hidden feeds.", nil)];
-	
 	
 	// Menu Buttons
 	
@@ -102,6 +99,9 @@
 			tip:NSLocalizedString(@"You can hold down option-key before opening the main menu to temporarily disable this setting.", nil)
 			 c1:nil c2:Pref_groupUnreadOnly c3:Pref_feedUnreadOnly c4:Pref_articleUnreadOnly];
 	
+//	self.y += PAD_M;
+//	[self note:NSLocalizedString(@"Hold down option-key before opening the main menu to temporarily show hidden feeds.", nil)];
+	
 	
 	// Other UI elements
 	
@@ -158,7 +158,7 @@
 			.accessibilityLabel = NSLocalizedString(@"Column header:", nil);
 		[self.columns addObject:ttip ? ttip : @""];
 	}
-	self.y += IconSize + PAD_S;
+	self.y += HEIGHT_INPUTFIELD + PAD_S;
 }
 
 
@@ -221,7 +221,7 @@ static inline NSButton* Checkbox(SettingsAppearanceView *self, CGFloat x, NSStri
 		rv.accessibilityValueDescription = rv.placeholderString;
 	}
 	// label
-	[[[[NSView label:label] tooltip:ttip] placeIn:self.content x:lbl_start yTop:self.y] sizeToRight:PAD_WIN];
+	[[[[NSView label:label] tooltip:ttip] placeIn:self.content x:lbl_start yTop:self.y + (HEIGHT_INPUTFIELD - HEIGHT_LABEL) / 2] sizeToRight:PAD_WIN];
 	self.y += HEIGHT_INPUTFIELD + PAD_S;
 	return rv;
 }
