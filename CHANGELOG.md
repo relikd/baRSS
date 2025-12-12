@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.6.0] – 2025-12-13
+### Added
+- *UI:* Limit content length for article tooltips. (fixes #25)
+- *Settings, Appearance:* Revamped appearance options v2. (thanks @Shnub)
+- *Settings, Appearance:* New GUI options for previously CLI-only options. Modify display limits directly in settings.
+
+### Fixed
+- *Status Bar Menu:* Uniform capitalization for all menu items.
+- *Status Bar Menu:* Setting the "Open a few"-limit to zero, hides the button altogether.
+- *Settings, Appearance:* Pixel-perfect alignment of all drawable icons.
+- *UI:* Accessibility hints for appearance options generate better VoiceOver output.
+
+### Changed
+- *UI:* "Show Hidden Article" renamed to "Show hidden feeds".
+
+
 ## [1.5.5] – 2025-12-03
 ### Added
 - *Settings, Appearance:* Improved tooltips on individual options
@@ -245,6 +261,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
+[1.6.0]: https://github.com/relikd/baRSS/compare/v1.5.5...v1.6.0
 [1.5.5]: https://github.com/relikd/baRSS/compare/v1.5.4...v1.5.5
 [1.5.4]: https://github.com/relikd/baRSS/compare/v1.5.3...v1.5.4
 [1.5.3]: https://github.com/relikd/baRSS/compare/v1.5.2...v1.5.3
