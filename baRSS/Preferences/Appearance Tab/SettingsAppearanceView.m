@@ -46,8 +46,8 @@
 	]];
 	
 	[self entry:NSLocalizedString(@"“Show hidden feeds”", nil)
-		   help:NSLocalizedString(@"Show button to quickly toggle whether hidden articles should be shown. See option “Show only unread”.", nil)
-			tip:nil
+		   help:NSLocalizedString(@"Show button to quickly toggle whether hidden articles should be shown. See option “Show only unread”.", nil)
+			tip:NSLocalizedString(@"You can hold down option-key before opening the main menu to temporarily show hidden entries.", nil)
 			 c1:Pref_globalToggleHidden c2:nil c3:nil c4:nil];
 	
 	[self entry:NSLocalizedString(@"“Update all feeds”", nil)
@@ -57,7 +57,7 @@
 	
 	[self entry:NSLocalizedString(@"“Open all unread”", nil)
 		   help:NSLocalizedString(@"Show button to open unread articles.", nil)
-			tip:NSLocalizedString(@"If you hold down option-key, this will become an “open a few” unread articles button.", nil)
+			tip:nil
 			 c1:Pref_globalOpenUnread c2:Pref_groupOpenUnread c3:Pref_feedOpenUnread c4:nil];
 	
 	[self entry:NSLocalizedString(@"“Mark all read”", nil)
@@ -69,6 +69,12 @@
 		   help:NSLocalizedString(@"Show button to mark articles unread.", nil)
 			tip:NSLocalizedString(@"You can hold down option-key and click on an article to toggle that item (un-)read.", nil)
 			 c1:Pref_globalMarkUnread c2:Pref_groupMarkUnread c3:Pref_feedMarkUnread c4:nil];
+	
+//	self.y += PAD_M;
+	[self intInput:Pref_openFewLinksLimit
+			  unit:NSLocalizedString(@"%ld unread", nil)
+			 label:NSLocalizedString(@"“Open a few unread” ⌥", nil)
+			  help:NSLocalizedString(@"If you hold down option-key, the “Open all unread” button becomes an “Open a few unread” button.", nil)];
 	
 //	self.y += PAD_M;
 //	[self note:NSLocalizedString(@"Hold down option-key and click on an article to toggle that item (un-)read.", nil)];
@@ -96,7 +102,7 @@
 	
 	[self entry:NSLocalizedString(@"Show only unread", nil)
 		   help:NSLocalizedString(@"Hide articles which have been read.", nil)
-			tip:NSLocalizedString(@"You can hold down option-key before opening the main menu to temporarily disable this setting.", nil)
+			tip:nil
 			 c1:nil c2:Pref_groupUnreadOnly c3:Pref_feedUnreadOnly c4:Pref_articleUnreadOnly];
 	
 //	self.y += PAD_M;

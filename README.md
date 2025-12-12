@@ -95,20 +95,14 @@ Most likely, you will never stumble upon these if not reading this chapter.
 **Note:** To reset an option run `defaults delete de.relikd.baRSS {KEY}`, where `{KEY}` is an option from below.
 
 
-1. When holding down the option key, the menu will show an item to open only a few unread items at a time. 
-This number can be changed with the following Terminal command (default: 10):
-```
-defaults write de.relikd.baRSS openFewLinksLimit -int 10
-```
-
-2. You can change the appearance of colors throughout the application. 
+1. You can change the appearance of colors throughout the application. 
 E.g., The tint color of the menu bar icon and the color of the blue unread articles dot.
 ```
 defaults write de.relikd.baRSS colorStatusIconTint -string "#37F"
 defaults write de.relikd.baRSS colorUnreadIndicator -string "#FBA33A"
 ```
 
-3. To backup your list of subscribed feeds, here is a one-liner:
+2. To backup your list of subscribed feeds, here is a one-liner:
 ```
 open barss:backup && cp "$HOME/Library/Containers/de.relikd.baRSS/Data/Library/Application Support/baRSS/backup/feeds_latest.opml" "$HOME/Desktop/baRSS_backup_$(date "+%Y-%m-%d").opml"
 ```
