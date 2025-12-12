@@ -42,17 +42,12 @@ Go to [releases](https://github.com/relikd/baRSS/releases) and downloaded the la
 Searching for the App Store release? Read this [notice](#app-store-notice).
 
 ### Build from source
-You'll need Xcode, [RSXML2] \(required), and [QLOPML] \(optional).
+You'll need Xcode and [RSXML2].
 
 ```sh
 git clone https://github.com/relikd/baRSS
 git clone https://github.com/relikd/RSXML2
-git clone https://github.com/relikd/QLOPML
 ```
-
-Alternatively, you can simply delete the `QLOPML` project reference without much harm.
-`QLOPML` is a Quick Look plugin for `.opml` files.
-It will display the file contents whenever you hit spacebar.
 
 That's it. 
 Open `baRSS/baRSS.xcodeproj` and build the project. 
@@ -169,6 +164,7 @@ Sadly, this was before Swift 5 and ABI stability.
 Had I only started the project a year later…
 But on the other hand, now it is macOS 10.12 compatible.
 
+
 ### 3rd Party Libraries
 
 This project uses a modified version of Brent Simmons' [RSXML] for feed parsing. 
@@ -178,10 +174,9 @@ This project uses a modified version of Brent Simmons' [RSXML] for feed parsing.
 ##### Trivia
 
 - Start of project: __July 19, 2018__
-- Estimated development time: __2053h+__
+- Estimated development time: __2121h+__
 - First prototype used __feedparser python__ library
 
 
-[QLOPML]: https://github.com/relikd/QLOPML
 [RSXML2]: https://github.com/relikd/RSXML2
 [RSXML]: https://github.com/brentsimmons/RSXML
