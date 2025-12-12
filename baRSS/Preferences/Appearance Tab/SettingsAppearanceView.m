@@ -215,7 +215,7 @@ static inline NSButton* Checkbox(SettingsAppearanceView *self, CGFloat x, NSStri
 	rv.identifier = pref;
 	rv.delegate = self;
 	NSInteger val = UserPrefsInt(pref);
-	if (val > 0) {
+	if (val >= 0) {
 		rv.stringValue = [NSString stringWithFormat:@"%ld", val];
 	} else {
 		rv.accessibilityValueDescription = rv.placeholderString;
@@ -231,11 +231,9 @@ static inline NSButton* Checkbox(SettingsAppearanceView *self, CGFloat x, NSStri
 	NSString *pref = sender.identifier;
 	
 	NSInteger newVal = sender.integerValue;
-	if (newVal == 0 && sender.stringValue.length > 0) {
-		sender.stringValue = @""; // clear input to show placeholder text
-	}
-	sender.accessibilityValueDescription = newVal > 0 ? nil : sender.placeholderString;
-	UserPrefsSetInt(pref, newVal > 0 ? newVal : -1);
+	BOOL isEmpty = newVal == 0 && sender.stringValue.length == 0;
+	sender.accessibilityValueDescription = isEmpty ? sender.placeholderString : nil;
+	UserPrefsSetInt(pref, isEmpty ? -1 : newVal);
 	
 	BOOL hitReturn = [[obj.userInfo valueForKey:NSTextMovementUserInfoKey] integerValue] == NSTextMovementReturn;
 	if (hitReturn) {
