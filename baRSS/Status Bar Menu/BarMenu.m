@@ -74,14 +74,16 @@
 	[menu insertDefaultHeader];
 	NSInteger mc = UserPrefsInt(Pref_articleCountLimit);
 	if (mc < 0) mc = NSIntegerMax;
-	BOOL onlyUnread = UserPrefsBool(Pref_articleUnreadOnly);
-	
-	for (FeedArticle *fa in sortedList) {
-		if (onlyUnread && !fa.unread && !_showHidden)
-			continue;
-		if (--mc < 0) // mc == 0 will first decrement to -1, then evaluate
-			break;
-		[menu addItem:[fa newMenuItem]];
+	if (mc > 0) {
+		BOOL onlyUnread = UserPrefsBool(Pref_articleUnreadOnly);
+		
+		for (FeedArticle *fa in sortedList) {
+			if (onlyUnread && !fa.unread && !_showHidden)
+				continue;
+			if (--mc < 0) // mc == 0 will first decrement to -1, then evaluate
+				break;
+			[menu addItem:[fa newMenuItem]];
+		}
 	}
 	[menu setHeaderHasUnread:self.unreadMap[menu.titleIndexPath]];
 }

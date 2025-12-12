@@ -75,8 +75,11 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	self.autoenablesItems = NO;
 	NSMenuItem *itm = [self addItemIfAllowed:TagOpenAllUnread title:NSLocalizedString(@"Open all unread", nil)];
 	if (itm) {
-		NSString *altTitle = [NSString stringWithFormat:NSLocalizedString(@"Open a few unread (%lu)", nil), UserPrefsUInt(Pref_openFewLinksLimit)];
-		[self addItem:[itm alternateWithTitle:altTitle]];
+		NSInteger limit = UserPrefsInt(Pref_openFewLinksLimit);
+		if (limit > 0) {
+			NSString *altTitle = [NSString stringWithFormat:NSLocalizedString(@"Open a few unread (%ld)", nil), limit];
+			[self addItem:[itm alternateWithTitle:altTitle]];
+		}
 	}
 	[self addItemIfAllowed:TagMarkAllRead title:NSLocalizedString(@"Mark all read", nil)];
 	[self addItemIfAllowed:TagMarkAllUnread title:NSLocalizedString(@"Mark all unread", nil)];
@@ -165,7 +168,7 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	BOOL openLinks = NO;
 	NSUInteger limit = 0;
 	if (sender.tag == TagOpenAllUnread) {
-		if (sender.isAlternate)
+		if (sender.isAlternate) // if reaches this far, limit is guaranteed to be >0
 			limit = UserPrefsUInt(Pref_openFewLinksLimit);
 		openLinks = YES;
 	} else if (sender.tag != TagMarkAllRead && sender.tag != TagMarkAllUnread) {
