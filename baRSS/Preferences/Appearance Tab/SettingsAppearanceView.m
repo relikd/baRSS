@@ -46,8 +46,8 @@
 	]];
 	
 	[self entry:NSLocalizedString(@"“Show hidden feeds”", nil)
-		   help:NSLocalizedString(@"Show button to quickly toggle whether hidden articles should be shown. See option “Show only unread”.", nil)
-			tip:NSLocalizedString(@"You can hold down option-key before opening the main menu to temporarily show hidden entries.", nil)
+		   help:NSLocalizedString(@"Show button to quickly toggle whether hidden entries should be shown. See option “Show only unread”.", nil)
+			tip:NSLocalizedString(@"You can hold down option-key before opening the main menu to temporarily show all hidden entries.", nil)
 			 c1:Pref_globalToggleHidden c2:nil c3:nil c4:nil];
 	
 	[self entry:NSLocalizedString(@"“Update all feeds”", nil)
@@ -67,7 +67,7 @@
 	
 	[self entry:NSLocalizedString(@"“Mark all unread”", nil)
 		   help:NSLocalizedString(@"Show button to mark articles unread.", nil)
-			tip:NSLocalizedString(@"You can hold down option-key and click on an article to toggle that item (un-)read.", nil)
+			tip:NSLocalizedString(@"Alternatively, you can hold down option-key and click on an article to toggle that item (un-)read.", nil)
 			 c1:Pref_globalMarkUnread c2:Pref_groupMarkUnread c3:Pref_feedMarkUnread c4:nil];
 	
 //	self.y += PAD_M;
