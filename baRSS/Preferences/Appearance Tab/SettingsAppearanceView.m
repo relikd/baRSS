@@ -29,9 +29,13 @@
 - (instancetype)init {
 	self = [super initWithFrame:NSMakeRect(0, 0, 320, 327)];
 	self.y = PAD_WIN;
-	// stupidly complex UI generation just because you cant top-align `.documentView`
-	NSScrollView *scroll = [[[FlippedView new] wrapInScrollView:self.frame.size] placeIn:self x:0 y:0];
+	// stupidly complex, nested UI just because you cant top-align `.documentView`
+	// View is 0.5px shorter than self.frame because it will otherwise add a transparency to the TabBar
+	NSScrollView *scroll = [[[FlippedView new] wrapInScrollView:NSMakeSize(320, 326.5)] placeIn:self x:0 y:0];
 	self.content = [[[NSView alloc] initWithFrame:scroll.documentView.frame] placeIn:scroll.documentView x:0 y:0];
+	scroll.borderType = NSNoBorder;
+	// fix default window background color instead of pure black/white
+	scroll.drawsBackground = NO;
 	
 	[self note:NSLocalizedString(@"Hover over the options for additional explanations and usage tips.", nil)];
 	
@@ -143,8 +147,6 @@
 - (void)section:(NSString*)title {
 	self.y += PAD_L;
 	NSTextField *label = [[[NSView label:title] placeIn:self.content x:PAD_WIN yTop:self.y] large];
-//	[[DrawSeparator withSize:NSMakeSize(lbl_start - PAD_S, NSHeight(label.frame))] placeIn:self.content x:0 yTop:self.y]
-//		.invert = YES;
 	[[[DrawSeparator withSize:NSMakeSize(100, NSHeight(label.frame))] placeIn:self.content x:NSMaxX(label.frame) + PAD_S yTop:self.y] sizeToRight:0];
 	self.y += NSHeight(label.frame) + PAD_M;
 }
