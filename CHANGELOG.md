@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.6.1] – 2026-01-11
+### Fixed
+- Reschedule update timer after changing the refresh interval of a feed
+- Reschedule update timer after system sleep (fixes #26)
+
+
 ## [1.6.0] – 2025-12-13
 ### Added
 - *UI:* Limit content length for article tooltips. (fixes #25)
@@ -261,6 +267,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
+[1.6.1]: https://github.com/relikd/baRSS/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/relikd/baRSS/compare/v1.5.5...v1.6.0
 [1.5.5]: https://github.com/relikd/baRSS/compare/v1.5.4...v1.5.5
 [1.5.4]: https://github.com/relikd/baRSS/compare/v1.5.3...v1.5.4
