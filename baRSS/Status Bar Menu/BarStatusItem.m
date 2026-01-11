@@ -8,12 +8,12 @@
 #import "NotifyEndpoint.h"
 #import "NSView+Ext.h"
 #import "NSColor+Ext.h"
+#import "NSMenu+Ext.h"
 
 @interface BarStatusItem()
 @property (strong) BarMenu *barMenu;
 @property (strong) NSStatusItem *statusItem;
 @property (assign) NSInteger unreadCountTotal;
-@property (weak) NSMenuItem *updateAllItem;
 /// Set to `true` if user toggled the `"Show hidden feeds"` menu option.
 @property (assign) BOOL optShowHidden;
 /// Set to `true` if menu bar was opened while holding down option-key.
@@ -49,8 +49,8 @@
 /// Fired when network conditions change.
 - (void)networkChanged:(NSNotification*)notify {
 	BOOL available = [[notify object] boolValue];
-	self.updateAllItem.enabled = available;
 	[self updateBarIcon];
+	[self.statusItem.menu recursiveSetNetworkAvailable:available];
 }
 
 /// Fired when a single feed has been updated. Object contains relative unread count change.
@@ -197,13 +197,6 @@
 		}
 	}
 	
-	// 'Update all feeds' item
-	if (UserPrefsBool(Pref_globalUpdateAll)) {
-		NSMenuItem *updateAll = [menu addItemWithTitle:NSLocalizedString(@"Update all feeds", nil) action:@selector(updateAllFeeds) keyEquivalent:@""];
-		updateAll.target = self;
-		updateAll.enabled = [UpdateScheduler allowNetworkConnection];
-		self.updateAllItem = updateAll;
-	}
 	// Separator between main header and default header
 	[menu addItem:[NSMenuItem separatorItem]];
 }
@@ -218,12 +211,6 @@
 - (void)toggleHiddenArticles {
 	self.optShowHidden = !self.optShowHidden;
 	self.barMenu.showHidden = self.optShowHidden;
-}
-
-/// Called when user clicks on `Update all feeds` (main menu only).
-- (void)updateAllFeeds {
-//	[self asyncReloadUnreadCount]; // should not be necessary
-	[UpdateScheduler forceUpdateAllFeeds];
 }
 
 @end

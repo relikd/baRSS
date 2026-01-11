@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)insertDefaultHeader;
 // Update menu
 - (void)setHeaderHasUnread:(UnreadTotal*)count;
+- (void)recursiveSetNetworkAvailable:(BOOL)flag;
 - (nullable NSMenuItem*)deepestItemWithPath:(nonnull NSString*)path;
 @end
 

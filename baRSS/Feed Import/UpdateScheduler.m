@@ -18,7 +18,6 @@ static NSTimer *_timer;
 static SCNetworkReachabilityRef _reachability = NULL;
 static BOOL _isReachable = YES;
 static BOOL _updatePaused = NO;
-static BOOL _nextUpdateIsForced = NO;
 static _Atomic(NSUInteger) _queueSize = 0;
 
 @implementation UpdateScheduler
@@ -90,14 +89,9 @@ static _Atomic(NSUInteger) _queueSize = 0;
 		nextTime = [NSDate dateWithTimeIntervalSinceNow:1];
 	}
 	[self scheduleTimer:nextTime];
-}
-
-/// Start download of all feeds (immediatelly) regardless of @c .scheduled property.
-+ (void)forceUpdateAllFeeds {
-	if (![self allowNetworkConnection]) // timer will restart once connection exists
-		return;
-	_nextUpdateIsForced = YES;
-	[self scheduleTimer:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+#ifdef DEBUG
+	NSLog(@"schedule next update: %@", nextTime);
+#endif
 }
 
 /**
@@ -116,13 +110,9 @@ static _Atomic(NSUInteger) _queueSize = 0;
 	if (!nextTime)
 		nextTime = [NSDate distantFuture];
 	int tolerance = (int)([nextTime timeIntervalSinceNow] * 0.15);
-	tolerance = (tolerance < 1 ? 1 : tolerance > 600 ? 600 : tolerance); // at least 1 sec, upto 10 min
-	_timer.tolerance = tolerance;
+	_timer.tolerance = (tolerance < 1 ? 1 : tolerance > 600 ? 600 : tolerance); // at least 1 sec, upto 10 min
 	_timer.fireDate = nextTime;
 	PostNotification(kNotificationScheduleTimerChanged, nil);
-#ifdef DEBUG
-	NSLog(@"schedule timer: %@ (+/- %d sec)", nextTime, tolerance);
-#endif
 }
 
 + (void)didWakeAfterSleep {
@@ -134,17 +124,26 @@ static _Atomic(NSUInteger) _queueSize = 0;
 
 /// Called when schedule timer runs out (earliest @c .schedule date). Or if forced by user.
 + (void)updateTimerCallback {
-#ifdef DEBUG
-	NSLog(@"fired");
-#endif
-	BOOL updateAll = _nextUpdateIsForced;
-	_nextUpdateIsForced = NO;
-	
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
-	NSArray<Feed*> *list = [StoreCoordinator listOfFeedsThatNeedUpdate:updateAll inContext:moc];
-	//NSAssert(list.count > 0, @"ERROR: Something went wrong, timer fired too early.");
-	
-	[self downloadList:list userInitiated:updateAll notifications:YES finally:^{
+	NSArray<Feed*> *list = [StoreCoordinator feedsThatNeedUpdate:moc];
+	[self update:list userInitiated:NO context:moc];
+}
+
+/// Start download of feeds immediatelly, regardless of @c .scheduled property.
++ (void)forceUpdate:(NSString*)indexPath {
+	if (![self allowNetworkConnection]) // menu item should be disabled anyway
+		return;
+	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
+	NSArray<Feed*> *list = [StoreCoordinator feedsWithIndexPath:indexPath inContext:moc];
+	[self update:list userInitiated:YES context:moc];
+}
+
+/// Helper method for actual download
++ (void)update:(NSArray<Feed*>*)list userInitiated:(BOOL)flag context:(NSManagedObjectContext*)moc {
+#ifdef DEBUG
+	NSLog(@"updating feeds: %ld (%@)", list.count, flag ? @"forced" : @"scheduled");
+#endif
+	[self downloadList:list userInitiated:flag notifications:YES finally:^{
 		[StoreCoordinator saveContext:moc andParent:YES]; // save parents too ...
 		[moc reset];
 		[self scheduleNextFeed]; // always reset the timer
@@ -157,7 +156,7 @@ static _Atomic(NSUInteger) _queueSize = 0;
 
 /// Perform @c FaviconDownload on all core data @c Feed entries.
 + (void)updateAllFavicons {
-	for (Feed *f in [StoreCoordinator listOfFeedsThatNeedUpdate:YES inContext:nil])
+	for (Feed *f in [StoreCoordinator feedsWithIndexPath:nil inContext:nil])
 		[FaviconDownload updateFeed:f finally:nil];
 }
 

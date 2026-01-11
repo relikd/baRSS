@@ -54,11 +54,6 @@
 			tip:NSLocalizedString(@"You can hold down option-key before opening the main menu to temporarily show all hidden entries.", nil)
 			 c1:Pref_globalToggleHidden c2:nil c3:nil c4:nil];
 	
-	[self entry:NSLocalizedString(@"“Update all feeds”", nil)
-		   help:NSLocalizedString(@"Show button to reload all feeds. This will force fetch new online content regardless of next-update timer.", nil)
-			tip:nil
-			 c1:Pref_globalUpdateAll c2:nil c3:nil c4:nil];
-	
 	[self entry:NSLocalizedString(@"“Open all unread”", nil)
 		   help:NSLocalizedString(@"Show button to open unread articles.", nil)
 			tip:nil
@@ -73,6 +68,11 @@
 		   help:NSLocalizedString(@"Show button to mark articles unread.", nil)
 			tip:NSLocalizedString(@"Alternatively, you can hold down option-key and click on an article to toggle that item (un-)read.", nil)
 			 c1:Pref_globalMarkUnread c2:Pref_groupMarkUnread c3:Pref_feedMarkUnread c4:nil];
+	
+	[self entry:NSLocalizedString(@"“Update feeds”", nil)
+		   help:NSLocalizedString(@"Show button to reload all feeds. This will force fetch new online content regardless of next-update timer.", nil)
+			tip:nil
+			 c1:Pref_globalUpdateAll c2:Pref_groupUpdateAll c3:Pref_feedUpdateAll c4:nil];
 	
 //	self.y += PAD_M;
 	[self intInput:Pref_openFewLinksLimit

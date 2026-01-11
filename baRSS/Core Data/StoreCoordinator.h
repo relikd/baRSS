@@ -15,7 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Feed update
 + (NSDate*)nextScheduledUpdate;
-+ (NSArray<Feed*>*)listOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(nullable NSManagedObjectContext*)moc;
++ (NSArray<Feed*>*)feedsThatNeedUpdate:(nullable NSManagedObjectContext*)moc;
++ (NSArray<Feed*>*)feedsWithIndexPath:(nullable NSString*)path inContext:(nullable NSManagedObjectContext*)moc;
 
 // Count elements
 + (BOOL)isEmpty;

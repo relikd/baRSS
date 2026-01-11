@@ -79,14 +79,24 @@
 /**
  List of @c Feed items that need to be updated. Scheduled time is now (or in past).
 
- @param forceAll If @c YES get a list of all @c Feed regardless of schedules time.
  @param moc If @c nil perform requests on main context (ok for reading).
  */
-+ (NSArray<Feed*>*)listOfFeedsThatNeedUpdate:(BOOL)forceAll inContext:(nullable NSManagedObjectContext*)moc {
++ (NSArray<Feed*>*)feedsThatNeedUpdate:(nullable NSManagedObjectContext*)moc {
 	NSFetchRequest *fr = [Feed fetchRequest];
-	if (!forceAll) {
-		// when fetching also get those feeds that would need update soon (now + 2s)
-		[fr where:@"meta.scheduled <= %@", [NSDate dateWithTimeIntervalSinceNow:+2]];
+	// when fetching also get those feeds that would need update soon (now + 2s)
+	[fr where:@"meta.scheduled <= %@", [NSDate dateWithTimeIntervalSinceNow:+2]];
+	return [fr fetchAllRows:moc ? moc : [self getMainContext]];
+}
+
+/** List of @c Feed items that match @c Feed.indexPath either by direct match or some child thereof.
+ 
+ @param path If @c nil return all @c Feed items. May match either full string OR startswith string + "."
+ @param moc If @c nil perform requests on main context (ok for reading).
+ */
++ (NSArray<Feed*>*)feedsWithIndexPath:(nullable NSString*)path inContext:(nullable NSManagedObjectContext*)moc {
+	NSFetchRequest *fr = [Feed fetchRequest];
+	if (path && path.length > 0) {
+		[fr where:@"indexPath = %@ OR indexPath BEGINSWITH %@", path, [path stringByAppendingString:@"."]];
 	}
 	return [fr fetchAllRows:moc ? moc : [self getMainContext]];
 }

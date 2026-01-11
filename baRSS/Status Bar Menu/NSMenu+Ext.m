@@ -6,12 +6,14 @@
 #import "Constants.h"
 #import "MapUnreadTotal.h"
 #import "NotifyEndpoint.h"
+#import "UpdateScheduler.h"
 
 typedef NS_ENUM(NSInteger, MenuItemTag) {
 	/// Used in @c allowDisplayOfHeaderItem: to identify and enable items
 	TagMarkAllRead = 1,
 	TagMarkAllUnread = 2,
 	TagOpenAllUnread = 3,
+	TagUpdateFeeds = 4,
 	/// Delimiter item between default header and core data items
 	TagHeaderDelimiter = 8,
 	/// Indicator whether unread count is currently shown in menu item title or not
@@ -83,6 +85,9 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	}
 	[self addItemIfAllowed:TagMarkAllRead title:NSLocalizedString(@"Mark all read", nil)];
 	[self addItemIfAllowed:TagMarkAllUnread title:NSLocalizedString(@"Mark all unread", nil)];
+	[self addItemIfAllowed:TagUpdateFeeds title:self.isFeedMenu ? NSLocalizedString(@"Update feed", nil) : NSLocalizedString(@"Update feeds", nil)]
+		.enabled = [UpdateScheduler allowNetworkConnection];
+	
 	if (self.numberOfItems > 0) {
 		// in case someone has disabled all header items. Else, during articles menu rebuild it will stay on top.
 		NSMenuItem *sep = [NSMenuItem separatorItem];
@@ -108,6 +113,16 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 				item.enabled = hasUnread; break;
 			case TagMarkAllUnread:
 				item.enabled = hasRead; break;
+		}
+	}
+}
+
+/// Call this method whenever network availability changes to mark "Update feeds" button en-/disabled.
+- (void)recursiveSetNetworkAvailable:(BOOL)flag {
+	[self itemWithTag:TagUpdateFeeds].enabled = flag;
+	for (NSMenuItem *item in self.itemArray) {
+		if (item.hasSubmenu) {
+			[item.submenu recursiveSetNetworkAvailable:flag];
 		}
 	}
 }
@@ -141,11 +156,13 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	static NSString* const mr[] = {Pref_globalMarkRead,   Pref_groupMarkRead,   Pref_feedMarkRead};
 	static NSString* const mu[] = {Pref_globalMarkUnread, Pref_groupMarkUnread, Pref_feedMarkUnread};
 	static NSString* const ou[] = {Pref_globalOpenUnread, Pref_groupOpenUnread, Pref_feedOpenUnread};
+	static NSString* const ua[] = {Pref_globalUpdateAll,  Pref_groupUpdateAll,  Pref_feedUpdateAll};
 	int i = (self.supermenu == nil ? 0 : (self.isFeedMenu ? 2 : 1));
 	switch (tag) {
 		case TagMarkAllRead:   return UserPrefsBool(mr[i]);
 		case TagMarkAllUnread: return UserPrefsBool(mu[i]);
 		case TagOpenAllUnread: return UserPrefsBool(ou[i]);
+		case TagUpdateFeeds:   return UserPrefsBool(ua[i]);
 		default: return NO;
 	}
 }
@@ -165,6 +182,10 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 
 /// Prepare @c userInfo dictionary and send @c NSNotification. Callback for every default header menu item.
 + (void)headerMenuItemCallback:(NSMenuItem*)sender {
+	if (sender.tag == TagUpdateFeeds) {
+		[UpdateScheduler forceUpdate:sender.menu.titleIndexPath];
+		return;
+	}
 	BOOL openLinks = NO;
 	NSUInteger limit = 0;
 	if (sender.tag == TagOpenAllUnread) {

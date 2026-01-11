@@ -18,6 +18,8 @@
 // menu buttons
 /** default: @c  NO */ static NSString* const Pref_globalToggleHidden     = @"globalToggleHidden";
 /** default: @c YES */ static NSString* const Pref_globalUpdateAll        = @"globalUpdateAll";
+/** default: @c YES */ static NSString* const Pref_groupUpdateAll         = @"groupUpdateAll";
+/** default: @c YES */ static NSString* const Pref_feedUpdateAll          = @"feedUpdateAll";
 /** default: @c YES */ static NSString* const Pref_globalOpenUnread       = @"globalOpenUnread";
 /** default: @c YES */ static NSString* const Pref_groupOpenUnread        = @"groupOpenUnread";
 /** default: @c YES */ static NSString* const Pref_feedOpenUnread         = @"feedOpenUnread";
