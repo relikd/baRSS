@@ -113,10 +113,14 @@ static _Atomic(NSUInteger) _queueSize = 0;
 	});
 	if (!nextTime)
 		nextTime = [NSDate distantFuture];
-	NSTimeInterval tolerance = [nextTime timeIntervalSinceNow] * 0.15;
-	_timer.tolerance = (tolerance < 1 ? 1 : tolerance); // at least 1 sec
+	int tolerance = (int)([nextTime timeIntervalSinceNow] * 0.15);
+	tolerance = (tolerance < 1 ? 1 : tolerance > 600 ? 600 : tolerance); // at least 1 sec, upto 10 min
+	_timer.tolerance = tolerance;
 	_timer.fireDate = nextTime;
 	PostNotification(kNotificationScheduleTimerChanged, nil);
+#ifdef DEBUG
+	NSLog(@"schedule timer: %@ (+/- %d sec)", nextTime, tolerance);
+#endif
 }
 
 /// Called when schedule timer runs out (earliest @c .schedule date). Or if forced by user.
