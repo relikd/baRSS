@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.6.2] – 2026-01-11
+### Added
+- Restore macOS 10.13 compatibility (without Notification support)
+- *Status Bar Menu:* "Update feeds" for all menu levels
+- *Status Bar Menu:* "Pause updates" can be removed
+
+
 ## [1.6.1] – 2026-01-11
 ### Fixed
 - Reschedule update timer after changing the refresh interval of a feed
@@ -267,6 +274,7 @@ and this project does adhere to [Semantic Versioning](https://semver.org/spec/v2
 Initial release
 
 
+[1.6.2]: https://github.com/relikd/baRSS/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/relikd/baRSS/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/relikd/baRSS/compare/v1.5.5...v1.6.0
 [1.5.5]: https://github.com/relikd/baRSS/compare/v1.5.4...v1.5.5
