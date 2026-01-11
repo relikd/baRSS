@@ -18,6 +18,7 @@ static NSString* const kActionOpenOnly = @"OPEN_ONLY_DONT_MARK_READ";
 
 @implementation NotifyEndpoint
 
+API_AVAILABLE(macos(10.14))
 static NotifyEndpoint *singleton = nil;
 static NotificationType notifyType;
 

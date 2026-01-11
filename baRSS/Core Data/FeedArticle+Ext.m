@@ -91,7 +91,9 @@
 		NSNumber *num = (fa.unread ? @+1 : @-1);
 		PostNotification(kNotificationTotalUnreadCountChanged, num);
 		
-		[NotifyEndpoint dismiss:fa.feed.countUnread > 0 ? @[fa.notificationID] : @[fa.notificationID, fa.feed.notificationID]];
+		if (@available(macOS 10.14, *)) {
+			[NotifyEndpoint dismiss:fa.feed.countUnread > 0 ? @[fa.notificationID] : @[fa.notificationID, fa.feed.notificationID]];
+		}
 	}
 	[moc reset];
 }

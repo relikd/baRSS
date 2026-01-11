@@ -77,7 +77,9 @@
 	NSInteger oldCount = _unreadCountTotal;
 	_unreadCountTotal = count > 0 ? (NSInteger)count : 0;
 	[self updateBarIcon];
-	[NotifyEndpoint setGlobalCount:_unreadCountTotal previousCount:oldCount];
+	if (@available(macOS 10.14, *)) {
+		[NotifyEndpoint setGlobalCount:_unreadCountTotal previousCount:oldCount];
+	}
 }
 
 /// Assign new value by adding @c count to total unread count (may be negative).
@@ -88,7 +90,9 @@
 		_unreadCountTotal = 0;
 	}
 	[self updateBarIcon];
-	[NotifyEndpoint setGlobalCount:_unreadCountTotal previousCount:oldCount];
+	if (@available(macOS 10.14, *)) {
+		[NotifyEndpoint setGlobalCount:_unreadCountTotal previousCount:oldCount];
+	}
 }
 
 /// Fetch new total unread count from core data and assign it as new value (dispatch async on main thread).

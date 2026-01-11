@@ -86,7 +86,9 @@
 - (void)changeNotificationType:(NSPopUpButton *)sender {
 	UserPrefsSet(Pref_notificationType, sender.selectedItem.representedObject);
 	self.view.notificationHelp.stringValue = [self notificationHelpString:UserPrefsNotificationType()];
-	[NotifyEndpoint activate];
+	if (@available(macOS 10.14, *)) {
+		[NotifyEndpoint activate];
+	}
 }
 
 /// Help string explaining the different notification settings (for the current configuration)

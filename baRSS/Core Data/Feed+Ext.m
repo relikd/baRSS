@@ -129,7 +129,9 @@
 	if (deletingSet.count > 0) {
 		[localSet minusSet:deletingSet];
 		[self removeArticles:deletingSet];
-		[NotifyEndpoint dismiss:dismissed];
+		if (@available(macOS 10.14, *)) {
+			[NotifyEndpoint dismiss:dismissed];
+		}
 	}
 	return c;
 }

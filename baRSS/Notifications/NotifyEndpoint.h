@@ -5,6 +5,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+API_AVAILABLE(macos(10.14))
 @interface NotifyEndpoint : NSObject <UNUserNotificationCenterDelegate>
 + (void)activate;
 

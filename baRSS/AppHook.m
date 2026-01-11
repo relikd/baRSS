@@ -47,9 +47,11 @@
 		if (initial) [UpdateScheduler updateAllFavicons];
 	}
 	
-	// Notifications are disabled by default so this wont trigger for first app launch.
-	// Also, this will register the notification delegate and respond to click & open feed.
-	[NotifyEndpoint activate];
+	if (@available(macOS 10.14, *)) {
+		// Notifications are disabled by default so this wont trigger for first app launch.
+		// Also, this will register the notification delegate and respond to click & open feed.
+		[NotifyEndpoint activate];
+	}
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {

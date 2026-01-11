@@ -206,8 +206,10 @@ typedef NS_ENUM(NSInteger, MenuItemTag) {
 	}
 	NSManagedObjectContext *moc = [StoreCoordinator createChildContext];
 	NSArray<FeedArticle*> *list = [StoreCoordinator articlesAtPath:path isFeed:isFeedMenu sorted:openLinks unread:markRead inContext:moc limit:limit];
-	[NotifyEndpoint dismiss:
-	 [StoreCoordinator updateArticles:list markRead:markRead andOpen:openLinks inContext:moc]];
+	NSArray<NSString *> *notificationIds = [StoreCoordinator updateArticles:list markRead:markRead andOpen:openLinks inContext:moc];
+	if (@available(macOS 10.14, *)) {
+		[NotifyEndpoint dismiss:notificationIds];
+	}
 }
 
 @end

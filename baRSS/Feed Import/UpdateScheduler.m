@@ -211,26 +211,28 @@ static inline void AlertDownloadError(NSError *err, NSString *url) {
 		
 		// after save, update notifications
 		// dismiss previously delivered notifications
-		if (deleted) {
-			NSMutableArray *ids = [NSMutableArray array];
-			for (FeedArticle *article in deleted) { // will contain non-articles too
-				if ([article isKindOfClass:[FeedArticle class]] || [article isKindOfClass:[Feed class]]) {
-					[ids addObject:article.notificationID];
+		if (@available(macOS 10.14, *)) {
+			if (deleted) {
+				NSMutableArray *ids = [NSMutableArray array];
+				for (FeedArticle *article in deleted) { // will contain non-articles too
+					if ([article isKindOfClass:[FeedArticle class]] || [article isKindOfClass:[Feed class]]) {
+						[ids addObject:article.notificationID];
+					}
 				}
+				[NotifyEndpoint dismiss:ids]; // no-op if empty
 			}
-			[NotifyEndpoint dismiss:ids]; // no-op if empty
-		}
-		// post new notification (if needed)
-		if (notify && inserted) {
-			BOOL didAddAny = NO;
-			for (FeedArticle *article in inserted) { // will contain non-articles too
-				if ([article isKindOfClass:[FeedArticle class]]) {
-					[NotifyEndpoint postArticle:article];
-					didAddAny = YES;
+			// post new notification (if needed)
+			if (notify && inserted) {
+				BOOL didAddAny = NO;
+				for (FeedArticle *article in inserted) { // will contain non-articles too
+					if ([article isKindOfClass:[FeedArticle class]]) {
+						[NotifyEndpoint postArticle:article];
+						didAddAny = YES;
+					}
 				}
+				if (didAddAny)
+					[NotifyEndpoint postFeed:f];
 			}
-			if (didAddAny)
-				[NotifyEndpoint postFeed:f];
 		}
 		
 		if (needsNotification)
