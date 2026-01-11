@@ -110,6 +110,8 @@ static _Atomic(NSUInteger) _queueSize = 0;
 	dispatch_once(&onceToken, ^{
 		_timer = [NSTimer timerWithTimeInterval:NSTimeIntervalSince1970 target:[self class] selector:@selector(updateTimerCallback) userInfo:nil repeats:YES];
 		[[NSRunLoop mainRunLoop] addTimer:_timer forMode:NSRunLoopCommonModes];
+		// technically not the right place to register. But since it is run once, its easier than somewhere else.
+		[NSWorkspace.sharedWorkspace.notificationCenter addObserver:[self class] selector:@selector(didWakeAfterSleep) name:NSWorkspaceDidWakeNotification object:nil];
 	});
 	if (!nextTime)
 		nextTime = [NSDate distantFuture];
@@ -121,6 +123,13 @@ static _Atomic(NSUInteger) _queueSize = 0;
 #ifdef DEBUG
 	NSLog(@"schedule timer: %@ (+/- %d sec)", nextTime, tolerance);
 #endif
+}
+
++ (void)didWakeAfterSleep {
+#ifdef DEBUG
+	NSLog(@"did wake from sleep");
+#endif
+	[UpdateScheduler scheduleNextFeed];
 }
 
 /// Called when schedule timer runs out (earliest @c .schedule date). Or if forced by user.
