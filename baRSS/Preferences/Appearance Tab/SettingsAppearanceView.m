@@ -49,6 +49,11 @@
 		RSSImageSettingsFeed, NSLocalizedString(@"Feed menu", nil),
 	]];
 	
+	[self entry:NSLocalizedString(@"“Pause updates”", nil)
+		   help:NSLocalizedString(@"Show button to temporarily disable feed updates. E.g., no distrations during focus hours.", nil)
+			tip:nil
+			 c1:Pref_globalPauseUpdates c2:nil c3:nil c4:nil];
+	
 	[self entry:NSLocalizedString(@"“Show hidden feeds”", nil)
 		   help:NSLocalizedString(@"Show button to quickly toggle whether hidden entries should be shown. See option “Show only unread”.", nil)
 			tip:NSLocalizedString(@"You can hold down option-key before opening the main menu to temporarily show all hidden entries.", nil)

@@ -16,6 +16,7 @@
 /** default: @c nil */ static NSString* const Pref_notificationType = @"notificationType";
 // ------ Appearance matrix ------ (Preferences > Appearance Tab) ------
 // menu buttons
+/** default: @c YES */ static NSString* const Pref_globalPauseUpdates     = @"globalPauseUpdates";
 /** default: @c  NO */ static NSString* const Pref_globalToggleHidden     = @"globalToggleHidden";
 /** default: @c YES */ static NSString* const Pref_globalUpdateAll        = @"globalUpdateAll";
 /** default: @c YES */ static NSString* const Pref_groupUpdateAll         = @"groupUpdateAll";

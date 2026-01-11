@@ -12,6 +12,7 @@ void UserPrefsInit(void) {
 	NSMutableDictionary *defs = [NSMutableDictionary dictionary];
 	defaultsAppend(defs, @YES, @[
 		Pref_globalTintMenuIcon,
+		Pref_globalPauseUpdates,
 		Pref_globalUpdateAll,   Pref_groupUpdateAll,   Pref_feedUpdateAll,
 		Pref_globalOpenUnread,  Pref_groupOpenUnread,  Pref_feedOpenUnread,
 		Pref_globalMarkRead,    Pref_groupMarkRead,    Pref_feedMarkRead,

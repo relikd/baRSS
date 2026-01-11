@@ -179,10 +179,12 @@
 
 - (void)insertMainMenuHeader:(NSMenu*)menu {
 	// 'Pause Updates' item
-	NSMenuItem *pause = [menu addItemWithTitle:NSLocalizedString(@"Pause updates", nil) action:@selector(pauseUpdates) keyEquivalent:@""];
-	pause.target = self;
-	if ([UpdateScheduler isPaused])
-		pause.title = NSLocalizedString(@"Resume updates", nil);
+	if (UserPrefsBool(Pref_globalPauseUpdates)) {
+		NSMenuItem *pause = [menu addItemWithTitle:NSLocalizedString(@"Pause updates", nil) action:@selector(pauseUpdates) keyEquivalent:@""];
+		pause.target = self;
+		if ([UpdateScheduler isPaused])
+			pause.title = NSLocalizedString(@"Resume updates", nil);
+	}
 	
 	// 'show hidden feeds' item
 	if (UserPrefsBool(Pref_globalToggleHidden)) {
@@ -197,8 +199,10 @@
 		}
 	}
 	
-	// Separator between main header and default header
-	[menu addItem:[NSMenuItem separatorItem]];
+	if (menu.numberOfItems > 0) {
+		// Separator between main header and default header
+		[menu addItem:[NSMenuItem separatorItem]];
+	}
 }
 
 /// Called when user clicks on 'Pause Updates' (main menu only).
