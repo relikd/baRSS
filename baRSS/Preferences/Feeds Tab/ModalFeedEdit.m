@@ -114,11 +114,15 @@
 	Interval intv = [NSDate intervalForPopup:self.view.refreshUnit andField:self.view.refreshNum];
 	[self.feedGroup setNameIfChanged:self.view.name.stringValue];
 	[f.meta setRefreshIfChanged:intv];
-	if (self.memFeed) {
+	if (self.memFeed) { // newly created
 		[self.memFeed copyValuesTo:f ignoreError:YES];
 		if (self.faviconFile) // only if downloaded anything (nil deletes icon!)
 			[f setNewIcon:self.faviconFile];
 		self.faviconFile = nil;
+	} else { // updating existing feed meta
+		if (f.meta.scheduled == nil || f.meta.scheduled.timeIntervalSinceNow > f.meta.refresh) {
+			[f.meta scheduleNow:f.meta.refresh];
+		}
 	}
 }
 
