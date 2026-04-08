@@ -1,11 +1,14 @@
-[![macOS 10.13+](https://img.shields.io/badge/macOS-10.13+-888)](#download--install)
-[![Current release](https://img.shields.io/github/release/relikd/baRSS)](https://github.com/relikd/baRSS/releases)
+[![macOS 10.13+](https://img.shields.io/badge/macOS-10.13+-888)](#)
+[![Current release](https://img.shields.io/github/release/relikd/baRSS)](https://github.com/relikd/baRSS/releases/latest)
 [![All downloads](https://img.shields.io/github/downloads/relikd/baRSS/total)](https://github.com/relikd/baRSS/releases)
-[![GitHub license](https://img.shields.io/github/license/relikd/baRSS)](LICENSE)
+
+<img src="baRSS/Artwork/application-icon.svg" width="180" height="180">
 
 
 baRSS – *Menu Bar RSS Reader*
 =============================
+
+RSS & Atom feed reader that lives in the system status bar.
 
 ![screenshot](screenshot.png)
 
@@ -13,11 +16,11 @@ baRSS – *Menu Bar RSS Reader*
 What is it?
 -----------
 
-A RSS & Atom feed reader that lives in the system status bar.  
-Very much inspired by [RSS Menu](https://itunes.apple.com/us/app/rss-menu/id423069534); go ahead and check that out.
-
-*baRSS* will automatically update feeds for you, and inform you when new content is available.
+*baRSS* will automatically update feeds for you, and inform you of new content.
 The new articles are just a menu away.
+
+But contrary to the definition of RSS, there is no content viewer.
+Instead, articles open in your browser of choice.
 
 
 ### Features
@@ -32,14 +35,20 @@ Further, tuning the update frequently will decrease the traffic even more.
 
 
 
-Download & Install
-------------------
+Installation
+------------
 
 Requires macOS High Sierra (10.13) or higher.
 
-### Easy way
-Go to [releases](https://github.com/relikd/baRSS/releases) and downloaded the latest version.  
+```sh
+brew install --cask relikd/tap/barss
+xattr -d com.apple.quarantine /Applications/baRSS.app
+```
+
+or download from [releases](https://github.com/relikd/baRSS/releases/latest).
+
 Searching for the App Store release? Read this [notice](#app-store-notice).
+
 
 ### Build from source
 You'll need Xcode and [RSXML2].
@@ -49,10 +58,8 @@ git clone https://github.com/relikd/baRSS
 git clone https://github.com/relikd/RSXML2
 ```
 
-That's it. 
 Open `baRSS/baRSS.xcodeproj` and build the project. 
-Note, there are some compiler flags that append 'beta' to the development release. 
-If you prefer the optimized release version go to `Product > Archive`.
+For the release version, run `Product > Archive`.
 
 
 
@@ -61,10 +68,10 @@ Hidden options
 
 ### Launch on start / reboot
 
-baRSS has no option to launch it on start.
+baRSS has no option to launch on start.
 However, you can still add the application to auto boot by adding it to the system login items:
 
-`System Preferences > User > Login Items` (macOS 10.x-12)
+`System Preferences > User > Login Items` (macOS 10.x-12)  
 `System Preferences > General > Login Items & Extensions` (macOS 13+)
 
 
@@ -141,7 +148,7 @@ Further, I can't guarantee the App Store version wasn't modified by a malicious 
 ### Why create something that already existed?
 
 First, open source is awesome!
-Second, RSS Menu made some design decisions I didn't like.
+Second, my old reader, RSS Menu, made some design decisions I didn't like.
 For example, the new integrated browser window.
 
 One thing I liked most, was the fact that feeds were opened in the default browser.
